@@ -1,0 +1,19 @@
+{
+  "name": "net.narazaka.vrchat.avatar-menu-creater-for-ma",
+  "version": "1.1.2",
+  "displayName": "AvatarMenuCreaterForMA",
+  "description": "AvatarMenuCreater for Modular Avatar",
+  "author": {
+    "name": "Narazaka",
+    "url": "https://github.com/Narazaka"
+  },
+  "license": "Zlib",
+  "type": "tool",
+  "url" : "https://github.com/Narazaka/AvatarMenuCreaterForMA.git",
+  "vpmDependencies": {
+    "nadena.dev.modular-avatar": ">=1.0.0"
+  },
+  "legacyFolders": {
+    "Assets\\AvatarMenuCreaterForMA": "095273a7f0d90e54aa2e0b3b202fa526"
+  }
+}

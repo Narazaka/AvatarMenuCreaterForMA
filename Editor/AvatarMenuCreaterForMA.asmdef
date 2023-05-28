@@ -1,0 +1,17 @@
+{
+    "name": "AvatarMenuCreaterForMA",
+    "references": [
+        "GUID:fc900867c0f47cd49b6e2ae4ef907300"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": false,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
