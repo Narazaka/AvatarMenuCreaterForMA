@@ -1,0 +1,21 @@
+name: Build Package Listing
+
+on: 
+  workflow_dispatch:
+  workflow_run:
+    workflows: [Build Release]
+    types:
+      - completed
+  release:
+     types: [published, created, edited, unpublished, deleted, released]
+
+# Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+jobs:
+  
+  build-listing:
+    uses: Narazaka/vpm-repos/.github/workflows/build-package-listing.yml@main

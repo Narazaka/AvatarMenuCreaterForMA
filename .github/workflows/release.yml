@@ -1,0 +1,14 @@
+name: Build Release
+
+on: 
+  workflow_dispatch:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    uses: Narazaka/vpm-repos/.github/workflows/release.yml@main
