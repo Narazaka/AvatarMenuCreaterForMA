@@ -24,7 +24,7 @@ Modular Avatarでアバターのメニューを構成出来るようにする補
 ### unitypackageによる方法
 
 1. Modular Avatar https://modular-avatar.nadena.dev/ をインストールします。
-2. [Releaseページ](https://github.com/Narazaka/AvatarMenuCreaterForMA/releases/latest) から net.narazaka.vrchat.avatar-menu-creater-for-ma-\*.\*.\***-novcc**.zip をダウンロードし、アバタープロジェクトにインストールします。
+2. [Releaseページ](https://github.com/Narazaka/AvatarMenuCreaterForMA/releases/latest) から net.narazaka.vrchat.avatar-menu-creater-for-ma-\*.\*.\***-novcc**.zip をダウンロード＆解凍し、unitypackageをアバタープロジェクトにインストールします。
 
 ## 使い方
 
