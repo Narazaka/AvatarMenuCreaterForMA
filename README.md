@@ -13,7 +13,18 @@ Modular Avatarでアバターのメニューを構成出来るようにする補
 
 に対応しています。
 
-Modular Avatar ( https://modular-avatar.nadena.dev/ja/ ) を導入したあとでこれを導入して下さい。
+## インストール
+
+### ～1.1.1
+
+1. Modular Avatar https://modular-avatar.nadena.dev/ をインストールします。
+2. https://narazaka.booth.pm/items/4419509 からAvatarMenuCreaterForMAをダウンロードし、アバタープロジェクトにインストールします。
+
+### 1.1.2～
+
+1. https://vpm.narazaka.net/ から「Add to VCC」ボタンを押してリポジトリをVCCにインストールします。
+2. VCCでSettings→Packages→Installed Repositoriesの一覧中で「Narazaka VPM Listing」にチェックが付いていることを確認します。
+3. アバタープロジェクトの「Manage Project」から「AvatarMenuCreaterForMA」をインストールします。
 
 ## 使い方
 
