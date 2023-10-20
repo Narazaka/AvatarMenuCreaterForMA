@@ -72,6 +72,11 @@ namespace net.narazaka.avatarmenucreater
             GetWindow<AvatarMenuCreaterForMA>("AvatarMenuCreater for Modular Avatar");
         }
 
+        void Update()
+        {
+            Repaint();
+        }
+
         void OnGUI()
         {
             VRCAvatarDescriptor = EditorGUILayout.ObjectField("Avatar", VRCAvatarDescriptor, typeof(VRCAvatarDescriptor), true) as VRCAvatarDescriptor;
