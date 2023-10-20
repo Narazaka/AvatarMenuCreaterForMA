@@ -10,6 +10,16 @@ using nadena.dev.modular_avatar.core;
 
 namespace net.narazaka.avatarmenucreater
 {
+    enum IncludeAssetType
+    {
+        [InspectorName("全て個別に保存")]
+        Extract,
+        [InspectorName("prefabとanimator")]
+        AnimatorAndInclude,
+        [InspectorName("全てprefabに含める")]
+        Include,
+    }
+
     enum MenuType
     {
         [InspectorName("ON／OFF")]
@@ -54,6 +64,7 @@ namespace net.narazaka.avatarmenucreater
     {
         VRCAvatarDescriptor VRCAvatarDescriptor;
         MenuType MenuType = MenuType.Toggle;
+        IncludeAssetType IncludeAssetType = IncludeAssetType.AnimatorAndInclude;
         Dictionary<GameObject, ToggleType> ToggleObjects = new Dictionary<GameObject, ToggleType>();
         Dictionary<(GameObject, string), ToggleBlendShape> ToggleBlendShapes = new Dictionary<(GameObject, string), ToggleBlendShape>();
         Dictionary<(GameObject, string), ToggleBlendShape> ToggleShaderParameters = new Dictionary<(GameObject, string), ToggleBlendShape>();
@@ -169,6 +180,7 @@ namespace net.narazaka.avatarmenucreater
                 }
             }
 
+            IncludeAssetType = (IncludeAssetType)EditorGUILayout.EnumPopup("保存形式", IncludeAssetType);
             if (GUILayout.Button("Create!"))
             {
                 var basePath = EditorUtility.SaveFilePanelInProject("保存場所", "New Menu", "asset", "アセットの保存場所");
@@ -398,7 +410,9 @@ namespace net.narazaka.avatarmenucreater
             var matchGameObjects = new HashSet<GameObject>(gameObjects);
             // clip
             var active = new AnimationClip();
+            active.name = $"{baseName}_active";
             var inactive = new AnimationClip();
+            inactive.name = $"{baseName}_inactive";
             foreach (var gameObject in ToggleObjects.Keys)
             {
                 if (!matchGameObjects.Contains(gameObject)) continue;
@@ -425,13 +439,10 @@ namespace net.narazaka.avatarmenucreater
                 active.SetCurve(curvePath, typeof(SkinnedMeshRenderer), curveName, new AnimationCurve(new Keyframe(0 / 60.0f, value.Active)));
                 inactive.SetCurve(curvePath, typeof(SkinnedMeshRenderer), curveName, new AnimationCurve(new Keyframe(0 / 60.0f, value.Inactive)));
             }
-            AssetDatabase.CreateAsset(active, $"{basePath}_active.anim");
-            AssetDatabase.CreateAsset(inactive, $"{basePath}_inactive.anim");
             // controller
-            var controller = AnimatorController.CreateAnimatorControllerAtPath($"{basePath}.controller");
-            controller.parameters = new AnimatorControllerParameter[]{
-                new AnimatorControllerParameter { name = baseName, type = AnimatorControllerParameterType.Bool, defaultBool = false },
-            };
+            var controller = new AnimatorController();
+            controller.AddParameter(new AnimatorControllerParameter { name = baseName, type = AnimatorControllerParameterType.Bool, defaultBool = false });
+            if (controller.layers.Length == 0) controller.AddLayer(baseName);
             var layer = controller.layers[0];
             layer.name = baseName;
             layer.stateMachine.name = baseName;
@@ -466,8 +477,6 @@ namespace net.narazaka.avatarmenucreater
                     threshold = 1,
                 },
             };
-            // AssetDatabase.AddObjectToAsset(toActive, controller);
-            // AssetDatabase.AddObjectToAsset(toInactive, controller);
             // menu
             var menu = new VRCExpressionsMenu
             {
@@ -486,9 +495,14 @@ namespace net.narazaka.avatarmenucreater
                     },
                 },
             };
-            AssetDatabase.CreateAsset(menu, $"{basePath}.asset");
+            menu.name = baseName;
             // prefab
+            var prefabPath = $"{basePath}.prefab";
             var prefab = new GameObject(baseName);
+            PrefabUtility.SaveAsPrefabAsset(prefab, prefabPath);
+            DestroyImmediate(prefab);
+            SaveAssets(baseName, basePath, controller, new AnimationClip[] { active, inactive }, menu);
+            prefab = PrefabUtility.LoadPrefabContents(prefabPath);
             var menuInstaller = prefab.GetOrAddComponent<ModularAvatarMenuInstaller>();
             menuInstaller.menuToAppend = menu;
             var parameters = prefab.GetOrAddComponent<ModularAvatarParameters>();
@@ -504,8 +518,10 @@ namespace net.narazaka.avatarmenucreater
             mergeAnimator.layerType = VRCAvatarDescriptor.AnimLayerType.FX;
             mergeAnimator.pathMode = MergeAnimatorPathMode.Absolute;
             mergeAnimator.matchAvatarWriteDefaults = true;
-            PrefabUtility.SaveAsPrefabAsset(prefab, $"{basePath}.prefab");
-            DestroyImmediate(prefab);
+
+            PrefabUtility.SaveAsPrefabAsset(prefab, prefabPath);
+            PrefabUtility.UnloadPrefabContents(prefab);
+            AssetDatabase.SaveAssets();
         }
 
         void CreateRadialAssets(string baseName, string basePath, GameObject[] gameObjects)
@@ -513,6 +529,7 @@ namespace net.narazaka.avatarmenucreater
             var matchGameObjects = new HashSet<GameObject>(gameObjects);
             // clip
             var clip = new AnimationClip();
+            clip.name = baseName;
             foreach (var (gameObject, name) in RadialBlendShapes.Keys)
             {
                 if (!matchGameObjects.Contains(gameObject)) continue;
@@ -525,12 +542,10 @@ namespace net.narazaka.avatarmenucreater
                 var value = RadialShaderParameters[(gameObject, name)];
                 clip.SetCurve(Util.ChildPath(VRCAvatarDescriptor.gameObject, gameObject), typeof(SkinnedMeshRenderer), $"material.{name}", new AnimationCurve(new Keyframe(0 / 60.0f, value.Start), new Keyframe(1 / 60.0f, value.End)));
             }
-            AssetDatabase.CreateAsset(clip, $"{basePath}.anim");
             // controller
-            var controller = AnimatorController.CreateAnimatorControllerAtPath($"{basePath}.controller");
-            controller.parameters = new AnimatorControllerParameter[]{
-                new AnimatorControllerParameter { name = baseName, type = AnimatorControllerParameterType.Float, defaultFloat = RadialDefaultValue },
-            };
+            var controller = new AnimatorController();
+            controller.AddParameter(new AnimatorControllerParameter { name = baseName, type = AnimatorControllerParameterType.Float, defaultFloat = RadialDefaultValue });
+            if (controller.layers.Length == 0) controller.AddLayer(baseName);
             var layer = controller.layers[0];
             layer.name = baseName;
             layer.stateMachine.name = baseName;
@@ -558,9 +573,14 @@ namespace net.narazaka.avatarmenucreater
                     },
                 },
             };
-            AssetDatabase.CreateAsset(menu, $"{basePath}.asset");
+            menu.name = baseName;
             // prefab
+            var prefabPath = $"{basePath}.prefab";
             var prefab = new GameObject(baseName);
+            PrefabUtility.SaveAsPrefabAsset(prefab, prefabPath);
+            DestroyImmediate(prefab);
+            SaveAssets(baseName, basePath, controller, new AnimationClip[] { clip }, menu);
+            prefab = PrefabUtility.LoadPrefabContents(prefabPath);
             var menuInstaller = prefab.GetOrAddComponent<ModularAvatarMenuInstaller>();
             menuInstaller.menuToAppend = menu;
             var parameters = prefab.GetOrAddComponent<ModularAvatarParameters>();
@@ -575,8 +595,92 @@ namespace net.narazaka.avatarmenucreater
             mergeAnimator.layerType = VRCAvatarDescriptor.AnimLayerType.FX;
             mergeAnimator.pathMode = MergeAnimatorPathMode.Absolute;
             mergeAnimator.matchAvatarWriteDefaults = true;
-            PrefabUtility.SaveAsPrefabAsset(prefab, $"{basePath}.prefab");
-            DestroyImmediate(prefab);
+
+            PrefabUtility.SaveAsPrefabAsset(prefab, prefabPath);
+            PrefabUtility.UnloadPrefabContents(prefab);
+            AssetDatabase.SaveAssets();
+        }
+
+        void SaveAssets(string baseName, string basePath, AnimatorController controller, AnimationClip[] clips, VRCExpressionsMenu menu)
+        {
+            var prefabPath = $"{basePath}.prefab";
+            var controllerPath = $"{basePath}.controller";
+            if (IncludeAssetType == IncludeAssetType.Include)
+            {
+                AssetDatabase.AddObjectToAsset(menu, prefabPath);
+                foreach (var clip in clips)
+                {
+                    AssetDatabase.AddObjectToAsset(clip, prefabPath);
+                }
+                controller.name = baseName;
+                SaveAnimator(controller, prefabPath, true);
+            }
+            else if (IncludeAssetType == IncludeAssetType.AnimatorAndInclude)
+            {
+                AssetDatabase.AddObjectToAsset(menu, prefabPath);
+
+                SaveAnimator(controller, controllerPath);
+                foreach (var clip in clips)
+                {
+                    AssetDatabase.AddObjectToAsset(clip, controllerPath);
+                }
+            }
+            else
+            {
+                var basePathDir = System.IO.Path.GetDirectoryName(basePath);
+                AssetDatabase.CreateAsset(menu, $"{basePathDir}/{menu.name}.asset");
+                foreach (var clip in clips)
+                {
+                    AssetDatabase.CreateAsset(clip, $"{basePathDir}/{clip.name}.anim");
+                }
+                SaveAnimator(controller, controllerPath);
+            }
+        }
+
+        void SaveAnimator(AnimatorController controller, string path, bool isSubAsset = false)
+        {
+            if (isSubAsset)
+            {
+                AssetDatabase.AddObjectToAsset(controller, path);
+            }
+            else
+            {
+                AssetDatabase.CreateAsset(controller, path);
+            }
+
+            foreach (var l in controller.layers)
+            {
+                SaveStateMachine(l.stateMachine, path);
+            }
+        }
+
+        void SaveStateMachine(AnimatorStateMachine machine, string path)
+        {
+            machine.hideFlags = HideFlags.HideInHierarchy;
+            AssetDatabase.AddObjectToAsset(machine, path);
+            foreach (var s in machine.states)
+            {
+                AssetDatabase.AddObjectToAsset(s.state, path);
+                foreach (var t in s.state.transitions)
+                {
+                    t.hideFlags = HideFlags.HideInHierarchy;
+                    AssetDatabase.AddObjectToAsset(t, path);
+                }
+            }
+            foreach (var t in machine.entryTransitions)
+            {
+                t.hideFlags = HideFlags.HideInHierarchy;
+                AssetDatabase.AddObjectToAsset(t, path);
+            }
+            foreach (var t in machine.anyStateTransitions)
+            {
+                t.hideFlags = HideFlags.HideInHierarchy;
+                AssetDatabase.AddObjectToAsset(t, path);
+            }
+            foreach (var m in machine.stateMachines)
+            {
+                SaveStateMachine(m.stateMachine, path);
+            }
         }
     }
 
