@@ -42,11 +42,20 @@ namespace net.narazaka.avatarmenucreater
     {
         public float Inactive;
         public float Active;
+        public float TransitionOffsetPercent;
+        public float TransitionDurationPercent;
 
         public bool Equals(ToggleBlendShape other)
         {
-            return Inactive == other.Inactive && Active == other.Active;
+            return Inactive == other.Inactive && Active == other.Active && TransitionOffsetPercent == other.TransitionOffsetPercent && TransitionDurationPercent == other.TransitionDurationPercent;
         }
+
+        public float TransitionOffsetRate { get => TransitionOffsetPercent / 100f; }
+        public float TransitionDurationRate { get => TransitionDurationPercent / 100f; }
+        public float ActivateStartRate { get => TransitionOffsetRate; }
+        public float ActivateEndRate { get => TransitionOffsetRate + TransitionDurationRate; }
+        public float InactivateStartRate { get => 1f - ActivateEndRate; }
+        public float InactivateEndRate { get => 1f - ActivateStartRate; }
     }
 
     struct RadialBlendShape : System.IEquatable<RadialBlendShape>
@@ -309,7 +318,7 @@ namespace net.narazaka.avatarmenucreater
                 {
                     if (EditorGUILayout.ToggleLeft(name.Description, true))
                     {
-                        var newValue = new ToggleBlendShape();
+                        var newValue = new ToggleBlendShape { TransitionDurationPercent = 100 };
                         using (new EditorGUILayout.HorizontalScope())
                         {
                             EditorGUI.indentLevel++;
@@ -318,6 +327,18 @@ namespace net.narazaka.avatarmenucreater
                             newValue.Active = EditorGUILayout.FloatField("ON", value.Active, GUILayout.Width(100));
                             EditorGUIUtility.labelWidth = 0;
                             EditorGUI.indentLevel--;
+                        }
+                        if (TransitionSeconds > 0)
+                        {
+                            using (new EditorGUILayout.HorizontalScope())
+                            {
+                                EditorGUI.indentLevel++;
+                                EditorGUIUtility.labelWidth = 110;
+                                newValue.TransitionOffsetPercent = EditorGUILayout.FloatField("変化待機%", value.TransitionOffsetPercent, GUILayout.Width(140));
+                                newValue.TransitionDurationPercent = EditorGUILayout.FloatField("変化時間%", value.TransitionDurationPercent, GUILayout.Width(140));
+                                EditorGUIUtility.labelWidth = 0;
+                                EditorGUI.indentLevel--;
+                            }
                         }
                         if (!value.Equals(newValue))
                         {
@@ -330,6 +351,14 @@ namespace net.narazaka.avatarmenucreater
                             {
                                 if (newValue.Inactive > (float)maxValue) newValue.Inactive = (float)maxValue;
                                 if (newValue.Active > (float)maxValue) newValue.Active = (float)maxValue;
+                            }
+                            if (newValue.TransitionOffsetPercent < 0) newValue.TransitionOffsetPercent = 0;
+                            if (newValue.TransitionOffsetPercent > 100) newValue.TransitionOffsetPercent = 100;
+                            if (newValue.TransitionDurationPercent < 0) newValue.TransitionDurationPercent = 0;
+                            if (newValue.TransitionDurationPercent > 100) newValue.TransitionDurationPercent = 100;
+                            if (newValue.TransitionOffsetPercent + newValue.TransitionDurationPercent > 100)
+                            {
+                                newValue.TransitionDurationPercent = 100 - newValue.TransitionOffsetPercent;
                             }
 
                             toggles[key] = newValue;
@@ -344,7 +373,7 @@ namespace net.narazaka.avatarmenucreater
                 {
                     if (EditorGUILayout.ToggleLeft(name.Description, false))
                     {
-                        toggles[key] = new ToggleBlendShape { Inactive = 0, Active = defaultActiveValue };
+                        toggles[key] = new ToggleBlendShape { Inactive = 0, Active = defaultActiveValue, TransitionDurationPercent = 100 };
                     }
                 }
             }
@@ -448,8 +477,8 @@ namespace net.narazaka.avatarmenucreater
                 inactive.SetCurve(curvePath, typeof(SkinnedMeshRenderer), curveName, new AnimationCurve(new Keyframe(0 / 60.0f, value.Inactive)));
                 if (TransitionSeconds > 0)
                 {
-                    activate.SetCurve(curvePath, typeof(SkinnedMeshRenderer), curveName, new AnimationCurve(new Keyframe(0, value.Inactive), new Keyframe(TransitionSeconds, value.Active)));
-                    inactivate.SetCurve(curvePath, typeof(SkinnedMeshRenderer), curveName, new AnimationCurve(new Keyframe(0, value.Active), new Keyframe(TransitionSeconds, value.Inactive)));
+                    activate.SetCurve(curvePath, typeof(SkinnedMeshRenderer), curveName, new AnimationCurve(new Keyframe(TransitionSeconds * value.ActivateStartRate, value.Inactive), new Keyframe(TransitionSeconds * value.ActivateEndRate, value.Active)));
+                    inactivate.SetCurve(curvePath, typeof(SkinnedMeshRenderer), curveName, new AnimationCurve(new Keyframe(TransitionSeconds * value.InactivateStartRate, value.Active), new Keyframe(TransitionSeconds * value.InactivateEndRate, value.Inactive)));
                 }
             }
             foreach (var (gameObject, name) in ToggleShaderParameters.Keys)
@@ -462,8 +491,8 @@ namespace net.narazaka.avatarmenucreater
                 inactive.SetCurve(curvePath, typeof(SkinnedMeshRenderer), curveName, new AnimationCurve(new Keyframe(0 / 60.0f, value.Inactive)));
                 if (TransitionSeconds > 0)
                 {
-                    activate.SetCurve(curvePath, typeof(SkinnedMeshRenderer), curveName, new AnimationCurve(new Keyframe(0, value.Inactive), new Keyframe(TransitionSeconds, value.Active)));
-                    inactivate.SetCurve(curvePath, typeof(SkinnedMeshRenderer), curveName, new AnimationCurve(new Keyframe(0, value.Active), new Keyframe(TransitionSeconds, value.Inactive)));
+                    activate.SetCurve(curvePath, typeof(SkinnedMeshRenderer), curveName, new AnimationCurve(new Keyframe(TransitionSeconds * value.ActivateStartRate, value.Inactive), new Keyframe(TransitionSeconds * value.ActivateEndRate, value.Active)));
+                    inactivate.SetCurve(curvePath, typeof(SkinnedMeshRenderer), curveName, new AnimationCurve(new Keyframe(TransitionSeconds * value.InactivateStartRate, value.Active), new Keyframe(TransitionSeconds * value.InactivateEndRate, value.Inactive)));
                 }
             }
             // controller
