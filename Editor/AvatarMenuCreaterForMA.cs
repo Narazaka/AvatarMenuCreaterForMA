@@ -194,13 +194,21 @@ namespace net.narazaka.avatarmenucreater
 
                     TransitionSeconds = EditorGUILayout.FloatField("徐々に変化（秒数）", TransitionSeconds);
                     if (TransitionSeconds < 0) TransitionSeconds = 0;
-                    if (TransitionSeconds > 0 && ToggleBlendShapes.Count == 0 && ToggleShaderParameters.Count == 0)
+                    if (TransitionSeconds > 0)
                     {
-                        EditorGUILayout.HelpBox("徐々に変化するものの指定が有りません", MessageType.Warning);
+                        if (ToggleBlendShapes.Count == 0 && ToggleShaderParameters.Count == 0)
+                        {
+                            EditorGUILayout.HelpBox("徐々に変化するものの指定が有りません", MessageType.Warning);
+                        }
+                        else
+                        {
+                            EditorGUILayout.HelpBox("指定時間かけて変化します", MessageType.Info);
+                        }
                     }
 
                     foreach (var gameObject in gameObjects)
                     {
+                        EditorGUILayout.Space();
                         EditorGUILayout.LabelField(Util.ChildPath(VRCAvatarDescriptor.gameObject, gameObject));
                         EditorGUI.indentLevel++;
                         ShowToggleObjectControl(gameObject);
@@ -238,13 +246,21 @@ namespace net.narazaka.avatarmenucreater
                     EditorGUI.indentLevel--;
                     TransitionSeconds = EditorGUILayout.FloatField("徐々に変化（秒数）", TransitionSeconds);
                     if (TransitionSeconds < 0) TransitionSeconds = 0;
-                    if (TransitionSeconds > 0 && ChooseBlendShapes.Count == 0 && ChooseShaderParameters.Count == 0)
+                    if (TransitionSeconds > 0)
                     {
-                        EditorGUILayout.HelpBox("徐々に変化するものの指定が有りません", MessageType.Warning);
+                        if (ChooseBlendShapes.Count == 0 && ChooseShaderParameters.Count == 0)
+                        {
+                            EditorGUILayout.HelpBox("徐々に変化するものの指定が有りません", MessageType.Warning);
+                        }
+                        else
+                        {
+                            EditorGUILayout.HelpBox("指定時間かけて変化します", MessageType.Info);
+                        }
                     }
 
                     foreach (var gameObject in gameObjects)
                     {
+                        EditorGUILayout.Space();
                         EditorGUILayout.LabelField(Util.ChildPath(VRCAvatarDescriptor.gameObject, gameObject));
                         EditorGUI.indentLevel++;
                         if (FoldoutGameObjectHeader(gameObject, "GameObject"))
@@ -291,28 +307,27 @@ namespace net.narazaka.avatarmenucreater
                     if (RadialDefaultValue > 1) RadialDefaultValue = 1;
                     foreach (var gameObject in gameObjects)
                     {
+                        EditorGUILayout.Space();
                         var names = Util.GetBlendShapeNames(gameObject);
                         var parameters = ShaderParametersCache.GetFilteredShaderParameters(gameObject);
                         var path = Util.ChildPath(VRCAvatarDescriptor.gameObject, gameObject);
                         if (names.Count > 0 || parameters.Count > 0)
                         {
-                            if (FoldoutHeader(gameObject, path))
+                            EditorGUILayout.LabelField(path);
+                            EditorGUI.indentLevel++;
+                            if (names.Count > 0 && FoldoutBlendShapeHeader(gameObject, "BlendShapes"))
                             {
                                 EditorGUI.indentLevel++;
-                                if (names.Count > 0 && FoldoutBlendShapeHeader(gameObject, "BlendShapes"))
-                                {
-                                    EditorGUI.indentLevel++;
-                                    ShowRadialBlendShapeControl(gameObject, RadialBlendShapes, names.ToNames());
-                                    EditorGUI.indentLevel--;
-                                }
-                                if (parameters.Count > 0 && FoldoutShaderParameterHeader(gameObject, "Shader Parameters"))
-                                {
-                                    EditorGUI.indentLevel++;
-                                    ShowRadialBlendShapeControl(gameObject, RadialShaderParameters, parameters, 1, minValue: null, maxValue: null);
-                                    EditorGUI.indentLevel--;
-                                }
+                                ShowRadialBlendShapeControl(gameObject, RadialBlendShapes, names.ToNames());
                                 EditorGUI.indentLevel--;
                             }
+                            if (parameters.Count > 0 && FoldoutShaderParameterHeader(gameObject, "Shader Parameters"))
+                            {
+                                EditorGUI.indentLevel++;
+                                ShowRadialBlendShapeControl(gameObject, RadialShaderParameters, parameters, 1, minValue: null, maxValue: null);
+                                EditorGUI.indentLevel--;
+                            }
+                            EditorGUI.indentLevel--;
                         }
                         else
                         {
