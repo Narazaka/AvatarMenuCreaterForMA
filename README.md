@@ -8,7 +8,7 @@ Modular Avatarでアバターのメニューを構成出来るようにする補
 
 アバターのメニュー1項目をModular Avatarの1プレハブとして作成します。
 
-- オブジェクト・BlendShape・シェーダーパラメーターのトグル制御（Toggle）
+- オブジェクト・マテリアル・BlendShape・シェーダーパラメーターのトグル/選択肢制御（Toggle）
 - BlendShape・シェーダーパラメーターの無段階調整（Radial Puppet）
 
 に対応しています。
