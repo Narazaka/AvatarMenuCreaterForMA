@@ -102,6 +102,8 @@ namespace net.narazaka.avatarmenucreater
         HashSet<GameObject> FoldoutShaderParameters = new HashSet<GameObject>();
         Vector2 ScrollPosition;
 
+        Util.ShaderParametersCache ShaderParametersCache = new Util.ShaderParametersCache();
+
         [MenuItem("Tools/Modular Avatar/AvatarMenuCreater for Modular Avatar")]
         static void CreateWindow()
         {
@@ -153,7 +155,7 @@ namespace net.narazaka.avatarmenucreater
                         ShowToggleObjectControl(gameObject);
 
                         var names = Util.GetBlendShapeNames(gameObject);
-                        var parameters = Util.GetShaderParameters(gameObject).ToFlatUniqueShaderParameterValues().OnlyFloatLike().OrderDefault().ToList();
+                        var parameters = ShaderParametersCache.GetFilteredShaderParameters(gameObject);
                         if (names.Count > 0 && FoldoutBlendShapeHeader(gameObject, "BlendShapes"))
                         {
                             EditorGUI.indentLevel++;
@@ -210,7 +212,7 @@ namespace net.narazaka.avatarmenucreater
                         }
 
                         var names = Util.GetBlendShapeNames(gameObject);
-                        var parameters = Util.GetShaderParameters(gameObject).ToFlatUniqueShaderParameterValues().OnlyFloatLike().OrderDefault().ToList();
+                        var parameters = ShaderParametersCache.GetFilteredShaderParameters(gameObject);
                         if (names.Count > 0 && FoldoutBlendShapeHeader(gameObject, "BlendShapes"))
                         {
                             EditorGUI.indentLevel++;
@@ -239,7 +241,7 @@ namespace net.narazaka.avatarmenucreater
                     foreach (var gameObject in gameObjects)
                     {
                         var names = Util.GetBlendShapeNames(gameObject);
-                        var parameters = Util.GetShaderParameters(gameObject).ToFlatUniqueShaderParameterValues().OnlyFloatLike().OrderDefault().ToList();
+                        var parameters = ShaderParametersCache.GetFilteredShaderParameters(gameObject);
                         var path = Util.ChildPath(VRCAvatarDescriptor.gameObject, gameObject);
                         if (names.Count > 0 || parameters.Count > 0)
                         {
@@ -1239,7 +1241,65 @@ namespace net.narazaka.avatarmenucreater
         {
             public int Index;
             public Material Material;
+            public Shader Shader;
             public List<ShaderParameter> ShaderParameters;
+        }
+
+        public class ShaderParametersCache
+        {
+            Dictionary<GameObject, List<MaterialShaderDescription>> All = new Dictionary<GameObject, List<MaterialShaderDescription>>();
+            Dictionary<GameObject, List<ShaderParameter>> Filtered = new Dictionary<GameObject, List<ShaderParameter>>();
+
+            public void Clear()
+            {
+                All.Clear();
+                Filtered.Clear();
+            }
+
+            public List<MaterialShaderDescription> GetShaderParameters(GameObject gameObject)
+            {
+                var renderer = gameObject.GetComponent<Renderer>();
+                if (renderer == null) return new List<MaterialShaderDescription>();
+                if (All.TryGetValue(gameObject, out var descriptions))
+                {
+                    if (Valid(renderer, descriptions))
+                    {
+                        return descriptions;
+                    }
+                }
+                descriptions = Util.GetShaderParameters(gameObject).ToList();
+                All[gameObject] = descriptions;
+                return descriptions;
+            }
+
+            public List<ShaderParameter> GetFilteredShaderParameters(GameObject gameObject)
+            {
+                var renderer = gameObject.GetComponent<Renderer>();
+                if (renderer == null) return new List<ShaderParameter>();
+                if (All.TryGetValue(gameObject, out var descriptions))
+                {
+                    if (Valid(renderer, descriptions))
+                    {
+                        if (Filtered.TryGetValue(gameObject, out var filtered))
+                        {
+                            return filtered;
+                        }
+                    }
+                }
+                return (Filtered[gameObject] = GetShaderParameters(gameObject).ToFlatUniqueShaderParameterValues().OnlyFloatLike().OrderDefault().ToList());
+            }
+
+            bool Valid(Renderer renderer, List<MaterialShaderDescription> descriptions)
+            {
+                var materials = renderer.sharedMaterials;
+                if (descriptions.Count != materials.Length) return false;
+                for (var i = 0; i < descriptions.Count; ++i)
+                {
+                    if (descriptions[i].Material != materials[i]) return false;
+                    if (descriptions[i].Shader != materials[i].shader) return false;
+                }
+                return true;
+            }
         }
 
         public static IEnumerable<MaterialShaderDescription> GetShaderParameters(GameObject gameObject)
@@ -1250,6 +1310,7 @@ namespace net.narazaka.avatarmenucreater
             {
                 Index = i,
                 Material = mat,
+                Shader = mat.shader,
                 ShaderParameters = GetShaderParameters(mat.shader).ToList(),
             });
         }
