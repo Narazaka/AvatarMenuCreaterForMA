@@ -80,6 +80,7 @@ namespace net.narazaka.avatarmenucreater
         Dictionary<(GameObject, string), ToggleBlendShape> ToggleBlendShapes = new Dictionary<(GameObject, string), ToggleBlendShape>();
         Dictionary<(GameObject, string), ToggleBlendShape> ToggleShaderParameters = new Dictionary<(GameObject, string), ToggleBlendShape>();
         Dictionary<GameObject, int> ChooseObjects = new Dictionary<GameObject, int>();
+        Dictionary<(GameObject, int), Dictionary<int, Material>> ChooseMaterials = new Dictionary<(GameObject, int), Dictionary<int, Material>>();
         Dictionary<(GameObject, string), Dictionary<int, float>> ChooseBlendShapes = new Dictionary<(GameObject, string), Dictionary<int, float>>();
         Dictionary<(GameObject, string), Dictionary<int, float>> ChooseShaderParameters = new Dictionary<(GameObject, string), Dictionary<int, float>>();
         Dictionary<(GameObject, string), RadialBlendShape> RadialBlendShapes = new Dictionary<(GameObject, string), RadialBlendShape>();
@@ -91,6 +92,7 @@ namespace net.narazaka.avatarmenucreater
 
         HashSet<GameObject> Foldouts = new HashSet<GameObject>();
         HashSet<GameObject> FoldoutGameObjects = new HashSet<GameObject>();
+        HashSet<GameObject> FoldoutMaterials = new HashSet<GameObject>();
         HashSet<GameObject> FoldoutBlendShapes = new HashSet<GameObject>();
         HashSet<GameObject> FoldoutShaderParameters = new HashSet<GameObject>();
         Vector2 ScrollPosition;
@@ -191,6 +193,14 @@ namespace net.narazaka.avatarmenucreater
                         {
                             EditorGUI.indentLevel++;
                             ShowChooseObjectControl(gameObject);
+                            EditorGUI.indentLevel--;
+                        }
+
+                        var materials = Util.GetMaterialSlots(gameObject);
+                        if (materials.Length > 0 && FoldoutMaterialHeader(gameObject, "Materials"))
+                        {
+                            EditorGUI.indentLevel++;
+                            ShowChooseMaterialControl(gameObject, materials);
                             EditorGUI.indentLevel--;
                         }
 
@@ -312,6 +322,24 @@ namespace net.narazaka.avatarmenucreater
             return newFoldout;
         }
 
+        bool FoldoutMaterialHeader(GameObject gameObject, string title)
+        {
+            var foldout = FoldoutMaterials.Contains(gameObject);
+            var newFoldout = EditorGUILayout.Foldout(foldout, title);
+            if (newFoldout != foldout)
+            {
+                if (newFoldout)
+                {
+                    FoldoutMaterials.Add(gameObject);
+                }
+                else
+                {
+                    FoldoutMaterials.Remove(gameObject);
+                }
+            }
+            return newFoldout;
+        }
+
         bool FoldoutBlendShapeHeader(GameObject gameObject, string title)
         {
             var foldout = FoldoutBlendShapes.Contains(gameObject);
@@ -379,7 +407,6 @@ namespace net.narazaka.avatarmenucreater
             }
 
         }
-
 
         void ShowToggleBlendShapeControl(
             GameObject gameObject,
@@ -482,6 +509,58 @@ namespace net.narazaka.avatarmenucreater
                 {
                     ChooseObjects[gameObject] = newIndex;
                 }
+            }
+        }
+
+        void ShowChooseMaterialControl(GameObject gameObject, Material[] materials)
+        {
+            for (var i = 0; i < materials.Length; ++i)
+            {
+                var key = (gameObject, i);
+                Dictionary<int, Material> values;
+                if (ChooseMaterials.TryGetValue(key, out values))
+                {
+                    if (ShowChooseMaterialToggle(i, materials[i], true))
+                    {
+                        EditorGUI.indentLevel++;
+                        for (var j = 0; j < ChooseCount; ++j)
+                        {
+                            var value = values.ContainsKey(j) ? values[j] : null;
+                            var newValue = EditorGUILayout.ObjectField(ChooseNames.ContainsKey(j) ? ChooseNames[j] : $"選択肢{j}", value, typeof(Material), false) as Material;
+                            if (value != newValue)
+                            {
+                                values[j] = newValue;
+                            }
+                        }
+                        EditorGUI.indentLevel--;
+                    }
+                    else
+                    {
+                        ChooseMaterials.Remove(key);
+                    }
+                }
+                else
+                {
+                    if (ShowChooseMaterialToggle(i, materials[i], false))
+                    {
+                        ChooseMaterials[key] = new Dictionary<int, Material>();
+                    }
+                }
+            }
+        }
+
+        bool ShowChooseMaterialToggle(int index, Material material, bool value)
+        {
+            using (new EditorGUILayout.HorizontalScope())
+            {
+                EditorGUIUtility.labelWidth = 40;
+                var result = EditorGUILayout.ToggleLeft($"[{index}]", value, GUILayout.Width(80));
+                EditorGUIUtility.labelWidth = 0;
+                using (new EditorGUI.DisabledGroupScope(true))
+                {
+                    EditorGUILayout.ObjectField(material, typeof(Material), false);
+                }
+                return result;
             }
         }
 
@@ -801,6 +880,17 @@ namespace net.narazaka.avatarmenucreater
                     choices[i].SetCurve(curvePath, typeof(GameObject), "m_IsActive", new AnimationCurve(new Keyframe(0, i == ChooseObjects[gameObject] ? 1 : 0)));
                 }
             }
+            foreach (var (gameObject, index) in ChooseMaterials.Keys)
+            {
+                if (!matchGameObjects.Contains(gameObject)) continue;
+                var value = ChooseMaterials[(gameObject, index)];
+                var curvePath = Util.ChildPath(VRCAvatarDescriptor.gameObject, gameObject);
+                var curveName = $"m_Materials.Array.data[{index}]";
+                for (var i = 0; i < ChooseCount; ++i)
+                {
+                    AnimationUtility.SetObjectReferenceCurve(choices[i], EditorCurveBinding.PPtrCurve(curvePath, typeof(SkinnedMeshRenderer), curveName), new ObjectReferenceKeyframe[] { new ObjectReferenceKeyframe { time = 0, value = value.ContainsKey(i) ? value[i] : null } });
+                }
+            }
             foreach (var (gameObject, name) in ChooseBlendShapes.Keys)
             {
                 if (!matchGameObjects.Contains(gameObject)) continue;
@@ -1102,6 +1192,13 @@ namespace net.narazaka.avatarmenucreater
             }
             paths.Reverse();
             return string.Join("/", paths.ToArray());
+        }
+
+        public static Material[] GetMaterialSlots(GameObject gameObject)
+        {
+            var renderer = gameObject.GetComponent<Renderer>();
+            if (renderer == null) return new Material[0];
+            return renderer.sharedMaterials;
         }
 
         public static List<string> GetBlendShapeNames(GameObject gameObject)
