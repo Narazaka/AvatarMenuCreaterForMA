@@ -52,6 +52,33 @@ namespace net.narazaka.avatarmenucreater
             return Inactive == other.Inactive && Active == other.Active && TransitionOffsetPercent == other.TransitionOffsetPercent && TransitionDurationPercent == other.TransitionDurationPercent;
         }
 
+        public string ChangedProp(ToggleBlendShape other)
+        {
+            if (Inactive != other.Inactive) return nameof(Inactive);
+            if (Active != other.Active) return nameof(Active);
+            if (TransitionOffsetPercent != other.TransitionOffsetPercent) return nameof(TransitionOffsetPercent);
+            if (TransitionDurationPercent != other.TransitionDurationPercent) return nameof(TransitionDurationPercent);
+            return "";
+        }
+
+        public float GetProp(string name)
+        {
+            if (name == nameof(Inactive)) return Inactive;
+            if (name == nameof(Active)) return Active;
+            if (name == nameof(TransitionOffsetPercent)) return TransitionOffsetPercent;
+            if (name == nameof(TransitionDurationPercent)) return TransitionDurationPercent;
+            return 0;
+        }
+
+        public ToggleBlendShape SetProp(string name, float value)
+        {
+            if (name == nameof(Inactive)) Inactive = value;
+            if (name == nameof(Active)) Active = value;
+            if (name == nameof(TransitionOffsetPercent)) TransitionOffsetPercent = value;
+            if (name == nameof(TransitionDurationPercent)) TransitionDurationPercent = value;
+            return this;
+        }
+
         public float TransitionOffsetRate { get => TransitionOffsetPercent / 100f; }
         public float TransitionDurationRate { get => TransitionDurationPercent / 100f; }
         public float ActivateStartRate { get => TransitionOffsetRate; }
@@ -68,6 +95,27 @@ namespace net.narazaka.avatarmenucreater
         public bool Equals(RadialBlendShape other)
         {
             return Start == other.Start && End == other.End;
+        }
+
+        public string ChangedProp(RadialBlendShape other)
+        {
+            if (Start != other.Start) return nameof(Start);
+            if (End != other.End) return nameof(End);
+            return "";
+        }
+
+        public float GetProp(string name)
+        {
+            if (name == nameof(Start)) return Start;
+            if (name == nameof(End)) return End;
+            return 0;
+        }
+
+        public RadialBlendShape SetProp(string name, float value)
+        {
+            if (name == nameof(Start)) Start = value;
+            if (name == nameof(End)) End = value;
+            return this;
         }
     }
 
@@ -94,6 +142,8 @@ namespace net.narazaka.avatarmenucreater
             if (ChooseNames.ContainsKey(index)) return ChooseNames[index];
             return $"選択肢{index}";
         }
+
+        bool BulkSet;
 
         HashSet<GameObject> Foldouts = new HashSet<GameObject>();
         HashSet<GameObject> FoldoutGameObjects = new HashSet<GameObject>();
@@ -134,6 +184,7 @@ namespace net.narazaka.avatarmenucreater
             }
 
             MenuType = (MenuType)EditorGUILayout.EnumPopup(MenuType);
+            BulkSet = EditorGUILayout.ToggleLeft("同名パラメーターや同マテリアルスロットを一括設定", BulkSet);
 
             if (MenuType == MenuType.Toggle)
             {
@@ -476,6 +527,10 @@ namespace net.narazaka.avatarmenucreater
                             }
 
                             toggles[key] = newValue;
+                            if (BulkSet)
+                            {
+                                BulkSetToggleBlendShape(toggles, name.Name, newValue, value.ChangedProp(newValue));
+                            }
                         }
                     }
                     else
@@ -490,6 +545,22 @@ namespace net.narazaka.avatarmenucreater
                         toggles[key] = new ToggleBlendShape { Inactive = 0, Active = defaultActiveValue, TransitionDurationPercent = 100 };
                     }
                 }
+            }
+        }
+
+        void BulkSetToggleBlendShape(Dictionary<(GameObject, string), ToggleBlendShape> toggles, string toggleName, ToggleBlendShape toggleBlendShape, string changedProp)
+        {
+            var matches = new List<(GameObject, string)>();
+            foreach (var (gameObject, name) in toggles.Keys)
+            {
+                if (name == toggleName)
+                {
+                    matches.Add((gameObject, name));
+                }
+            }
+            foreach (var key in matches)
+            {
+                toggles[key] = toggles[key].SetProp(changedProp, toggleBlendShape.GetProp(changedProp));
             }
         }
 
@@ -537,6 +608,10 @@ namespace net.narazaka.avatarmenucreater
                             if (value != newValue)
                             {
                                 values[j] = newValue;
+                                if (BulkSet)
+                                {
+                                    SetBulkChooseMaterial(materials[i], j, newValue);
+                                }
                             }
                         }
                         EditorGUI.indentLevel--;
@@ -568,6 +643,19 @@ namespace net.narazaka.avatarmenucreater
                     EditorGUILayout.ObjectField(material, typeof(Material), false);
                 }
                 return result;
+            }
+        }
+
+        void SetBulkChooseMaterial(Material sourceMaterial, int choiseIndex, Material choiceMaterial)
+        {
+            foreach (var (gameObject, index) in ChooseMaterials.Keys)
+            {
+                var materials = Util.GetMaterialSlots(gameObject);
+                if (index < materials.Length && materials[index] == sourceMaterial)
+                {
+                    var values = ChooseMaterials[(gameObject, index)];
+                    values[choiseIndex] = choiceMaterial;
+                }
             }
         }
 
@@ -604,6 +692,10 @@ namespace net.narazaka.avatarmenucreater
                                     if (newValue > (float)maxValue) newValue = (float)maxValue;
                                 }
                                 values[i] = newValue;
+                                if (BulkSet)
+                                {
+                                    BulkSetChooseBlendShape(choices, name.Name, i, newValue);
+                                }
                             }
                         }
                         EditorGUI.indentLevel--;
@@ -619,6 +711,17 @@ namespace net.narazaka.avatarmenucreater
                     {
                         choices[key] = new Dictionary<int, float>();
                     }
+                }
+            }
+        }
+
+        void BulkSetChooseBlendShape(Dictionary<(GameObject, string), Dictionary<int, float>> choices, string toggleName, int choiseIndex, float choiceValue)
+        {
+            foreach (var (gameObject, name) in choices.Keys)
+            {
+                if (name == toggleName)
+                {
+                    choices[(gameObject, name)][choiseIndex] = choiceValue; 
                 }
             }
         }
@@ -669,6 +772,10 @@ namespace net.narazaka.avatarmenucreater
                             }
 
                             radials[key] = newValue;
+                            if (BulkSet)
+                            {
+                                BulkSetRadialBlendShape(radials, name.Name, newValue, value.ChangedProp(newValue));
+                            }
                         }
                     }
                     else
@@ -683,6 +790,22 @@ namespace net.narazaka.avatarmenucreater
                         radials[key] = new RadialBlendShape { Start = 0, End = defaultEndValue };
                     }
                 }
+            }
+        }
+
+        void BulkSetRadialBlendShape(Dictionary<(GameObject, string), RadialBlendShape> radials, string radialName, RadialBlendShape radialBlendShape, string changedProp)
+        {
+            var matches = new List<(GameObject, string)>();
+            foreach (var (gameObject, name) in radials.Keys)
+            {
+                if (name == radialName)
+                {
+                    matches.Add((gameObject, name));
+                }
+            }
+            foreach (var key in matches)
+            {
+                radials[key] = radials[key].SetProp(changedProp, radialBlendShape.GetProp(changedProp));
             }
         }
 
