@@ -89,6 +89,11 @@ namespace net.narazaka.avatarmenucreater
         float TransitionSeconds;
         int ChooseCount = 2;
         Dictionary<int, string> ChooseNames = new Dictionary<int, string>();
+        string ChooseName(int index)
+        {
+            if (ChooseNames.ContainsKey(index)) return ChooseNames[index];
+            return $"選択肢{index}";
+        }
 
         HashSet<GameObject> Foldouts = new HashSet<GameObject>();
         HashSet<GameObject> FoldoutGameObjects = new HashSet<GameObject>();
@@ -175,7 +180,7 @@ namespace net.narazaka.avatarmenucreater
                     EditorGUI.indentLevel++;
                     for (var i = 0; i < ChooseCount; ++i)
                     {
-                        ChooseNames[i] = EditorGUILayout.TextField($"選択肢{i}", ChooseNames.ContainsKey(i) ? ChooseNames[i] : $"選択肢{i}");
+                        ChooseNames[i] = EditorGUILayout.TextField($"選択肢{i}", ChooseName(i));
                     }
                     EditorGUI.indentLevel--;
                     TransitionSeconds = EditorGUILayout.FloatField("徐々に変化（秒数）", TransitionSeconds);
@@ -497,7 +502,7 @@ namespace net.narazaka.avatarmenucreater
             if (EditorGUILayout.ToggleLeft($"制御しない", index == -1) && index != -1) newIndex = -1;
             for (var i = 0; i < ChooseCount; i++)
             {
-                if (EditorGUILayout.ToggleLeft(ChooseNames.ContainsKey(i) ? ChooseNames[i] :  $"選択肢{i}", index == i) && index != i) newIndex = i;
+                if (EditorGUILayout.ToggleLeft(ChooseName(i), index == i) && index != i) newIndex = i;
             }
             if (index != newIndex)
             {
@@ -526,7 +531,7 @@ namespace net.narazaka.avatarmenucreater
                         for (var j = 0; j < ChooseCount; ++j)
                         {
                             var value = values.ContainsKey(j) ? values[j] : null;
-                            var newValue = EditorGUILayout.ObjectField(ChooseNames.ContainsKey(j) ? ChooseNames[j] : $"選択肢{j}", value, typeof(Material), false) as Material;
+                            var newValue = EditorGUILayout.ObjectField(ChooseName(j), value, typeof(Material), false) as Material;
                             if (value != newValue)
                             {
                                 values[j] = newValue;
@@ -584,7 +589,7 @@ namespace net.narazaka.avatarmenucreater
                         for (var i = 0; i < ChooseCount; ++i)
                         {
                             var value = values.ContainsKey(i) ? values[i] : 0;
-                            var newValue = EditorGUILayout.FloatField(ChooseNames.ContainsKey(i) ? ChooseNames[i] : $"選択肢{i}", value);
+                            var newValue = EditorGUILayout.FloatField(ChooseName(i), value);
 
                             if (value != newValue)
                             {
@@ -950,7 +955,7 @@ namespace net.narazaka.avatarmenucreater
             var menu = new VRCExpressionsMenu
             {
                 controls = Enumerable.Range(0, ChooseCount).Select(i => new VRCExpressionsMenu.Control {
-                    name = ChooseNames.ContainsKey(i) ? ChooseNames[i] : $"選択肢{i}",
+                    name = ChooseName(i),
                     type = VRCExpressionsMenu.Control.ControlType.Toggle,
                     parameter = new VRCExpressionsMenu.Control.Parameter
                     {
