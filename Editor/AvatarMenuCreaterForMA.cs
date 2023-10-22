@@ -24,6 +24,8 @@ namespace net.narazaka.avatarmenucreater
     {
         [InspectorName("ON／OFF")]
         Toggle,
+        [InspectorName("選択式")]
+        Choose,
         [InspectorName("無段階制御")]
         Slider,
     }
@@ -77,12 +79,18 @@ namespace net.narazaka.avatarmenucreater
         Dictionary<GameObject, ToggleType> ToggleObjects = new Dictionary<GameObject, ToggleType>();
         Dictionary<(GameObject, string), ToggleBlendShape> ToggleBlendShapes = new Dictionary<(GameObject, string), ToggleBlendShape>();
         Dictionary<(GameObject, string), ToggleBlendShape> ToggleShaderParameters = new Dictionary<(GameObject, string), ToggleBlendShape>();
+        Dictionary<GameObject, int> ChooseObjects = new Dictionary<GameObject, int>();
+        Dictionary<(GameObject, string), Dictionary<int, float>> ChooseBlendShapes = new Dictionary<(GameObject, string), Dictionary<int, float>>();
+        Dictionary<(GameObject, string), Dictionary<int, float>> ChooseShaderParameters = new Dictionary<(GameObject, string), Dictionary<int, float>>();
         Dictionary<(GameObject, string), RadialBlendShape> RadialBlendShapes = new Dictionary<(GameObject, string), RadialBlendShape>();
         Dictionary<(GameObject, string), RadialBlendShape> RadialShaderParameters = new Dictionary<(GameObject, string), RadialBlendShape>();
         float RadialDefaultValue;
         float TransitionSeconds;
+        int ChooseCount = 2;
+        Dictionary<int, string> ChooseNames = new Dictionary<int, string>();
 
         HashSet<GameObject> Foldouts = new HashSet<GameObject>();
+        HashSet<GameObject> FoldoutGameObjects = new HashSet<GameObject>();
         HashSet<GameObject> FoldoutBlendShapes = new HashSet<GameObject>();
         HashSet<GameObject> FoldoutShaderParameters = new HashSet<GameObject>();
         Vector2 ScrollPosition;
@@ -155,6 +163,55 @@ namespace net.narazaka.avatarmenucreater
                     }
                 }
             }
+            else if (MenuType == MenuType.Choose)
+            {
+                using (var scrollView = new EditorGUILayout.ScrollViewScope(ScrollPosition))
+                {
+                    ScrollPosition = scrollView.scrollPosition;
+
+                    ChooseCount = EditorGUILayout.IntField("選択肢の数", ChooseCount);
+                    EditorGUI.indentLevel++;
+                    for (var i = 0; i < ChooseCount; ++i)
+                    {
+                        ChooseNames[i] = EditorGUILayout.TextField($"選択肢{i}", ChooseNames.ContainsKey(i) ? ChooseNames[i] : $"選択肢{i}");
+                    }
+                    EditorGUI.indentLevel--;
+                    TransitionSeconds = EditorGUILayout.FloatField("徐々に変化（秒数）", TransitionSeconds);
+                    if (TransitionSeconds < 0) TransitionSeconds = 0;
+                    if (TransitionSeconds > 0 && ChooseBlendShapes.Count == 0 && ChooseShaderParameters.Count == 0)
+                    {
+                        EditorGUILayout.HelpBox("徐々に変化するものの指定が有りません", MessageType.Warning);
+                    }
+
+                    foreach (var gameObject in gameObjects)
+                    {
+                        EditorGUILayout.LabelField(Util.ChildPath(VRCAvatarDescriptor.gameObject, gameObject));
+                        EditorGUI.indentLevel++;
+                        if (FoldoutGameObjectHeader(gameObject, "GameObject"))
+                        {
+                            EditorGUI.indentLevel++;
+                            ShowChooseObjectControl(gameObject);
+                            EditorGUI.indentLevel--;
+                        }
+
+                        var names = Util.GetBlendShapeNames(gameObject);
+                        var parameters = Util.GetShaderParameters(gameObject).ToFlatUniqueShaderParameterValues().OnlyFloatLike().OrderDefault().ToList();
+                        if (names.Count > 0 && FoldoutBlendShapeHeader(gameObject, "BlendShapes"))
+                        {
+                            EditorGUI.indentLevel++;
+                            ShowChooseBlendShapeControl(gameObject, ChooseBlendShapes, names.ToNames());
+                            EditorGUI.indentLevel--;
+                        }
+                        if (parameters.Count > 0 && FoldoutShaderParameterHeader(gameObject, "Shader Parameters"))
+                        {
+                            EditorGUI.indentLevel++;
+                            ShowChooseBlendShapeControl(gameObject, ChooseShaderParameters, parameters, minValue: null, maxValue: null);
+                            EditorGUI.indentLevel--;
+                        }
+                        EditorGUI.indentLevel--;
+                    }
+                }
+            }
             else
             {
                 RadialDefaultValue = EditorGUILayout.FloatField("パラメーター初期値", RadialDefaultValue);
@@ -208,6 +265,10 @@ namespace net.narazaka.avatarmenucreater
                 {
                     CreateToggleAssets(baseName, basePath, gameObjects);
                 }
+                else if (MenuType == MenuType.Choose)
+                {
+                    CreateChooseAssets(baseName, basePath, gameObjects);
+                }
                 else
                 {
                     CreateRadialAssets(baseName, basePath, gameObjects);
@@ -228,6 +289,24 @@ namespace net.narazaka.avatarmenucreater
                 else
                 {
                     Foldouts.Remove(gameObject);
+                }
+            }
+            return newFoldout;
+        }
+
+        bool FoldoutGameObjectHeader(GameObject gameObject, string title)
+        {
+            var foldout = FoldoutGameObjects.Contains(gameObject);
+            var newFoldout = EditorGUILayout.Foldout(foldout, title);
+            if (newFoldout != foldout)
+            {
+                if (newFoldout)
+                {
+                    FoldoutGameObjects.Add(gameObject);
+                }
+                else
+                {
+                    FoldoutGameObjects.Remove(gameObject);
                 }
             }
             return newFoldout;
@@ -300,6 +379,7 @@ namespace net.narazaka.avatarmenucreater
             }
 
         }
+
 
         void ShowToggleBlendShapeControl(
             GameObject gameObject,
@@ -374,6 +454,84 @@ namespace net.narazaka.avatarmenucreater
                     if (EditorGUILayout.ToggleLeft(name.Description, false))
                     {
                         toggles[key] = new ToggleBlendShape { Inactive = 0, Active = defaultActiveValue, TransitionDurationPercent = 100 };
+                    }
+                }
+            }
+        }
+
+        void ShowChooseObjectControl(GameObject gameObject)
+        {
+            int index;
+            if (!ChooseObjects.TryGetValue(gameObject, out index))
+            {
+                index = -1;
+            }
+            var newIndex = index;
+            if (EditorGUILayout.ToggleLeft($"制御しない", index == -1) && index != -1) newIndex = -1;
+            for (var i = 0; i < ChooseCount; i++)
+            {
+                if (EditorGUILayout.ToggleLeft(ChooseNames.ContainsKey(i) ? ChooseNames[i] :  $"選択肢{i}", index == i) && index != i) newIndex = i;
+            }
+            if (index != newIndex)
+            {
+                if (newIndex == -1)
+                {
+                    ChooseObjects.Remove(gameObject);
+                }
+                else
+                {
+                    ChooseObjects[gameObject] = newIndex;
+                }
+            }
+        }
+
+        void ShowChooseBlendShapeControl(
+            GameObject gameObject,
+            Dictionary<(GameObject, string), Dictionary<int, float>> choices,
+            IEnumerable<Util.INameAndDescription> names,
+            float? minValue = 0,
+            float? maxValue = 100
+            )
+        {
+            foreach (var name in names)
+            {
+                var key = (gameObject, name.Name);
+                Dictionary<int, float> values;
+                if (choices.TryGetValue(key, out values))
+                {
+                    if (EditorGUILayout.ToggleLeft(name.Description, true))
+                    {
+                        EditorGUI.indentLevel++;
+                        for (var i = 0; i < ChooseCount; ++i)
+                        {
+                            var value = values.ContainsKey(i) ? values[i] : 0;
+                            var newValue = EditorGUILayout.FloatField(ChooseNames.ContainsKey(i) ? ChooseNames[i] : $"選択肢{i}", value);
+
+                            if (value != newValue)
+                            {
+                                if (minValue != null)
+                                {
+                                    if (newValue < (float)minValue) newValue = (float)minValue;
+                                }
+                                if (maxValue != null)
+                                {
+                                    if (newValue > (float)maxValue) newValue = (float)maxValue;
+                                }
+                                values[i] = newValue;
+                            }
+                        }
+                        EditorGUI.indentLevel--;
+                    }
+                    else
+                    {
+                        choices.Remove(key);
+                    }
+                }
+                else
+                {
+                    if (EditorGUILayout.ToggleLeft(name.Description, false))
+                    {
+                        choices[key] = new Dictionary<int, float>();
                     }
                 }
             }
@@ -628,6 +786,139 @@ namespace net.narazaka.avatarmenucreater
             AssetDatabase.SaveAssets();
         }
 
+
+        void CreateChooseAssets(string baseName, string basePath, GameObject[] gameObjects)
+        {
+            var matchGameObjects = new HashSet<GameObject>(gameObjects);
+            // clip
+            var choices = Enumerable.Range(0, ChooseCount).Select(i => new AnimationClip { name = $"{baseName}_{i}" }).ToList();
+            foreach (var gameObject in ChooseObjects.Keys)
+            {
+                if (!matchGameObjects.Contains(gameObject)) continue;
+                var curvePath = Util.ChildPath(VRCAvatarDescriptor.gameObject, gameObject);
+                for (var i = 0; i < ChooseCount; ++i)
+                {
+                    choices[i].SetCurve(curvePath, typeof(GameObject), "m_IsActive", new AnimationCurve(new Keyframe(0, i == ChooseObjects[gameObject] ? 1 : 0)));
+                }
+            }
+            foreach (var (gameObject, name) in ChooseBlendShapes.Keys)
+            {
+                if (!matchGameObjects.Contains(gameObject)) continue;
+                var value = ChooseBlendShapes[(gameObject, name)];
+                var curvePath = Util.ChildPath(VRCAvatarDescriptor.gameObject, gameObject);
+                var curveName = $"blendShape.{name}";
+                for (var i = 0; i < ChooseCount; ++i)
+                {
+                    choices[i].SetCurve(curvePath, typeof(SkinnedMeshRenderer), curveName, new AnimationCurve(new Keyframe(0, value.ContainsKey(i) ? value[i] : 0)));
+                }
+            }
+            foreach (var (gameObject, name) in ChooseShaderParameters.Keys)
+            {
+                if (!matchGameObjects.Contains(gameObject)) continue;
+                var value = ChooseShaderParameters[(gameObject, name)];
+                var curvePath = Util.ChildPath(VRCAvatarDescriptor.gameObject, gameObject);
+                var curveName = $"material.{name}";
+                for (var i = 0; i < ChooseCount; ++i)
+                {
+                    choices[i].SetCurve(curvePath, typeof(SkinnedMeshRenderer), curveName, new AnimationCurve(new Keyframe(0, value.ContainsKey(i) ? value[i] : 0)));
+                }
+            }
+            // controller
+            var controller = new AnimatorController();
+            controller.AddParameter(new AnimatorControllerParameter { name = baseName, type = AnimatorControllerParameterType.Int, defaultInt = 0 });
+            if (controller.layers.Length == 0) controller.AddLayer(baseName);
+            var layer = controller.layers[0];
+            layer.name = baseName;
+            layer.stateMachine.name = baseName;
+            var states = choices.Select((clip, i) =>
+            {
+                var state = layer.stateMachine.AddState($"{baseName}_{i}", new Vector3(300, 50 * i));
+                state.motion = clip;
+                state.writeDefaultValues = false;
+                return state;
+            }).ToList();
+            layer.stateMachine.defaultState = states[0];
+            for (var i = 0; i < ChooseCount; ++i)
+            {
+                var state = states[i];
+                var toNext = layer.stateMachine.AddAnyStateTransition(state);
+                toNext.exitTime = 0;
+                toNext.duration = TransitionSeconds;
+                toNext.hasExitTime = false;
+                toNext.conditions = new AnimatorCondition[]
+                {
+                    new AnimatorCondition
+                    {
+                        mode = AnimatorConditionMode.Equals,
+                        parameter = baseName,
+                        threshold = i,
+                    },
+                };
+                toNext.canTransitionToSelf = false;
+            }
+            // menu
+            var menu = new VRCExpressionsMenu
+            {
+                controls = Enumerable.Range(0, ChooseCount).Select(i => new VRCExpressionsMenu.Control {
+                    name = ChooseNames.ContainsKey(i) ? ChooseNames[i] : $"選択肢{i}",
+                    type = VRCExpressionsMenu.Control.ControlType.Toggle,
+                    parameter = new VRCExpressionsMenu.Control.Parameter
+                    {
+                        name = baseName,
+                    },
+                    subParameters = new VRCExpressionsMenu.Control.Parameter[] { },
+                    value = i,
+                    labels = new VRCExpressionsMenu.Control.Label[] { },
+                }).ToList(),
+            };
+            menu.name = baseName;
+            var parentMenu = new VRCExpressionsMenu
+            {
+                controls = new List<VRCExpressionsMenu.Control>
+                {
+                    new VRCExpressionsMenu.Control {
+                        name = baseName,
+                        type = VRCExpressionsMenu.Control.ControlType.SubMenu,
+                        parameter = new VRCExpressionsMenu.Control.Parameter
+                        {
+                            name = "",
+                        },
+                        subParameters = new VRCExpressionsMenu.Control.Parameter[] { },
+                        value = 1,
+                        labels = new VRCExpressionsMenu.Control.Label[] { },
+                        subMenu = menu,
+                    },
+                },
+            };
+            parentMenu.name = $"{baseName}_parent";
+            // prefab
+            var prefabPath = $"{basePath}.prefab";
+            var prefab = new GameObject(baseName);
+            PrefabUtility.SaveAsPrefabAsset(prefab, prefabPath);
+            DestroyImmediate(prefab);
+            SaveAssets(baseName, basePath, controller, choices, menu, parentMenu);
+            prefab = PrefabUtility.LoadPrefabContents(prefabPath);
+            var menuInstaller = prefab.GetOrAddComponent<ModularAvatarMenuInstaller>();
+            menuInstaller.menuToAppend = parentMenu;
+            var parameters = prefab.GetOrAddComponent<ModularAvatarParameters>();
+            parameters.parameters.Add(new ParameterConfig
+            {
+                nameOrPrefix = baseName,
+                defaultValue = 0,
+                syncType = ParameterSyncType.Int,
+                saved = true,
+            });
+            var mergeAnimator = prefab.GetOrAddComponent<ModularAvatarMergeAnimator>();
+            mergeAnimator.animator = controller;
+            mergeAnimator.layerType = VRCAvatarDescriptor.AnimLayerType.FX;
+            mergeAnimator.pathMode = MergeAnimatorPathMode.Absolute;
+            mergeAnimator.matchAvatarWriteDefaults = true;
+
+            PrefabUtility.SaveAsPrefabAsset(prefab, prefabPath);
+            PrefabUtility.UnloadPrefabContents(prefab);
+            AssetDatabase.SaveAssets();
+        }
+
         void CreateRadialAssets(string baseName, string basePath, GameObject[] gameObjects)
         {
             var matchGameObjects = new HashSet<GameObject>(gameObjects);
@@ -705,13 +996,14 @@ namespace net.narazaka.avatarmenucreater
             AssetDatabase.SaveAssets();
         }
 
-        void SaveAssets(string baseName, string basePath, AnimatorController controller, AnimationClip[] clips, VRCExpressionsMenu menu)
+        void SaveAssets(string baseName, string basePath, AnimatorController controller, IEnumerable<AnimationClip> clips, VRCExpressionsMenu menu, VRCExpressionsMenu parentMenu = null)
         {
             var prefabPath = $"{basePath}.prefab";
             var controllerPath = $"{basePath}.controller";
             if (IncludeAssetType == IncludeAssetType.Include)
             {
                 AssetDatabase.AddObjectToAsset(menu, prefabPath);
+                if (parentMenu != null) AssetDatabase.AddObjectToAsset(parentMenu, prefabPath);
                 foreach (var clip in clips)
                 {
                     AssetDatabase.AddObjectToAsset(clip, prefabPath);
@@ -722,6 +1014,7 @@ namespace net.narazaka.avatarmenucreater
             else if (IncludeAssetType == IncludeAssetType.AnimatorAndInclude)
             {
                 AssetDatabase.AddObjectToAsset(menu, prefabPath);
+                if (parentMenu != null) AssetDatabase.AddObjectToAsset(parentMenu, prefabPath);
 
                 SaveAnimator(controller, controllerPath);
                 foreach (var clip in clips)
@@ -733,6 +1026,7 @@ namespace net.narazaka.avatarmenucreater
             {
                 var basePathDir = System.IO.Path.GetDirectoryName(basePath);
                 AssetDatabase.CreateAsset(menu, $"{basePathDir}/{menu.name}.asset");
+                if (parentMenu != null) AssetDatabase.CreateAsset(parentMenu, $"{basePathDir}/{parentMenu.name}.asset");
                 foreach (var clip in clips)
                 {
                     AssetDatabase.CreateAsset(clip, $"{basePathDir}/{clip.name}.anim");
