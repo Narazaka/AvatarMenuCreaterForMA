@@ -343,7 +343,7 @@ namespace net.narazaka.avatarmenucreater
             if (GUILayout.Button("Create!"))
             {
                 var basePath = EditorUtility.SaveFilePanelInProject("保存場所", "New Menu", "prefab", "アセットの保存場所", SaveFolder);
-                if (basePath == null || basePath == ".prefab") return;
+                if (string.IsNullOrEmpty(basePath)) return;
                 basePath = new System.Text.RegularExpressions.Regex(@"\.prefab").Replace(basePath, "");
                 var baseName = System.IO.Path.GetFileNameWithoutExtension(basePath);
                 if (MenuType == MenuType.Toggle)
