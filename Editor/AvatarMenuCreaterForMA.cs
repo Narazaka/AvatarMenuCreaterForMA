@@ -154,6 +154,8 @@ namespace net.narazaka.avatarmenucreater
 
         Util.ShaderParametersCache ShaderParametersCache = new Util.ShaderParametersCache();
 
+        string SaveFolder = "Assets";
+
         [MenuItem("Tools/Modular Avatar/AvatarMenuCreater for Modular Avatar")]
         static void CreateWindow()
         {
@@ -340,9 +342,9 @@ namespace net.narazaka.avatarmenucreater
             IncludeAssetType = (IncludeAssetType)EditorGUILayout.EnumPopup("保存形式", IncludeAssetType);
             if (GUILayout.Button("Create!"))
             {
-                var basePath = EditorUtility.SaveFilePanelInProject("保存場所", "New Menu", "asset", "アセットの保存場所");
-                if (basePath == null) return;
-                basePath = new System.Text.RegularExpressions.Regex(@"\.asset").Replace(basePath, "");
+                var basePath = EditorUtility.SaveFilePanelInProject("保存場所", "New Menu", "prefab", "アセットの保存場所", SaveFolder);
+                if (basePath == null || basePath == ".prefab") return;
+                basePath = new System.Text.RegularExpressions.Regex(@"\.prefab").Replace(basePath, "");
                 var baseName = System.IO.Path.GetFileNameWithoutExtension(basePath);
                 if (MenuType == MenuType.Toggle)
                 {
@@ -356,6 +358,7 @@ namespace net.narazaka.avatarmenucreater
                 {
                     CreateRadialAssets(baseName, basePath, gameObjects);
                 }
+                SaveFolder = System.IO.Path.GetDirectoryName(basePath);
             }
         }
 
