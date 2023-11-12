@@ -1238,6 +1238,7 @@ namespace net.narazaka.avatarmenucreater
         {
             var prefabPath = $"{basePath}.prefab";
             var controllerPath = $"{basePath}.controller";
+            AssetDatabase.LoadAllAssetsAtPath(prefabPath).Where(a => !(a is GameObject)).ToList().ForEach(AssetDatabase.RemoveObjectFromAsset);
             if (IncludeAssetType == IncludeAssetType.Include)
             {
                 AssetDatabase.AddObjectToAsset(menu, prefabPath);
