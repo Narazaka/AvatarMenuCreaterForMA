@@ -7,6 +7,7 @@ using VRC.SDK3.Avatars.Components;
 using VRC.SDK3.Avatars.ScriptableObjects;
 using VRC.Core;
 using nadena.dev.modular_avatar.core;
+using System;
 
 namespace net.narazaka.avatarmenucreater
 {
@@ -260,6 +261,13 @@ namespace net.narazaka.avatarmenucreater
                         }
                     }
 
+                    var allMaterials = gameObjects.ToDictionary(gameObject => gameObject, gameObject => Util.GetMaterialSlots(gameObject));
+
+                    if (BulkSet)
+                    {
+                        ShowChooseBulkMaterialControl(allMaterials);
+                    }
+
                     foreach (var gameObject in gameObjects)
                     {
                         EditorGUILayout.Space();
@@ -272,7 +280,7 @@ namespace net.narazaka.avatarmenucreater
                             EditorGUI.indentLevel--;
                         }
 
-                        var materials = Util.GetMaterialSlots(gameObject);
+                        var materials = allMaterials[gameObject];
                         if (materials.Length > 0 && FoldoutMaterialHeader(gameObject, "Materials"))
                         {
                             EditorGUI.indentLevel++;
@@ -674,6 +682,36 @@ namespace net.narazaka.avatarmenucreater
                     var values = ChooseMaterials[(gameObject, index)];
                     values[choiseIndex] = choiceMaterial;
                 }
+            }
+        }
+
+        void ShowChooseBulkMaterialControl(Dictionary<GameObject, Material[]> allMaterials)
+        {
+            Func<(GameObject, int), Material> keyToMaterial = ((GameObject, int) key) => allMaterials.TryGetValue(key.Item1, out var m) && m != null && m.Length > key.Item2 ? m[key.Item2] : null;
+            var sourceMaterials = ChooseMaterials.Keys.Select(keyToMaterial).Distinct();
+            var chooseMaterialGroups = ChooseMaterials.Keys.GroupBy(keyToMaterial).ToDictionary(group => group.Key, group => group.ToList());
+            foreach (var sourceMaterial in sourceMaterials)
+            {
+                using (new EditorGUI.DisabledGroupScope(true))
+                {
+                    EditorGUILayout.ObjectField(sourceMaterial, typeof(Material), false);
+                }
+                EditorGUI.indentLevel++;
+                for (var j = 0; j < ChooseCount; ++j)
+                {
+                    var materials = chooseMaterialGroups[sourceMaterial].Select(key => ChooseMaterials.TryGetValue(key, out var ms) && ms.TryGetValue(j, out var m) ? m : null).Distinct().ToList();
+                    var value = materials[0];
+                    var newValue = EditorGUILayout.ObjectField(ChooseName(j), value, typeof(Material), false) as Material;
+                    if (value != newValue)
+                    {
+                        SetBulkChooseMaterial(sourceMaterial, j, newValue);
+                    }
+                    if (materials.Count != 1)
+                    {
+                        EditorGUILayout.HelpBox("複数のマテリアルが選択されています", MessageType.Warning);
+                    }
+                }
+                EditorGUI.indentLevel--;
             }
         }
 
