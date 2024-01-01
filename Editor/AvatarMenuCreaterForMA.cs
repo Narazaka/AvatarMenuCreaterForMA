@@ -128,7 +128,7 @@ namespace net.narazaka.avatarmenucreater
         Dictionary<GameObject, ToggleType> ToggleObjects = new Dictionary<GameObject, ToggleType>();
         Dictionary<(GameObject, string), ToggleBlendShape> ToggleBlendShapes = new Dictionary<(GameObject, string), ToggleBlendShape>();
         Dictionary<(GameObject, string), ToggleBlendShape> ToggleShaderParameters = new Dictionary<(GameObject, string), ToggleBlendShape>();
-        Dictionary<GameObject, int> ChooseObjects = new Dictionary<GameObject, int>();
+        Dictionary<GameObject, HashSet<int>> ChooseObjects = new Dictionary<GameObject, HashSet<int>>();
         Dictionary<(GameObject, int), Dictionary<int, Material>> ChooseMaterials = new Dictionary<(GameObject, int), Dictionary<int, Material>>();
         Dictionary<(GameObject, string), Dictionary<int, float>> ChooseBlendShapes = new Dictionary<(GameObject, string), Dictionary<int, float>>();
         Dictionary<(GameObject, string), Dictionary<int, float>> ChooseShaderParameters = new Dictionary<(GameObject, string), Dictionary<int, float>>();
@@ -592,26 +592,44 @@ namespace net.narazaka.avatarmenucreater
 
         void ShowChooseObjectControl(GameObject gameObject)
         {
-            int index;
-            if (!ChooseObjects.TryGetValue(gameObject, out index))
+            HashSet<int> indexes;
+            if (!ChooseObjects.TryGetValue(gameObject, out indexes))
             {
-                index = -1;
+                indexes = new HashSet<int>();
             }
-            var newIndex = index;
-            if (EditorGUILayout.ToggleLeft($"制御しない", index == -1) && index != -1) newIndex = -1;
+            var changed = false;
+            var isEmpty = indexes.Count == 0;
+            if (EditorGUILayout.ToggleLeft($"制御しない", isEmpty) && !isEmpty)
+            {
+                indexes = new HashSet<int>();
+                changed = true;
+            }
             for (var i = 0; i < ChooseCount; i++)
             {
-                if (EditorGUILayout.ToggleLeft(ChooseName(i), index == i) && index != i) newIndex = i;
+                var active = indexes.Contains(i);
+                var newActive = EditorGUILayout.ToggleLeft(ChooseName(i), active);
+                if (active != newActive)
+                {
+                    if (newActive)
+                    {
+                        indexes.Add(i);
+                    }
+                    else
+                    {
+                        indexes.Remove(i);
+                    }
+                    changed = true;
+                }
             }
-            if (index != newIndex)
+            if (changed)
             {
-                if (newIndex == -1)
+                if (indexes.Count == 0)
                 {
                     ChooseObjects.Remove(gameObject);
                 }
                 else
                 {
-                    ChooseObjects[gameObject] = newIndex;
+                    ChooseObjects[gameObject] = indexes;
                 }
             }
         }
@@ -1063,7 +1081,7 @@ namespace net.narazaka.avatarmenucreater
                 var curvePath = Util.ChildPath(VRCAvatarDescriptor.gameObject, gameObject);
                 for (var i = 0; i < ChooseCount; ++i)
                 {
-                    choices[i].SetCurve(curvePath, typeof(GameObject), "m_IsActive", new AnimationCurve(new Keyframe(0, i == ChooseObjects[gameObject] ? 1 : 0)));
+                    choices[i].SetCurve(curvePath, typeof(GameObject), "m_IsActive", new AnimationCurve(new Keyframe(0, ChooseObjects[gameObject].Contains(i) ? 1 : 0)));
                 }
             }
             foreach (var (gameObject, index) in ChooseMaterials.Keys)
