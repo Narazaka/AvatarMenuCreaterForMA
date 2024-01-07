@@ -135,6 +135,9 @@ namespace net.narazaka.avatarmenucreater
         Dictionary<(GameObject, string), RadialBlendShape> RadialBlendShapes = new Dictionary<(GameObject, string), RadialBlendShape>();
         Dictionary<(GameObject, string), RadialBlendShape> RadialShaderParameters = new Dictionary<(GameObject, string), RadialBlendShape>();
         float RadialDefaultValue;
+        bool RadialInactiveRange;
+        float RadialInactiveRangeMin = float.NaN;
+        float RadialInactiveRangeMax = float.NaN;
         float TransitionSeconds;
         int ChooseCount = 2;
         Dictionary<int, string> ChooseNames = new Dictionary<int, string>();
@@ -309,6 +312,70 @@ namespace net.narazaka.avatarmenucreater
             else
             {
                 RadialDefaultValue = EditorGUILayout.FloatField("パラメーター初期値", RadialDefaultValue);
+                if (RadialInactiveRange)
+                {
+                    if (!EditorGUILayout.Toggle("無効領域を設定", true))
+                    {
+                        RadialInactiveRange = false;
+                    }
+                    EditorGUILayout.HelpBox("アニメーションが影響しないパラメーター領域を設定します", MessageType.Info);
+                    using (new EditorGUI.IndentLevelScope())
+                    {
+                        using (new EditorGUILayout.HorizontalScope())
+                        {
+                            if (float.IsNaN(RadialInactiveRangeMin))
+                            {
+                                var active = EditorGUILayout.ToggleLeft("これより大きい場合", false);
+                                if (active)
+                                {
+                                    RadialInactiveRangeMin = 0.49f;
+                                }
+                            }
+                            else
+                            {
+                                var active = EditorGUILayout.ToggleLeft("これより大きい場合", true);
+                                if (active)
+                                {
+                                    RadialInactiveRangeMin = EditorGUILayout.FloatField(RadialInactiveRangeMin);
+                                }
+                                else
+                                {
+                                    RadialInactiveRangeMin = float.NaN;
+                                }
+                            }
+                        }
+                        using (new EditorGUILayout.HorizontalScope())
+                        {
+                            if (float.IsNaN(RadialInactiveRangeMax))
+                            {
+                                var active = EditorGUILayout.ToggleLeft("これより小さい場合", false);
+                                if (active)
+                                {
+                                    RadialInactiveRangeMax = 0.01f;
+                                }
+                            }
+                            else
+                            {
+                                var active = EditorGUILayout.ToggleLeft("これより小さい場合", true);
+                                if (active)
+                                {
+                                    RadialInactiveRangeMax = EditorGUILayout.FloatField(RadialInactiveRangeMax);
+                                }
+                                else
+                                {
+                                    RadialInactiveRangeMax = float.NaN;
+                                }
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                    if (EditorGUILayout.Toggle("無効領域を設定", false))
+                    {
+                        RadialInactiveRange = true;
+                    }
+                }
                 using (var scrollView = new EditorGUILayout.ScrollViewScope(ScrollPosition))
                 {
                     ScrollPosition = scrollView.scrollPosition;
@@ -1243,6 +1310,73 @@ namespace net.narazaka.avatarmenucreater
             state.timeParameter = baseName;
             state.motion = clip;
             state.writeDefaultValues = false;
+            AnimationClip emptyClip = null;
+            if (RadialInactiveRange && !(float.IsNaN(RadialInactiveRangeMin) && float.IsNaN(RadialInactiveRangeMax)))
+            {
+                emptyClip = new AnimationClip();
+                emptyClip.name = $"{baseName}_empty";
+                var inactiveState = layer.stateMachine.AddState($"{baseName}_inactive", new Vector3(300, 100));
+                inactiveState.motion = emptyClip;
+                inactiveState.writeDefaultValues = false;
+                layer.stateMachine.defaultState = inactiveState;
+                var toInactive = state.AddTransition(inactiveState);
+                toInactive.exitTime = 0;
+                toInactive.duration = 0;
+                toInactive.hasExitTime = false;
+                var toInactiveConditions = new List<AnimatorCondition>();
+                if (!float.IsNaN(RadialInactiveRangeMin))
+                {
+                    toInactiveConditions.Add(new AnimatorCondition
+                    {
+                        mode = AnimatorConditionMode.Greater,
+                        parameter = baseName,
+                        threshold = RadialInactiveRangeMin,
+                    });
+                }
+                if (!float.IsNaN(RadialInactiveRangeMax))
+                {
+                    toInactiveConditions.Add(new AnimatorCondition
+                    {
+                        mode = AnimatorConditionMode.Less,
+                        parameter = baseName,
+                        threshold = RadialInactiveRangeMax,
+                    });
+                }
+                toInactive.conditions = toInactiveConditions.ToArray();
+
+                if (!float.IsNaN(RadialInactiveRangeMin))
+                {
+                    var toActiveMin = inactiveState.AddTransition(state);
+                    toActiveMin.exitTime = 0;
+                    toActiveMin.duration = 0;
+                    toActiveMin.hasExitTime = false;
+                    toActiveMin.conditions = new AnimatorCondition[]
+                    {
+                        new AnimatorCondition
+                        {
+                            mode = AnimatorConditionMode.Less,
+                            parameter = baseName,
+                            threshold = RadialInactiveRangeMin,
+                        },
+                    };
+                }
+                if (!float.IsNaN(RadialInactiveRangeMax))
+                {
+                    var toActiveMax = inactiveState.AddTransition(state);
+                    toActiveMax.exitTime = 0;
+                    toActiveMax.duration = 0;
+                    toActiveMax.hasExitTime = false;
+                    toActiveMax.conditions = new AnimatorCondition[]
+                    {
+                        new AnimatorCondition
+                        {
+                            mode = AnimatorConditionMode.Greater,
+                            parameter = baseName,
+                            threshold = RadialInactiveRangeMax,
+                        },
+                    };
+                }
+            }
             // menu
             var menu = new VRCExpressionsMenu
             {
@@ -1268,7 +1402,7 @@ namespace net.narazaka.avatarmenucreater
             var prefab = new GameObject(baseName);
             PrefabUtility.SaveAsPrefabAsset(prefab, prefabPath);
             DestroyImmediate(prefab);
-            SaveAssets(baseName, basePath, controller, new AnimationClip[] { clip }, menu);
+            SaveAssets(baseName, basePath, controller, emptyClip == null ? new AnimationClip[] { clip } : new AnimationClip[] { clip, emptyClip }, menu);
             prefab = PrefabUtility.LoadPrefabContents(prefabPath);
             var menuInstaller = prefab.GetOrAddComponent<ModularAvatarMenuInstaller>();
             menuInstaller.menuToAppend = menu;
