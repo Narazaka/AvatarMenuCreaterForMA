@@ -1223,13 +1223,13 @@ namespace net.narazaka.avatarmenucreater
             {
                 if (!matchGameObjects.Contains(gameObject)) continue;
                 var value = RadialBlendShapes[(gameObject, name)];
-                clip.SetCurve(Util.ChildPath(VRCAvatarDescriptor.gameObject, gameObject), typeof(SkinnedMeshRenderer), $"blendShape.{name}", new AnimationCurve(new Keyframe(0 / 60.0f, value.Start), new Keyframe(1 / 60.0f, value.End)));
+                clip.SetCurve(Util.ChildPath(VRCAvatarDescriptor.gameObject, gameObject), typeof(SkinnedMeshRenderer), $"blendShape.{name}", SetAutoTangentMode(new AnimationCurve(new Keyframe(0 / 60.0f, value.Start), new Keyframe(1 / 60.0f, value.End))));
             }
             foreach (var (gameObject, name) in RadialShaderParameters.Keys)
             {
                 if (!matchGameObjects.Contains(gameObject)) continue;
                 var value = RadialShaderParameters[(gameObject, name)];
-                clip.SetCurve(Util.ChildPath(VRCAvatarDescriptor.gameObject, gameObject), typeof(SkinnedMeshRenderer), $"material.{name}", new AnimationCurve(new Keyframe(0 / 60.0f, value.Start), new Keyframe(1 / 60.0f, value.End)));
+                clip.SetCurve(Util.ChildPath(VRCAvatarDescriptor.gameObject, gameObject), typeof(SkinnedMeshRenderer), $"material.{name}", SetAutoTangentMode(new AnimationCurve(new Keyframe(0 / 60.0f, value.Start), new Keyframe(1 / 60.0f, value.End))));
             }
             // controller
             var controller = new AnimatorController();
@@ -1288,6 +1288,16 @@ namespace net.narazaka.avatarmenucreater
             PrefabUtility.SaveAsPrefabAsset(prefab, prefabPath);
             PrefabUtility.UnloadPrefabContents(prefab);
             AssetDatabase.SaveAssets();
+        }
+
+        AnimationCurve SetAutoTangentMode(AnimationCurve curve)
+        {
+            for (var i = 0; i < curve.length; ++i)
+            {
+                AnimationUtility.SetKeyLeftTangentMode(curve, i, AnimationUtility.TangentMode.Auto);
+                AnimationUtility.SetKeyRightTangentMode(curve, i, AnimationUtility.TangentMode.Auto);
+            }
+            return curve;
         }
 
         void SaveAssets(string baseName, string basePath, AnimatorController controller, IEnumerable<AnimationClip> clips, VRCExpressionsMenu menu, VRCExpressionsMenu parentMenu = null)
