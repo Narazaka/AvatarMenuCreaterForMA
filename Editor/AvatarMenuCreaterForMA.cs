@@ -123,6 +123,9 @@ namespace net.narazaka.avatarmenucreater
     public class AvatarMenuCreaterForMA : EditorWindow
     {
         VRCAvatarDescriptor VRCAvatarDescriptor;
+        GameObject Target;
+        bool RelativeMode;
+        bool IgnorePrefabPath;
         MenuType MenuType = MenuType.Toggle;
         IncludeAssetType IncludeAssetType = IncludeAssetType.AnimatorAndInclude;
         Dictionary<GameObject, ToggleType> ToggleObjects = new Dictionary<GameObject, ToggleType>();
@@ -173,17 +176,54 @@ namespace net.narazaka.avatarmenucreater
 
         void OnGUI()
         {
-            VRCAvatarDescriptor = EditorGUILayout.ObjectField("Avatar", VRCAvatarDescriptor, typeof(VRCAvatarDescriptor), true) as VRCAvatarDescriptor;
-
-            if (VRCAvatarDescriptor == null)
+            if (RelativeMode)
             {
-                EditorGUILayout.LabelField("対象のアバターを選択して下さい");
-                return;
+                Target = EditorGUILayout.ObjectField("Target", Target, typeof(GameObject), true) as GameObject;
+                EditorGUILayout.HelpBox("対象オブジェクト直下に生成されたprefabを入れてください", MessageType.Info);
+            }
+            else
+            {
+                using (var check = new EditorGUI.ChangeCheckScope())
+                {
+                    VRCAvatarDescriptor = EditorGUILayout.ObjectField("Avatar", VRCAvatarDescriptor, typeof(VRCAvatarDescriptor), true) as VRCAvatarDescriptor;
+                    if (check.changed)
+                    {
+                        if (VRCAvatarDescriptor != null)
+                        {
+                            Target = VRCAvatarDescriptor.gameObject;
+                        }
+                        else
+                        {
+                            Target = null;
+                        }
+                    }
+                }
+            }
+
+            RelativeMode = EditorGUILayout.ToggleLeft("相対パスで指定", RelativeMode);
+
+            if (RelativeMode)
+            {
+                if (Target == null)
+                {
+                    EditorGUILayout.LabelField("対象のオブジェクトを選択して下さい");
+                    return;
+                }
+
+                IgnorePrefabPath = EditorGUILayout.ToggleLeft("prefabのパスを無視(手動編集向け)", IgnorePrefabPath);
+            }
+            else
+            {
+                if (VRCAvatarDescriptor == null)
+                {
+                    EditorGUILayout.LabelField("対象のアバターを選択して下さい");
+                    return;
+                }
             }
 
             var gameObjects = Selection.gameObjects;
 
-            if (gameObjects.Length == 0 || (gameObjects.Length == 1 && gameObjects[0] == VRCAvatarDescriptor.gameObject))
+            if (gameObjects.Length == 0 || (gameObjects.Length == 1 && gameObjects[0] == Target))
             {
                 EditorGUILayout.LabelField("対象のオブジェクトを選択して下さい");
                 return;
@@ -215,7 +255,7 @@ namespace net.narazaka.avatarmenucreater
                     foreach (var gameObject in gameObjects)
                     {
                         EditorGUILayout.Space();
-                        EditorGUILayout.LabelField(Util.ChildPath(VRCAvatarDescriptor.gameObject, gameObject));
+                        EditorGUILayout.LabelField(ChildPath(Target, gameObject));
                         EditorGUI.indentLevel++;
                         ShowToggleObjectControl(gameObject);
 
@@ -274,7 +314,7 @@ namespace net.narazaka.avatarmenucreater
                     foreach (var gameObject in gameObjects)
                     {
                         EditorGUILayout.Space();
-                        EditorGUILayout.LabelField(Util.ChildPath(VRCAvatarDescriptor.gameObject, gameObject));
+                        EditorGUILayout.LabelField(ChildPath(Target, gameObject));
                         EditorGUI.indentLevel++;
                         if (FoldoutGameObjectHeader(gameObject, "GameObject"))
                         {
@@ -387,7 +427,7 @@ namespace net.narazaka.avatarmenucreater
                         EditorGUILayout.Space();
                         var names = Util.GetBlendShapeNames(gameObject);
                         var parameters = ShaderParametersCache.GetFilteredShaderParameters(gameObject);
-                        var path = Util.ChildPath(VRCAvatarDescriptor.gameObject, gameObject);
+                        var path = ChildPath(Target, gameObject);
                         if (names.Count > 0 || parameters.Count > 0)
                         {
                             EditorGUILayout.LabelField(path);
@@ -966,7 +1006,7 @@ namespace net.narazaka.avatarmenucreater
             {
                 if (!matchGameObjects.Contains(gameObject)) continue;
                 var activeValue = ToggleObjects[gameObject] == ToggleType.ON;
-                var curvePath = Util.ChildPath(VRCAvatarDescriptor.gameObject, gameObject);
+                var curvePath = ChildPath(Target, gameObject);
                 active.SetCurve(curvePath, typeof(GameObject), "m_IsActive", new AnimationCurve(new Keyframe(0 / 60.0f, activeValue ? 1 : 0)));
                 inactive.SetCurve(curvePath, typeof(GameObject), "m_IsActive", new AnimationCurve(new Keyframe(0 / 60.0f, activeValue ? 0 : 1)));
                 if (TransitionSeconds > 0)
@@ -979,7 +1019,7 @@ namespace net.narazaka.avatarmenucreater
             {
                 if (!matchGameObjects.Contains(gameObject)) continue;
                 var value = ToggleBlendShapes[(gameObject, name)];
-                var curvePath = Util.ChildPath(VRCAvatarDescriptor.gameObject, gameObject);
+                var curvePath = ChildPath(Target, gameObject);
                 var curveName = $"blendShape.{name}";
                 active.SetCurve(curvePath, typeof(SkinnedMeshRenderer), curveName, new AnimationCurve(new Keyframe(0 / 60.0f, value.Active)));
                 inactive.SetCurve(curvePath, typeof(SkinnedMeshRenderer), curveName, new AnimationCurve(new Keyframe(0 / 60.0f, value.Inactive)));
@@ -993,7 +1033,7 @@ namespace net.narazaka.avatarmenucreater
             {
                 if (!matchGameObjects.Contains(gameObject)) continue;
                 var value = ToggleShaderParameters[(gameObject, name)];
-                var curvePath = Util.ChildPath(VRCAvatarDescriptor.gameObject, gameObject);
+                var curvePath = ChildPath(Target, gameObject);
                 var curveName = $"material.{name}";
                 active.SetCurve(curvePath, typeof(Renderer), curveName, new AnimationCurve(new Keyframe(0 / 60.0f, value.Active)));
                 inactive.SetCurve(curvePath, typeof(Renderer), curveName, new AnimationCurve(new Keyframe(0 / 60.0f, value.Inactive)));
@@ -1159,7 +1199,7 @@ namespace net.narazaka.avatarmenucreater
             var mergeAnimator = prefab.GetOrAddComponent<ModularAvatarMergeAnimator>();
             mergeAnimator.animator = controller;
             mergeAnimator.layerType = VRCAvatarDescriptor.AnimLayerType.FX;
-            mergeAnimator.pathMode = MergeAnimatorPathMode.Absolute;
+            mergeAnimator.pathMode = RelativeMode ? MergeAnimatorPathMode.Relative : MergeAnimatorPathMode.Absolute;
             mergeAnimator.matchAvatarWriteDefaults = true;
 
             PrefabUtility.SaveAsPrefabAsset(prefab, prefabPath);
@@ -1176,7 +1216,7 @@ namespace net.narazaka.avatarmenucreater
             foreach (var gameObject in ChooseObjects.Keys)
             {
                 if (!matchGameObjects.Contains(gameObject)) continue;
-                var curvePath = Util.ChildPath(VRCAvatarDescriptor.gameObject, gameObject);
+                var curvePath = ChildPath(Target, gameObject);
                 for (var i = 0; i < ChooseCount; ++i)
                 {
                     choices[i].SetCurve(curvePath, typeof(GameObject), "m_IsActive", new AnimationCurve(new Keyframe(0, ChooseObjects[gameObject].Contains(i) ? 1 : 0)));
@@ -1186,7 +1226,7 @@ namespace net.narazaka.avatarmenucreater
             {
                 if (!matchGameObjects.Contains(gameObject)) continue;
                 var value = ChooseMaterials[(gameObject, index)];
-                var curvePath = Util.ChildPath(VRCAvatarDescriptor.gameObject, gameObject);
+                var curvePath = ChildPath(Target, gameObject);
                 var curveName = $"m_Materials.Array.data[{index}]";
                 for (var i = 0; i < ChooseCount; ++i)
                 {
@@ -1197,7 +1237,7 @@ namespace net.narazaka.avatarmenucreater
             {
                 if (!matchGameObjects.Contains(gameObject)) continue;
                 var value = ChooseBlendShapes[(gameObject, name)];
-                var curvePath = Util.ChildPath(VRCAvatarDescriptor.gameObject, gameObject);
+                var curvePath = ChildPath(Target, gameObject);
                 var curveName = $"blendShape.{name}";
                 for (var i = 0; i < ChooseCount; ++i)
                 {
@@ -1208,7 +1248,7 @@ namespace net.narazaka.avatarmenucreater
             {
                 if (!matchGameObjects.Contains(gameObject)) continue;
                 var value = ChooseShaderParameters[(gameObject, name)];
-                var curvePath = Util.ChildPath(VRCAvatarDescriptor.gameObject, gameObject);
+                var curvePath = ChildPath(Target, gameObject);
                 var curveName = $"material.{name}";
                 for (var i = 0; i < ChooseCount; ++i)
                 {
@@ -1321,7 +1361,7 @@ namespace net.narazaka.avatarmenucreater
             var mergeAnimator = prefab.GetOrAddComponent<ModularAvatarMergeAnimator>();
             mergeAnimator.animator = controller;
             mergeAnimator.layerType = VRCAvatarDescriptor.AnimLayerType.FX;
-            mergeAnimator.pathMode = MergeAnimatorPathMode.Absolute;
+            mergeAnimator.pathMode = RelativeMode ? MergeAnimatorPathMode.Relative : MergeAnimatorPathMode.Absolute;
             mergeAnimator.matchAvatarWriteDefaults = true;
 
             PrefabUtility.SaveAsPrefabAsset(prefab, prefabPath);
@@ -1339,13 +1379,13 @@ namespace net.narazaka.avatarmenucreater
             {
                 if (!matchGameObjects.Contains(gameObject)) continue;
                 var value = RadialBlendShapes[(gameObject, name)];
-                clip.SetCurve(Util.ChildPath(VRCAvatarDescriptor.gameObject, gameObject), typeof(SkinnedMeshRenderer), $"blendShape.{name}", SetAutoTangentMode(new AnimationCurve(new Keyframe(0 / 60.0f, value.Start), new Keyframe(1 / 60.0f, value.End))));
+                clip.SetCurve(ChildPath(Target, gameObject), typeof(SkinnedMeshRenderer), $"blendShape.{name}", SetAutoTangentMode(new AnimationCurve(new Keyframe(0 / 60.0f, value.Start), new Keyframe(1 / 60.0f, value.End))));
             }
             foreach (var (gameObject, name) in RadialShaderParameters.Keys)
             {
                 if (!matchGameObjects.Contains(gameObject)) continue;
                 var value = RadialShaderParameters[(gameObject, name)];
-                clip.SetCurve(Util.ChildPath(VRCAvatarDescriptor.gameObject, gameObject), typeof(Renderer), $"material.{name}", SetAutoTangentMode(new AnimationCurve(new Keyframe(0 / 60.0f, value.Start), new Keyframe(1 / 60.0f, value.End))));
+                clip.SetCurve(ChildPath(Target, gameObject), typeof(Renderer), $"material.{name}", SetAutoTangentMode(new AnimationCurve(new Keyframe(0 / 60.0f, value.Start), new Keyframe(1 / 60.0f, value.End))));
             }
             // controller
             var controller = new AnimatorController();
@@ -1465,7 +1505,7 @@ namespace net.narazaka.avatarmenucreater
             var mergeAnimator = prefab.GetOrAddComponent<ModularAvatarMergeAnimator>();
             mergeAnimator.animator = controller;
             mergeAnimator.layerType = VRCAvatarDescriptor.AnimLayerType.FX;
-            mergeAnimator.pathMode = MergeAnimatorPathMode.Absolute;
+            mergeAnimator.pathMode = RelativeMode ? MergeAnimatorPathMode.Relative : MergeAnimatorPathMode.Absolute;
             mergeAnimator.matchAvatarWriteDefaults = true;
 
             PrefabUtility.SaveAsPrefabAsset(prefab, prefabPath);
@@ -1568,28 +1608,68 @@ namespace net.narazaka.avatarmenucreater
                 SaveStateMachine(m.stateMachine, path);
             }
         }
+
+        public string ChildPath(GameObject parentObject, GameObject childObject)
+        {
+            if (!RelativeMode) return Util.ChildPath(parentObject, childObject);
+
+            var paths = Util.ChildPaths(parentObject.transform, childObject.transform, true);
+            if (paths != null)
+            {
+                if (!IgnorePrefabPath) paths.Insert(0, "..");
+                return string.Join("/", paths.ToArray());
+            }
+
+            var childPaths = Util.ChildPaths(null, childObject.transform);
+            var parentPaths = Util.ChildPaths(null, parentObject.transform);
+            var childUri = new Uri("file:///" + string.Join("/", childPaths.ToArray()));
+            var parentUri = new Uri("file:///" + string.Join("/", parentPaths.ToArray()) + (IgnorePrefabPath ? "/" : "/__AVATAR_MENU_CREATOR_PREFAB__/"));
+            var relativeUri = parentUri.MakeRelativeUri(childUri);
+            return Uri.UnescapeDataString(relativeUri.ToString());
+        }
     }
 
     public static class Util
     {
+
         /// <summary>
-        /// 子GameObjectの相対パスを返す (親がnullなら絶対パス)
+        /// 子GameObjectの相対パスを返す (親がnullか親子関係が正しくなければ絶対パス)
         /// </summary>
-        /// <param name="baseObject">親 (nullなら絶対パス)</param>
-        /// <param name="targetObject">子</param>
+        /// <param name="parentObject">親 (nullなら絶対パス)</param>
+        /// <param name="childObject">子</param>
+        /// <param name="strict">親子関係が正しくなければnullを返す</param>
         /// <returns>パス</returns>
-        public static string ChildPath(GameObject baseObject, GameObject targetObject)
+        public static string ChildPath(GameObject parentObject, GameObject childObject, bool strict = false)
+        {
+            var paths = ChildPaths(parentObject == null ? null : parentObject.transform, childObject.transform, strict);
+            if (paths == null) return null;
+            return string.Join("/", paths.ToArray());
+        }
+
+        /// <summary>
+        /// 子GameObjectの相対パスを返す (親がnullか親子関係が正しくなければ絶対パス)
+        /// </summary>
+        /// <param name="parent">親 (nullなら絶対パス)</param>
+        /// <param name="child">子</param>
+        /// <param name="strict">親子関係が正しくなければnullを返す</param>
+        /// <returns>パス</returns>
+        public static List<string> ChildPaths(Transform parent, Transform child, bool strict = false)
         {
             var paths = new List<string>();
-            var transform = targetObject.transform;
-            var baseObjectTransform = baseObject == null ? null : baseObject.transform;
-            while (baseObjectTransform != transform && transform != null)
+            var hit = false;
+            while (child != null)
             {
-                paths.Add(transform.gameObject.name);
-                transform = transform.parent;
+                if (parent == child)
+                {
+                    hit = true;
+                    break;
+                }
+                paths.Add(child.gameObject.name);
+                child = child.parent;
             }
+            if (parent != null && strict && !hit) return null;
             paths.Reverse();
-            return string.Join("/", paths.ToArray());
+            return paths;
         }
 
         public static Material[] GetMaterialSlots(GameObject gameObject)
