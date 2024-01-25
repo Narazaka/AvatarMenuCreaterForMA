@@ -995,12 +995,12 @@ namespace net.narazaka.avatarmenucreater
                 var value = ToggleShaderParameters[(gameObject, name)];
                 var curvePath = Util.ChildPath(VRCAvatarDescriptor.gameObject, gameObject);
                 var curveName = $"material.{name}";
-                active.SetCurve(curvePath, typeof(SkinnedMeshRenderer), curveName, new AnimationCurve(new Keyframe(0 / 60.0f, value.Active)));
-                inactive.SetCurve(curvePath, typeof(SkinnedMeshRenderer), curveName, new AnimationCurve(new Keyframe(0 / 60.0f, value.Inactive)));
+                active.SetCurve(curvePath, typeof(Renderer), curveName, new AnimationCurve(new Keyframe(0 / 60.0f, value.Active)));
+                inactive.SetCurve(curvePath, typeof(Renderer), curveName, new AnimationCurve(new Keyframe(0 / 60.0f, value.Inactive)));
                 if (TransitionSeconds > 0)
                 {
-                    activate.SetCurve(curvePath, typeof(SkinnedMeshRenderer), curveName, new AnimationCurve(new Keyframe(TransitionSeconds * value.ActivateStartRate, value.Inactive), new Keyframe(TransitionSeconds * value.ActivateEndRate, value.Active)));
-                    inactivate.SetCurve(curvePath, typeof(SkinnedMeshRenderer), curveName, new AnimationCurve(new Keyframe(TransitionSeconds * value.InactivateStartRate, value.Active), new Keyframe(TransitionSeconds * value.InactivateEndRate, value.Inactive)));
+                    activate.SetCurve(curvePath, typeof(Renderer), curveName, new AnimationCurve(new Keyframe(TransitionSeconds * value.ActivateStartRate, value.Inactive), new Keyframe(TransitionSeconds * value.ActivateEndRate, value.Active)));
+                    inactivate.SetCurve(curvePath, typeof(Renderer), curveName, new AnimationCurve(new Keyframe(TransitionSeconds * value.InactivateStartRate, value.Active), new Keyframe(TransitionSeconds * value.InactivateEndRate, value.Inactive)));
                 }
             }
             // controller
@@ -1212,7 +1212,7 @@ namespace net.narazaka.avatarmenucreater
                 var curveName = $"material.{name}";
                 for (var i = 0; i < ChooseCount; ++i)
                 {
-                    choices[i].SetCurve(curvePath, typeof(SkinnedMeshRenderer), curveName, new AnimationCurve(new Keyframe(0, value.ContainsKey(i) ? value[i] : 0)));
+                    choices[i].SetCurve(curvePath, typeof(Renderer), curveName, new AnimationCurve(new Keyframe(0, value.ContainsKey(i) ? value[i] : 0)));
                 }
             }
             // controller
@@ -1345,7 +1345,7 @@ namespace net.narazaka.avatarmenucreater
             {
                 if (!matchGameObjects.Contains(gameObject)) continue;
                 var value = RadialShaderParameters[(gameObject, name)];
-                clip.SetCurve(Util.ChildPath(VRCAvatarDescriptor.gameObject, gameObject), typeof(SkinnedMeshRenderer), $"material.{name}", SetAutoTangentMode(new AnimationCurve(new Keyframe(0 / 60.0f, value.Start), new Keyframe(1 / 60.0f, value.End))));
+                clip.SetCurve(Util.ChildPath(VRCAvatarDescriptor.gameObject, gameObject), typeof(Renderer), $"material.{name}", SetAutoTangentMode(new AnimationCurve(new Keyframe(0 / 60.0f, value.Start), new Keyframe(1 / 60.0f, value.End))));
             }
             // controller
             var controller = new AnimatorController();
