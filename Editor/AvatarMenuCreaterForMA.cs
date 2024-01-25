@@ -1,4 +1,4 @@
-﻿using System.Linq;
+using System.Linq;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
@@ -1010,13 +1010,42 @@ namespace net.narazaka.avatarmenucreater
             var layer = controller.layers[0];
             layer.name = baseName;
             layer.stateMachine.name = baseName;
+            var idleState = layer.stateMachine.AddState($"{baseName}_idle", new Vector3(-300, 0));
+            idleState.motion = inactive;
+            idleState.writeDefaultValues = false;
             var inactiveState = layer.stateMachine.AddState($"{baseName}_inactive", new Vector3(300, 100));
             inactiveState.motion = inactive;
             inactiveState.writeDefaultValues = false;
             var activeState = layer.stateMachine.AddState($"{baseName}_active", new Vector3(300, -100));
             activeState.motion = active;
             activeState.writeDefaultValues = false;
-            layer.stateMachine.defaultState = inactiveState;
+            layer.stateMachine.defaultState = idleState;
+            var idleToActive = idleState.AddTransition(activeState);
+            idleToActive.exitTime = 0;
+            idleToActive.duration = 0;
+            idleToActive.hasExitTime = false;
+            idleToActive.conditions = new AnimatorCondition[]
+            {
+                new AnimatorCondition
+                {
+                    mode = AnimatorConditionMode.If,
+                    parameter = baseName,
+                    threshold = 1,
+                },
+            };
+            var idleToInactive = idleState.AddTransition(inactiveState);
+            idleToInactive.exitTime = 0;
+            idleToInactive.duration = 0;
+            idleToInactive.hasExitTime = false;
+            idleToInactive.conditions = new AnimatorCondition[]
+            {
+                new AnimatorCondition
+                {
+                    mode = AnimatorConditionMode.IfNot,
+                    parameter = baseName,
+                    threshold = 1,
+                },
+            };
             if (TransitionSeconds > 0)
             {
                 var inactivateState = layer.stateMachine.AddState($"{baseName}_inactivate", new Vector3(500, 0));
@@ -1191,6 +1220,10 @@ namespace net.narazaka.avatarmenucreater
             var layer = controller.layers[0];
             layer.name = baseName;
             layer.stateMachine.name = baseName;
+            var idleState = layer.stateMachine.AddState($"{baseName}_idle", new Vector3(-300, 0));
+            idleState.motion = choices[0];
+            idleState.writeDefaultValues = false;
+            layer.stateMachine.defaultState = idleState;
             var states = choices.Select((clip, i) =>
             {
                 var state = layer.stateMachine.AddState($"{baseName}_{i}", new Vector3(300, 50 * i));
@@ -1198,7 +1231,6 @@ namespace net.narazaka.avatarmenucreater
                 state.writeDefaultValues = false;
                 return state;
             }).ToList();
-            layer.stateMachine.defaultState = states[0];
             for (var i = 0; i < ChooseCount; ++i)
             {
                 var state = states[i];
@@ -1216,6 +1248,19 @@ namespace net.narazaka.avatarmenucreater
                     },
                 };
                 toNext.canTransitionToSelf = false;
+                var fromIdle = idleState.AddTransition(state);
+                fromIdle.exitTime = 0;
+                fromIdle.duration = 0;
+                fromIdle.hasExitTime = false;
+                fromIdle.conditions = new AnimatorCondition[]
+                {
+                    new AnimatorCondition
+                    {
+                        mode = AnimatorConditionMode.Equals,
+                        parameter = baseName,
+                        threshold = i,
+                    },
+                };
             }
             // menu
             var menu = new VRCExpressionsMenu
