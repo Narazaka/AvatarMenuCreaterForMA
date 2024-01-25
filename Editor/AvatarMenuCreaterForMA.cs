@@ -1010,6 +1010,8 @@ namespace net.narazaka.avatarmenucreater
             var layer = controller.layers[0];
             layer.name = baseName;
             layer.stateMachine.name = baseName;
+            layer.stateMachine.entryPosition = new Vector3(-600, 0);
+            layer.stateMachine.anyStatePosition = new Vector3(800, 0);
             var idleState = layer.stateMachine.AddState($"{baseName}_idle", new Vector3(-300, 0));
             idleState.motion = inactive;
             idleState.writeDefaultValues = false;
@@ -1220,6 +1222,8 @@ namespace net.narazaka.avatarmenucreater
             var layer = controller.layers[0];
             layer.name = baseName;
             layer.stateMachine.name = baseName;
+            layer.stateMachine.entryPosition = new Vector3(-600, 0);
+            layer.stateMachine.anyStatePosition = new Vector3(800, 0);
             var idleState = layer.stateMachine.AddState($"{baseName}_idle", new Vector3(-300, 0));
             idleState.motion = choices[0];
             idleState.writeDefaultValues = false;
