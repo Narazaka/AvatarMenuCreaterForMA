@@ -14,7 +14,7 @@ namespace net.narazaka.avatarmenucreator.editor
         AvatarChooseMenu AvatarMenu;
         public CreateAvatarChooseMenu(AvatarChooseMenu avatarChooseMenu) => AvatarMenu = avatarChooseMenu;
 
-        public override void CreateAssets(IncludeAssetType includeAssetType, string baseName, string basePath, string[] children)
+        public override CreatedAssets CreateAssets(string baseName, string[] children)
         {
             var matchGameObjects = new HashSet<string>(children);
             // clip
@@ -148,7 +148,7 @@ namespace net.narazaka.avatarmenucreator.editor
                 },
             };
             parentMenu.name = $"{baseName}_parent";
-            SaveAssets(includeAssetType, baseName, basePath, controller, choices, menu, parentMenu, (prefab) =>
+            return new CreatedAssets(baseName, controller, choices, menu, parentMenu, (prefab) =>
             {
                 var menuInstaller = prefab.GetOrAddComponent<ModularAvatarMenuInstaller>();
                 menuInstaller.menuToAppend = parentMenu;

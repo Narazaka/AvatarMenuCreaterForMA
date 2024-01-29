@@ -12,7 +12,7 @@ namespace net.narazaka.avatarmenucreator.editor
         AvatarToggleMenu AvatarMenu;
         public CreateAvatarToggleMenu(AvatarToggleMenu avatarToggleMenu) => AvatarMenu = avatarToggleMenu;
 
-        public override void CreateAssets(IncludeAssetType includeAssetType, string baseName, string basePath, string[] children)
+        public override CreatedAssets CreateAssets(string baseName, string[] children)
         {
             var matchGameObjects = new HashSet<string>(children);
             // clip
@@ -201,7 +201,7 @@ namespace net.narazaka.avatarmenucreator.editor
                 },
             };
             menu.name = baseName;
-            SaveAssets(includeAssetType, baseName, basePath, controller, AvatarMenu.TransitionSeconds > 0 ? new AnimationClip[] { active, inactive, activate, inactivate } : new AnimationClip[] { active, inactive }, menu, null, (prefab) =>
+            return new CreatedAssets(baseName, controller, AvatarMenu.TransitionSeconds > 0 ? new AnimationClip[] { active, inactive, activate, inactivate } : new AnimationClip[] { active, inactive }, menu, null, (prefab) =>
             {
                 var menuInstaller = prefab.GetOrAddComponent<ModularAvatarMenuInstaller>();
                 menuInstaller.menuToAppend = menu;

@@ -151,7 +151,7 @@ namespace net.narazaka.avatarmenucreator.editor
                 {
                     createAvatarMenu = CreateAvatarMenuBase.GetCreateAvatarMenu(AvatarRadialMenu);
                 }
-                createAvatarMenu.CreateAssets(IncludeAssetType, baseName, basePath, children);
+                createAvatarMenu.CreateAssets(baseName, children).SaveAssets(IncludeAssetType, basePath);
                 SaveFolder = System.IO.Path.GetDirectoryName(basePath);
             }
         }

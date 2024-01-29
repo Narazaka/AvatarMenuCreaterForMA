@@ -13,7 +13,7 @@ namespace net.narazaka.avatarmenucreator.editor
         AvatarRadialMenu AvatarMenu;
         public CreateAvatarRadialMenu(AvatarRadialMenu avatarRadialMenu) => AvatarMenu = avatarRadialMenu;
 
-        public override void CreateAssets(IncludeAssetType includeAssetType, string baseName, string basePath, string[] children)
+        public override CreatedAssets CreateAssets(string baseName, string[] children)
         {
             var matchGameObjects = new HashSet<string>(children);
             // clip
@@ -131,7 +131,7 @@ namespace net.narazaka.avatarmenucreator.editor
             };
             menu.name = baseName;
             // prefab
-            SaveAssets(includeAssetType, baseName, basePath, controller, emptyClip == null ? new AnimationClip[] { clip } : new AnimationClip[] { clip, emptyClip }, menu, null, (prefab) =>
+            return new CreatedAssets(baseName, controller, emptyClip == null ? new AnimationClip[] { clip } : new AnimationClip[] { clip, emptyClip }, menu, null, (prefab) =>
             {
                 var menuInstaller = prefab.GetOrAddComponent<ModularAvatarMenuInstaller>();
                 menuInstaller.menuToAppend = menu;
