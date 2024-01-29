@@ -402,32 +402,24 @@ namespace net.narazaka.avatarmenucreator
                 },
             };
             menu.name = baseName;
-            // prefab
-            var prefabPath = $"{basePath}.prefab";
-            var prefab = new GameObject(baseName);
-            PrefabUtility.SaveAsPrefabAsset(prefab, prefabPath);
-            UnityEngine.Object.DestroyImmediate(prefab);
-            SaveAssets(includeAssetType, baseName, basePath, controller, TransitionSeconds > 0 ? new AnimationClip[] { active, inactive, activate, inactivate } : new AnimationClip[] { active, inactive }, menu);
-            prefab = PrefabUtility.LoadPrefabContents(prefabPath);
-            var menuInstaller = prefab.GetOrAddComponent<ModularAvatarMenuInstaller>();
-            menuInstaller.menuToAppend = menu;
-            var parameters = prefab.GetOrAddComponent<ModularAvatarParameters>();
-            parameters.parameters.Add(new ParameterConfig
+            SaveAssets(includeAssetType, baseName, basePath, controller, TransitionSeconds > 0 ? new AnimationClip[] { active, inactive, activate, inactivate } : new AnimationClip[] { active, inactive }, menu, null, (prefab) =>
             {
-                nameOrPrefix = baseName,
-                defaultValue = ToggleDefaultValue ? 1 : 0,
-                syncType = ParameterSyncType.Bool,
-                saved = true,
+                var menuInstaller = prefab.GetOrAddComponent<ModularAvatarMenuInstaller>();
+                menuInstaller.menuToAppend = menu;
+                var parameters = prefab.GetOrAddComponent<ModularAvatarParameters>();
+                parameters.parameters.Add(new ParameterConfig
+                {
+                    nameOrPrefix = baseName,
+                    defaultValue = ToggleDefaultValue ? 1 : 0,
+                    syncType = ParameterSyncType.Bool,
+                    saved = true,
+                });
+                var mergeAnimator = prefab.GetOrAddComponent<ModularAvatarMergeAnimator>();
+                mergeAnimator.animator = controller;
+                mergeAnimator.layerType = VRCAvatarDescriptor.AnimLayerType.FX;
+                mergeAnimator.pathMode = MergeAnimatorPathMode.Absolute;
+                mergeAnimator.matchAvatarWriteDefaults = true;
             });
-            var mergeAnimator = prefab.GetOrAddComponent<ModularAvatarMergeAnimator>();
-            mergeAnimator.animator = controller;
-            mergeAnimator.layerType = VRCAvatarDescriptor.AnimLayerType.FX;
-            mergeAnimator.pathMode = MergeAnimatorPathMode.Absolute;
-            mergeAnimator.matchAvatarWriteDefaults = true;
-
-            PrefabUtility.SaveAsPrefabAsset(prefab, prefabPath);
-            PrefabUtility.UnloadPrefabContents(prefab);
-            AssetDatabase.SaveAssets();
         }
 #endif
     }

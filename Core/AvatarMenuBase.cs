@@ -176,7 +176,24 @@ namespace net.narazaka.avatarmenucreator
             return newFoldout;
         }
 
-        protected void SaveAssets(IncludeAssetType includeAssetType, string baseName, string basePath, AnimatorController controller, IEnumerable<AnimationClip> clips, VRCExpressionsMenu menu, VRCExpressionsMenu parentMenu = null)
+        protected void SaveAssets(IncludeAssetType includeAssetType, string baseName, string basePath, AnimatorController controller, IEnumerable<AnimationClip> clips, VRCExpressionsMenu menu, VRCExpressionsMenu parentMenu, Action<GameObject> modifyPrefab)
+        {
+            // prefab
+            var prefabPath = $"{basePath}.prefab";
+            var prefab = new GameObject(baseName);
+            PrefabUtility.SaveAsPrefabAsset(prefab, prefabPath);
+            UnityEngine.Object.DestroyImmediate(prefab);
+            SaveAssets(includeAssetType, baseName, basePath, controller, clips, menu, parentMenu);
+            prefab = PrefabUtility.LoadPrefabContents(prefabPath);
+
+            modifyPrefab(prefab);
+
+            PrefabUtility.SaveAsPrefabAsset(prefab, prefabPath);
+            PrefabUtility.UnloadPrefabContents(prefab);
+            AssetDatabase.SaveAssets();
+        }
+
+        void SaveAssets(IncludeAssetType includeAssetType, string baseName, string basePath, AnimatorController controller, IEnumerable<AnimationClip> clips, VRCExpressionsMenu menu, VRCExpressionsMenu parentMenu = null)
         {
             var prefabPath = $"{basePath}.prefab";
             var controllerPath = $"{basePath}.controller";
