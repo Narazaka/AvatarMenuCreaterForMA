@@ -1,13 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 #if UNITY_EDITOR
 using UnityEditor;
-using UnityEditor.Animations;
 using net.narazaka.avatarmenucreator.editor.util;
 #endif
-using VRC.SDK3.Avatars.ScriptableObjects;
 
 namespace net.narazaka.avatarmenucreator
 {
