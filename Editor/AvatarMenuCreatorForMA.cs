@@ -14,6 +14,8 @@ namespace net.narazaka.avatarmenucreator
         AvatarChooseMenu AvatarChooseMenu = new AvatarChooseMenu();
         AvatarRadialMenu AvatarRadialMenu = new AvatarRadialMenu();
 
+        bool BulkSet;
+
         string SaveFolder = "Assets";
 
         [MenuItem("Tools/Modular Avatar/AvatarMenuCreator for Modular Avatar")]
@@ -25,6 +27,14 @@ namespace net.narazaka.avatarmenucreator
         void Update()
         {
             Repaint();
+        }
+
+        void ShowBulkSet()
+        {
+            BulkSet = EditorGUILayout.ToggleLeft("同名パラメーターや同マテリアルスロットを一括設定", BulkSet);
+            AvatarToggleMenu.BulkSet = BulkSet;
+            AvatarChooseMenu.BulkSet = BulkSet;
+            AvatarRadialMenu.BulkSet = BulkSet;
         }
 
         void OnGUI()
@@ -46,6 +56,8 @@ namespace net.narazaka.avatarmenucreator
             }
 
             MenuType = (MenuType)EditorGUILayout.EnumPopup(MenuType);
+
+            ShowBulkSet();
 
             if (MenuType == MenuType.Toggle)
             {

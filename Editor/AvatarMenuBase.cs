@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using UnityEngine;
 using UnityEditor;
 using VRC.SDK3.Avatars.ScriptableObjects;
@@ -12,9 +10,9 @@ namespace net.narazaka.avatarmenucreator
 {
     public abstract class AvatarMenuBase
     {
-        protected float TransitionSeconds;
+        public bool BulkSet;
 
-        protected bool BulkSet;
+        protected float TransitionSeconds;
 
         HashSet<GameObject> FoldoutGameObjects = new HashSet<GameObject>();
         HashSet<GameObject> FoldoutMaterials = new HashSet<GameObject>();
@@ -55,11 +53,6 @@ namespace net.narazaka.avatarmenucreator
                     EditorGUILayout.HelpBox("指定時間かけて変化します", MessageType.Info);
                 }
             }
-        }
-
-        protected void ShowBulkSet()
-        {
-            BulkSet = EditorGUILayout.ToggleLeft("同名パラメーターや同マテリアルスロットを一括設定", BulkSet);
         }
 
         protected bool FoldoutGameObjectHeader(GameObject gameObject, string title)

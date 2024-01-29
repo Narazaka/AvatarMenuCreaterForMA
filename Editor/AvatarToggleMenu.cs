@@ -22,7 +22,6 @@ namespace net.narazaka.avatarmenucreator
 
         protected override void OnHeaderGUI(GameObject baseObject, GameObject[] gameObjects)
         {
-            ShowBulkSet();
             ShowTransitionSeconds();
         }
 

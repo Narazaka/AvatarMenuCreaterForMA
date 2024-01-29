@@ -1,8 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using UnityEngine;
 using UnityEditor;
 using VRC.SDK3.Avatars.Components;
@@ -28,8 +25,6 @@ namespace net.narazaka.avatarmenucreator
 
         protected override void OnHeaderGUI(GameObject baseObject, GameObject[] gameObjects)
         {
-            ShowBulkSet();
-
             RadialDefaultValue = EditorGUILayout.FloatField("パラメーター初期値", RadialDefaultValue);
             if (RadialDefaultValue < 0) RadialDefaultValue = 0;
             if (RadialDefaultValue > 1) RadialDefaultValue = 1;

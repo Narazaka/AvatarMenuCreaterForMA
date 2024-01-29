@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using UnityEngine;
 using UnityEditor;
 using VRC.SDK3.Avatars.Components;
@@ -30,7 +28,6 @@ namespace net.narazaka.avatarmenucreator
 
         protected override void OnHeaderGUI(GameObject baseObject, GameObject[] gameObjects)
         {
-            ShowBulkSet();
             ShowTransitionSeconds();
 
             ChooseCount = EditorGUILayout.IntField("選択肢の数", ChooseCount);
