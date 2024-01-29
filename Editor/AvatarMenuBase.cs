@@ -134,12 +134,12 @@ namespace net.narazaka.avatarmenucreator
             return newFoldout;
         }
 
-        protected void SaveAssets(IncludeAssetType IncludeAssetType, string baseName, string basePath, AnimatorController controller, IEnumerable<AnimationClip> clips, VRCExpressionsMenu menu, VRCExpressionsMenu parentMenu = null)
+        protected void SaveAssets(IncludeAssetType includeAssetType, string baseName, string basePath, AnimatorController controller, IEnumerable<AnimationClip> clips, VRCExpressionsMenu menu, VRCExpressionsMenu parentMenu = null)
         {
             var prefabPath = $"{basePath}.prefab";
             var controllerPath = $"{basePath}.controller";
             AssetDatabase.LoadAllAssetsAtPath(prefabPath).Where(a => !(a is GameObject)).ToList().ForEach(AssetDatabase.RemoveObjectFromAsset);
-            if (IncludeAssetType == IncludeAssetType.Include)
+            if (includeAssetType == IncludeAssetType.Include)
             {
                 AssetDatabase.AddObjectToAsset(menu, prefabPath);
                 if (parentMenu != null) AssetDatabase.AddObjectToAsset(parentMenu, prefabPath);
@@ -150,7 +150,7 @@ namespace net.narazaka.avatarmenucreator
                 controller.name = baseName;
                 SaveAnimator(controller, prefabPath, true);
             }
-            else if (IncludeAssetType == IncludeAssetType.AnimatorAndInclude)
+            else if (includeAssetType == IncludeAssetType.AnimatorAndInclude)
             {
                 AssetDatabase.AddObjectToAsset(menu, prefabPath);
                 if (parentMenu != null) AssetDatabase.AddObjectToAsset(parentMenu, prefabPath);

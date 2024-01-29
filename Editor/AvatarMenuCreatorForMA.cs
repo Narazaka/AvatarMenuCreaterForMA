@@ -1,13 +1,6 @@
-using System.Linq;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
-using UnityEditor.Animations;
 using VRC.SDK3.Avatars.Components;
-using VRC.SDK3.Avatars.ScriptableObjects;
-using VRC.Core;
-using nadena.dev.modular_avatar.core;
-using System;
 
 namespace net.narazaka.avatarmenucreator
 {
@@ -16,8 +9,6 @@ namespace net.narazaka.avatarmenucreator
         VRCAvatarDescriptor VRCAvatarDescriptor;
         MenuType MenuType = MenuType.Toggle;
         IncludeAssetType IncludeAssetType = IncludeAssetType.AnimatorAndInclude;
-
-        bool BulkSet;
 
         AvatarToggleMenu AvatarToggleMenu = new AvatarToggleMenu();
         AvatarChooseMenu AvatarChooseMenu = new AvatarChooseMenu();
