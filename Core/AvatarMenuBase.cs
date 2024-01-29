@@ -44,11 +44,13 @@ namespace net.narazaka.avatarmenucreator
         Dictionary<string, GameObject> GameObjectCache = new Dictionary<string, GameObject>();
 
         public abstract void CreateAssets(IncludeAssetType includeAssetType, string baseName, string basePath, string[] children);
-        protected abstract void OnHeaderGUI(string[] children);
-        protected abstract void OnMainGUI(string[] children);
+        public abstract IEnumerable<string> GetStoredChildren();
+        public abstract void RemoveStoredChild(string child);
+        protected abstract void OnHeaderGUI(IList<string> children);
+        protected abstract void OnMainGUI(IList<string> children);
         protected abstract bool IsSuitableForTransition();
 
-        public void OnAvatarMenuGUI(string[] children)
+        public void OnAvatarMenuGUI(IList<string> children)
         {
             OnHeaderGUI(children);
 

@@ -1,6 +1,7 @@
 ﻿using nadena.dev.modular_avatar.core;
 using net.narazaka.avatarmenucreator.collections.instance;
 using System;
+using System.Linq;
 using System.Collections.Generic;
 #if UNITY_EDITOR
 using UnityEditor;
@@ -25,14 +26,27 @@ namespace net.narazaka.avatarmenucreator
 
 #if UNITY_EDITOR
 
+        public override IEnumerable<string> GetStoredChildren() => ToggleObjects.Keys.Concat(ToggleBlendShapes.Keys.Select(k => k.Item1)).Concat(ToggleShaderParameters.Keys.Select(k => k.Item1)).Distinct();
+        public override void RemoveStoredChild(string child)
+        {
+            ToggleObjects.Remove(child);
+            foreach (var key in ToggleBlendShapes.Keys.Where(k => k.Item1 == child))
+            {
+                ToggleBlendShapes.Remove(key);
+            }
+            foreach (var key in ToggleShaderParameters.Keys.Where(k => k.Item1 == child))
+            {
+                ToggleShaderParameters.Remove(key);
+            }
+        }
         protected override bool IsSuitableForTransition() => ToggleBlendShapes.Count > 0 || ToggleShaderParameters.Count > 0;
 
-        protected override void OnHeaderGUI(string[] children)
+        protected override void OnHeaderGUI(IList<string> children)
         {
             ShowTransitionSeconds();
         }
 
-        protected override void OnMainGUI(string[] children)
+        protected override void OnMainGUI(IList<string> children)
         {
             foreach (var child in children)
             {

@@ -38,9 +38,28 @@ namespace net.narazaka.avatarmenucreator
             return $"選択肢{index}";
         }
 
+        public override IEnumerable<string> GetStoredChildren() => ChooseObjects.Keys.Concat(ChooseMaterials.Keys.Select(key => key.Item1)).Concat(ChooseBlendShapes.Keys.Select(key => key.Item1)).Concat(ChooseShaderParameters.Keys.Select(key => key.Item1)).Distinct();
+
+        public override void RemoveStoredChild(string child)
+        {
+            ChooseObjects.Remove(child);
+            foreach (var key in ChooseMaterials.Keys.Where(key => key.Item1 == child))
+            {
+                ChooseMaterials.Remove(key);
+            }
+            foreach (var key in ChooseBlendShapes.Keys.Where(key => key.Item1 == child))
+            {
+                ChooseBlendShapes.Remove(key);
+            }
+            foreach (var key in ChooseShaderParameters.Keys.Where(key => key.Item1 == child))
+            {
+                ChooseShaderParameters.Remove(key);
+            }
+        }
+
         protected override bool IsSuitableForTransition() => ChooseBlendShapes.Count > 0 || ChooseShaderParameters.Count > 0;
 
-        protected override void OnHeaderGUI(string[] children)
+        protected override void OnHeaderGUI(IList<string> children)
         {
             ShowTransitionSeconds();
 
@@ -60,7 +79,7 @@ namespace net.narazaka.avatarmenucreator
             }
         }
 
-        protected override void OnMainGUI(string[] children)
+        protected override void OnMainGUI(IList<string> children)
         {
             var allMaterials = children.ToDictionary(child => child, child => Util.GetMaterialSlots(GetGameObject(child)));
 

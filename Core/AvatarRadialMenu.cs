@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Collections.Generic;
 using UnityEngine;
 #if UNITY_EDITOR
@@ -31,12 +32,24 @@ namespace net.narazaka.avatarmenucreator
 
 #if UNITY_EDITOR
 
+        public override IEnumerable<string> GetStoredChildren() => RadialBlendShapes.Keys.Select(key => key.Item1).Concat(RadialShaderParameters.Keys.Select(key => key.Item1)).Distinct();
+        public override void RemoveStoredChild(string child)
+        {
+            foreach (var key in RadialBlendShapes.Keys.Where(k => k.Item1 == child))
+            {
+                RadialBlendShapes.Remove(key);
+            }
+            foreach (var key in RadialShaderParameters.Keys.Where(k => k.Item1 == child))
+            {
+                RadialShaderParameters.Remove(key);
+            }
+        }
         protected override bool IsSuitableForTransition()
         {
             return false;
         }
 
-        protected override void OnHeaderGUI(string[] children)
+        protected override void OnHeaderGUI(IList<string> children)
         {
             RadialDefaultValue = EditorGUILayout.FloatField("パラメーター初期値", RadialDefaultValue);
             if (RadialDefaultValue < 0) RadialDefaultValue = 0;
@@ -107,7 +120,7 @@ namespace net.narazaka.avatarmenucreator
             }
         }
 
-        protected override void OnMainGUI(string[] children)
+        protected override void OnMainGUI(IList<string> children)
         {
             foreach (var child in children)
             {
