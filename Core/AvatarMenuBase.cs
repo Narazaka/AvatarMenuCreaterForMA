@@ -2,17 +2,25 @@
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+#if UNITY_EDITOR
 using UnityEditor;
-using VRC.SDK3.Avatars.ScriptableObjects;
 using UnityEditor.Animations;
+using net.narazaka.avatarmenucreator.editor.util;
+#endif
+using VRC.SDK3.Avatars.ScriptableObjects;
 
 namespace net.narazaka.avatarmenucreator
 {
+    [Serializable]
     public abstract class AvatarMenuBase
     {
+        [NonSerialized]
         public bool BulkSet;
 
+        [SerializeField]
         protected float TransitionSeconds;
+
+#if UNITY_EDITOR
 
         HashSet<GameObject> FoldoutGameObjects = new HashSet<GameObject>();
         HashSet<GameObject> FoldoutMaterials = new HashSet<GameObject>();
@@ -212,5 +220,6 @@ namespace net.narazaka.avatarmenucreator
                 SaveStateMachine(m.stateMachine, path);
             }
         }
+#endif
     }
 }

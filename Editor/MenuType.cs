@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace net.narazaka.avatarmenucreator
+namespace net.narazaka.avatarmenucreator.editor
 {
     enum MenuType
     {

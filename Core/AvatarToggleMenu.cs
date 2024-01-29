@@ -2,8 +2,11 @@
 using net.narazaka.avatarmenucreator.collections.instance;
 using System;
 using System.Collections.Generic;
+#if UNITY_EDITOR
 using UnityEditor;
 using UnityEditor.Animations;
+using net.narazaka.avatarmenucreator.editor.util;
+#endif
 using UnityEngine;
 using VRC.SDK3.Avatars.Components;
 using VRC.SDK3.Avatars.ScriptableObjects;
@@ -19,6 +22,8 @@ namespace net.narazaka.avatarmenucreator
         ToggleBlendShapeDictionary ToggleBlendShapes = new ToggleBlendShapeDictionary();
         [SerializeField]
         ToggleBlendShapeDictionary ToggleShaderParameters = new ToggleBlendShapeDictionary();
+
+#if UNITY_EDITOR
 
         protected override bool IsSuitableForTransition() => ToggleBlendShapes.Count > 0 || ToggleShaderParameters.Count > 0;
 
@@ -401,5 +406,6 @@ namespace net.narazaka.avatarmenucreator
             PrefabUtility.UnloadPrefabContents(prefab);
             AssetDatabase.SaveAssets();
         }
+#endif
     }
 }

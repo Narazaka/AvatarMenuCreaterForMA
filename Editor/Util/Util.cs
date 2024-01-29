@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace net.narazaka.avatarmenucreator
+namespace net.narazaka.avatarmenucreator.editor.util
 {
     public static class Util
     {

@@ -2,10 +2,13 @@
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+#if UNITY_EDITOR
 using UnityEditor;
+using UnityEditor.Animations;
+using net.narazaka.avatarmenucreator.editor.util;
+#endif
 using VRC.SDK3.Avatars.Components;
 using nadena.dev.modular_avatar.core;
-using UnityEditor.Animations;
 using VRC.SDK3.Avatars.ScriptableObjects;
 using net.narazaka.avatarmenucreator.collections.instance;
 
@@ -26,6 +29,9 @@ namespace net.narazaka.avatarmenucreator
         int ChooseCount = 2;
         [SerializeField]
         IntStringDictionary ChooseNames = new IntStringDictionary();
+
+#if UNITY_EDITOR
+
         string ChooseName(int index)
         {
             if (ChooseNames.ContainsKey(index)) return ChooseNames[index];
@@ -467,5 +473,6 @@ namespace net.narazaka.avatarmenucreator
             PrefabUtility.UnloadPrefabContents(prefab);
             AssetDatabase.SaveAssets();
         }
+#endif
     }
 }

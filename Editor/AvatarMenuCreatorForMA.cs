@@ -2,7 +2,7 @@ using UnityEngine;
 using UnityEditor;
 using VRC.SDK3.Avatars.Components;
 
-namespace net.narazaka.avatarmenucreator
+namespace net.narazaka.avatarmenucreator.editor
 {
     public class AvatarMenuCreatorForMA : EditorWindow
     {
