@@ -26,6 +26,8 @@ namespace net.narazaka.avatarmenucreator
         [SerializeField]
         ChooseBlendShapeDictionary ChooseShaderParameters = new ChooseBlendShapeDictionary();
         [SerializeField]
+        int ChooseDefaultValue;
+        [SerializeField]
         int ChooseCount = 2;
         [SerializeField]
         IntStringDictionary ChooseNames = new IntStringDictionary();
@@ -64,7 +66,13 @@ namespace net.narazaka.avatarmenucreator
         {
             ShowTransitionSeconds();
 
+            ChooseDefaultValue = IntField("パラメーター初期値", ChooseDefaultValue);
+
             ChooseCount = IntField("選択肢の数", ChooseCount);
+
+            if (ChooseDefaultValue < 0 && ChooseCount > 0) ChooseDefaultValue = 0;
+            if (ChooseDefaultValue >= ChooseCount) ChooseDefaultValue = ChooseCount - 1;
+
             EditorGUI.indentLevel++;
             for (var i = 0; i < ChooseCount; ++i)
             {
@@ -488,7 +496,7 @@ namespace net.narazaka.avatarmenucreator
             parameters.parameters.Add(new ParameterConfig
             {
                 nameOrPrefix = baseName,
-                defaultValue = 0,
+                defaultValue = ChooseDefaultValue,
                 syncType = ParameterSyncType.Int,
                 saved = true,
             });

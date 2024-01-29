@@ -23,6 +23,8 @@ namespace net.narazaka.avatarmenucreator
         ToggleBlendShapeDictionary ToggleBlendShapes = new ToggleBlendShapeDictionary();
         [SerializeField]
         ToggleBlendShapeDictionary ToggleShaderParameters = new ToggleBlendShapeDictionary();
+        [SerializeField]
+        bool ToggleDefaultValue;
 
 #if UNITY_EDITOR
 
@@ -45,6 +47,7 @@ namespace net.narazaka.avatarmenucreator
         protected override void OnHeaderGUI(IList<string> children)
         {
             ShowTransitionSeconds();
+            ToggleDefaultValue = Toggle("パラメーター初期値", ToggleDefaultValue);
         }
 
         protected override void OnMainGUI(IList<string> children)
@@ -412,7 +415,7 @@ namespace net.narazaka.avatarmenucreator
             parameters.parameters.Add(new ParameterConfig
             {
                 nameOrPrefix = baseName,
-                defaultValue = 0,
+                defaultValue = ToggleDefaultValue ? 1 : 0,
                 syncType = ParameterSyncType.Bool,
                 saved = true,
             });
