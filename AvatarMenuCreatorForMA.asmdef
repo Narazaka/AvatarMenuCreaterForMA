@@ -3,9 +3,7 @@
     "references": [
         "nadena.dev.modular-avatar.core"
     ],
-    "includePlatforms": [
-        "Editor"
-    ],
+    "includePlatforms": [],
     "excludePlatforms": [],
     "allowUnsafeCode": false,
     "overrideReferences": false,

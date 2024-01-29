@@ -7,17 +7,25 @@ using VRC.SDK3.Avatars.Components;
 using nadena.dev.modular_avatar.core;
 using UnityEditor.Animations;
 using VRC.SDK3.Avatars.ScriptableObjects;
+using net.narazaka.avatarmenucreator.collections.instance;
 
 namespace net.narazaka.avatarmenucreator
 {
+    [Serializable]
     public class AvatarChooseMenu : AvatarMenuBase
     {
-        Dictionary<GameObject, HashSet<int>> ChooseObjects = new Dictionary<GameObject, HashSet<int>>();
-        Dictionary<(GameObject, int), Dictionary<int, Material>> ChooseMaterials = new Dictionary<(GameObject, int), Dictionary<int, Material>>();
-        Dictionary<(GameObject, string), Dictionary<int, float>> ChooseBlendShapes = new Dictionary<(GameObject, string), Dictionary<int, float>>();
-        Dictionary<(GameObject, string), Dictionary<int, float>> ChooseShaderParameters = new Dictionary<(GameObject, string), Dictionary<int, float>>();
+        [SerializeField]
+        IntHashSetDictionary ChooseObjects = new IntHashSetDictionary();
+        [SerializeField]
+        ChooseMaterialDictionary ChooseMaterials = new ChooseMaterialDictionary();
+        [SerializeField]
+        ChooseBlendShapeDictionary ChooseBlendShapes = new ChooseBlendShapeDictionary();
+        [SerializeField]
+        ChooseBlendShapeDictionary ChooseShaderParameters = new ChooseBlendShapeDictionary();
+        [SerializeField]
         int ChooseCount = 2;
-        Dictionary<int, string> ChooseNames = new Dictionary<int, string>();
+        [SerializeField]
+        IntStringDictionary ChooseNames = new IntStringDictionary();
         string ChooseName(int index)
         {
             if (ChooseNames.ContainsKey(index)) return ChooseNames[index];
@@ -90,16 +98,16 @@ namespace net.narazaka.avatarmenucreator
 
         void ShowChooseObjectControl(GameObject gameObject)
         {
-            HashSet<int> indexes;
+            IntHashSet indexes;
             if (!ChooseObjects.TryGetValue(gameObject, out indexes))
             {
-                indexes = new HashSet<int>();
+                indexes = new IntHashSet();
             }
             var changed = false;
             var isEmpty = indexes.Count == 0;
             if (EditorGUILayout.ToggleLeft($"制御しない", isEmpty) && !isEmpty)
             {
-                indexes = new HashSet<int>();
+                indexes = new IntHashSet();
                 changed = true;
             }
             for (var i = 0; i < ChooseCount; i++)
@@ -137,7 +145,7 @@ namespace net.narazaka.avatarmenucreator
             for (var i = 0; i < materials.Length; ++i)
             {
                 var key = (gameObject, i);
-                Dictionary<int, Material> values;
+                IntMaterialDictionary values;
                 if (ChooseMaterials.TryGetValue(key, out values))
                 {
                     if (ShowChooseMaterialToggle(i, materials[i], true))
@@ -167,7 +175,7 @@ namespace net.narazaka.avatarmenucreator
                 {
                     if (ShowChooseMaterialToggle(i, materials[i], false))
                     {
-                        ChooseMaterials[key] = new Dictionary<int, Material>();
+                        ChooseMaterials[key] = new IntMaterialDictionary();
                     }
                 }
             }
@@ -233,7 +241,7 @@ namespace net.narazaka.avatarmenucreator
 
         void ShowChooseBlendShapeControl(
             GameObject gameObject,
-            Dictionary<(GameObject, string), Dictionary<int, float>> choices,
+            ChooseBlendShapeDictionary choices,
             IEnumerable<Util.INameAndDescription> names,
             float? minValue = 0,
             float? maxValue = 100
@@ -242,7 +250,7 @@ namespace net.narazaka.avatarmenucreator
             foreach (var name in names)
             {
                 var key = (gameObject, name.Name);
-                Dictionary<int, float> values;
+                IntFloatDictionary values;
                 if (choices.TryGetValue(key, out values))
                 {
                     if (EditorGUILayout.ToggleLeft(name.Description, true))
@@ -281,13 +289,13 @@ namespace net.narazaka.avatarmenucreator
                 {
                     if (EditorGUILayout.ToggleLeft(name.Description, false))
                     {
-                        choices[key] = new Dictionary<int, float>();
+                        choices[key] = new IntFloatDictionary();
                     }
                 }
             }
         }
 
-        void BulkSetChooseBlendShape(Dictionary<(GameObject, string), Dictionary<int, float>> choices, string toggleName, int choiseIndex, float choiceValue)
+        void BulkSetChooseBlendShape(ChooseBlendShapeDictionary choices, string toggleName, int choiseIndex, float choiceValue)
         {
             foreach (var (gameObject, name) in choices.Keys)
             {

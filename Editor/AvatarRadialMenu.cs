@@ -6,16 +6,24 @@ using VRC.SDK3.Avatars.Components;
 using nadena.dev.modular_avatar.core;
 using UnityEditor.Animations;
 using VRC.SDK3.Avatars.ScriptableObjects;
+using net.narazaka.avatarmenucreator.collections.instance;
 
 namespace net.narazaka.avatarmenucreator
 {
+    [Serializable]
     public class AvatarRadialMenu : AvatarMenuBase
     {
-        Dictionary<(GameObject, string), RadialBlendShape> RadialBlendShapes = new Dictionary<(GameObject, string), RadialBlendShape>();
-        Dictionary<(GameObject, string), RadialBlendShape> RadialShaderParameters = new Dictionary<(GameObject, string), RadialBlendShape>();
+        [SerializeField]
+        RadialBlendShapeDictionary RadialBlendShapes = new RadialBlendShapeDictionary();
+        [SerializeField]
+        RadialBlendShapeDictionary RadialShaderParameters = new RadialBlendShapeDictionary();
+        [SerializeField]
         float RadialDefaultValue;
+        [SerializeField]
         bool RadialInactiveRange;
+        [SerializeField]
         float RadialInactiveRangeMin = float.NaN;
+        [SerializeField]
         float RadialInactiveRangeMax = float.NaN;
 
         protected override bool IsSuitableForTransition()

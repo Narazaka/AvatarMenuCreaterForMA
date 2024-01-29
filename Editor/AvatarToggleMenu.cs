@@ -1,9 +1,7 @@
 ﻿using nadena.dev.modular_avatar.core;
+using net.narazaka.avatarmenucreator.collections.instance;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using UnityEditor;
 using UnityEditor.Animations;
 using UnityEngine;
@@ -12,11 +10,15 @@ using VRC.SDK3.Avatars.ScriptableObjects;
 
 namespace net.narazaka.avatarmenucreator
 {
+    [Serializable]
     public class AvatarToggleMenu : AvatarMenuBase
     {
-        Dictionary<GameObject, ToggleType> ToggleObjects = new Dictionary<GameObject, ToggleType>();
-        Dictionary<(GameObject, string), ToggleBlendShape> ToggleBlendShapes = new Dictionary<(GameObject, string), ToggleBlendShape>();
-        Dictionary<(GameObject, string), ToggleBlendShape> ToggleShaderParameters = new Dictionary<(GameObject, string), ToggleBlendShape>();
+        [SerializeField]
+        ToggleTypeDictionary ToggleObjects = new ToggleTypeDictionary();
+        [SerializeField]
+        ToggleBlendShapeDictionary ToggleBlendShapes = new ToggleBlendShapeDictionary();
+        [SerializeField]
+        ToggleBlendShapeDictionary ToggleShaderParameters = new ToggleBlendShapeDictionary();
 
         protected override bool IsSuitableForTransition() => ToggleBlendShapes.Count > 0 || ToggleShaderParameters.Count > 0;
 
