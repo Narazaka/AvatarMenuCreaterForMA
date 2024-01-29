@@ -2,7 +2,7 @@
     "name": "AvatarMenuCreatorForMA.Editor",
     "references": [
         "nadena.dev.modular-avatar.core",
-        "AvatarMenuCreatorForMA",
+        "AvatarMenuCreatorForMA.Core",
         "AvatarMenuCreatorForMA.Editor.Util"
     ],
     "includePlatforms": [
