@@ -40,7 +40,7 @@ namespace net.narazaka.avatarmenucreator
 
         protected override bool IsSuitableForTransition() => ChooseBlendShapes.Count > 0 || ChooseShaderParameters.Count > 0;
 
-        protected override void OnHeaderGUI(string[] gameObjects)
+        protected override void OnHeaderGUI(string[] children)
         {
             ShowTransitionSeconds();
 
@@ -52,7 +52,7 @@ namespace net.narazaka.avatarmenucreator
             }
             EditorGUI.indentLevel--;
 
-            var allMaterials = gameObjects.ToDictionary(gameObject => gameObject, gameObject => Util.GetMaterialSlots(GetGameObject(gameObject)));
+            var allMaterials = children.ToDictionary(child => child, child => Util.GetMaterialSlots(GetGameObject(child)));
 
             if (BulkSet)
             {
@@ -60,53 +60,53 @@ namespace net.narazaka.avatarmenucreator
             }
         }
 
-        protected override void OnMainGUI(string[] gameObjects)
+        protected override void OnMainGUI(string[] children)
         {
-            var allMaterials = gameObjects.ToDictionary(gameObject => gameObject, gameObject => Util.GetMaterialSlots(GetGameObject(gameObject)));
+            var allMaterials = children.ToDictionary(child => child, child => Util.GetMaterialSlots(GetGameObject(child)));
 
-            foreach (var gameObject in gameObjects)
+            foreach (var child in children)
             {
                 EditorGUILayout.Space();
-                EditorGUILayout.LabelField(gameObject);
+                EditorGUILayout.LabelField(child);
                 EditorGUI.indentLevel++;
-                if (FoldoutGameObjectHeader(gameObject, "GameObject"))
+                if (FoldoutGameObjectHeader(child, "GameObject"))
                 {
                     EditorGUI.indentLevel++;
-                    ShowChooseObjectControl(gameObject);
+                    ShowChooseObjectControl(child);
                     EditorGUI.indentLevel--;
                 }
 
-                var materials = allMaterials[gameObject];
-                if (materials.Length > 0 && FoldoutMaterialHeader(gameObject, "Materials"))
+                var materials = allMaterials[child];
+                if (materials.Length > 0 && FoldoutMaterialHeader(child, "Materials"))
                 {
                     EditorGUI.indentLevel++;
-                    ShowChooseMaterialControl(gameObject, materials);
+                    ShowChooseMaterialControl(child, materials);
                     EditorGUI.indentLevel--;
                 }
 
-                var gameObjectRef = GetGameObject(gameObject);
+                var gameObjectRef = GetGameObject(child);
                 var names = Util.GetBlendShapeNames(gameObjectRef);
                 var parameters = ShaderParametersCache.GetFilteredShaderParameters(gameObjectRef);
-                if (names.Count > 0 && FoldoutBlendShapeHeader(gameObject, "BlendShapes"))
+                if (names.Count > 0 && FoldoutBlendShapeHeader(child, "BlendShapes"))
                 {
                     EditorGUI.indentLevel++;
-                    ShowChooseBlendShapeControl(gameObject, ChooseBlendShapes, names.ToNames());
+                    ShowChooseBlendShapeControl(child, ChooseBlendShapes, names.ToNames());
                     EditorGUI.indentLevel--;
                 }
-                if (parameters.Count > 0 && FoldoutShaderParameterHeader(gameObject, "Shader Parameters"))
+                if (parameters.Count > 0 && FoldoutShaderParameterHeader(child, "Shader Parameters"))
                 {
                     EditorGUI.indentLevel++;
-                    ShowChooseBlendShapeControl(gameObject, ChooseShaderParameters, parameters, minValue: null, maxValue: null);
+                    ShowChooseBlendShapeControl(child, ChooseShaderParameters, parameters, minValue: null, maxValue: null);
                     EditorGUI.indentLevel--;
                 }
                 EditorGUI.indentLevel--;
             }
         }
 
-        void ShowChooseObjectControl(string gameObject)
+        void ShowChooseObjectControl(string child)
         {
             IntHashSet indexes;
-            if (!ChooseObjects.TryGetValue(gameObject, out indexes))
+            if (!ChooseObjects.TryGetValue(child, out indexes))
             {
                 indexes = new IntHashSet();
             }
@@ -138,20 +138,20 @@ namespace net.narazaka.avatarmenucreator
             {
                 if (indexes.Count == 0)
                 {
-                    ChooseObjects.Remove(gameObject);
+                    ChooseObjects.Remove(child);
                 }
                 else
                 {
-                    ChooseObjects[gameObject] = indexes;
+                    ChooseObjects[child] = indexes;
                 }
             }
         }
 
-        void ShowChooseMaterialControl(string gameObject, Material[] materials)
+        void ShowChooseMaterialControl(string child, Material[] materials)
         {
             for (var i = 0; i < materials.Length; ++i)
             {
-                var key = (gameObject, i);
+                var key = (child, i);
                 IntMaterialDictionary values;
                 if (ChooseMaterials.TryGetValue(key, out values))
                 {
@@ -205,12 +205,12 @@ namespace net.narazaka.avatarmenucreator
 
         void SetBulkChooseMaterial(Material sourceMaterial, int choiseIndex, Material choiceMaterial)
         {
-            foreach (var (gameObject, index) in ChooseMaterials.Keys)
+            foreach (var (child, index) in ChooseMaterials.Keys)
             {
-                var materials = Util.GetMaterialSlots(GetGameObject(gameObject));
+                var materials = Util.GetMaterialSlots(GetGameObject(child));
                 if (index < materials.Length && materials[index] == sourceMaterial)
                 {
-                    var values = ChooseMaterials[(gameObject, index)];
+                    var values = ChooseMaterials[(child, index)];
                     values[choiseIndex] = choiceMaterial;
                 }
             }
@@ -247,7 +247,7 @@ namespace net.narazaka.avatarmenucreator
         }
 
         void ShowChooseBlendShapeControl(
-            string gameObject,
+            string child,
             ChooseBlendShapeDictionary choices,
             IEnumerable<Util.INameAndDescription> names,
             float? minValue = 0,
@@ -256,7 +256,7 @@ namespace net.narazaka.avatarmenucreator
         {
             foreach (var name in names)
             {
-                var key = (gameObject, name.Name);
+                var key = (child, name.Name);
                 IntFloatDictionary values;
                 if (choices.TryGetValue(key, out values))
                 {
@@ -304,56 +304,56 @@ namespace net.narazaka.avatarmenucreator
 
         void BulkSetChooseBlendShape(ChooseBlendShapeDictionary choices, string toggleName, int choiseIndex, float choiceValue)
         {
-            foreach (var (gameObject, name) in choices.Keys)
+            foreach (var (child, name) in choices.Keys)
             {
                 if (name == toggleName)
                 {
-                    choices[(gameObject, name)][choiseIndex] = choiceValue;
+                    choices[(child, name)][choiseIndex] = choiceValue;
                 }
             }
         }
 
-        public override void CreateAssets(IncludeAssetType includeAssetType, string baseName, string basePath, string[] gameObjects)
+        public override void CreateAssets(IncludeAssetType includeAssetType, string baseName, string basePath, string[] children)
         {
-            var matchGameObjects = new HashSet<string>(gameObjects);
+            var matchGameObjects = new HashSet<string>(children);
             // clip
             var choices = Enumerable.Range(0, ChooseCount).Select(i => new AnimationClip { name = $"{baseName}_{i}" }).ToList();
-            foreach (var gameObject in ChooseObjects.Keys)
+            foreach (var child in ChooseObjects.Keys)
             {
-                if (!matchGameObjects.Contains(gameObject)) continue;
-                var curvePath = gameObject;
+                if (!matchGameObjects.Contains(child)) continue;
+                var curvePath = child;
                 for (var i = 0; i < ChooseCount; ++i)
                 {
-                    choices[i].SetCurve(curvePath, typeof(GameObject), "m_IsActive", new AnimationCurve(new Keyframe(0, ChooseObjects[gameObject].Contains(i) ? 1 : 0)));
+                    choices[i].SetCurve(curvePath, typeof(GameObject), "m_IsActive", new AnimationCurve(new Keyframe(0, ChooseObjects[child].Contains(i) ? 1 : 0)));
                 }
             }
-            foreach (var (gameObject, index) in ChooseMaterials.Keys)
+            foreach (var (child, index) in ChooseMaterials.Keys)
             {
-                if (!matchGameObjects.Contains(gameObject)) continue;
-                var value = ChooseMaterials[(gameObject, index)];
-                var curvePath = gameObject;
+                if (!matchGameObjects.Contains(child)) continue;
+                var value = ChooseMaterials[(child, index)];
+                var curvePath = child;
                 var curveName = $"m_Materials.Array.data[{index}]";
                 for (var i = 0; i < ChooseCount; ++i)
                 {
                     AnimationUtility.SetObjectReferenceCurve(choices[i], EditorCurveBinding.PPtrCurve(curvePath, typeof(SkinnedMeshRenderer), curveName), new ObjectReferenceKeyframe[] { new ObjectReferenceKeyframe { time = 0, value = value.ContainsKey(i) ? value[i] : null } });
                 }
             }
-            foreach (var (gameObject, name) in ChooseBlendShapes.Keys)
+            foreach (var (child, name) in ChooseBlendShapes.Keys)
             {
-                if (!matchGameObjects.Contains(gameObject)) continue;
-                var value = ChooseBlendShapes[(gameObject, name)];
-                var curvePath = gameObject;
+                if (!matchGameObjects.Contains(child)) continue;
+                var value = ChooseBlendShapes[(child, name)];
+                var curvePath = child;
                 var curveName = $"blendShape.{name}";
                 for (var i = 0; i < ChooseCount; ++i)
                 {
                     choices[i].SetCurve(curvePath, typeof(SkinnedMeshRenderer), curveName, new AnimationCurve(new Keyframe(0, value.ContainsKey(i) ? value[i] : 0)));
                 }
             }
-            foreach (var (gameObject, name) in ChooseShaderParameters.Keys)
+            foreach (var (child, name) in ChooseShaderParameters.Keys)
             {
-                if (!matchGameObjects.Contains(gameObject)) continue;
-                var value = ChooseShaderParameters[(gameObject, name)];
-                var curvePath = gameObject;
+                if (!matchGameObjects.Contains(child)) continue;
+                var value = ChooseShaderParameters[(child, name)];
+                var curvePath = child;
                 var curveName = $"material.{name}";
                 for (var i = 0; i < ChooseCount; ++i)
                 {

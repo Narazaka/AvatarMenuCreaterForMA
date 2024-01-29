@@ -36,7 +36,7 @@ namespace net.narazaka.avatarmenucreator
             return false;
         }
 
-        protected override void OnHeaderGUI(string[] gameObjects)
+        protected override void OnHeaderGUI(string[] children)
         {
             RadialDefaultValue = EditorGUILayout.FloatField("パラメーター初期値", RadialDefaultValue);
             if (RadialDefaultValue < 0) RadialDefaultValue = 0;
@@ -107,29 +107,29 @@ namespace net.narazaka.avatarmenucreator
             }
         }
 
-        protected override void OnMainGUI(string[] gameObjects)
+        protected override void OnMainGUI(string[] children)
         {
-            foreach (var gameObject in gameObjects)
+            foreach (var child in children)
             {
                 EditorGUILayout.Space();
-                var gameObjectRef = GetGameObject(gameObject);
+                var gameObjectRef = GetGameObject(child);
                 var names = Util.GetBlendShapeNames(gameObjectRef);
                 var parameters = ShaderParametersCache.GetFilteredShaderParameters(gameObjectRef);
-                var path = gameObject;
+                var path = child;
                 if (names.Count > 0 || parameters.Count > 0)
                 {
                     EditorGUILayout.LabelField(path);
                     EditorGUI.indentLevel++;
-                    if (names.Count > 0 && FoldoutBlendShapeHeader(gameObject, "BlendShapes"))
+                    if (names.Count > 0 && FoldoutBlendShapeHeader(child, "BlendShapes"))
                     {
                         EditorGUI.indentLevel++;
-                        ShowRadialBlendShapeControl(gameObject, RadialBlendShapes, names.ToNames());
+                        ShowRadialBlendShapeControl(child, RadialBlendShapes, names.ToNames());
                         EditorGUI.indentLevel--;
                     }
-                    if (parameters.Count > 0 && FoldoutShaderParameterHeader(gameObject, "Shader Parameters"))
+                    if (parameters.Count > 0 && FoldoutShaderParameterHeader(child, "Shader Parameters"))
                     {
                         EditorGUI.indentLevel++;
-                        ShowRadialBlendShapeControl(gameObject, RadialShaderParameters, parameters, 1, minValue: null, maxValue: null);
+                        ShowRadialBlendShapeControl(child, RadialShaderParameters, parameters, 1, minValue: null, maxValue: null);
                         EditorGUI.indentLevel--;
                     }
                     EditorGUI.indentLevel--;
@@ -142,7 +142,7 @@ namespace net.narazaka.avatarmenucreator
         }
 
         void ShowRadialBlendShapeControl(
-            string gameObject,
+            string child,
             RadialBlendShapeDictionary radials,
             IEnumerable<Util.INameAndDescription> names,
             float defaultEndValue = 100,
@@ -152,7 +152,7 @@ namespace net.narazaka.avatarmenucreator
         {
             foreach (var name in names)
             {
-                var key = (gameObject, name.Name);
+                var key = (child, name.Name);
                 RadialBlendShape value;
                 if (radials.TryGetValue(key, out value))
                 {
@@ -211,11 +211,11 @@ namespace net.narazaka.avatarmenucreator
         void BulkSetRadialBlendShape(RadialBlendShapeDictionary radials, string radialName, RadialBlendShape radialBlendShape, string changedProp)
         {
             var matches = new List<(string, string)>();
-            foreach (var (gameObject, name) in radials.Keys)
+            foreach (var (child, name) in radials.Keys)
             {
                 if (name == radialName)
                 {
-                    matches.Add((gameObject, name));
+                    matches.Add((child, name));
                 }
             }
             foreach (var key in matches)
@@ -224,23 +224,23 @@ namespace net.narazaka.avatarmenucreator
             }
         }
 
-        public override void CreateAssets(IncludeAssetType includeAssetType, string baseName, string basePath, string[] gameObjects)
+        public override void CreateAssets(IncludeAssetType includeAssetType, string baseName, string basePath, string[] children)
         {
-            var matchGameObjects = new HashSet<string>(gameObjects);
+            var matchGameObjects = new HashSet<string>(children);
             // clip
             var clip = new AnimationClip();
             clip.name = baseName;
-            foreach (var (gameObject, name) in RadialBlendShapes.Keys)
+            foreach (var (child, name) in RadialBlendShapes.Keys)
             {
-                if (!matchGameObjects.Contains(gameObject)) continue;
-                var value = RadialBlendShapes[(gameObject, name)];
-                clip.SetCurve(gameObject, typeof(SkinnedMeshRenderer), $"blendShape.{name}", SetAutoTangentMode(new AnimationCurve(new Keyframe(0 / 60.0f, value.Start), new Keyframe(1 / 60.0f, value.End))));
+                if (!matchGameObjects.Contains(child)) continue;
+                var value = RadialBlendShapes[(child, name)];
+                clip.SetCurve(child, typeof(SkinnedMeshRenderer), $"blendShape.{name}", SetAutoTangentMode(new AnimationCurve(new Keyframe(0 / 60.0f, value.Start), new Keyframe(1 / 60.0f, value.End))));
             }
-            foreach (var (gameObject, name) in RadialShaderParameters.Keys)
+            foreach (var (child, name) in RadialShaderParameters.Keys)
             {
-                if (!matchGameObjects.Contains(gameObject)) continue;
-                var value = RadialShaderParameters[(gameObject, name)];
-                clip.SetCurve(gameObject, typeof(Renderer), $"material.{name}", SetAutoTangentMode(new AnimationCurve(new Keyframe(0 / 60.0f, value.Start), new Keyframe(1 / 60.0f, value.End))));
+                if (!matchGameObjects.Contains(child)) continue;
+                var value = RadialShaderParameters[(child, name)];
+                clip.SetCurve(child, typeof(Renderer), $"material.{name}", SetAutoTangentMode(new AnimationCurve(new Keyframe(0 / 60.0f, value.Start), new Keyframe(1 / 60.0f, value.End))));
             }
             // controller
             var controller = new AnimatorController();

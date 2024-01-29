@@ -38,23 +38,23 @@ namespace net.narazaka.avatarmenucreator.editor
         }
 
         GameObject[] selectedGameObjects;
-        string[] gameObjectChildPaths;
-        string[] GetGameObjects()
+        string[] children;
+        string[] GetChildren()
         {
-            if (selectedGameObjects == Selection.gameObjects && gameObjectChildPaths != null)
+            if (selectedGameObjects == Selection.gameObjects && children != null)
             {
-                return gameObjectChildPaths;
+                return children;
             }
             AvatarToggleMenu.ClearGameObjectCache();
             AvatarChooseMenu.ClearGameObjectCache();
             AvatarRadialMenu.ClearGameObjectCache();
             selectedGameObjects = Selection.gameObjects;
-            gameObjectChildPaths = new string[selectedGameObjects.Length];
+            children = new string[selectedGameObjects.Length];
             for (int i = 0; i < selectedGameObjects.Length; i++)
             {
-                gameObjectChildPaths[i] = util.Util.ChildPath(VRCAvatarDescriptor.gameObject, selectedGameObjects[i]);
+                children[i] = util.Util.ChildPath(VRCAvatarDescriptor.gameObject, selectedGameObjects[i]);
             }
-            return gameObjectChildPaths;
+            return children;
         }
 
         void OnGUI()
@@ -67,9 +67,9 @@ namespace net.narazaka.avatarmenucreator.editor
                 return;
             }
 
-            var gameObjects = GetGameObjects();
+            var children = GetChildren();
 
-            if (gameObjects.Length == 0 || (gameObjects.Length == 1 && selectedGameObjects[0] == VRCAvatarDescriptor.gameObject))
+            if (children.Length == 0 || (children.Length == 1 && selectedGameObjects[0] == VRCAvatarDescriptor.gameObject))
             {
                 EditorGUILayout.LabelField("対象のオブジェクトを選択して下さい");
                 return;
@@ -84,15 +84,15 @@ namespace net.narazaka.avatarmenucreator.editor
 
             if (MenuType == MenuType.Toggle)
             {
-                AvatarToggleMenu.OnAvatarMenuGUI(gameObjects);
+                AvatarToggleMenu.OnAvatarMenuGUI(children);
             }
             else if (MenuType == MenuType.Choose)
             {
-                AvatarChooseMenu.OnAvatarMenuGUI(gameObjects);
+                AvatarChooseMenu.OnAvatarMenuGUI(children);
             }
             else
             {
-                AvatarRadialMenu.OnAvatarMenuGUI(gameObjects);
+                AvatarRadialMenu.OnAvatarMenuGUI(children);
             }
 
             IncludeAssetType = (IncludeAssetType)EditorGUILayout.EnumPopup("保存形式", IncludeAssetType);
@@ -104,15 +104,15 @@ namespace net.narazaka.avatarmenucreator.editor
                 var baseName = System.IO.Path.GetFileNameWithoutExtension(basePath);
                 if (MenuType == MenuType.Toggle)
                 {
-                    AvatarToggleMenu.CreateAssets(IncludeAssetType, baseName, basePath, gameObjects);
+                    AvatarToggleMenu.CreateAssets(IncludeAssetType, baseName, basePath, children);
                 }
                 else if (MenuType == MenuType.Choose)
                 {
-                    AvatarChooseMenu.CreateAssets(IncludeAssetType, baseName, basePath, gameObjects);
+                    AvatarChooseMenu.CreateAssets(IncludeAssetType, baseName, basePath, children);
                 }
                 else
                 {
-                    AvatarRadialMenu.CreateAssets(IncludeAssetType, baseName, basePath, gameObjects);
+                    AvatarRadialMenu.CreateAssets(IncludeAssetType, baseName, basePath, children);
                 }
                 SaveFolder = System.IO.Path.GetDirectoryName(basePath);
             }

@@ -43,19 +43,19 @@ namespace net.narazaka.avatarmenucreator
         protected Util.ShaderParametersCache ShaderParametersCache = new Util.ShaderParametersCache();
         Dictionary<string, GameObject> GameObjectCache = new Dictionary<string, GameObject>();
 
-        public abstract void CreateAssets(IncludeAssetType includeAssetType, string baseName, string basePath, string[] gameObjects);
-        protected abstract void OnHeaderGUI(string[] gameObjects);
-        protected abstract void OnMainGUI(string[] gameObjects);
+        public abstract void CreateAssets(IncludeAssetType includeAssetType, string baseName, string basePath, string[] children);
+        protected abstract void OnHeaderGUI(string[] children);
+        protected abstract void OnMainGUI(string[] children);
         protected abstract bool IsSuitableForTransition();
 
-        public void OnAvatarMenuGUI(string[] gameObjects)
+        public void OnAvatarMenuGUI(string[] children)
         {
-            OnHeaderGUI(gameObjects);
+            OnHeaderGUI(children);
 
             using (var scrollView = new EditorGUILayout.ScrollViewScope(ScrollPosition))
             {
                 ScrollPosition = scrollView.scrollPosition;
-                OnMainGUI(gameObjects);
+                OnMainGUI(children);
             }
         }
 
@@ -76,12 +76,12 @@ namespace net.narazaka.avatarmenucreator
             }
         }
 
-        protected GameObject GetGameObject(string gameObject)
+        protected GameObject GetGameObject(string child)
         {
             if (GameObjectCache == null) GameObjectCache = new Dictionary<string, GameObject>();
-            if (!GameObjectCache.TryGetValue(gameObject, out var gameObjectRef))
+            if (!GameObjectCache.TryGetValue(child, out var gameObjectRef))
             {
-                GameObjectCache[gameObject] = gameObjectRef = BaseObject.transform.Find(gameObject).gameObject;
+                GameObjectCache[child] = gameObjectRef = BaseObject.transform.Find(child).gameObject;
             }
             return gameObjectRef;
         }
@@ -91,73 +91,73 @@ namespace net.narazaka.avatarmenucreator
             GameObjectCache = null;
         }
 
-        protected bool FoldoutGameObjectHeader(string gameObject, string title)
+        protected bool FoldoutGameObjectHeader(string child, string title)
         {
-            var foldout = FoldoutGameObjects.Contains(gameObject);
+            var foldout = FoldoutGameObjects.Contains(child);
             var newFoldout = EditorGUILayout.Foldout(foldout, title);
             if (newFoldout != foldout)
             {
                 if (newFoldout)
                 {
-                    FoldoutGameObjects.Add(gameObject);
+                    FoldoutGameObjects.Add(child);
                 }
                 else
                 {
-                    FoldoutGameObjects.Remove(gameObject);
+                    FoldoutGameObjects.Remove(child);
                 }
             }
             return newFoldout;
         }
 
-        protected bool FoldoutMaterialHeader(string gameObject, string title)
+        protected bool FoldoutMaterialHeader(string child, string title)
         {
-            var foldout = FoldoutMaterials.Contains(gameObject);
+            var foldout = FoldoutMaterials.Contains(child);
             var newFoldout = EditorGUILayout.Foldout(foldout, title);
             if (newFoldout != foldout)
             {
                 if (newFoldout)
                 {
-                    FoldoutMaterials.Add(gameObject);
+                    FoldoutMaterials.Add(child);
                 }
                 else
                 {
-                    FoldoutMaterials.Remove(gameObject);
+                    FoldoutMaterials.Remove(child);
                 }
             }
             return newFoldout;
         }
 
-        protected bool FoldoutBlendShapeHeader(string gameObject, string title)
+        protected bool FoldoutBlendShapeHeader(string child, string title)
         {
-            var foldout = FoldoutBlendShapes.Contains(gameObject);
+            var foldout = FoldoutBlendShapes.Contains(child);
             var newFoldout = EditorGUILayout.Foldout(foldout, title);
             if (newFoldout != foldout)
             {
                 if (newFoldout)
                 {
-                    FoldoutBlendShapes.Add(gameObject);
+                    FoldoutBlendShapes.Add(child);
                 }
                 else
                 {
-                    FoldoutBlendShapes.Remove(gameObject);
+                    FoldoutBlendShapes.Remove(child);
                 }
             }
             return newFoldout;
         }
 
-        protected bool FoldoutShaderParameterHeader(string gameObject, string title)
+        protected bool FoldoutShaderParameterHeader(string child, string title)
         {
-            var foldout = FoldoutShaderParameters.Contains(gameObject);
+            var foldout = FoldoutShaderParameters.Contains(child);
             var newFoldout = EditorGUILayout.Foldout(foldout, title);
             if (newFoldout != foldout)
             {
                 if (newFoldout)
                 {
-                    FoldoutShaderParameters.Add(gameObject);
+                    FoldoutShaderParameters.Add(child);
                 }
                 else
                 {
-                    FoldoutShaderParameters.Remove(gameObject);
+                    FoldoutShaderParameters.Remove(child);
                 }
             }
             return newFoldout;
