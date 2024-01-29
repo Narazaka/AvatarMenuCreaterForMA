@@ -6,7 +6,7 @@ namespace net.narazaka.avatarmenucreator.collections
 {
     // cf. https://qiita.com/kat_out/items/98420ae6dcdfee58dd07
     [Serializable]
-    class SerializedDictionary<K, V> : Dictionary<K, V>, ISerializationCallbackReceiver
+    public class SerializedDictionary<K, V> : Dictionary<K, V>, ISerializationCallbackReceiver
     {
         [SerializeField]
         K[] keys;

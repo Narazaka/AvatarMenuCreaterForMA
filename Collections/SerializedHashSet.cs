@@ -6,7 +6,7 @@ using UnityEngine;
 namespace net.narazaka.avatarmenucreator.collections
 {
     [Serializable]
-    class SerializedHashSet<V> : HashSet<V>, ISerializationCallbackReceiver
+    public class SerializedHashSet<V> : HashSet<V>, ISerializationCallbackReceiver
     {
         [SerializeField]
         V[] values;

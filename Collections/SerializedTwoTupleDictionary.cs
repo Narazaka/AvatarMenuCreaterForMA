@@ -4,7 +4,7 @@ using UnityEngine;
 namespace net.narazaka.avatarmenucreator.collections
 {
     [System.Serializable]
-    class SerializedTwoTupleDictionary<K1, K2, V> : Dictionary<(K1, K2), V>, ISerializationCallbackReceiver
+    public class SerializedTwoTupleDictionary<K1, K2, V> : Dictionary<(K1, K2), V>, ISerializationCallbackReceiver
     {
         [SerializeField]
         K1[] keys1;

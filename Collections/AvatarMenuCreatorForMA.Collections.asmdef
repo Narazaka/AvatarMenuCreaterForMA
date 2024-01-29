@@ -1,10 +1,6 @@
 {
-    "name": "AvatarMenuCreatorForMA",
-    "references": [
-        "nadena.dev.modular-avatar.core",
-        "AvatarMenuCreatorForMA.Editor.Util",
-        "AvatarMenuCreatorForMA.Collections"
-    ],
+    "name": "AvatarMenuCreatorForMA.Collections",
+    "references": [],
     "includePlatforms": [],
     "excludePlatforms": [],
     "allowUnsafeCode": false,
