@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -15,6 +15,13 @@ namespace net.narazaka.avatarmenucreator
     public abstract class AvatarMenuBase
     {
         [NonSerialized]
+        public bool BulkSet;
+
+        [SerializeField]
+        protected float TransitionSeconds;
+
+#if UNITY_EDITOR
+        [NonSerialized]
         GameObject _BaseObject;
         public GameObject BaseObject
         {
@@ -26,13 +33,6 @@ namespace net.narazaka.avatarmenucreator
                 ClearGameObjectCache();
             }
         }
-        [NonSerialized]
-        public bool BulkSet;
-
-        [SerializeField]
-        protected float TransitionSeconds;
-
-#if UNITY_EDITOR
 
         HashSet<string> FoldoutGameObjects = new HashSet<string>();
         HashSet<string> FoldoutMaterials = new HashSet<string>();
