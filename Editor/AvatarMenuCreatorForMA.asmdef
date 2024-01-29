@@ -1,5 +1,5 @@
 {
-    "name": "AvatarMenuCreaterForMA",
+    "name": "AvatarMenuCreatorForMA",
     "references": [
         "nadena.dev.modular-avatar.core"
     ],

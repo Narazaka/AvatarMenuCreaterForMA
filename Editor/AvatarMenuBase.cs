@@ -8,7 +8,7 @@ using UnityEditor;
 using VRC.SDK3.Avatars.ScriptableObjects;
 using UnityEditor.Animations;
 
-namespace net.narazaka.avatarmenucreater
+namespace net.narazaka.avatarmenucreator
 {
     public abstract class AvatarMenuBase
     {

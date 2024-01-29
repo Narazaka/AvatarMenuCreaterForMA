@@ -10,7 +10,7 @@ using UnityEngine;
 using VRC.SDK3.Avatars.Components;
 using VRC.SDK3.Avatars.ScriptableObjects;
 
-namespace net.narazaka.avatarmenucreater
+namespace net.narazaka.avatarmenucreator
 {
     public class AvatarToggleMenu : AvatarMenuBase
     {

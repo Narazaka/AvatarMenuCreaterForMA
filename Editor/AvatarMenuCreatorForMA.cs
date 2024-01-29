@@ -9,9 +9,9 @@ using VRC.Core;
 using nadena.dev.modular_avatar.core;
 using System;
 
-namespace net.narazaka.avatarmenucreater
+namespace net.narazaka.avatarmenucreator
 {
-    public class AvatarMenuCreaterForMA : EditorWindow
+    public class AvatarMenuCreatorForMA : EditorWindow
     {
         VRCAvatarDescriptor VRCAvatarDescriptor;
         MenuType MenuType = MenuType.Toggle;
@@ -25,10 +25,10 @@ namespace net.narazaka.avatarmenucreater
 
         string SaveFolder = "Assets";
 
-        [MenuItem("Tools/Modular Avatar/AvatarMenuCreater for Modular Avatar")]
+        [MenuItem("Tools/Modular Avatar/AvatarMenuCreator for Modular Avatar")]
         static void CreateWindow()
         {
-            GetWindow<AvatarMenuCreaterForMA>("AvatarMenuCreater for Modular Avatar");
+            GetWindow<AvatarMenuCreatorForMA>("AvatarMenuCreator for Modular Avatar");
         }
 
         void Update()

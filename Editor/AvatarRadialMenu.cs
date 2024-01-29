@@ -10,7 +10,7 @@ using nadena.dev.modular_avatar.core;
 using UnityEditor.Animations;
 using VRC.SDK3.Avatars.ScriptableObjects;
 
-namespace net.narazaka.avatarmenucreater
+namespace net.narazaka.avatarmenucreator
 {
     public class AvatarRadialMenu : AvatarMenuBase
     {

@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace net.narazaka.avatarmenucreater
+namespace net.narazaka.avatarmenucreator
 {
     public enum IncludeAssetType
     {

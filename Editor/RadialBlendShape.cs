@@ -1,4 +1,4 @@
-﻿namespace net.narazaka.avatarmenucreater
+﻿namespace net.narazaka.avatarmenucreator
 {
     struct RadialBlendShape : System.IEquatable<RadialBlendShape>
     {
