@@ -36,7 +36,7 @@ namespace net.narazaka.avatarmenucreator
             return false;
         }
 
-        protected override void OnHeaderGUI(GameObject[] gameObjects)
+        protected override void OnHeaderGUI(string[] gameObjects)
         {
             RadialDefaultValue = EditorGUILayout.FloatField("パラメーター初期値", RadialDefaultValue);
             if (RadialDefaultValue < 0) RadialDefaultValue = 0;
@@ -107,14 +107,15 @@ namespace net.narazaka.avatarmenucreator
             }
         }
 
-        protected override void OnMainGUI(GameObject[] gameObjects)
+        protected override void OnMainGUI(string[] gameObjects)
         {
             foreach (var gameObject in gameObjects)
             {
                 EditorGUILayout.Space();
-                var names = Util.GetBlendShapeNames(gameObject);
-                var parameters = ShaderParametersCache.GetFilteredShaderParameters(gameObject);
-                var path = Util.ChildPath(BaseObject, gameObject);
+                var gameObjectRef = GetGameObject(gameObject);
+                var names = Util.GetBlendShapeNames(gameObjectRef);
+                var parameters = ShaderParametersCache.GetFilteredShaderParameters(gameObjectRef);
+                var path = gameObject;
                 if (names.Count > 0 || parameters.Count > 0)
                 {
                     EditorGUILayout.LabelField(path);
@@ -141,8 +142,8 @@ namespace net.narazaka.avatarmenucreator
         }
 
         void ShowRadialBlendShapeControl(
-            GameObject gameObject,
-            Dictionary<(GameObject, string), RadialBlendShape> radials,
+            string gameObject,
+            RadialBlendShapeDictionary radials,
             IEnumerable<Util.INameAndDescription> names,
             float defaultEndValue = 100,
             float? minValue = 0,
@@ -207,9 +208,9 @@ namespace net.narazaka.avatarmenucreator
             }
         }
 
-        void BulkSetRadialBlendShape(Dictionary<(GameObject, string), RadialBlendShape> radials, string radialName, RadialBlendShape radialBlendShape, string changedProp)
+        void BulkSetRadialBlendShape(RadialBlendShapeDictionary radials, string radialName, RadialBlendShape radialBlendShape, string changedProp)
         {
-            var matches = new List<(GameObject, string)>();
+            var matches = new List<(string, string)>();
             foreach (var (gameObject, name) in radials.Keys)
             {
                 if (name == radialName)
@@ -223,9 +224,9 @@ namespace net.narazaka.avatarmenucreator
             }
         }
 
-        public override void CreateAssets(IncludeAssetType includeAssetType, string baseName, string basePath, GameObject[] gameObjects)
+        public override void CreateAssets(IncludeAssetType includeAssetType, string baseName, string basePath, string[] gameObjects)
         {
-            var matchGameObjects = new HashSet<GameObject>(gameObjects);
+            var matchGameObjects = new HashSet<string>(gameObjects);
             // clip
             var clip = new AnimationClip();
             clip.name = baseName;
@@ -233,13 +234,13 @@ namespace net.narazaka.avatarmenucreator
             {
                 if (!matchGameObjects.Contains(gameObject)) continue;
                 var value = RadialBlendShapes[(gameObject, name)];
-                clip.SetCurve(Util.ChildPath(BaseObject, gameObject), typeof(SkinnedMeshRenderer), $"blendShape.{name}", SetAutoTangentMode(new AnimationCurve(new Keyframe(0 / 60.0f, value.Start), new Keyframe(1 / 60.0f, value.End))));
+                clip.SetCurve(gameObject, typeof(SkinnedMeshRenderer), $"blendShape.{name}", SetAutoTangentMode(new AnimationCurve(new Keyframe(0 / 60.0f, value.Start), new Keyframe(1 / 60.0f, value.End))));
             }
             foreach (var (gameObject, name) in RadialShaderParameters.Keys)
             {
                 if (!matchGameObjects.Contains(gameObject)) continue;
                 var value = RadialShaderParameters[(gameObject, name)];
-                clip.SetCurve(Util.ChildPath(BaseObject, gameObject), typeof(Renderer), $"material.{name}", SetAutoTangentMode(new AnimationCurve(new Keyframe(0 / 60.0f, value.Start), new Keyframe(1 / 60.0f, value.End))));
+                clip.SetCurve(gameObject, typeof(Renderer), $"material.{name}", SetAutoTangentMode(new AnimationCurve(new Keyframe(0 / 60.0f, value.Start), new Keyframe(1 / 60.0f, value.End))));
             }
             // controller
             var controller = new AnimatorController();

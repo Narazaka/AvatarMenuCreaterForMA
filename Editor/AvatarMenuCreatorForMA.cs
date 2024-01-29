@@ -37,6 +37,26 @@ namespace net.narazaka.avatarmenucreator.editor
             AvatarRadialMenu.BulkSet = BulkSet;
         }
 
+        GameObject[] selectedGameObjects;
+        string[] gameObjectChildPaths;
+        string[] GetGameObjects()
+        {
+            if (selectedGameObjects == Selection.gameObjects && gameObjectChildPaths != null)
+            {
+                return gameObjectChildPaths;
+            }
+            AvatarToggleMenu.ClearGameObjectCache();
+            AvatarChooseMenu.ClearGameObjectCache();
+            AvatarRadialMenu.ClearGameObjectCache();
+            selectedGameObjects = Selection.gameObjects;
+            gameObjectChildPaths = new string[selectedGameObjects.Length];
+            for (int i = 0; i < selectedGameObjects.Length; i++)
+            {
+                gameObjectChildPaths[i] = util.Util.ChildPath(VRCAvatarDescriptor.gameObject, selectedGameObjects[i]);
+            }
+            return gameObjectChildPaths;
+        }
+
         void OnGUI()
         {
             VRCAvatarDescriptor = EditorGUILayout.ObjectField("Avatar", VRCAvatarDescriptor, typeof(VRCAvatarDescriptor), true) as VRCAvatarDescriptor;
@@ -47,9 +67,9 @@ namespace net.narazaka.avatarmenucreator.editor
                 return;
             }
 
-            var gameObjects = Selection.gameObjects;
+            var gameObjects = GetGameObjects();
 
-            if (gameObjects.Length == 0 || (gameObjects.Length == 1 && gameObjects[0] == VRCAvatarDescriptor.gameObject))
+            if (gameObjects.Length == 0 || (gameObjects.Length == 1 && selectedGameObjects[0] == VRCAvatarDescriptor.gameObject))
             {
                 EditorGUILayout.LabelField("対象のオブジェクトを選択して下さい");
                 return;

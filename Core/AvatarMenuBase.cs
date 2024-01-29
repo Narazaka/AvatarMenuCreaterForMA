@@ -15,7 +15,17 @@ namespace net.narazaka.avatarmenucreator
     public abstract class AvatarMenuBase
     {
         [NonSerialized]
-        public GameObject BaseObject;
+        GameObject _BaseObject;
+        public GameObject BaseObject
+        {
+            get => _BaseObject;
+            set
+            {
+                if (_BaseObject == value) return;
+                _BaseObject = value;
+                ClearGameObjectCache();
+            }
+        }
         [NonSerialized]
         public bool BulkSet;
 
@@ -24,20 +34,21 @@ namespace net.narazaka.avatarmenucreator
 
 #if UNITY_EDITOR
 
-        HashSet<GameObject> FoldoutGameObjects = new HashSet<GameObject>();
-        HashSet<GameObject> FoldoutMaterials = new HashSet<GameObject>();
-        HashSet<GameObject> FoldoutBlendShapes = new HashSet<GameObject>();
-        HashSet<GameObject> FoldoutShaderParameters = new HashSet<GameObject>();
+        HashSet<string> FoldoutGameObjects = new HashSet<string>();
+        HashSet<string> FoldoutMaterials = new HashSet<string>();
+        HashSet<string> FoldoutBlendShapes = new HashSet<string>();
+        HashSet<string> FoldoutShaderParameters = new HashSet<string>();
         Vector2 ScrollPosition;
 
         protected Util.ShaderParametersCache ShaderParametersCache = new Util.ShaderParametersCache();
+        Dictionary<string, GameObject> GameObjectCache = new Dictionary<string, GameObject>();
 
-        public abstract void CreateAssets(IncludeAssetType includeAssetType, string baseName, string basePath, GameObject[] gameObjects);
-        protected abstract void OnHeaderGUI(GameObject[] gameObjects);
-        protected abstract void OnMainGUI(GameObject[] gameObjects);
+        public abstract void CreateAssets(IncludeAssetType includeAssetType, string baseName, string basePath, string[] gameObjects);
+        protected abstract void OnHeaderGUI(string[] gameObjects);
+        protected abstract void OnMainGUI(string[] gameObjects);
         protected abstract bool IsSuitableForTransition();
 
-        public void OnAvatarMenuGUI(GameObject[] gameObjects)
+        public void OnAvatarMenuGUI(string[] gameObjects)
         {
             OnHeaderGUI(gameObjects);
 
@@ -65,7 +76,22 @@ namespace net.narazaka.avatarmenucreator
             }
         }
 
-        protected bool FoldoutGameObjectHeader(GameObject gameObject, string title)
+        protected GameObject GetGameObject(string gameObject)
+        {
+            if (GameObjectCache == null) GameObjectCache = new Dictionary<string, GameObject>();
+            if (!GameObjectCache.TryGetValue(gameObject, out var gameObjectRef))
+            {
+                GameObjectCache[gameObject] = gameObjectRef = BaseObject.transform.Find(gameObject).gameObject;
+            }
+            return gameObjectRef;
+        }
+
+        public void ClearGameObjectCache()
+        {
+            GameObjectCache = null;
+        }
+
+        protected bool FoldoutGameObjectHeader(string gameObject, string title)
         {
             var foldout = FoldoutGameObjects.Contains(gameObject);
             var newFoldout = EditorGUILayout.Foldout(foldout, title);
@@ -83,7 +109,7 @@ namespace net.narazaka.avatarmenucreator
             return newFoldout;
         }
 
-        protected bool FoldoutMaterialHeader(GameObject gameObject, string title)
+        protected bool FoldoutMaterialHeader(string gameObject, string title)
         {
             var foldout = FoldoutMaterials.Contains(gameObject);
             var newFoldout = EditorGUILayout.Foldout(foldout, title);
@@ -101,7 +127,7 @@ namespace net.narazaka.avatarmenucreator
             return newFoldout;
         }
 
-        protected bool FoldoutBlendShapeHeader(GameObject gameObject, string title)
+        protected bool FoldoutBlendShapeHeader(string gameObject, string title)
         {
             var foldout = FoldoutBlendShapes.Contains(gameObject);
             var newFoldout = EditorGUILayout.Foldout(foldout, title);
@@ -119,7 +145,7 @@ namespace net.narazaka.avatarmenucreator
             return newFoldout;
         }
 
-        protected bool FoldoutShaderParameterHeader(GameObject gameObject, string title)
+        protected bool FoldoutShaderParameterHeader(string gameObject, string title)
         {
             var foldout = FoldoutShaderParameters.Contains(gameObject);
             var newFoldout = EditorGUILayout.Foldout(foldout, title);
