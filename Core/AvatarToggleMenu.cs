@@ -31,11 +31,11 @@ namespace net.narazaka.avatarmenucreator
         {
             WillChange();
             ToggleObjects.Remove(child);
-            foreach (var key in ToggleBlendShapes.Keys.Where(k => k.Item1 == child))
+            foreach (var key in ToggleBlendShapes.Keys.Where(k => k.Item1 == child).ToList())
             {
                 ToggleBlendShapes.Remove(key);
             }
-            foreach (var key in ToggleShaderParameters.Keys.Where(k => k.Item1 == child))
+            foreach (var key in ToggleShaderParameters.Keys.Where(k => k.Item1 == child).ToList())
             {
                 ToggleShaderParameters.Remove(key);
             }

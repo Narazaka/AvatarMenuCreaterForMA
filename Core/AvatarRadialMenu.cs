@@ -36,11 +36,11 @@ namespace net.narazaka.avatarmenucreator
         public override void RemoveStoredChild(string child)
         {
             WillChange();
-            foreach (var key in RadialBlendShapes.Keys.Where(k => k.Item1 == child))
+            foreach (var key in RadialBlendShapes.Keys.Where(k => k.Item1 == child).ToList())
             {
                 RadialBlendShapes.Remove(key);
             }
-            foreach (var key in RadialShaderParameters.Keys.Where(k => k.Item1 == child))
+            foreach (var key in RadialShaderParameters.Keys.Where(k => k.Item1 == child).ToList())
             {
                 RadialShaderParameters.Remove(key);
             }

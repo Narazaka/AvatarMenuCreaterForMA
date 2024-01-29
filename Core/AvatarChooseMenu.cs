@@ -44,15 +44,15 @@ namespace net.narazaka.avatarmenucreator
         {
             WillChange();
             ChooseObjects.Remove(child);
-            foreach (var key in ChooseMaterials.Keys.Where(key => key.Item1 == child))
+            foreach (var key in ChooseMaterials.Keys.Where(key => key.Item1 == child).ToList())
             {
                 ChooseMaterials.Remove(key);
             }
-            foreach (var key in ChooseBlendShapes.Keys.Where(key => key.Item1 == child))
+            foreach (var key in ChooseBlendShapes.Keys.Where(key => key.Item1 == child).ToList())
             {
                 ChooseBlendShapes.Remove(key);
             }
-            foreach (var key in ChooseShaderParameters.Keys.Where(key => key.Item1 == child))
+            foreach (var key in ChooseShaderParameters.Keys.Where(key => key.Item1 == child).ToList())
             {
                 ChooseShaderParameters.Remove(key);
             }
