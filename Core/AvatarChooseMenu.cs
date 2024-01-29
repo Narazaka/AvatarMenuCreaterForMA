@@ -40,7 +40,7 @@ namespace net.narazaka.avatarmenucreator
 
         protected override bool IsSuitableForTransition() => ChooseBlendShapes.Count > 0 || ChooseShaderParameters.Count > 0;
 
-        protected override void OnHeaderGUI(GameObject baseObject, GameObject[] gameObjects)
+        protected override void OnHeaderGUI(GameObject[] gameObjects)
         {
             ShowTransitionSeconds();
 
@@ -60,14 +60,14 @@ namespace net.narazaka.avatarmenucreator
             }
         }
 
-        protected override void OnMainGUI(GameObject baseObject, GameObject[] gameObjects)
+        protected override void OnMainGUI(GameObject[] gameObjects)
         {
             var allMaterials = gameObjects.ToDictionary(gameObject => gameObject, gameObject => Util.GetMaterialSlots(gameObject));
 
             foreach (var gameObject in gameObjects)
             {
                 EditorGUILayout.Space();
-                EditorGUILayout.LabelField(Util.ChildPath(baseObject, gameObject));
+                EditorGUILayout.LabelField(Util.ChildPath(BaseObject, gameObject));
                 EditorGUI.indentLevel++;
                 if (FoldoutGameObjectHeader(gameObject, "GameObject"))
                 {
@@ -312,7 +312,7 @@ namespace net.narazaka.avatarmenucreator
             }
         }
 
-        public override void CreateAssets(IncludeAssetType includeAssetType, GameObject baseObject, string baseName, string basePath, GameObject[] gameObjects)
+        public override void CreateAssets(IncludeAssetType includeAssetType, string baseName, string basePath, GameObject[] gameObjects)
         {
             var matchGameObjects = new HashSet<GameObject>(gameObjects);
             // clip
@@ -320,7 +320,7 @@ namespace net.narazaka.avatarmenucreator
             foreach (var gameObject in ChooseObjects.Keys)
             {
                 if (!matchGameObjects.Contains(gameObject)) continue;
-                var curvePath = Util.ChildPath(baseObject, gameObject);
+                var curvePath = Util.ChildPath(BaseObject, gameObject);
                 for (var i = 0; i < ChooseCount; ++i)
                 {
                     choices[i].SetCurve(curvePath, typeof(GameObject), "m_IsActive", new AnimationCurve(new Keyframe(0, ChooseObjects[gameObject].Contains(i) ? 1 : 0)));
@@ -330,7 +330,7 @@ namespace net.narazaka.avatarmenucreator
             {
                 if (!matchGameObjects.Contains(gameObject)) continue;
                 var value = ChooseMaterials[(gameObject, index)];
-                var curvePath = Util.ChildPath(baseObject, gameObject);
+                var curvePath = Util.ChildPath(BaseObject, gameObject);
                 var curveName = $"m_Materials.Array.data[{index}]";
                 for (var i = 0; i < ChooseCount; ++i)
                 {
@@ -341,7 +341,7 @@ namespace net.narazaka.avatarmenucreator
             {
                 if (!matchGameObjects.Contains(gameObject)) continue;
                 var value = ChooseBlendShapes[(gameObject, name)];
-                var curvePath = Util.ChildPath(baseObject, gameObject);
+                var curvePath = Util.ChildPath(BaseObject, gameObject);
                 var curveName = $"blendShape.{name}";
                 for (var i = 0; i < ChooseCount; ++i)
                 {
@@ -352,7 +352,7 @@ namespace net.narazaka.avatarmenucreator
             {
                 if (!matchGameObjects.Contains(gameObject)) continue;
                 var value = ChooseShaderParameters[(gameObject, name)];
-                var curvePath = Util.ChildPath(baseObject, gameObject);
+                var curvePath = Util.ChildPath(BaseObject, gameObject);
                 var curveName = $"material.{name}";
                 for (var i = 0; i < ChooseCount; ++i)
                 {

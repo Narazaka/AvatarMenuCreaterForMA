@@ -27,17 +27,17 @@ namespace net.narazaka.avatarmenucreator
 
         protected override bool IsSuitableForTransition() => ToggleBlendShapes.Count > 0 || ToggleShaderParameters.Count > 0;
 
-        protected override void OnHeaderGUI(GameObject baseObject, GameObject[] gameObjects)
+        protected override void OnHeaderGUI(GameObject[] gameObjects)
         {
             ShowTransitionSeconds();
         }
 
-        protected override void OnMainGUI(GameObject baseObject, GameObject[] gameObjects)
+        protected override void OnMainGUI(GameObject[] gameObjects)
         {
             foreach (var gameObject in gameObjects)
             {
                 EditorGUILayout.Space();
-                EditorGUILayout.LabelField(Util.ChildPath(baseObject, gameObject));
+                EditorGUILayout.LabelField(Util.ChildPath(BaseObject, gameObject));
                 EditorGUI.indentLevel++;
                 ShowToggleObjectControl(gameObject);
 
@@ -190,7 +190,7 @@ namespace net.narazaka.avatarmenucreator
         }
 
 
-        public override void CreateAssets(IncludeAssetType includeAssetType, GameObject baseObject, string baseName, string basePath, GameObject[] gameObjects)
+        public override void CreateAssets(IncludeAssetType includeAssetType, string baseName, string basePath, GameObject[] gameObjects)
         {
             var matchGameObjects = new HashSet<GameObject>(gameObjects);
             // clip
@@ -206,7 +206,7 @@ namespace net.narazaka.avatarmenucreator
             {
                 if (!matchGameObjects.Contains(gameObject)) continue;
                 var activeValue = ToggleObjects[gameObject] == ToggleType.ON;
-                var curvePath = Util.ChildPath(baseObject, gameObject);
+                var curvePath = Util.ChildPath(BaseObject, gameObject);
                 active.SetCurve(curvePath, typeof(GameObject), "m_IsActive", new AnimationCurve(new Keyframe(0 / 60.0f, activeValue ? 1 : 0)));
                 inactive.SetCurve(curvePath, typeof(GameObject), "m_IsActive", new AnimationCurve(new Keyframe(0 / 60.0f, activeValue ? 0 : 1)));
                 if (TransitionSeconds > 0)
@@ -219,7 +219,7 @@ namespace net.narazaka.avatarmenucreator
             {
                 if (!matchGameObjects.Contains(gameObject)) continue;
                 var value = ToggleBlendShapes[(gameObject, name)];
-                var curvePath = Util.ChildPath(baseObject, gameObject);
+                var curvePath = Util.ChildPath(BaseObject, gameObject);
                 var curveName = $"blendShape.{name}";
                 active.SetCurve(curvePath, typeof(SkinnedMeshRenderer), curveName, new AnimationCurve(new Keyframe(0 / 60.0f, value.Active)));
                 inactive.SetCurve(curvePath, typeof(SkinnedMeshRenderer), curveName, new AnimationCurve(new Keyframe(0 / 60.0f, value.Inactive)));
@@ -233,7 +233,7 @@ namespace net.narazaka.avatarmenucreator
             {
                 if (!matchGameObjects.Contains(gameObject)) continue;
                 var value = ToggleShaderParameters[(gameObject, name)];
-                var curvePath = Util.ChildPath(baseObject, gameObject);
+                var curvePath = Util.ChildPath(BaseObject, gameObject);
                 var curveName = $"material.{name}";
                 active.SetCurve(curvePath, typeof(Renderer), curveName, new AnimationCurve(new Keyframe(0 / 60.0f, value.Active)));
                 inactive.SetCurve(curvePath, typeof(Renderer), curveName, new AnimationCurve(new Keyframe(0 / 60.0f, value.Inactive)));

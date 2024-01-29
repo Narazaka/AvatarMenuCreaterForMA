@@ -58,18 +58,21 @@ namespace net.narazaka.avatarmenucreator.editor
             MenuType = (MenuType)EditorGUILayout.EnumPopup(MenuType);
 
             ShowBulkSet();
+            AvatarToggleMenu.BaseObject = VRCAvatarDescriptor.gameObject;
+            AvatarChooseMenu.BaseObject = VRCAvatarDescriptor.gameObject;
+            AvatarRadialMenu.BaseObject = VRCAvatarDescriptor.gameObject;
 
             if (MenuType == MenuType.Toggle)
             {
-                AvatarToggleMenu.OnAvatarMenuGUI(VRCAvatarDescriptor.gameObject, gameObjects);
+                AvatarToggleMenu.OnAvatarMenuGUI(gameObjects);
             }
             else if (MenuType == MenuType.Choose)
             {
-                AvatarChooseMenu.OnAvatarMenuGUI(VRCAvatarDescriptor.gameObject, gameObjects);
+                AvatarChooseMenu.OnAvatarMenuGUI(gameObjects);
             }
             else
             {
-                AvatarRadialMenu.OnAvatarMenuGUI(VRCAvatarDescriptor.gameObject, gameObjects);
+                AvatarRadialMenu.OnAvatarMenuGUI(gameObjects);
             }
 
             IncludeAssetType = (IncludeAssetType)EditorGUILayout.EnumPopup("保存形式", IncludeAssetType);
@@ -81,15 +84,15 @@ namespace net.narazaka.avatarmenucreator.editor
                 var baseName = System.IO.Path.GetFileNameWithoutExtension(basePath);
                 if (MenuType == MenuType.Toggle)
                 {
-                    AvatarToggleMenu.CreateAssets(IncludeAssetType, VRCAvatarDescriptor.gameObject, baseName, basePath, gameObjects);
+                    AvatarToggleMenu.CreateAssets(IncludeAssetType, baseName, basePath, gameObjects);
                 }
                 else if (MenuType == MenuType.Choose)
                 {
-                    AvatarChooseMenu.CreateAssets(IncludeAssetType, VRCAvatarDescriptor.gameObject, baseName, basePath, gameObjects);
+                    AvatarChooseMenu.CreateAssets(IncludeAssetType, baseName, basePath, gameObjects);
                 }
                 else
                 {
-                    AvatarRadialMenu.CreateAssets(IncludeAssetType, VRCAvatarDescriptor.gameObject, baseName, basePath, gameObjects);
+                    AvatarRadialMenu.CreateAssets(IncludeAssetType, baseName, basePath, gameObjects);
                 }
                 SaveFolder = System.IO.Path.GetDirectoryName(basePath);
             }

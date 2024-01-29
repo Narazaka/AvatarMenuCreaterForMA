@@ -15,6 +15,8 @@ namespace net.narazaka.avatarmenucreator
     public abstract class AvatarMenuBase
     {
         [NonSerialized]
+        public GameObject BaseObject;
+        [NonSerialized]
         public bool BulkSet;
 
         [SerializeField]
@@ -30,19 +32,19 @@ namespace net.narazaka.avatarmenucreator
 
         protected Util.ShaderParametersCache ShaderParametersCache = new Util.ShaderParametersCache();
 
-        public abstract void CreateAssets(IncludeAssetType includeAssetType, GameObject baseObject, string baseName, string basePath, GameObject[] gameObjects);
-        protected abstract void OnHeaderGUI(GameObject baseObject, GameObject[] gameObjects);
-        protected abstract void OnMainGUI(GameObject baseObject, GameObject[] gameObjects);
+        public abstract void CreateAssets(IncludeAssetType includeAssetType, string baseName, string basePath, GameObject[] gameObjects);
+        protected abstract void OnHeaderGUI(GameObject[] gameObjects);
+        protected abstract void OnMainGUI(GameObject[] gameObjects);
         protected abstract bool IsSuitableForTransition();
 
-        public void OnAvatarMenuGUI(GameObject baseObject, GameObject[] gameObjects)
+        public void OnAvatarMenuGUI(GameObject[] gameObjects)
         {
-            OnHeaderGUI(baseObject, gameObjects);
+            OnHeaderGUI(gameObjects);
 
             using (var scrollView = new EditorGUILayout.ScrollViewScope(ScrollPosition))
             {
                 ScrollPosition = scrollView.scrollPosition;
-                OnMainGUI(baseObject, gameObjects);
+                OnMainGUI(gameObjects);
             }
         }
 
