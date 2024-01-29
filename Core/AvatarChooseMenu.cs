@@ -42,6 +42,7 @@ namespace net.narazaka.avatarmenucreator
 
         public override void RemoveStoredChild(string child)
         {
+            WillChange();
             ChooseObjects.Remove(child);
             foreach (var key in ChooseMaterials.Keys.Where(key => key.Item1 == child))
             {
@@ -63,11 +64,11 @@ namespace net.narazaka.avatarmenucreator
         {
             ShowTransitionSeconds();
 
-            ChooseCount = EditorGUILayout.IntField("選択肢の数", ChooseCount);
+            ChooseCount = IntField("選択肢の数", ChooseCount);
             EditorGUI.indentLevel++;
             for (var i = 0; i < ChooseCount; ++i)
             {
-                ChooseNames[i] = EditorGUILayout.TextField($"選択肢{i}", ChooseName(i));
+                ChooseNames[i] = TextField($"選択肢{i}", ChooseName(i));
             }
             EditorGUI.indentLevel--;
 
@@ -155,6 +156,7 @@ namespace net.narazaka.avatarmenucreator
             }
             if (changed)
             {
+                WillChange();
                 if (indexes.Count == 0)
                 {
                     ChooseObjects.Remove(child);
@@ -183,6 +185,7 @@ namespace net.narazaka.avatarmenucreator
                             var newValue = EditorGUILayout.ObjectField(ChooseName(j), value, typeof(Material), false) as Material;
                             if (value != newValue)
                             {
+                                WillChange();
                                 values[j] = newValue;
                                 if (BulkSet)
                                 {
@@ -194,6 +197,7 @@ namespace net.narazaka.avatarmenucreator
                     }
                     else
                     {
+                        WillChange();
                         ChooseMaterials.Remove(key);
                     }
                 }
@@ -201,6 +205,7 @@ namespace net.narazaka.avatarmenucreator
                 {
                     if (ShowChooseMaterialToggle(i, materials[i], false))
                     {
+                        WillChange();
                         ChooseMaterials[key] = new IntMaterialDictionary();
                     }
                 }
@@ -254,6 +259,7 @@ namespace net.narazaka.avatarmenucreator
                     var newValue = EditorGUILayout.ObjectField(ChooseName(j), value, typeof(Material), false) as Material;
                     if (value != newValue)
                     {
+                        WillChange();
                         SetBulkChooseMaterial(sourceMaterial, j, newValue);
                     }
                     if (materials.Count != 1)
@@ -289,6 +295,7 @@ namespace net.narazaka.avatarmenucreator
 
                             if (value != newValue)
                             {
+                                WillChange();
                                 if (minValue != null)
                                 {
                                     if (newValue < (float)minValue) newValue = (float)minValue;
@@ -308,6 +315,7 @@ namespace net.narazaka.avatarmenucreator
                     }
                     else
                     {
+                        WillChange();
                         choices.Remove(key);
                     }
                 }
@@ -315,6 +323,7 @@ namespace net.narazaka.avatarmenucreator
                 {
                     if (EditorGUILayout.ToggleLeft(name.Description, false))
                     {
+                        WillChange();
                         choices[key] = new IntFloatDictionary();
                     }
                 }

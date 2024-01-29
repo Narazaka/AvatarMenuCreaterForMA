@@ -29,6 +29,7 @@ namespace net.narazaka.avatarmenucreator
         public override IEnumerable<string> GetStoredChildren() => ToggleObjects.Keys.Concat(ToggleBlendShapes.Keys.Select(k => k.Item1)).Concat(ToggleShaderParameters.Keys.Select(k => k.Item1)).Distinct();
         public override void RemoveStoredChild(string child)
         {
+            WillChange();
             ToggleObjects.Remove(child);
             foreach (var key in ToggleBlendShapes.Keys.Where(k => k.Item1 == child))
             {
@@ -94,6 +95,7 @@ namespace net.narazaka.avatarmenucreator
             // Debug.Log($"{type} {newType}");
             if (type != newType)
             {
+                WillChange();
                 if (newType == ToggleType.None)
                 {
                     ToggleObjects.Remove(child);
@@ -147,6 +149,7 @@ namespace net.narazaka.avatarmenucreator
                         }
                         if (!value.Equals(newValue))
                         {
+                            WillChange();
                             if (minValue != null)
                             {
                                 if (newValue.Inactive < (float)minValue) newValue.Inactive = (float)minValue;
@@ -175,6 +178,7 @@ namespace net.narazaka.avatarmenucreator
                     }
                     else
                     {
+                        WillChange();
                         toggles.Remove(key);
                     }
                 }
@@ -182,6 +186,7 @@ namespace net.narazaka.avatarmenucreator
                 {
                     if (EditorGUILayout.ToggleLeft(name.Description, false))
                     {
+                        WillChange();
                         toggles[key] = new ToggleBlendShape { Inactive = 0, Active = defaultActiveValue, TransitionDurationPercent = 100 };
                     }
                 }

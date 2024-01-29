@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -34,6 +34,9 @@ namespace net.narazaka.avatarmenucreator
             }
         }
 
+        [NonSerialized]
+        public UnityEngine.Object UndoObject;
+
         HashSet<string> FoldoutGameObjects = new HashSet<string>();
         HashSet<string> FoldoutMaterials = new HashSet<string>();
         HashSet<string> FoldoutBlendShapes = new HashSet<string>();
@@ -63,7 +66,15 @@ namespace net.narazaka.avatarmenucreator
 
         protected void ShowTransitionSeconds()
         {
-            TransitionSeconds = EditorGUILayout.FloatField("徐々に変化（秒数）", TransitionSeconds);
+            using (var check = new EditorGUI.ChangeCheckScope())
+            {
+                var newTransitionSeconds = EditorGUILayout.FloatField("徐々に変化（秒数）", TransitionSeconds);
+                if (check.changed)
+                {
+                    WillChange();
+                    TransitionSeconds = newTransitionSeconds;
+                }
+            }
             if (TransitionSeconds < 0) TransitionSeconds = 0;
             if (TransitionSeconds > 0)
             {
@@ -248,6 +259,76 @@ namespace net.narazaka.avatarmenucreator
             foreach (var m in machine.stateMachines)
             {
                 SaveStateMachine(m.stateMachine, path);
+            }
+        }
+
+        protected void WillChange(string message = null)
+        {
+            UndoUtility.RecordObject(UndoObject, message ?? UndoMessage);
+        }
+
+        string _UndoMessage;
+        string UndoMessage
+        {
+            get
+            {
+                if (_UndoMessage == null)
+                {
+                    _UndoMessage = $"{GetType().Name} changed";
+                }
+                return _UndoMessage;
+            }
+        }
+
+        protected string TextField(string label, string value)
+        {
+            using (var check = new EditorGUI.ChangeCheckScope())
+            {
+                var newValue = EditorGUILayout.TextField(label, value);
+                if (check.changed)
+                {
+                    WillChange();
+                }
+                return newValue;
+            }
+        }
+
+        protected int IntField(string label, int value)
+        {
+            using (var check = new EditorGUI.ChangeCheckScope())
+            {
+                var newValue = EditorGUILayout.IntField(label, value);
+                if (check.changed)
+                {
+                    WillChange();
+                }
+                return newValue;
+            }
+        }
+
+        protected float FloatField(string label, float value)
+        {
+            using (var check = new EditorGUI.ChangeCheckScope())
+            {
+                var newValue = EditorGUILayout.FloatField(label, value);
+                if (check.changed)
+                {
+                    WillChange();
+                }
+                return newValue;
+            }
+        }
+
+        protected float FloatField(float value)
+        {
+            using (var check = new EditorGUI.ChangeCheckScope())
+            {
+                var newValue = EditorGUILayout.FloatField(value);
+                if (check.changed)
+                {
+                    WillChange();
+                }
+                return newValue;
             }
         }
 #endif

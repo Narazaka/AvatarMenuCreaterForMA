@@ -35,6 +35,7 @@ namespace net.narazaka.avatarmenucreator
         public override IEnumerable<string> GetStoredChildren() => RadialBlendShapes.Keys.Select(key => key.Item1).Concat(RadialShaderParameters.Keys.Select(key => key.Item1)).Distinct();
         public override void RemoveStoredChild(string child)
         {
+            WillChange();
             foreach (var key in RadialBlendShapes.Keys.Where(k => k.Item1 == child))
             {
                 RadialBlendShapes.Remove(key);
@@ -51,13 +52,14 @@ namespace net.narazaka.avatarmenucreator
 
         protected override void OnHeaderGUI(IList<string> children)
         {
-            RadialDefaultValue = EditorGUILayout.FloatField("パラメーター初期値", RadialDefaultValue);
+            RadialDefaultValue = FloatField("パラメーター初期値", RadialDefaultValue);
             if (RadialDefaultValue < 0) RadialDefaultValue = 0;
             if (RadialDefaultValue > 1) RadialDefaultValue = 1;
             if (RadialInactiveRange)
             {
                 if (!EditorGUILayout.Toggle("無効領域を設定", true))
                 {
+                    WillChange();
                     RadialInactiveRange = false;
                 }
                 EditorGUILayout.HelpBox("アニメーションが影響しないパラメーター領域を設定します", MessageType.Info);
@@ -70,6 +72,7 @@ namespace net.narazaka.avatarmenucreator
                             var active = EditorGUILayout.ToggleLeft("これより大きい場合", false);
                             if (active)
                             {
+                                WillChange();
                                 RadialInactiveRangeMin = 0.49f;
                             }
                         }
@@ -78,10 +81,11 @@ namespace net.narazaka.avatarmenucreator
                             var active = EditorGUILayout.ToggleLeft("これより大きい場合", true);
                             if (active)
                             {
-                                RadialInactiveRangeMin = EditorGUILayout.FloatField(RadialInactiveRangeMin);
+                                RadialInactiveRangeMin = FloatField(RadialInactiveRangeMin);
                             }
                             else
                             {
+                                WillChange();
                                 RadialInactiveRangeMin = float.NaN;
                             }
                         }
@@ -93,6 +97,7 @@ namespace net.narazaka.avatarmenucreator
                             var active = EditorGUILayout.ToggleLeft("これより小さい場合", false);
                             if (active)
                             {
+                                WillChange();
                                 RadialInactiveRangeMax = 0.01f;
                             }
                         }
@@ -101,10 +106,11 @@ namespace net.narazaka.avatarmenucreator
                             var active = EditorGUILayout.ToggleLeft("これより小さい場合", true);
                             if (active)
                             {
-                                RadialInactiveRangeMax = EditorGUILayout.FloatField(RadialInactiveRangeMax);
+                                RadialInactiveRangeMax = FloatField(RadialInactiveRangeMax);
                             }
                             else
                             {
+                                WillChange();
                                 RadialInactiveRangeMax = float.NaN;
                             }
                         }
@@ -115,6 +121,7 @@ namespace net.narazaka.avatarmenucreator
             {
                 if (EditorGUILayout.Toggle("無効領域を設定", false))
                 {
+                    WillChange();
                     RadialInactiveRange = true;
                 }
             }
@@ -188,6 +195,7 @@ namespace net.narazaka.avatarmenucreator
                         }
                         if (!value.Equals(newValue))
                         {
+                            WillChange();
                             if (minValue != null)
                             {
                                 if (newValue.Start < (float)minValue) newValue.Start = (float)minValue;
@@ -208,6 +216,7 @@ namespace net.narazaka.avatarmenucreator
                     }
                     else
                     {
+                        WillChange();
                         radials.Remove(key);
                     }
                 }
@@ -215,6 +224,7 @@ namespace net.narazaka.avatarmenucreator
                 {
                     if (EditorGUILayout.ToggleLeft(name.Description, false))
                     {
+                        WillChange();
                         radials[key] = new RadialBlendShape { Start = 0, End = defaultEndValue };
                     }
                 }

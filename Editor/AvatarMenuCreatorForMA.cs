@@ -1,19 +1,27 @@
 using UnityEngine;
 using UnityEditor;
 using VRC.SDK3.Avatars.Components;
+using net.narazaka.avatarmenucreator.editor.util;
 
 namespace net.narazaka.avatarmenucreator.editor
 {
     public class AvatarMenuCreatorForMA : EditorWindow
     {
+        [SerializeField]
         VRCAvatarDescriptor VRCAvatarDescriptor;
+        [SerializeField]
         MenuType MenuType = MenuType.Toggle;
+        [SerializeField]
         IncludeAssetType IncludeAssetType = IncludeAssetType.AnimatorAndInclude;
 
+        [SerializeField]
         AvatarToggleMenu AvatarToggleMenu = new AvatarToggleMenu();
+        [SerializeField]
         AvatarChooseMenu AvatarChooseMenu = new AvatarChooseMenu();
+        [SerializeField]
         AvatarRadialMenu AvatarRadialMenu = new AvatarRadialMenu();
 
+        [SerializeField]
         bool BulkSet;
 
         string SaveFolder = "Assets";
@@ -24,6 +32,13 @@ namespace net.narazaka.avatarmenucreator.editor
             GetWindow<AvatarMenuCreatorForMA>("AvatarMenuCreator for Modular Avatar");
         }
 
+        void OnEnable()
+        {
+            AvatarToggleMenu.UndoObject = this;
+            AvatarChooseMenu.UndoObject = this;
+            AvatarRadialMenu.UndoObject = this;
+        }
+
         void Update()
         {
             Repaint();
@@ -31,10 +46,15 @@ namespace net.narazaka.avatarmenucreator.editor
 
         void ShowBulkSet()
         {
-            BulkSet = EditorGUILayout.ToggleLeft("同名パラメーターや同マテリアルスロットを一括設定", BulkSet);
-            AvatarToggleMenu.BulkSet = BulkSet;
-            AvatarChooseMenu.BulkSet = BulkSet;
-            AvatarRadialMenu.BulkSet = BulkSet;
+            var newBulkSet = EditorGUILayout.ToggleLeft("同名パラメーターや同マテリアルスロットを一括設定", BulkSet);
+            if (newBulkSet != BulkSet)
+            {
+                UndoUtility.RecordObject(this, "BulkSet");
+                BulkSet = newBulkSet;
+                AvatarToggleMenu.BulkSet = BulkSet;
+                AvatarChooseMenu.BulkSet = BulkSet;
+                AvatarRadialMenu.BulkSet = BulkSet;
+            }
         }
 
         GameObject[] selectedGameObjects;
@@ -59,7 +79,13 @@ namespace net.narazaka.avatarmenucreator.editor
 
         void OnGUI()
         {
-            VRCAvatarDescriptor = EditorGUILayout.ObjectField("Avatar", VRCAvatarDescriptor, typeof(VRCAvatarDescriptor), true) as VRCAvatarDescriptor;
+
+            var newVRCAvatarDescriptor = EditorGUILayout.ObjectField("Avatar", VRCAvatarDescriptor, typeof(VRCAvatarDescriptor), true) as VRCAvatarDescriptor;
+            if (newVRCAvatarDescriptor != VRCAvatarDescriptor)
+            {
+                UndoUtility.RecordObject(this, "VRCAvatarDescriptor");
+                VRCAvatarDescriptor = newVRCAvatarDescriptor;
+            }
 
             if (VRCAvatarDescriptor == null)
             {
@@ -75,7 +101,12 @@ namespace net.narazaka.avatarmenucreator.editor
                 return;
             }
 
-            MenuType = (MenuType)EditorGUILayout.EnumPopup(MenuType);
+            var newMenuType = (MenuType)EditorGUILayout.EnumPopup(MenuType);
+            if (newMenuType != MenuType)
+            {
+                UndoUtility.RecordObject(this, "MenuType");
+                MenuType = newMenuType;
+            }
 
             ShowBulkSet();
             AvatarToggleMenu.BaseObject = VRCAvatarDescriptor.gameObject;
@@ -95,7 +126,12 @@ namespace net.narazaka.avatarmenucreator.editor
                 AvatarRadialMenu.OnAvatarMenuGUI(children);
             }
 
-            IncludeAssetType = (IncludeAssetType)EditorGUILayout.EnumPopup("保存形式", IncludeAssetType);
+            var newIncludeAssetType = (IncludeAssetType)EditorGUILayout.EnumPopup("保存形式", IncludeAssetType);
+            if (newIncludeAssetType != IncludeAssetType)
+            {
+                UndoUtility.RecordObject(this, "IncludeAssetType");
+                IncludeAssetType = newIncludeAssetType;
+            }
             if (GUILayout.Button("Create!"))
             {
                 var basePath = EditorUtility.SaveFilePanelInProject("保存場所", "New Menu", "prefab", "アセットの保存場所", SaveFolder);
