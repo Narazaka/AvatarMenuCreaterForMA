@@ -67,6 +67,7 @@ namespace net.narazaka.avatarmenucreator
             ShowTransitionSeconds();
 
             ChooseDefaultValue = IntField("パラメーター初期値", ChooseDefaultValue);
+            ShowSaved();
 
             ChooseCount = IntField("選択肢の数", ChooseCount);
 
@@ -488,12 +489,13 @@ namespace net.narazaka.avatarmenucreator
                 var menuInstaller = prefab.GetOrAddComponent<ModularAvatarMenuInstaller>();
                 menuInstaller.menuToAppend = parentMenu;
                 var parameters = prefab.GetOrAddComponent<ModularAvatarParameters>();
+                parameters.parameters.Clear();
                 parameters.parameters.Add(new ParameterConfig
                 {
                     nameOrPrefix = baseName,
                     defaultValue = ChooseDefaultValue,
                     syncType = ParameterSyncType.Int,
-                    saved = true,
+                    saved = Saved,
                 });
                 var mergeAnimator = prefab.GetOrAddComponent<ModularAvatarMergeAnimator>();
                 mergeAnimator.animator = controller;

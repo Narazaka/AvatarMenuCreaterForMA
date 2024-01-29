@@ -19,6 +19,8 @@ namespace net.narazaka.avatarmenucreator
 
         [SerializeField]
         protected float TransitionSeconds;
+        [SerializeField]
+        protected bool Saved = true;
 
 #if UNITY_EDITOR
         [NonSerialized]
@@ -87,6 +89,11 @@ namespace net.narazaka.avatarmenucreator
                     EditorGUILayout.HelpBox("指定時間かけて変化します", MessageType.Info);
                 }
             }
+        }
+
+        protected void ShowSaved()
+        {
+            Saved = Toggle("Saved", Saved);
         }
 
         protected GameObject GetGameObject(string child)
@@ -180,9 +187,13 @@ namespace net.narazaka.avatarmenucreator
         {
             // prefab
             var prefabPath = $"{basePath}.prefab";
-            var prefab = new GameObject(baseName);
-            PrefabUtility.SaveAsPrefabAsset(prefab, prefabPath);
-            UnityEngine.Object.DestroyImmediate(prefab);
+            GameObject prefab;
+            if (!System.IO.File.Exists(prefabPath))
+            {
+                prefab = new GameObject(baseName);
+                PrefabUtility.SaveAsPrefabAsset(prefab, prefabPath);
+                UnityEngine.Object.DestroyImmediate(prefab);
+            }
             SaveAssets(includeAssetType, baseName, basePath, controller, clips, menu, parentMenu);
             prefab = PrefabUtility.LoadPrefabContents(prefabPath);
 

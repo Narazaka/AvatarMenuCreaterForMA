@@ -48,6 +48,7 @@ namespace net.narazaka.avatarmenucreator
         {
             ShowTransitionSeconds();
             ToggleDefaultValue = Toggle("パラメーター初期値", ToggleDefaultValue);
+            ShowSaved();
         }
 
         protected override void OnMainGUI(IList<string> children)
@@ -407,12 +408,13 @@ namespace net.narazaka.avatarmenucreator
                 var menuInstaller = prefab.GetOrAddComponent<ModularAvatarMenuInstaller>();
                 menuInstaller.menuToAppend = menu;
                 var parameters = prefab.GetOrAddComponent<ModularAvatarParameters>();
+                parameters.parameters.Clear();
                 parameters.parameters.Add(new ParameterConfig
                 {
                     nameOrPrefix = baseName,
                     defaultValue = ToggleDefaultValue ? 1 : 0,
                     syncType = ParameterSyncType.Bool,
-                    saved = true,
+                    saved = Saved,
                 });
                 var mergeAnimator = prefab.GetOrAddComponent<ModularAvatarMergeAnimator>();
                 mergeAnimator.animator = controller;

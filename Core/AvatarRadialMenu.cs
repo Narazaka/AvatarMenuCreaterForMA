@@ -53,6 +53,7 @@ namespace net.narazaka.avatarmenucreator
         protected override void OnHeaderGUI(IList<string> children)
         {
             RadialDefaultValue = FloatField("パラメーター初期値", RadialDefaultValue);
+            ShowSaved();
             if (RadialDefaultValue < 0) RadialDefaultValue = 0;
             if (RadialDefaultValue > 1) RadialDefaultValue = 1;
             if (RadialInactiveRange)
@@ -370,12 +371,13 @@ namespace net.narazaka.avatarmenucreator
                 var menuInstaller = prefab.GetOrAddComponent<ModularAvatarMenuInstaller>();
                 menuInstaller.menuToAppend = menu;
                 var parameters = prefab.GetOrAddComponent<ModularAvatarParameters>();
+                parameters.parameters.Clear();
                 parameters.parameters.Add(new ParameterConfig
                 {
                     nameOrPrefix = baseName,
                     defaultValue = RadialDefaultValue,
                     syncType = ParameterSyncType.Float,
-                    saved = true,
+                    saved = Saved,
                 });
                 var mergeAnimator = prefab.GetOrAddComponent<ModularAvatarMergeAnimator>();
                 mergeAnimator.animator = controller;
