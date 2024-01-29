@@ -3,7 +3,7 @@
 namespace net.narazaka.avatarmenucreator
 {
     [Serializable]
-    struct ToggleBlendShape : System.IEquatable<ToggleBlendShape>
+    public struct ToggleBlendShape : System.IEquatable<ToggleBlendShape>
     {
         public float Inactive;
         public float Active;

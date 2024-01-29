@@ -18,23 +18,23 @@ namespace net.narazaka.avatarmenucreator
     public class AvatarChooseMenu : AvatarMenuBase
     {
         [SerializeField]
-        IntHashSetDictionary ChooseObjects = new IntHashSetDictionary();
+        public IntHashSetDictionary ChooseObjects = new IntHashSetDictionary();
         [SerializeField]
-        ChooseMaterialDictionary ChooseMaterials = new ChooseMaterialDictionary();
+        public ChooseMaterialDictionary ChooseMaterials = new ChooseMaterialDictionary();
         [SerializeField]
-        ChooseBlendShapeDictionary ChooseBlendShapes = new ChooseBlendShapeDictionary();
+        public ChooseBlendShapeDictionary ChooseBlendShapes = new ChooseBlendShapeDictionary();
         [SerializeField]
-        ChooseBlendShapeDictionary ChooseShaderParameters = new ChooseBlendShapeDictionary();
+        public ChooseBlendShapeDictionary ChooseShaderParameters = new ChooseBlendShapeDictionary();
         [SerializeField]
-        int ChooseDefaultValue;
+        public int ChooseDefaultValue;
         [SerializeField]
-        int ChooseCount = 2;
+        public int ChooseCount = 2;
         [SerializeField]
-        IntStringDictionary ChooseNames = new IntStringDictionary();
+        public IntStringDictionary ChooseNames = new IntStringDictionary();
 
 #if UNITY_EDITOR
 
-        string ChooseName(int index)
+        public string ChooseName(int index)
         {
             if (ChooseNames.ContainsKey(index)) return ChooseNames[index];
             return $"選択肢{index}";
@@ -348,161 +348,6 @@ namespace net.narazaka.avatarmenucreator
                     choices[(child, name)][choiseIndex] = choiceValue;
                 }
             }
-        }
-
-        public override void CreateAssets(IncludeAssetType includeAssetType, string baseName, string basePath, string[] children)
-        {
-            var matchGameObjects = new HashSet<string>(children);
-            // clip
-            var choices = Enumerable.Range(0, ChooseCount).Select(i => new AnimationClip { name = $"{baseName}_{i}" }).ToList();
-            foreach (var child in ChooseObjects.Keys)
-            {
-                if (!matchGameObjects.Contains(child)) continue;
-                var curvePath = child;
-                for (var i = 0; i < ChooseCount; ++i)
-                {
-                    choices[i].SetCurve(curvePath, typeof(GameObject), "m_IsActive", new AnimationCurve(new Keyframe(0, ChooseObjects[child].Contains(i) ? 1 : 0)));
-                }
-            }
-            foreach (var (child, index) in ChooseMaterials.Keys)
-            {
-                if (!matchGameObjects.Contains(child)) continue;
-                var value = ChooseMaterials[(child, index)];
-                var curvePath = child;
-                var curveName = $"m_Materials.Array.data[{index}]";
-                for (var i = 0; i < ChooseCount; ++i)
-                {
-                    AnimationUtility.SetObjectReferenceCurve(choices[i], EditorCurveBinding.PPtrCurve(curvePath, typeof(SkinnedMeshRenderer), curveName), new ObjectReferenceKeyframe[] { new ObjectReferenceKeyframe { time = 0, value = value.ContainsKey(i) ? value[i] : null } });
-                }
-            }
-            foreach (var (child, name) in ChooseBlendShapes.Keys)
-            {
-                if (!matchGameObjects.Contains(child)) continue;
-                var value = ChooseBlendShapes[(child, name)];
-                var curvePath = child;
-                var curveName = $"blendShape.{name}";
-                for (var i = 0; i < ChooseCount; ++i)
-                {
-                    choices[i].SetCurve(curvePath, typeof(SkinnedMeshRenderer), curveName, new AnimationCurve(new Keyframe(0, value.ContainsKey(i) ? value[i] : 0)));
-                }
-            }
-            foreach (var (child, name) in ChooseShaderParameters.Keys)
-            {
-                if (!matchGameObjects.Contains(child)) continue;
-                var value = ChooseShaderParameters[(child, name)];
-                var curvePath = child;
-                var curveName = $"material.{name}";
-                for (var i = 0; i < ChooseCount; ++i)
-                {
-                    choices[i].SetCurve(curvePath, typeof(Renderer), curveName, new AnimationCurve(new Keyframe(0, value.ContainsKey(i) ? value[i] : 0)));
-                }
-            }
-            // controller
-            var controller = new AnimatorController();
-            controller.AddParameter(new AnimatorControllerParameter { name = baseName, type = AnimatorControllerParameterType.Int, defaultInt = 0 });
-            if (controller.layers.Length == 0) controller.AddLayer(baseName);
-            var layer = controller.layers[0];
-            layer.name = baseName;
-            layer.stateMachine.name = baseName;
-            layer.stateMachine.entryPosition = new Vector3(-600, 0);
-            layer.stateMachine.anyStatePosition = new Vector3(800, 0);
-            var idleState = layer.stateMachine.AddState($"{baseName}_idle", new Vector3(-300, 0));
-            idleState.motion = choices[0];
-            idleState.writeDefaultValues = false;
-            layer.stateMachine.defaultState = idleState;
-            var states = choices.Select((clip, i) =>
-            {
-                var state = layer.stateMachine.AddState($"{baseName}_{i}", new Vector3(300, 50 * i));
-                state.motion = clip;
-                state.writeDefaultValues = false;
-                return state;
-            }).ToList();
-            for (var i = 0; i < ChooseCount; ++i)
-            {
-                var state = states[i];
-                var toNext = layer.stateMachine.AddAnyStateTransition(state);
-                toNext.exitTime = 0;
-                toNext.duration = TransitionSeconds;
-                toNext.hasExitTime = false;
-                toNext.conditions = new AnimatorCondition[]
-                {
-                    new AnimatorCondition
-                    {
-                        mode = AnimatorConditionMode.Equals,
-                        parameter = baseName,
-                        threshold = i,
-                    },
-                };
-                toNext.canTransitionToSelf = false;
-                var fromIdle = idleState.AddTransition(state);
-                fromIdle.exitTime = 0;
-                fromIdle.duration = 0;
-                fromIdle.hasExitTime = false;
-                fromIdle.conditions = new AnimatorCondition[]
-                {
-                    new AnimatorCondition
-                    {
-                        mode = AnimatorConditionMode.Equals,
-                        parameter = baseName,
-                        threshold = i,
-                    },
-                };
-            }
-            // menu
-            var menu = new VRCExpressionsMenu
-            {
-                controls = Enumerable.Range(0, ChooseCount).Select(i => new VRCExpressionsMenu.Control
-                {
-                    name = ChooseName(i),
-                    type = VRCExpressionsMenu.Control.ControlType.Toggle,
-                    parameter = new VRCExpressionsMenu.Control.Parameter
-                    {
-                        name = baseName,
-                    },
-                    subParameters = new VRCExpressionsMenu.Control.Parameter[] { },
-                    value = i,
-                    labels = new VRCExpressionsMenu.Control.Label[] { },
-                }).ToList(),
-            };
-            menu.name = baseName;
-            var parentMenu = new VRCExpressionsMenu
-            {
-                controls = new List<VRCExpressionsMenu.Control>
-                {
-                    new VRCExpressionsMenu.Control {
-                        name = baseName,
-                        type = VRCExpressionsMenu.Control.ControlType.SubMenu,
-                        parameter = new VRCExpressionsMenu.Control.Parameter
-                        {
-                            name = "",
-                        },
-                        subParameters = new VRCExpressionsMenu.Control.Parameter[] { },
-                        value = 1,
-                        labels = new VRCExpressionsMenu.Control.Label[] { },
-                        subMenu = menu,
-                    },
-                },
-            };
-            parentMenu.name = $"{baseName}_parent";
-            SaveAssets(includeAssetType, baseName, basePath, controller, choices, menu, parentMenu, (prefab) =>
-            {
-                var menuInstaller = prefab.GetOrAddComponent<ModularAvatarMenuInstaller>();
-                menuInstaller.menuToAppend = parentMenu;
-                var parameters = prefab.GetOrAddComponent<ModularAvatarParameters>();
-                parameters.parameters.Clear();
-                parameters.parameters.Add(new ParameterConfig
-                {
-                    nameOrPrefix = baseName,
-                    defaultValue = ChooseDefaultValue,
-                    syncType = ParameterSyncType.Int,
-                    saved = Saved,
-                });
-                var mergeAnimator = prefab.GetOrAddComponent<ModularAvatarMergeAnimator>();
-                mergeAnimator.animator = controller;
-                mergeAnimator.layerType = VRCAvatarDescriptor.AnimLayerType.FX;
-                mergeAnimator.pathMode = MergeAnimatorPathMode.Absolute;
-                mergeAnimator.matchAvatarWriteDefaults = true;
-            });
         }
 #endif
     }

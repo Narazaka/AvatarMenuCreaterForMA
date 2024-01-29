@@ -18,17 +18,17 @@ namespace net.narazaka.avatarmenucreator
     public class AvatarRadialMenu : AvatarMenuBase
     {
         [SerializeField]
-        RadialBlendShapeDictionary RadialBlendShapes = new RadialBlendShapeDictionary();
+        public RadialBlendShapeDictionary RadialBlendShapes = new RadialBlendShapeDictionary();
         [SerializeField]
-        RadialBlendShapeDictionary RadialShaderParameters = new RadialBlendShapeDictionary();
+        public RadialBlendShapeDictionary RadialShaderParameters = new RadialBlendShapeDictionary();
         [SerializeField]
-        float RadialDefaultValue;
+        public float RadialDefaultValue;
         [SerializeField]
-        bool RadialInactiveRange;
+        public bool RadialInactiveRange;
         [SerializeField]
-        float RadialInactiveRangeMin = float.NaN;
+        public float RadialInactiveRangeMin = float.NaN;
         [SerializeField]
-        float RadialInactiveRangeMax = float.NaN;
+        public float RadialInactiveRangeMax = float.NaN;
 
 #if UNITY_EDITOR
 
@@ -246,155 +246,6 @@ namespace net.narazaka.avatarmenucreator
             {
                 radials[key] = radials[key].SetProp(changedProp, radialBlendShape.GetProp(changedProp));
             }
-        }
-
-        public override void CreateAssets(IncludeAssetType includeAssetType, string baseName, string basePath, string[] children)
-        {
-            var matchGameObjects = new HashSet<string>(children);
-            // clip
-            var clip = new AnimationClip();
-            clip.name = baseName;
-            foreach (var (child, name) in RadialBlendShapes.Keys)
-            {
-                if (!matchGameObjects.Contains(child)) continue;
-                var value = RadialBlendShapes[(child, name)];
-                clip.SetCurve(child, typeof(SkinnedMeshRenderer), $"blendShape.{name}", SetAutoTangentMode(new AnimationCurve(new Keyframe(0 / 60.0f, value.Start), new Keyframe(1 / 60.0f, value.End))));
-            }
-            foreach (var (child, name) in RadialShaderParameters.Keys)
-            {
-                if (!matchGameObjects.Contains(child)) continue;
-                var value = RadialShaderParameters[(child, name)];
-                clip.SetCurve(child, typeof(Renderer), $"material.{name}", SetAutoTangentMode(new AnimationCurve(new Keyframe(0 / 60.0f, value.Start), new Keyframe(1 / 60.0f, value.End))));
-            }
-            // controller
-            var controller = new AnimatorController();
-            controller.AddParameter(new AnimatorControllerParameter { name = baseName, type = AnimatorControllerParameterType.Float, defaultFloat = RadialDefaultValue });
-            if (controller.layers.Length == 0) controller.AddLayer(baseName);
-            var layer = controller.layers[0];
-            layer.name = baseName;
-            layer.stateMachine.name = baseName;
-            var state = layer.stateMachine.AddState(baseName, new Vector3(300, 0));
-            state.timeParameterActive = true;
-            state.timeParameter = baseName;
-            state.motion = clip;
-            state.writeDefaultValues = false;
-            AnimationClip emptyClip = null;
-            if (RadialInactiveRange && !(float.IsNaN(RadialInactiveRangeMin) && float.IsNaN(RadialInactiveRangeMax)))
-            {
-                emptyClip = new AnimationClip();
-                emptyClip.name = $"{baseName}_empty";
-                var inactiveState = layer.stateMachine.AddState($"{baseName}_inactive", new Vector3(300, 100));
-                inactiveState.motion = emptyClip;
-                inactiveState.writeDefaultValues = false;
-                layer.stateMachine.defaultState = inactiveState;
-                var toInactive = state.AddTransition(inactiveState);
-                toInactive.exitTime = 0;
-                toInactive.duration = 0;
-                toInactive.hasExitTime = false;
-                var toInactiveConditions = new List<AnimatorCondition>();
-                if (!float.IsNaN(RadialInactiveRangeMin))
-                {
-                    toInactiveConditions.Add(new AnimatorCondition
-                    {
-                        mode = AnimatorConditionMode.Greater,
-                        parameter = baseName,
-                        threshold = RadialInactiveRangeMin,
-                    });
-                }
-                if (!float.IsNaN(RadialInactiveRangeMax))
-                {
-                    toInactiveConditions.Add(new AnimatorCondition
-                    {
-                        mode = AnimatorConditionMode.Less,
-                        parameter = baseName,
-                        threshold = RadialInactiveRangeMax,
-                    });
-                }
-                toInactive.conditions = toInactiveConditions.ToArray();
-
-                if (!float.IsNaN(RadialInactiveRangeMin))
-                {
-                    var toActiveMin = inactiveState.AddTransition(state);
-                    toActiveMin.exitTime = 0;
-                    toActiveMin.duration = 0;
-                    toActiveMin.hasExitTime = false;
-                    toActiveMin.conditions = new AnimatorCondition[]
-                    {
-                        new AnimatorCondition
-                        {
-                            mode = AnimatorConditionMode.Less,
-                            parameter = baseName,
-                            threshold = RadialInactiveRangeMin,
-                        },
-                    };
-                }
-                if (!float.IsNaN(RadialInactiveRangeMax))
-                {
-                    var toActiveMax = inactiveState.AddTransition(state);
-                    toActiveMax.exitTime = 0;
-                    toActiveMax.duration = 0;
-                    toActiveMax.hasExitTime = false;
-                    toActiveMax.conditions = new AnimatorCondition[]
-                    {
-                        new AnimatorCondition
-                        {
-                            mode = AnimatorConditionMode.Greater,
-                            parameter = baseName,
-                            threshold = RadialInactiveRangeMax,
-                        },
-                    };
-                }
-            }
-            // menu
-            var menu = new VRCExpressionsMenu
-            {
-                controls = new List<VRCExpressionsMenu.Control>
-                {
-                    new VRCExpressionsMenu.Control {
-                        name = baseName,
-                        type = VRCExpressionsMenu.Control.ControlType.RadialPuppet,
-                        subParameters = new VRCExpressionsMenu.Control.Parameter[] {
-                            new VRCExpressionsMenu.Control.Parameter
-                            {
-                                name = baseName,
-                            }
-                        },
-                        value = RadialDefaultValue,
-                        labels = new VRCExpressionsMenu.Control.Label[] { },
-                    },
-                },
-            };
-            menu.name = baseName;
-            // prefab
-            SaveAssets(includeAssetType, baseName, basePath, controller, emptyClip == null ? new AnimationClip[] { clip } : new AnimationClip[] { clip, emptyClip }, menu, null, (prefab) =>
-            {
-                var menuInstaller = prefab.GetOrAddComponent<ModularAvatarMenuInstaller>();
-                menuInstaller.menuToAppend = menu;
-                var parameters = prefab.GetOrAddComponent<ModularAvatarParameters>();
-                parameters.parameters.Clear();
-                parameters.parameters.Add(new ParameterConfig
-                {
-                    nameOrPrefix = baseName,
-                    defaultValue = RadialDefaultValue,
-                    syncType = ParameterSyncType.Float,
-                    saved = Saved,
-                });
-                var mergeAnimator = prefab.GetOrAddComponent<ModularAvatarMergeAnimator>();
-                mergeAnimator.animator = controller;
-                mergeAnimator.layerType = VRCAvatarDescriptor.AnimLayerType.FX;
-                mergeAnimator.pathMode = MergeAnimatorPathMode.Absolute;
-                mergeAnimator.matchAvatarWriteDefaults = true;
-            });
-        }
-
-        AnimationCurve SetAutoTangentMode(AnimationCurve curve)
-        {
-            for (var i = 0; i < curve.length; ++i)
-            {
-                AnimationUtility.SetKeyLeftTangentMode(curve, i, AnimationUtility.TangentMode.Auto);
-                AnimationUtility.SetKeyRightTangentMode(curve, i, AnimationUtility.TangentMode.Auto);
-            }
-            return curve;
         }
 #endif
     }
