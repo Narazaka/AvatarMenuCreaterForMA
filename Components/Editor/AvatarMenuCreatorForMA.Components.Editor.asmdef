@@ -1,0 +1,30 @@
+{
+    "name": "AvatarMenuCreatorForMA.Components.Editor",
+    "references": [
+        "AvatarMenuCreatorForMA.Components",
+        "AvatarMenuCreatorForMA.Core",
+        "AvatarMenuCreatorForMA.Editor.Util",
+        "AvatarMenuCreatorForMA.Editor",
+        "nadena.dev.ndmf",
+        "nadena.dev.modular-avatar.core"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": false,
+    "defineConstraints": [
+        "NET_NARAZAKA_VRCHAT_AvatarMenuCreator_HAS_NDMF"
+    ],
+    "versionDefines": [
+        {
+            "name": "nadena.dev.ndmf",
+            "expression": "1.0.0",
+            "define": "NET_NARAZAKA_VRCHAT_AvatarMenuCreator_HAS_NDMF"
+        }
+    ],
+    "noEngineReferences": false
+}

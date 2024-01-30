@@ -1,27 +1,32 @@
-using System.Linq;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
-using UnityEditor.Animations;
 using VRC.SDK3.Avatars.Components;
-using VRC.SDK3.Avatars.ScriptableObjects;
-using VRC.Core;
-using nadena.dev.modular_avatar.core;
-using System;
+using net.narazaka.avatarmenucreator.editor.util;
+using net.narazaka.avatarmenucreator.components;
 
-namespace net.narazaka.avatarmenucreator
+namespace net.narazaka.avatarmenucreator.editor
 {
     public class AvatarMenuCreatorForMA : EditorWindow
     {
+        [SerializeField]
         VRCAvatarDescriptor VRCAvatarDescriptor;
+        [SerializeField]
         MenuType MenuType = MenuType.Toggle;
+        [SerializeField]
         IncludeAssetType IncludeAssetType = IncludeAssetType.AnimatorAndInclude;
 
+        [SerializeField]
+        AvatarToggleMenu AvatarToggleMenu = new AvatarToggleMenu();
+        [SerializeField]
+        AvatarChooseMenu AvatarChooseMenu = new AvatarChooseMenu();
+        [SerializeField]
+        AvatarRadialMenu AvatarRadialMenu = new AvatarRadialMenu();
+
+        [SerializeField]
         bool BulkSet;
 
-        AvatarToggleMenu AvatarToggleMenu = new AvatarToggleMenu();
-        AvatarChooseMenu AvatarChooseMenu = new AvatarChooseMenu();
-        AvatarRadialMenu AvatarRadialMenu = new AvatarRadialMenu();
+        [SerializeField]
+        string BaseName;
 
         string SaveFolder = "Assets";
 
@@ -31,14 +36,60 @@ namespace net.narazaka.avatarmenucreator
             GetWindow<AvatarMenuCreatorForMA>("AvatarMenuCreator for Modular Avatar");
         }
 
+        void OnEnable()
+        {
+            AvatarToggleMenu.UndoObject = this;
+            AvatarChooseMenu.UndoObject = this;
+            AvatarRadialMenu.UndoObject = this;
+        }
+
         void Update()
         {
             Repaint();
         }
 
+        void ShowBulkSet()
+        {
+            var newBulkSet = EditorGUILayout.ToggleLeft("同名パラメーターや同マテリアルスロットを一括設定", BulkSet);
+            if (newBulkSet != BulkSet)
+            {
+                UndoUtility.RecordObject(this, "BulkSet");
+                BulkSet = newBulkSet;
+                AvatarToggleMenu.BulkSet = BulkSet;
+                AvatarChooseMenu.BulkSet = BulkSet;
+                AvatarRadialMenu.BulkSet = BulkSet;
+            }
+        }
+
+        GameObject[] selectedGameObjects;
+        string[] children;
+        string[] GetChildren()
+        {
+            if (selectedGameObjects == Selection.gameObjects && children != null)
+            {
+                return children;
+            }
+            AvatarToggleMenu.ClearGameObjectCache();
+            AvatarChooseMenu.ClearGameObjectCache();
+            AvatarRadialMenu.ClearGameObjectCache();
+            selectedGameObjects = Selection.gameObjects;
+            children = new string[selectedGameObjects.Length];
+            for (int i = 0; i < selectedGameObjects.Length; i++)
+            {
+                children[i] = util.Util.ChildPath(VRCAvatarDescriptor.gameObject, selectedGameObjects[i]);
+            }
+            return children;
+        }
+
         void OnGUI()
         {
-            VRCAvatarDescriptor = EditorGUILayout.ObjectField("Avatar", VRCAvatarDescriptor, typeof(VRCAvatarDescriptor), true) as VRCAvatarDescriptor;
+
+            var newVRCAvatarDescriptor = EditorGUILayout.ObjectField("Avatar", VRCAvatarDescriptor, typeof(VRCAvatarDescriptor), true) as VRCAvatarDescriptor;
+            if (newVRCAvatarDescriptor != VRCAvatarDescriptor)
+            {
+                UndoUtility.RecordObject(this, "VRCAvatarDescriptor");
+                VRCAvatarDescriptor = newVRCAvatarDescriptor;
+            }
 
             if (VRCAvatarDescriptor == null)
             {
@@ -46,49 +97,111 @@ namespace net.narazaka.avatarmenucreator
                 return;
             }
 
-            var gameObjects = Selection.gameObjects;
+            var children = GetChildren();
 
-            if (gameObjects.Length == 0 || (gameObjects.Length == 1 && gameObjects[0] == VRCAvatarDescriptor.gameObject))
+            if (children.Length == 0 || (children.Length == 1 && selectedGameObjects[0] == VRCAvatarDescriptor.gameObject))
             {
                 EditorGUILayout.LabelField("対象のオブジェクトを選択して下さい");
                 return;
             }
 
-            MenuType = (MenuType)EditorGUILayout.EnumPopup(MenuType);
+            var newMenuType = (MenuType)EditorGUILayout.EnumPopup(MenuType);
+            if (newMenuType != MenuType)
+            {
+                UndoUtility.RecordObject(this, "MenuType");
+                MenuType = newMenuType;
+            }
+
+            ShowBulkSet();
+            AvatarToggleMenu.BaseObject = VRCAvatarDescriptor.gameObject;
+            AvatarChooseMenu.BaseObject = VRCAvatarDescriptor.gameObject;
+            AvatarRadialMenu.BaseObject = VRCAvatarDescriptor.gameObject;
 
             if (MenuType == MenuType.Toggle)
             {
-                AvatarToggleMenu.OnAvatarMenuGUI(VRCAvatarDescriptor.gameObject, gameObjects);
+                AvatarToggleMenu.OnAvatarMenuGUI(children);
             }
             else if (MenuType == MenuType.Choose)
             {
-                AvatarChooseMenu.OnAvatarMenuGUI(VRCAvatarDescriptor.gameObject, gameObjects);
+                AvatarChooseMenu.OnAvatarMenuGUI(children);
             }
             else
             {
-                AvatarRadialMenu.OnAvatarMenuGUI(VRCAvatarDescriptor.gameObject, gameObjects);
+                AvatarRadialMenu.OnAvatarMenuGUI(children);
             }
 
-            IncludeAssetType = (IncludeAssetType)EditorGUILayout.EnumPopup("保存形式", IncludeAssetType);
-            if (GUILayout.Button("Create!"))
+            var newIncludeAssetType = (IncludeAssetType)EditorGUILayout.EnumPopup("保存形式", IncludeAssetType);
+            if (newIncludeAssetType != IncludeAssetType)
             {
-                var basePath = EditorUtility.SaveFilePanelInProject("保存場所", "New Menu", "prefab", "アセットの保存場所", SaveFolder);
-                if (string.IsNullOrEmpty(basePath)) return;
-                basePath = new System.Text.RegularExpressions.Regex(@"\.prefab").Replace(basePath, "");
-                var baseName = System.IO.Path.GetFileNameWithoutExtension(basePath);
-                if (MenuType == MenuType.Toggle)
+                UndoUtility.RecordObject(this, "IncludeAssetType");
+                IncludeAssetType = newIncludeAssetType;
+            }
+            if (IncludeAssetType == IncludeAssetType.Component)
+            {
+                var newBaseName = EditorGUILayout.TextField("名前", BaseName);
+                if (newBaseName != BaseName)
                 {
-                    AvatarToggleMenu.CreateAssets(IncludeAssetType, VRCAvatarDescriptor.gameObject, baseName, basePath, gameObjects);
+                    UndoUtility.RecordObject(this, "BaseName");
+                    BaseName = newBaseName;
                 }
-                else if (MenuType == MenuType.Choose)
+            }
+            using (new EditorGUI.DisabledScope(IncludeAssetType == IncludeAssetType.Component && string.IsNullOrEmpty(BaseName)))
+            {
+                if (GUILayout.Button("Create!"))
                 {
-                    AvatarChooseMenu.CreateAssets(IncludeAssetType, VRCAvatarDescriptor.gameObject, baseName, basePath, gameObjects);
+                    AvatarMenuBase avatarMenu = MenuType == MenuType.Toggle ? AvatarToggleMenu as AvatarMenuBase : MenuType == MenuType.Choose ? AvatarChooseMenu as AvatarMenuBase : AvatarRadialMenu as AvatarMenuBase;
+
+                    if (IncludeAssetType == IncludeAssetType.Component)
+                    {
+                        SaveAsComponent(avatarMenu, children);
+                    }
+                    else
+                    {
+                        var basePath = EditorUtility.SaveFilePanelInProject("保存場所", "New Menu", "prefab", "アセットの保存場所", SaveFolder);
+                        if (string.IsNullOrEmpty(basePath)) return;
+                        basePath = new System.Text.RegularExpressions.Regex(@"\.prefab").Replace(basePath, "");
+                        var baseName = System.IO.Path.GetFileNameWithoutExtension(basePath);
+                        var createAvatarMenu = CreateAvatarMenuBase.GetCreateAvatarMenu(avatarMenu);
+                        createAvatarMenu.CreateAssets(baseName, children).SaveAssets(IncludeAssetType, basePath);
+                        SaveFolder = System.IO.Path.GetDirectoryName(basePath);
+                    }
                 }
-                else
-                {
-                    AvatarRadialMenu.CreateAssets(IncludeAssetType, VRCAvatarDescriptor.gameObject, baseName, basePath, gameObjects);
-                }
-                SaveFolder = System.IO.Path.GetDirectoryName(basePath);
+            }
+        }
+
+        public void SaveAsComponent(AvatarMenuBase avatarMenu, string[] children)
+        {
+            var obj = new GameObject(BaseName);
+            var creator = AddMenuCreatorComponent(obj, avatarMenu);
+            creator.AvatarMenu.FilterStoredTargets(children);
+            obj.transform.SetParent(VRCAvatarDescriptor.transform, false);
+            Undo.RegisterCreatedObjectUndo(obj, "Create Component");
+        }
+
+        AvatarMenuCreatorBase AddMenuCreatorComponent(GameObject obj, AvatarMenuBase avatarMenu)
+        {
+            switch (avatarMenu)
+            {
+                case AvatarToggleMenu a:
+                    {
+                        var creator = obj.AddComponent<AvatarToggleMenuCreator>();
+                        creator.AvatarToggleMenu = a.DeepCopy();
+                        return creator;
+                    }
+                case AvatarChooseMenu a:
+                    {
+                        var creator = obj.AddComponent<AvatarChooseMenuCreator>();
+                        creator.AvatarChooseMenu = a.DeepCopy();
+                        return creator;
+                    }
+                case AvatarRadialMenu a:
+                    {
+                        var creator = obj.AddComponent<AvatarRadialMenuCreator>();
+                        creator.AvatarRadialMenu = a.DeepCopy();
+                        return creator;
+                    }
+                default:
+                    throw new System.ArgumentException($"unknown menu type");
             }
         }
     }

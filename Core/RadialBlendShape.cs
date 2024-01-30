@@ -1,6 +1,9 @@
-﻿namespace net.narazaka.avatarmenucreator
+﻿using System;
+
+namespace net.narazaka.avatarmenucreator
 {
-    struct RadialBlendShape : System.IEquatable<RadialBlendShape>
+    [Serializable]
+    public struct RadialBlendShape : System.IEquatable<RadialBlendShape>
     {
         public float Start;
         public float End;

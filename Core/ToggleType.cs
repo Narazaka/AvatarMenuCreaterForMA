@@ -2,7 +2,7 @@
 
 namespace net.narazaka.avatarmenucreator
 {
-    enum ToggleType
+    public enum ToggleType
     {
         [InspectorName("制御しない")]
         None,

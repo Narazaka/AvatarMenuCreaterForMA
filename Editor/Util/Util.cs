@@ -2,10 +2,15 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace net.narazaka.avatarmenucreator
+namespace net.narazaka.avatarmenucreator.editor.util
 {
     public static class Util
     {
+        public static T DeepCopy<T>(this T obj)
+        {
+            return JsonUtility.FromJson<T>(JsonUtility.ToJson(obj));
+        }
+
         /// <summary>
         /// 子GameObjectの相対パスを返す (親がnullなら絶対パス)
         /// </summary>
