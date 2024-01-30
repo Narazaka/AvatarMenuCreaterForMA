@@ -11,7 +11,8 @@ namespace net.narazaka.avatarmenucreator
     {
         public Action<T> OnAdd;
         public Action<T> OnRemove;
-        IList<T> Items;
+        IList<T> Items = null;
+        IList<ListTreeViewItemContainer<T>> ItemsContainers = null;
         Func<IEnumerable<T>> GetExistItems;
         SearchField SearchField;
         string SearchQuery;
@@ -20,6 +21,12 @@ namespace net.narazaka.avatarmenucreator
         public ListPopupWindow(IList<T> items, Func<IEnumerable<T>> getExistItems)
         {
             Items = items;
+            GetExistItems = getExistItems;
+        }
+
+        public ListPopupWindow(IList<ListTreeViewItemContainer<T>> items, Func<IEnumerable<T>> getExistItems)
+        {
+            ItemsContainers = items;
             GetExistItems = getExistItems;
         }
 
@@ -33,11 +40,17 @@ namespace net.narazaka.avatarmenucreator
 
             if (TreeView == null)
             {
-                TreeView = new ListTreeView<T>(new TreeViewState(), Items, GetExistItems)
-                {
-                    OnAdd = OnAdd,
-                    OnRemove = OnRemove,
-                };
+                TreeView = Items == null
+                    ? new ListTreeView<T>(new TreeViewState(), ItemsContainers, GetExistItems)
+                    {
+                        OnAdd = OnAdd,
+                        OnRemove = OnRemove,
+                    }
+                    : new ListTreeView<T>(new TreeViewState(), Items, GetExistItems)
+                    {
+                        OnAdd = OnAdd,
+                        OnRemove = OnRemove,
+                    };
             }
             TreeView.searchString = SearchQuery;
             TreeView.OnGUI(rect);

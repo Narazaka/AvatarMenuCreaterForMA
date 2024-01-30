@@ -107,6 +107,27 @@ namespace net.narazaka.avatarmenucreator
             }
         }
 
+        class MaterialItemContainer : ListTreeViewItemContainer<int>
+        {
+            Material material;
+
+            public MaterialItemContainer(int index, Material material) : base(index)
+            {
+                this.material = material;
+            }
+
+            public override string displayName => material.name;
+            public override bool Toggle(Rect rect, bool exists)
+            {
+                var newExists = EditorGUI.ToggleLeft(new Rect(rect.x, rect.y, 45, rect.height), $"[{item}]", exists, exists ? EditorStyles.boldLabel : EditorStyles.label);
+                rect.xMin += 45;
+                EditorGUI.BeginDisabledGroup(true);
+                EditorGUI.ObjectField(rect, material, typeof(Material), false);
+                EditorGUI.EndDisabledGroup();
+                return newExists;
+            }
+        }
+
         protected override void OnMainGUI(IList<string> children)
         {
             var allMaterials = children.ToDictionary(child => child, child => Util.GetMaterialSlots(GetGameObject(child)));
@@ -124,7 +145,16 @@ namespace net.narazaka.avatarmenucreator
                 }
 
                 var materials = allMaterials[child];
-                if (materials.Length > 0 && FoldoutMaterialHeader(child, "Materials"))
+                if (materials.Length > 0 &&
+                    FoldoutHeaderWithAddItemButton(
+                        child,
+                        "Materials",
+                        ChooseMaterials.HasChild(child),
+                        () => materials.Select((material, index) => new MaterialItemContainer(index, material) as ListTreeViewItemContainer<int>).ToList(),
+                        () => ChooseMaterials.Indexes(child).ToImmutableHashSet(),
+                        index => AddChooseMaterial(child, index),
+                        index => RemoveChooseMaterial(child, index)
+                        ))
                 {
                     EditorGUI.indentLevel++;
                     ShowChooseMaterialControl(child, materials);
@@ -283,6 +313,22 @@ namespace net.narazaka.avatarmenucreator
                     values[choiseIndex] = choiceMaterial;
                 }
             }
+        }
+
+        void AddChooseMaterial(string child, int index)
+        {
+            var key = (child, index);
+            if (ChooseMaterials.ContainsKey(key)) return;
+            WillChange();
+            ChooseMaterials[key] = new IntMaterialDictionary();
+        }
+
+        void RemoveChooseMaterial(string child, int index)
+        {
+            var key = (child, index);
+            if (!ChooseMaterials.ContainsKey(key)) return;
+            WillChange();
+            ChooseMaterials.Remove(key);
         }
 
         void ShowChooseBulkMaterialControl(Dictionary<string, Material[]> allMaterials)

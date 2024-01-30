@@ -179,7 +179,25 @@ namespace net.narazaka.avatarmenucreator
             }
         }
 
+        protected void AddItemButton<T>(Func<IList<ListTreeViewItemContainer<T>>> getChildren, Func<IEnumerable<T>> getExistChildren, Action<T> onAdd, Action<T> onRemove)
+        {
+            var rect = EditorGUILayout.GetControlRect(GUILayout.Width(20));
+            if (GUI.Button(rect, "+"))
+            {
+                PopupWindow.Show(rect, new ListPopupWindow<T>(getChildren(), getExistChildren) { OnAdd = onAdd, OnRemove = onRemove });
+            }
+        }
+
         protected bool FoldoutHeaderWithAddItemButton<T>(string child, string title, bool hasChildren, Func<IList<T>> getChildren, Func<IEnumerable<T>> getExistChildren, Action<T> onAdd, Action<T> onRemove)
+        {
+            EditorGUILayout.BeginHorizontal();
+            var foldout = FoldoutHeader(child, title, hasChildren);
+            AddItemButton(getChildren, getExistChildren, onAdd, onRemove);
+            EditorGUILayout.EndHorizontal();
+            return foldout;
+        }
+
+        protected bool FoldoutHeaderWithAddItemButton<T>(string child, string title, bool hasChildren, Func<IList<ListTreeViewItemContainer<T>>> getChildren, Func<IEnumerable<T>> getExistChildren, Action<T> onAdd, Action<T> onRemove)
         {
             EditorGUILayout.BeginHorizontal();
             var foldout = FoldoutHeader(child, title, hasChildren);
