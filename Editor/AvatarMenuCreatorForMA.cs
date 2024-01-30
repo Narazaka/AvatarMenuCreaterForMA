@@ -15,7 +15,12 @@ namespace net.narazaka.avatarmenucreator.editor
         [SerializeField]
         MenuType MenuType = MenuType.Toggle;
         [SerializeField]
-        IncludeAssetType IncludeAssetType = IncludeAssetType.AnimatorAndInclude;
+        IncludeAssetType IncludeAssetType =
+#if NET_NARAZAKA_VRCHAT_AvatarMenuCreator_HAS_NDMF
+            IncludeAssetType.Component;
+#else
+            IncludeAssetType.AnimatorAndInclude;
+#endif
 
         [SerializeField]
         AvatarToggleMenu AvatarToggleMenu = new AvatarToggleMenu();
