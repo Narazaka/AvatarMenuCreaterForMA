@@ -4,6 +4,7 @@ using UnityEditor;
 using System.Linq;
 using VRC.SDK3.Avatars.Components;
 using net.narazaka.avatarmenucreator.editor.util;
+using nadena.dev.modular_avatar.core;
 
 namespace net.narazaka.avatarmenucreator.components.editor
 {
@@ -26,8 +27,22 @@ namespace net.narazaka.avatarmenucreator.components.editor
 
         public override void OnInspectorGUI()
         {
+            var maMergeAnimator = Creator.GetComponent<ModularAvatarMergeAnimator>();
+            var maParameters = Creator.GetComponent<ModularAvatarParameters>();
+            if (maMergeAnimator != null || maParameters != null)
+            {
+                EditorGUILayout.HelpBox("MA Merge AnimatorまたはMA Parametersがある場合、 このコンポーネントは影響せずそれらの設定がそのまま使われます。", MessageType.Info);
+            }
+            else
+            {
+                var maMenuInstaller = Creator.GetComponent<ModularAvatarMenuInstaller>();
+                if (maMenuInstaller?.menuToAppend != null)
+                {
+                    EditorGUILayout.HelpBox("MA Menu Installerのプレハブ開発者向け設定/インストールされるメニューが設定されていますが、無視されます。", MessageType.Warning);
+                }
+            }
             var baseObject = GetParentAvatar();
-            var child = EditorGUILayout.ObjectField("Add Children", null, typeof(GameObject), true) as GameObject;
+            var child = EditorGUILayout.ObjectField("オブジェクトを追加", null, typeof(GameObject), true) as GameObject;
             if (child != null)
             {
                 UndoUtility.RecordObject(this, "Add Children");

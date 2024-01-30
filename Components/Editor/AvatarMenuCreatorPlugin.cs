@@ -1,9 +1,6 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-using nadena.dev.ndmf;
+﻿using nadena.dev.ndmf;
 using net.narazaka.avatarmenucreator.editor;
-using System.Linq;
+using nadena.dev.modular_avatar.core;
 
 [assembly: ExportsPlugin(typeof(net.narazaka.avatarmenucreator.components.editor.AvatarMenuCreatorPlugin))]
 
@@ -22,6 +19,7 @@ namespace net.narazaka.avatarmenucreator.components.editor
                 var creators = ctx.AvatarRootTransform.GetComponentsInChildren<AvatarMenuCreatorBase>();
                 foreach (var creator in creators)
                 {
+                    if (creator.GetComponent<ModularAvatarMergeAnimator>() != null || creator.GetComponent<ModularAvatarParameters>() != null) continue;
                     CreateAvatarMenuBase.GetCreateAvatarMenu(creator.AvatarMenu).CreateAssets(creator.name).StoreAssets(creator.gameObject);
                 }
             });
