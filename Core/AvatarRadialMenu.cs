@@ -244,8 +244,7 @@ namespace net.narazaka.avatarmenucreator
                     }
                     else
                     {
-                        WillChange();
-                        radials.Remove(key);
+                        RemoveRadialBlendShape(radials, child, name.Name);
                     }
                 }
             }

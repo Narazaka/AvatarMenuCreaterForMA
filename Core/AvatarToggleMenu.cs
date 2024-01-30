@@ -214,8 +214,7 @@ namespace net.narazaka.avatarmenucreator
                     }
                     else
                     {
-                        WillChange();
-                        toggles.Remove(key);
+                        RemoveToggleBlendShape(toggles, child, name.Name);
                     }
                 }
             }

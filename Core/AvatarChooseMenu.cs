@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
@@ -288,16 +288,7 @@ namespace net.narazaka.avatarmenucreator
                     }
                     else
                     {
-                        WillChange();
-                        ChooseMaterials.Remove(key);
-                    }
-                }
-                else
-                {
-                    if (ShowChooseMaterialToggle(i, materials[i], false))
-                    {
-                        WillChange();
-                        ChooseMaterials[key] = new IntMaterialDictionary();
+                        RemoveChooseMaterial(child, i);
                     }
                 }
             }
@@ -422,8 +413,7 @@ namespace net.narazaka.avatarmenucreator
                     }
                     else
                     {
-                        WillChange();
-                        choices.Remove(key);
+                        RemoveChooseBlendShape(choices, child, name.Name);
                     }
                 }
             }
