@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
@@ -136,7 +136,7 @@ namespace net.narazaka.avatarmenucreator
                 this.material = material;
             }
 
-            public override string displayName => material.name;
+            public override string displayName => material == null ? "" : material.name;
             public override bool Toggle(Rect rect, bool exists)
             {
                 var newExists = EditorGUI.ToggleLeft(new Rect(rect.x, rect.y, 45, rect.height), $"[{item}]", exists, exists ? EditorStyles.boldLabel : EditorStyles.label);

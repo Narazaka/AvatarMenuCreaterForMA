@@ -129,7 +129,7 @@ namespace net.narazaka.avatarmenucreator.editor.util
                 for (var i = 0; i < descriptions.Count; ++i)
                 {
                     if (descriptions[i].Material != materials[i]) return false;
-                    if (descriptions[i].Shader != materials[i].shader) return false;
+                    if (descriptions[i].Shader != materials[i]?.shader) return false;
                 }
                 return true;
             }
@@ -143,8 +143,8 @@ namespace net.narazaka.avatarmenucreator.editor.util
             {
                 Index = i,
                 Material = mat,
-                Shader = mat.shader,
-                ShaderParameters = GetShaderParameters(mat.shader).ToList(),
+                Shader = mat?.shader,
+                ShaderParameters = mat == null ? new List<ShaderParameter>() : GetShaderParameters(mat.shader).ToList(),
             });
         }
 
