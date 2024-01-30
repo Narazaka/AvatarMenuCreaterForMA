@@ -67,6 +67,9 @@ namespace net.narazaka.avatarmenucreator.editor.util
         public static IEnumerable<NameWithDescription> ToNames(this IEnumerable<string> names) =>
             names.Select(name => new NameWithDescription { Name = name });
 
+        public static IEnumerable<string> ToStrings(this IEnumerable<INameAndDescription> names) =>
+            names.Select(name => name.Name);
+
         public class MaterialShaderDescription
         {
             public int Index;

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 using UnityEngine;
 #if UNITY_EDITOR
@@ -113,7 +114,7 @@ namespace net.narazaka.avatarmenucreator
             foreach (var child in children)
             {
                 EditorGUILayout.Space();
-                EditorGUILayout.LabelField(child);
+                EditorGUILayout.LabelField(child, EditorStyles.boldLabel);
                 EditorGUI.indentLevel++;
                 if (FoldoutGameObjectHeader(child, "GameObject"))
                 {
@@ -133,13 +134,31 @@ namespace net.narazaka.avatarmenucreator
                 var gameObjectRef = GetGameObject(child);
                 var names = Util.GetBlendShapeNames(gameObjectRef);
                 var parameters = ShaderParametersCache.GetFilteredShaderParameters(gameObjectRef);
-                if (names.Count > 0 && FoldoutBlendShapeHeader(child, "BlendShapes"))
+                if (names.Count > 0 &&
+                    FoldoutHeaderWithAddStringButton(
+                        child,
+                        "BlendShapes",
+                        ChooseBlendShapes.HasChild(child),
+                        () => names,
+                        () => ChooseBlendShapes.Names(child).ToImmutableHashSet(),
+                        name => AddChooseBlendShape(ChooseBlendShapes, child, name),
+                        name => RemoveChooseBlendShape(ChooseBlendShapes, child, name)
+                        ))
                 {
                     EditorGUI.indentLevel++;
                     ShowChooseBlendShapeControl(child, ChooseBlendShapes, names.ToNames());
                     EditorGUI.indentLevel--;
                 }
-                if (parameters.Count > 0 && FoldoutShaderParameterHeader(child, "Shader Parameters"))
+                if (parameters.Count > 0 &&
+                    FoldoutHeaderWithAddStringButton(
+                        child,
+                        "Shader Parameters",
+                        ChooseShaderParameters.HasChild(child),
+                        () => parameters.ToStrings().ToList(),
+                        () => ChooseShaderParameters.Names(child).ToImmutableHashSet(),
+                        name => AddChooseBlendShape(ChooseShaderParameters, child, name),
+                        name => RemoveChooseBlendShape(ChooseShaderParameters, child, name)
+                        ))
                 {
                     EditorGUI.indentLevel++;
                     ShowChooseBlendShapeControl(child, ChooseShaderParameters, parameters, minValue: null, maxValue: null);
@@ -345,14 +364,6 @@ namespace net.narazaka.avatarmenucreator
                         choices.Remove(key);
                     }
                 }
-                else
-                {
-                    if (EditorGUILayout.ToggleLeft(name.Description, false))
-                    {
-                        WillChange();
-                        choices[key] = new IntFloatDictionary();
-                    }
-                }
             }
         }
 
@@ -365,6 +376,22 @@ namespace net.narazaka.avatarmenucreator
                     choices[(child, name)][choiseIndex] = choiceValue;
                 }
             }
+        }
+
+        void AddChooseBlendShape(ChooseBlendShapeDictionary choices, string child, string name)
+        {
+            var key = (child, name);
+            if (choices.ContainsKey(key)) return;
+            WillChange();
+            choices[key] = new IntFloatDictionary();
+        }
+
+        void RemoveChooseBlendShape(ChooseBlendShapeDictionary choices, string child, string name)
+        {
+            var key = (child, name);
+            if (!choices.ContainsKey(key)) return;
+            WillChange();
+            choices.Remove(key);
         }
 #endif
     }

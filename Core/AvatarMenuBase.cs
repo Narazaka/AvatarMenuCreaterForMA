@@ -38,8 +38,7 @@ namespace net.narazaka.avatarmenucreator
 
         HashSet<string> FoldoutGameObjects = new HashSet<string>();
         HashSet<string> FoldoutMaterials = new HashSet<string>();
-        HashSet<string> FoldoutBlendShapes = new HashSet<string>();
-        HashSet<string> FoldoutShaderParameters = new HashSet<string>();
+        Dictionary<string, HashSet<string>> FoldoutGroups = new Dictionary<string, HashSet<string>>();
         Vector2 ScrollPosition;
 
         protected Util.ShaderParametersCache ShaderParametersCache = new Util.ShaderParametersCache();
@@ -144,40 +143,49 @@ namespace net.narazaka.avatarmenucreator
             return newFoldout;
         }
 
-        protected bool FoldoutBlendShapeHeader(string child, string title)
+        protected bool FoldoutHeader(string child, string title, bool hasChildren = true)
         {
-            var foldout = FoldoutBlendShapes.Contains(child);
-            var newFoldout = EditorGUILayout.Foldout(foldout, title);
-            if (newFoldout != foldout)
+            if (!hasChildren)
             {
-                if (newFoldout)
+                EditorGUILayout.LabelField(title);
+                return false;
+            }
+            if (!FoldoutGroups.TryGetValue(title, out var foldoutGroup))
+            {
+                FoldoutGroups[title] = foldoutGroup = new HashSet<string>();
+            }
+            var notFoldout = foldoutGroup.Contains(child);
+            var newNotFoldout = !EditorGUILayout.Foldout(!notFoldout, title); // default open
+            if (newNotFoldout != notFoldout)
+            {
+                if (newNotFoldout)
                 {
-                    FoldoutBlendShapes.Add(child);
+                    foldoutGroup.Add(child);
                 }
                 else
                 {
-                    FoldoutBlendShapes.Remove(child);
+                    foldoutGroup.Remove(child);
                 }
             }
-            return newFoldout;
+            return !newNotFoldout;
         }
 
-        protected bool FoldoutShaderParameterHeader(string child, string title)
+        protected void AddStringButton(Func<IList<string>> getChildren, Func<IEnumerable<string>> getExistChildren, Action<string> onAdd, Action<string> onRemove)
         {
-            var foldout = FoldoutShaderParameters.Contains(child);
-            var newFoldout = EditorGUILayout.Foldout(foldout, title);
-            if (newFoldout != foldout)
+            var rect = EditorGUILayout.GetControlRect(GUILayout.Width(20));
+            if (GUI.Button(rect, "+"))
             {
-                if (newFoldout)
-                {
-                    FoldoutShaderParameters.Add(child);
-                }
-                else
-                {
-                    FoldoutShaderParameters.Remove(child);
-                }
+                PopupWindow.Show(rect, new ListPopupWindow(getChildren(), getExistChildren) { OnAdd = onAdd, OnRemove = onRemove });
             }
-            return newFoldout;
+        }
+
+        protected bool FoldoutHeaderWithAddStringButton(string child, string title, bool hasChildren, Func<IList<string>> getChildren, Func<IEnumerable<string>> getExistChildren, Action<string> onAdd, Action<string> onRemove)
+        {
+            EditorGUILayout.BeginHorizontal();
+            var foldout = FoldoutHeader(child, title, hasChildren);
+            AddStringButton(getChildren, getExistChildren, onAdd, onRemove);
+            EditorGUILayout.EndHorizontal();
+            return foldout;
         }
 
         protected void WillChange(string message = null)
