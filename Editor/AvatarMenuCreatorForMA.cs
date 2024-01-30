@@ -138,7 +138,7 @@ namespace net.narazaka.avatarmenucreator.editor
                 if (string.IsNullOrEmpty(basePath)) return;
                 basePath = new System.Text.RegularExpressions.Regex(@"\.prefab").Replace(basePath, "");
                 var baseName = System.IO.Path.GetFileNameWithoutExtension(basePath);
-                AvatarMenuBase avatarMenu = MenuType == MenuType.Toggle ? AvatarToggleMenu : MenuType == MenuType.Choose ? AvatarChooseMenu : AvatarRadialMenu;
+                AvatarMenuBase avatarMenu = MenuType == MenuType.Toggle ? AvatarToggleMenu as AvatarMenuBase : MenuType == MenuType.Choose as AvatarMenuBase ? AvatarChooseMenu : AvatarRadialMenu as AvatarMenuBase;
                 var createAvatarMenu = CreateAvatarMenuBase.GetCreateAvatarMenu(avatarMenu);
                 createAvatarMenu.CreateAssets(baseName, children).SaveAssets(IncludeAssetType, basePath);
                 SaveFolder = System.IO.Path.GetDirectoryName(basePath);
