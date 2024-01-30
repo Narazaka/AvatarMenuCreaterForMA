@@ -38,6 +38,13 @@ Modular Avatarでアバターのメニューを構成出来るようにする補
 
 ## 更新履歴
 
+- 1.7.0-rc.0
+  - NDMFに対応
+    - コンポーネントを追加することでアセット生成なしにメニューが生成されます。
+    - NDMFは必須ではなく、Modular Avatar 1.7.x 以前でも使えます。
+  - Undoに対応
+  - 初期値とSavedを最初から指定可能に
+  - prefab側で変更したMenuInstallerのインストール先などが保持されるように
 - 1.6.2
   - Shader ParameterがSkinnedMeshRendererにしか適用されなかった問題を修正
 - 1.6.1
