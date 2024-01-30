@@ -120,7 +120,10 @@ namespace net.narazaka.avatarmenucreator
 
             if (BulkSet)
             {
-                ShowChooseBulkMaterialControl(allMaterials);
+                if (FoldoutHeader("", "一括設定", true))
+                {
+                    ShowChooseBulkMaterialControl(allMaterials);
+                }
             }
         }
 
