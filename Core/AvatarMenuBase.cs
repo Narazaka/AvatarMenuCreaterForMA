@@ -37,7 +37,6 @@ namespace net.narazaka.avatarmenucreator
         public UnityEngine.Object UndoObject;
 
         HashSet<string> FoldoutGameObjects = new HashSet<string>();
-        HashSet<string> FoldoutMaterials = new HashSet<string>();
         Dictionary<string, HashSet<string>> FoldoutGroups = new Dictionary<string, HashSet<string>>();
         Vector2 ScrollPosition;
 
@@ -120,24 +119,6 @@ namespace net.narazaka.avatarmenucreator
                 else
                 {
                     FoldoutGameObjects.Remove(child);
-                }
-            }
-            return newFoldout;
-        }
-
-        protected bool FoldoutMaterialHeader(string child, string title)
-        {
-            var foldout = FoldoutMaterials.Contains(child);
-            var newFoldout = EditorGUILayout.Foldout(foldout, title);
-            if (newFoldout != foldout)
-            {
-                if (newFoldout)
-                {
-                    FoldoutMaterials.Add(child);
-                }
-                else
-                {
-                    FoldoutMaterials.Remove(child);
                 }
             }
             return newFoldout;
