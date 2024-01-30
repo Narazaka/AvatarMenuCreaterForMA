@@ -89,7 +89,8 @@ namespace net.narazaka.avatarmenucreator
 
             ChooseCount = IntField("選択肢の数", ChooseCount);
 
-            if (ChooseDefaultValue < 0 && ChooseCount > 0) ChooseDefaultValue = 0;
+            if (ChooseCount < 1) ChooseCount = 1;
+            if (ChooseDefaultValue < 0) ChooseDefaultValue = 0;
             if (ChooseDefaultValue >= ChooseCount) ChooseDefaultValue = ChooseCount - 1;
 
             EditorGUI.indentLevel++;
@@ -137,10 +138,36 @@ namespace net.narazaka.avatarmenucreator
                 EditorGUILayout.Space();
                 EditorGUILayout.LabelField(child, EditorStyles.boldLabel);
                 EditorGUI.indentLevel++;
-                if (FoldoutGameObjectHeader(child, "GameObject"))
+
+                if (!ChooseObjects.TryGetValue(child, out var indexes))
+                {
+                    indexes = new IntHashSet();
+                }
+                EditorGUILayout.BeginHorizontal();
+                var hasSetting = indexes.Count > 0;
+                var foldoutGameObject = FoldoutHeader(child, "GameObject", hasSetting);
+                EditorGUIUtility.labelWidth = 40;
+                var newHasSetting = EditorGUILayout.Toggle("制御", hasSetting, GUILayout.Width(57));
+                EditorGUIUtility.labelWidth = 0;
+                if (hasSetting != newHasSetting)
+                {
+                    WillChange();
+                    if (newHasSetting)
+                    {
+                        indexes = new IntHashSet { 0 };
+                        ChooseObjects[child] = indexes;
+                    }
+                    else
+                    {
+                        indexes = new IntHashSet();
+                        ChooseObjects.Remove(child);
+                    }
+                }
+                EditorGUILayout.EndHorizontal();
+                if (foldoutGameObject)
                 {
                     EditorGUI.indentLevel++;
-                    ShowChooseObjectControl(child);
+                    ShowChooseObjectControl(child, indexes);
                     EditorGUI.indentLevel--;
                 }
 
@@ -198,20 +225,9 @@ namespace net.narazaka.avatarmenucreator
             }
         }
 
-        void ShowChooseObjectControl(string child)
+        void ShowChooseObjectControl(string child, IntHashSet indexes)
         {
-            IntHashSet indexes;
-            if (!ChooseObjects.TryGetValue(child, out indexes))
-            {
-                indexes = new IntHashSet();
-            }
             var changed = false;
-            var isEmpty = indexes.Count == 0;
-            if (EditorGUILayout.ToggleLeft($"制御しない", isEmpty) && !isEmpty)
-            {
-                indexes = new IntHashSet();
-                changed = true;
-            }
             for (var i = 0; i < ChooseCount; i++)
             {
                 var active = indexes.Contains(i);
