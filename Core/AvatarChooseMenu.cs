@@ -358,8 +358,8 @@ namespace net.narazaka.avatarmenucreator
         void ShowChooseBulkMaterialControl(Dictionary<string, Material[]> allMaterials)
         {
             Func<(string, int), Material> keyToMaterial = ((string, int) key) => allMaterials.TryGetValue(key.Item1, out var m) && m != null && m.Length > key.Item2 ? m[key.Item2] : null;
-            var sourceMaterials = ChooseMaterials.Keys.Select(keyToMaterial).Distinct();
-            var chooseMaterialGroups = ChooseMaterials.Keys.GroupBy(keyToMaterial).ToDictionary(group => group.Key, group => group.ToList());
+            var sourceMaterials = ChooseMaterials.Keys.Select(keyToMaterial).Where(m => m != null).Distinct();
+            var chooseMaterialGroups = ChooseMaterials.Keys.GroupBy(keyToMaterial).Where(m => m.Key != null).ToDictionary(group => group.Key, group => group.ToList());
             foreach (var sourceMaterial in sourceMaterials)
             {
                 using (new EditorGUI.DisabledGroupScope(true))
