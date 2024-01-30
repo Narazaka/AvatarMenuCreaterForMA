@@ -346,9 +346,17 @@ namespace net.narazaka.avatarmenucreator
         {
             if (BulkSet)
             {
+                var mat = Util.GetMaterialSlots(GetGameObject(child))[index];
                 foreach (var c in children)
                 {
-                    AddChooseMaterialSingle(c, index);
+                    var materials = Util.GetMaterialSlots(GetGameObject(c));
+                    for (var i = 0; i < materials.Length; ++i)
+                    {
+                        if (materials[i] == mat)
+                        {
+                            AddChooseMaterialSingle(c, i);
+                        }
+                    }
                 }
             }
             else
@@ -370,9 +378,17 @@ namespace net.narazaka.avatarmenucreator
         {
             if (BulkSet)
             {
+                var mat = Util.GetMaterialSlots(GetGameObject(child))[index];
                 foreach (var c in children)
                 {
-                    RemoveChooseMaterialSingle(c, index);
+                    var materials = Util.GetMaterialSlots(GetGameObject(c));
+                    for (var i = 0; i < materials.Length; ++i)
+                    {
+                        if (materials[i] == mat)
+                        {
+                            RemoveChooseMaterialSingle(c, i);
+                        }
+                    }
                 }
             }
             else
