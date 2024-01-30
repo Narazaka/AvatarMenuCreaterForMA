@@ -2,7 +2,9 @@ using UnityEngine;
 using UnityEditor;
 using VRC.SDK3.Avatars.Components;
 using net.narazaka.avatarmenucreator.editor.util;
+#if NET_NARAZAKA_VRCHAT_AvatarMenuCreator_HAS_NDMF
 using net.narazaka.avatarmenucreator.components;
+#endif
 
 namespace net.narazaka.avatarmenucreator.editor
 {
@@ -136,7 +138,13 @@ namespace net.narazaka.avatarmenucreator.editor
                 UndoUtility.RecordObject(this, "IncludeAssetType");
                 IncludeAssetType = newIncludeAssetType;
             }
-            if (IncludeAssetType == IncludeAssetType.Component)
+            var isComponent =
+#if NET_NARAZAKA_VRCHAT_AvatarMenuCreator_HAS_NDMF
+                IncludeAssetType == IncludeAssetType.Component;
+#else
+                false;
+#endif
+            if (isComponent)
             {
                 var newBaseName = EditorGUILayout.TextField("名前", BaseName);
                 if (newBaseName != BaseName)
@@ -145,15 +153,17 @@ namespace net.narazaka.avatarmenucreator.editor
                     BaseName = newBaseName;
                 }
             }
-            using (new EditorGUI.DisabledScope(IncludeAssetType == IncludeAssetType.Component && string.IsNullOrEmpty(BaseName)))
+            using (new EditorGUI.DisabledScope(isComponent && string.IsNullOrEmpty(BaseName)))
             {
                 if (GUILayout.Button("Create!"))
                 {
                     AvatarMenuBase avatarMenu = MenuType == MenuType.Toggle ? AvatarToggleMenu as AvatarMenuBase : MenuType == MenuType.Choose ? AvatarChooseMenu as AvatarMenuBase : AvatarRadialMenu as AvatarMenuBase;
 
-                    if (IncludeAssetType == IncludeAssetType.Component)
+                    if (isComponent)
                     {
+#if NET_NARAZAKA_VRCHAT_AvatarMenuCreator_HAS_NDMF
                         SaveAsComponent(avatarMenu, children);
+#endif
                     }
                     else
                     {
@@ -169,6 +179,7 @@ namespace net.narazaka.avatarmenucreator.editor
             }
         }
 
+#if NET_NARAZAKA_VRCHAT_AvatarMenuCreator_HAS_NDMF
         public void SaveAsComponent(AvatarMenuBase avatarMenu, string[] children)
         {
             var obj = new GameObject(BaseName);
@@ -204,5 +215,6 @@ namespace net.narazaka.avatarmenucreator.editor
                     throw new System.ArgumentException($"unknown menu type");
             }
         }
+#endif
     }
 }
