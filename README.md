@@ -1,6 +1,6 @@
-# AvatarMenuCreaterForMA
+# AvatarMenuCreatorForMA
 
-AvatarMenuCreater for Modular Avatar
+AvatarMenuCreator for Modular Avatar
 
 ## 概要
 
@@ -19,7 +19,7 @@ Modular Avatarでアバターのメニューを構成出来るようにする補
 
 1. https://vpm.narazaka.net/ から「Add to VCC」ボタンを押してリポジトリをVCCにインストールします。
 2. VCCでSettings→Packages→Installed Repositoriesの一覧中で「Narazaka VPM Listing」にチェックが付いていることを確認します。
-3. アバタープロジェクトの「Manage Project」から「AvatarMenuCreaterForMA」をインストールします。
+3. アバタープロジェクトの「Manage Project」から「AvatarMenuCreatorForMA」をインストールします。
 
 ### unitypackageによる方法
 
@@ -28,7 +28,7 @@ Modular Avatarでアバターのメニューを構成出来るようにする補
 
 ## 使い方
 
-1. 「Tools」→「Modular Avatar」→「AvatarMenuCreater for Modular Avatar」をクリックし、ツールを立ち上げます。
+1. 「Tools」→「Modular Avatar」→「AvatarMenuCreator for Modular Avatar」をクリックし、ツールを立ち上げます。
 
 2. アバターをツールに設定し、アバター以下の制御したいオブジェクトを選択した状態でツールで処理を設定します。（オブジェクトを選択してもツールのウインドウにカーソルを合わせないと表示が変わらないかも）
 
@@ -45,6 +45,7 @@ Modular Avatarでアバターのメニューを構成出来るようにする補
   - Undoに対応
   - 初期値とSavedを最初から指定可能に
   - prefab側で変更したMenuInstallerのインストール先などが保持されるように
+  - パッケージ名のスペルミスを修正（idは変更されません）
 - 1.6.2
   - Shader ParameterがSkinnedMeshRendererにしか適用されなかった問題を修正
 - 1.6.1
