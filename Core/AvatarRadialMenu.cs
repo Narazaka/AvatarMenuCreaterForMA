@@ -164,12 +164,12 @@ namespace net.narazaka.avatarmenucreator
                             RadialBlendShapes.HasChild(child),
                             () => names,
                             () => RadialBlendShapes.Names(child).ToImmutableHashSet(),
-                            name => AddRadialBlendShape(RadialBlendShapes, child, name),
-                            name => RemoveRadialBlendShape(RadialBlendShapes, child, name)
+                            name => AddRadialBlendShape(RadialBlendShapes, children, child, name),
+                            name => RemoveRadialBlendShape(RadialBlendShapes, children, child, name)
                             ))
                     {
                         EditorGUI.indentLevel++;
-                        ShowRadialBlendShapeControl(child, RadialBlendShapes, names.ToNames());
+                        ShowRadialBlendShapeControl(children, child, RadialBlendShapes, names.ToNames());
                         EditorGUI.indentLevel--;
                     }
                     if (parameters.Count > 0 &&
@@ -179,12 +179,12 @@ namespace net.narazaka.avatarmenucreator
                             RadialShaderParameters.HasChild(child),
                             () => parameters.ToStrings().ToList(),
                             () => RadialShaderParameters.Names(child).ToImmutableHashSet(),
-                            name => AddRadialBlendShape(RadialShaderParameters, child, name, 1),
-                            name => RemoveRadialBlendShape(RadialShaderParameters, child, name)
+                            name => AddRadialBlendShape(RadialShaderParameters, children, child, name, 1),
+                            name => RemoveRadialBlendShape(RadialShaderParameters, children, child, name)
                             ))
                     {
                         EditorGUI.indentLevel++;
-                        ShowRadialBlendShapeControl(child, RadialShaderParameters, parameters, minValue: null, maxValue: null);
+                        ShowRadialBlendShapeControl(children, child, RadialShaderParameters, parameters, minValue: null, maxValue: null);
                         EditorGUI.indentLevel--;
                     }
                     EditorGUI.indentLevel--;
@@ -197,6 +197,7 @@ namespace net.narazaka.avatarmenucreator
         }
 
         void ShowRadialBlendShapeControl(
+            IList<string> children,
             string child,
             RadialBlendShapeDictionary radials,
             IEnumerable<Util.INameAndDescription> names,
@@ -250,7 +251,7 @@ namespace net.narazaka.avatarmenucreator
                     }
                     else
                     {
-                        RemoveRadialBlendShape(radials, child, name.Name);
+                        RemoveRadialBlendShape(radials, children, child, name.Name);
                     }
                 }
             }
@@ -272,7 +273,22 @@ namespace net.narazaka.avatarmenucreator
             }
         }
 
-        void AddRadialBlendShape(RadialBlendShapeDictionary radials, string child, string name, float defaultEndValue = 100)
+        void AddRadialBlendShape(RadialBlendShapeDictionary radials, IList<string> children, string child, string name, float defaultEndValue = 100)
+        {
+            if (BulkSet)
+            {
+                foreach (var c in children)
+                {
+                    AddRadialBlendShapeSingle(radials, c, name, defaultEndValue);
+                }
+            }
+            else
+            {
+                AddRadialBlendShapeSingle(radials, child, name, defaultEndValue);
+            }
+        }
+
+        void AddRadialBlendShapeSingle(RadialBlendShapeDictionary radials, string child, string name, float defaultEndValue = 100)
         {
             var key = (child, name);
             if (radials.ContainsKey(key)) return;
@@ -280,7 +296,22 @@ namespace net.narazaka.avatarmenucreator
             radials[key] = new RadialBlendShape { Start = 0, End = defaultEndValue };
         }
 
-        void RemoveRadialBlendShape(RadialBlendShapeDictionary radials, string child, string name)
+        void RemoveRadialBlendShape(RadialBlendShapeDictionary radials, IList<string> children, string child, string name)
+        {
+            if (BulkSet)
+            {
+                foreach (var c in children)
+                {
+                    RemoveRadialBlendShapeSingle(radials, c, name);
+                }
+            }
+            else
+            {
+                RemoveRadialBlendShapeSingle(radials, child, name);
+            }
+        }
+
+        void RemoveRadialBlendShapeSingle(RadialBlendShapeDictionary radials, string child, string name)
         {
             var key = (child, name);
             if (!radials.ContainsKey(key)) return;

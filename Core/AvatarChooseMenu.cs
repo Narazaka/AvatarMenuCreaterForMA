@@ -199,12 +199,12 @@ namespace net.narazaka.avatarmenucreator
                         ChooseMaterials.HasChild(child),
                         () => materials.Select((material, index) => new MaterialItemContainer(index, material) as ListTreeViewItemContainer<int>).ToList(),
                         () => ChooseMaterials.Indexes(child).ToImmutableHashSet(),
-                        index => AddChooseMaterial(child, index),
-                        index => RemoveChooseMaterial(child, index)
+                        index => AddChooseMaterial(children, child, index),
+                        index => RemoveChooseMaterial(children, child, index)
                         ))
                 {
                     EditorGUI.indentLevel++;
-                    ShowChooseMaterialControl(child, materials);
+                    ShowChooseMaterialControl(children, child, materials);
                     EditorGUI.indentLevel--;
                 }
 
@@ -218,12 +218,12 @@ namespace net.narazaka.avatarmenucreator
                         ChooseBlendShapes.HasChild(child),
                         () => names,
                         () => ChooseBlendShapes.Names(child).ToImmutableHashSet(),
-                        name => AddChooseBlendShape(ChooseBlendShapes, child, name),
-                        name => RemoveChooseBlendShape(ChooseBlendShapes, child, name)
+                        name => AddChooseBlendShape(ChooseBlendShapes, children, child, name),
+                        name => RemoveChooseBlendShape(ChooseBlendShapes, children, child, name)
                         ))
                 {
                     EditorGUI.indentLevel++;
-                    ShowChooseBlendShapeControl(child, ChooseBlendShapes, names.ToNames());
+                    ShowChooseBlendShapeControl(children, child, ChooseBlendShapes, names.ToNames());
                     EditorGUI.indentLevel--;
                 }
                 if (parameters.Count > 0 &&
@@ -233,12 +233,12 @@ namespace net.narazaka.avatarmenucreator
                         ChooseShaderParameters.HasChild(child),
                         () => parameters.ToStrings().ToList(),
                         () => ChooseShaderParameters.Names(child).ToImmutableHashSet(),
-                        name => AddChooseBlendShape(ChooseShaderParameters, child, name),
-                        name => RemoveChooseBlendShape(ChooseShaderParameters, child, name)
+                        name => AddChooseBlendShape(ChooseShaderParameters, children, child, name),
+                        name => RemoveChooseBlendShape(ChooseShaderParameters, children, child, name)
                         ))
                 {
                     EditorGUI.indentLevel++;
-                    ShowChooseBlendShapeControl(child, ChooseShaderParameters, parameters, minValue: null, maxValue: null);
+                    ShowChooseBlendShapeControl(children, child, ChooseShaderParameters, parameters, minValue: null, maxValue: null);
                     EditorGUI.indentLevel--;
                 }
                 EditorGUI.indentLevel--;
@@ -279,7 +279,7 @@ namespace net.narazaka.avatarmenucreator
             }
         }
 
-        void ShowChooseMaterialControl(string child, Material[] materials)
+        void ShowChooseMaterialControl(IList<string> children, string child, Material[] materials)
         {
             for (var i = 0; i < materials.Length; ++i)
             {
@@ -308,7 +308,7 @@ namespace net.narazaka.avatarmenucreator
                     }
                     else
                     {
-                        RemoveChooseMaterial(child, i);
+                        RemoveChooseMaterial(children, child, i);
                     }
                 }
             }
@@ -342,7 +342,22 @@ namespace net.narazaka.avatarmenucreator
             }
         }
 
-        void AddChooseMaterial(string child, int index)
+        void AddChooseMaterial(IList<string> children, string child, int index)
+        {
+            if (BulkSet)
+            {
+                foreach (var c in children)
+                {
+                    AddChooseMaterialSingle(c, index);
+                }
+            }
+            else
+            {
+                AddChooseMaterialSingle(child, index);
+            }
+        }
+
+        void AddChooseMaterialSingle(string child, int index)
         {
             var key = (child, index);
             if (ChooseMaterials.ContainsKey(key)) return;
@@ -351,7 +366,22 @@ namespace net.narazaka.avatarmenucreator
             ChooseMaterials[key][0] = Util.GetMaterialSlots(GetGameObject(child))[index];
         }
 
-        void RemoveChooseMaterial(string child, int index)
+        void RemoveChooseMaterial(IList<string> children, string child, int index)
+        {
+            if (BulkSet)
+            {
+                foreach (var c in children)
+                {
+                    RemoveChooseMaterialSingle(c, index);
+                }
+            }
+            else
+            {
+                RemoveChooseMaterialSingle(child, index);
+            }
+        }
+
+        void RemoveChooseMaterialSingle(string child, int index)
         {
             var key = (child, index);
             if (!ChooseMaterials.ContainsKey(key)) return;
@@ -391,6 +421,7 @@ namespace net.narazaka.avatarmenucreator
         }
 
         void ShowChooseBlendShapeControl(
+            IList<string> children,
             string child,
             ChooseBlendShapeDictionary choices,
             IEnumerable<Util.INameAndDescription> names,
@@ -434,7 +465,7 @@ namespace net.narazaka.avatarmenucreator
                     }
                     else
                     {
-                        RemoveChooseBlendShape(choices, child, name.Name);
+                        RemoveChooseBlendShape(choices, children, child, name.Name);
                     }
                 }
             }
@@ -451,7 +482,22 @@ namespace net.narazaka.avatarmenucreator
             }
         }
 
-        void AddChooseBlendShape(ChooseBlendShapeDictionary choices, string child, string name)
+        void AddChooseBlendShape(ChooseBlendShapeDictionary choices, IList<string> children, string child, string name)
+        {
+            if (BulkSet)
+            {
+                foreach (var c in children)
+                {
+                    AddChooseBlendShapeSingle(choices, c, name);
+                }
+            }
+            else
+            {
+                AddChooseBlendShapeSingle(choices, child, name);
+            }
+        }
+
+        void AddChooseBlendShapeSingle(ChooseBlendShapeDictionary choices, string child, string name)
         {
             var key = (child, name);
             if (choices.ContainsKey(key)) return;
@@ -459,7 +505,22 @@ namespace net.narazaka.avatarmenucreator
             choices[key] = new IntFloatDictionary();
         }
 
-        void RemoveChooseBlendShape(ChooseBlendShapeDictionary choices, string child, string name)
+        void RemoveChooseBlendShape(ChooseBlendShapeDictionary choices, IList<string> children, string child, string name)
+        {
+            if (BulkSet)
+            {
+                foreach (var c in children)
+                {
+                    RemoveChooseBlendShapeSingle(choices, c, name);
+                }
+            }
+            else
+            {
+                RemoveChooseBlendShapeSingle(choices, child, name);
+            }
+        }
+
+        void RemoveChooseBlendShapeSingle(ChooseBlendShapeDictionary choices, string child, string name)
         {
             var key = (child, name);
             if (!choices.ContainsKey(key)) return;

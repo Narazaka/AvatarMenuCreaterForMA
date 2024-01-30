@@ -78,7 +78,7 @@ namespace net.narazaka.avatarmenucreator
                 EditorGUILayout.Space();
                 EditorGUILayout.LabelField(child, EditorStyles.boldLabel);
                 EditorGUI.indentLevel++;
-                ShowToggleObjectControl(child);
+                ShowToggleObjectControl(children, child);
 
                 var gameObjectRef = GetGameObject(child);
                 var names = Util.GetBlendShapeNames(gameObjectRef);
@@ -91,12 +91,12 @@ namespace net.narazaka.avatarmenucreator
                         ToggleBlendShapes.HasChild(child),
                         () => names,
                         () => ToggleBlendShapes.Names(child).ToImmutableHashSet(),
-                        (name) => AddToggleBlendShape(ToggleBlendShapes, child, name),
-                        (name) => RemoveToggleBlendShape(ToggleBlendShapes, child, name)
+                        (name) => AddToggleBlendShape(ToggleBlendShapes, children, child, name),
+                        (name) => RemoveToggleBlendShape(ToggleBlendShapes, children, child, name)
                         ))
                 {
                     EditorGUI.indentLevel++;
-                    ShowToggleBlendShapeControl(child, ToggleBlendShapes, names.ToNames());
+                    ShowToggleBlendShapeControl(children, child, ToggleBlendShapes, names.ToNames());
                     EditorGUI.indentLevel--;
                 }
                 if (parameters.Count > 0 &&
@@ -106,19 +106,19 @@ namespace net.narazaka.avatarmenucreator
                         ToggleShaderParameters.HasChild(child),
                         () => parameters.ToStrings().ToList(),
                         () => ToggleShaderParameters.Names(child).ToImmutableHashSet(),
-                        (name) => AddToggleBlendShape(ToggleShaderParameters, child, name, 1),
-                        (name) => RemoveToggleBlendShape(ToggleShaderParameters, child, name)
+                        (name) => AddToggleBlendShape(ToggleShaderParameters, children, child, name, 1),
+                        (name) => RemoveToggleBlendShape(ToggleShaderParameters, children, child, name)
                         ))
                 {
                     EditorGUI.indentLevel++;
-                    ShowToggleBlendShapeControl(child, ToggleShaderParameters, parameters, minValue: null, maxValue: null);
+                    ShowToggleBlendShapeControl(children, child, ToggleShaderParameters, parameters, minValue: null, maxValue: null);
                     EditorGUI.indentLevel--;
                 }
                 EditorGUI.indentLevel--;
             }
         }
 
-        void ShowToggleObjectControl(string child)
+        void ShowToggleObjectControl(IList<string> children, string child)
         {
             ToggleType type;
             if (!ToggleObjects.TryGetValue(child, out type))
@@ -142,16 +142,31 @@ namespace net.narazaka.avatarmenucreator
                 if (newType == ToggleType.None)
                 {
                     ToggleObjects.Remove(child);
+                    if (BulkSet)
+                    {
+                        foreach (var c in children)
+                        {
+                            ToggleObjects.Remove(c);
+                        }
+                    }
                 }
                 else
                 {
                     ToggleObjects[child] = newType;
+                    if (BulkSet)
+                    {
+                        foreach (var c in children)
+                        {
+                            ToggleObjects[c] = newType;
+                        }
+                    }
                 }
             }
 
         }
 
         void ShowToggleBlendShapeControl(
+            IList<string> children,
             string child,
             ToggleBlendShapeDictionary toggles,
             IEnumerable<Util.INameAndDescription> names,
@@ -220,7 +235,7 @@ namespace net.narazaka.avatarmenucreator
                     }
                     else
                     {
-                        RemoveToggleBlendShape(toggles, child, name.Name);
+                        RemoveToggleBlendShape(toggles, children, child, name.Name);
                     }
                 }
             }
@@ -242,7 +257,22 @@ namespace net.narazaka.avatarmenucreator
             }
         }
 
-        void AddToggleBlendShape(ToggleBlendShapeDictionary toggles, string child, string name, float defaultActiveValue = 100)
+        void AddToggleBlendShape(ToggleBlendShapeDictionary toggles, IList<string> children, string child, string name, float defaultActiveValue = 100)
+        {
+            if (BulkSet)
+            {
+                foreach (var c in children)
+                {
+                    AddToggleBlendShapeSingle(toggles, c, name, defaultActiveValue);
+                }
+            }
+            else
+            {
+                AddToggleBlendShapeSingle(toggles, child, name, defaultActiveValue);
+            }
+        }
+
+        void AddToggleBlendShapeSingle(ToggleBlendShapeDictionary toggles, string child, string name, float defaultActiveValue = 100)
         {
             var key = (child, name);
             if (toggles.ContainsKey(key)) return;
@@ -250,7 +280,22 @@ namespace net.narazaka.avatarmenucreator
             toggles[key] = new ToggleBlendShape { Inactive = 0, Active = defaultActiveValue, TransitionDurationPercent = 100 };
         }
 
-        void RemoveToggleBlendShape(ToggleBlendShapeDictionary toggles, string child, string name)
+        void RemoveToggleBlendShape(ToggleBlendShapeDictionary toggles, IList<string> children, string child, string name)
+        {
+            if (BulkSet)
+            {
+                foreach (var c in children)
+                {
+                    RemoveToggleBlendShapeSingle(toggles, c, name);
+                }
+            }
+            else
+            {
+                RemoveToggleBlendShapeSingle(toggles, child, name);
+            }
+        }
+
+        void RemoveToggleBlendShapeSingle(ToggleBlendShapeDictionary toggles, string child, string name)
         {
             var key = (child, name);
             if (!toggles.ContainsKey(key)) return;
