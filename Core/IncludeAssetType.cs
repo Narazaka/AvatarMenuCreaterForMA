@@ -10,5 +10,9 @@ namespace net.narazaka.avatarmenucreator
         AnimatorAndInclude,
         [InspectorName("全てprefabに含める")]
         Include,
+#if NET_NARAZAKA_VRCHAT_AvatarMenuCreator_HAS_NDMF
+        [InspectorName("コンポーネントとして保持")]
+        Component,
+#endif
     }
 }

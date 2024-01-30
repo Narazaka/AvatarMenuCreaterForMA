@@ -27,6 +27,11 @@ namespace net.narazaka.avatarmenucreator.editor
             this.modifyPrefab = modifyPrefab;
         }
 
+        public void StoreAssets(GameObject baseObject)
+        {
+            modifyPrefab(baseObject);
+        }
+
         public void SaveAssets(IncludeAssetType includeAssetType, string basePath)
         {
             // prefab
