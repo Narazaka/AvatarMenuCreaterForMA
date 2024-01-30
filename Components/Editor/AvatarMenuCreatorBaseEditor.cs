@@ -6,6 +6,7 @@ using VRC.SDK3.Avatars.Components;
 using net.narazaka.avatarmenucreator.editor.util;
 using nadena.dev.modular_avatar.core;
 using net.narazaka.avatarmenucreator.editor;
+using System;
 
 namespace net.narazaka.avatarmenucreator.components.editor
 {
@@ -18,6 +19,8 @@ namespace net.narazaka.avatarmenucreator.components.editor
         bool BulkSet;
         [SerializeField]
         List<string> Children;
+        [NonSerialized]
+        bool FoldoutSave;
 
         void OnEnable()
         {
@@ -30,7 +33,8 @@ namespace net.narazaka.avatarmenucreator.components.editor
         {
             var maMergeAnimator = Creator.GetComponent<ModularAvatarMergeAnimator>();
             var maParameters = Creator.GetComponent<ModularAvatarParameters>();
-            if (maMergeAnimator != null || maParameters != null)
+            var hasAssets = maMergeAnimator != null || maParameters != null;
+            if (hasAssets)
             {
                 EditorGUILayout.HelpBox("MA Merge AnimatorまたはMA Parametersがある場合、 このコンポーネントは影響せずそれらの設定がそのまま使われます。", MessageType.Info);
             }
@@ -45,28 +49,45 @@ namespace net.narazaka.avatarmenucreator.components.editor
 
             if (PrefabUtility.GetOutermostPrefabInstanceRoot(Creator.gameObject) == Creator.gameObject/* || !string.IsNullOrEmpty(AssetDatabase.GetAssetPath(Creator.gameObject))*/)
             {
-                var newIncludeAssetType = (IncludeAssetType)EditorGUILayout.EnumPopup("保存形式", Creator.AvatarMenu.IncludeAssetType);
-                if (newIncludeAssetType != Creator.AvatarMenu.IncludeAssetType)
+                if (FoldoutSave = EditorGUILayout.Foldout(FoldoutSave, "アセット生成（オプショナル）"))
                 {
-                    UndoUtility.RecordObject(Creator, "change IncludeAssetType");
-                    Creator.AvatarMenu.IncludeAssetType = newIncludeAssetType;
-                }
-                if (GUILayout.Button("Create"))
-                {
-                    var prefabPath = AssetDatabase.GetAssetPath(Creator.gameObject);
-                    if (string.IsNullOrEmpty(prefabPath))
+                    using (new EditorGUI.IndentLevelScope())
                     {
-                        var prefab = PrefabUtility.GetCorrespondingObjectFromSource(Creator.gameObject);
-                        prefabPath = AssetDatabase.GetAssetPath(prefab);
+                        var newIncludeAssetType = (IncludeAssetType)EditorGUILayout.EnumPopup("保存形式", Creator.AvatarMenu.IncludeAssetType);
+                        if (newIncludeAssetType != Creator.AvatarMenu.IncludeAssetType)
+                        {
+                            UndoUtility.RecordObject(Creator, "change IncludeAssetType");
+                            Creator.AvatarMenu.IncludeAssetType = newIncludeAssetType;
+                        }
+                        EditorGUI.BeginDisabledGroup(Creator.AvatarMenu.IncludeAssetType == IncludeAssetType.Component);
+                        if (GUILayout.Button(hasAssets ? "この設定でアセットを再生成" : "この設定でアセットを生成"))
+                        {
+                            var prefabPath = AssetDatabase.GetAssetPath(Creator.gameObject);
+                            if (string.IsNullOrEmpty(prefabPath))
+                            {
+                                var prefab = PrefabUtility.GetCorrespondingObjectFromSource(Creator.gameObject);
+                                prefabPath = AssetDatabase.GetAssetPath(prefab);
+                            }
+                            if (string.IsNullOrEmpty(prefabPath))
+                            {
+                                return;
+                            }
+                            var (basePath, baseName) = Util.GetBasePathAndNameFromPrefabPath(prefabPath);
+                            var createAvatarMenu = CreateAvatarMenuBase.GetCreateAvatarMenu(Creator.AvatarMenu);
+                            createAvatarMenu.CreateAssets(baseName).SaveAssets(Creator.AvatarMenu.IncludeAssetType, basePath, (prefab) => CreateAvatarMenuBase.GetOrAddMenuCreatorComponent(prefab, Creator.AvatarMenu));
+                        }
+                        EditorGUI.EndDisabledGroup();
+                        if (hasAssets)
+                        {
+                            EditorGUILayout.HelpBox("設定を変えてアセットを再生成出来ます", MessageType.Info);
+                        }
+                        else
+                        {
+                            EditorGUILayout.HelpBox("手動編集用にアセットを生成できます", MessageType.Info);
+                        }
                     }
-                    if (string.IsNullOrEmpty(prefabPath))
-                    {
-                        return;
-                    }
-                    var (basePath, baseName) = Util.GetBasePathAndNameFromPrefabPath(prefabPath);
-                    var createAvatarMenu = CreateAvatarMenuBase.GetCreateAvatarMenu(Creator.AvatarMenu);
-                    createAvatarMenu.CreateAssets(baseName).SaveAssets(Creator.AvatarMenu.IncludeAssetType, basePath, (prefab) => CreateAvatarMenuBase.GetOrAddMenuCreatorComponent(prefab, Creator.AvatarMenu));
                 }
+                EditorGUILayout.Space();
             }
 
             var baseObject = GetParentAvatar();
