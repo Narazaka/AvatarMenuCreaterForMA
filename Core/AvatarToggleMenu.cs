@@ -25,6 +25,23 @@ namespace net.narazaka.avatarmenucreator
 #if UNITY_EDITOR
 
         public override IEnumerable<string> GetStoredChildren() => ToggleObjects.Keys.Concat(ToggleBlendShapes.Keys.Select(k => k.Item1)).Concat(ToggleShaderParameters.Keys.Select(k => k.Item1)).Distinct();
+        public override void FilterStoredTargets(IEnumerable<string> children)
+        {
+            WillChange();
+            var filter = new HashSet<string>(children);
+            foreach (var key in ToggleObjects.Keys.Where(k => !filter.Contains(k)).ToList())
+            {
+                ToggleObjects.Remove(key);
+            }
+            foreach (var key in ToggleBlendShapes.Keys.Where(k => !filter.Contains(k.Item1)).ToList())
+            {
+                ToggleBlendShapes.Remove(key);
+            }
+            foreach (var key in ToggleShaderParameters.Keys.Where(k => !filter.Contains(k.Item1)).ToList())
+            {
+                ToggleShaderParameters.Remove(key);
+            }
+        }
         public override void RemoveStoredChild(string child)
         {
             WillChange();

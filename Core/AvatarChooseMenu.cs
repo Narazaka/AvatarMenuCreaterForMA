@@ -38,6 +38,27 @@ namespace net.narazaka.avatarmenucreator
 
         public override IEnumerable<string> GetStoredChildren() => ChooseObjects.Keys.Concat(ChooseMaterials.Keys.Select(key => key.Item1)).Concat(ChooseBlendShapes.Keys.Select(key => key.Item1)).Concat(ChooseShaderParameters.Keys.Select(key => key.Item1)).Distinct();
 
+        public override void FilterStoredTargets(IEnumerable<string> children)
+        {
+            var filter = new HashSet<string>(children);
+            foreach (var child in ChooseObjects.Keys.Where(child => !filter.Contains(child)).ToList())
+            {
+                ChooseObjects.Remove(child);
+            }
+            foreach (var key in ChooseMaterials.Keys.Where(key => !filter.Contains(key.Item1)).ToList())
+            {
+                ChooseMaterials.Remove(key);
+            }
+            foreach (var key in ChooseBlendShapes.Keys.Where(key => !filter.Contains(key.Item1)).ToList())
+            {
+                ChooseBlendShapes.Remove(key);
+            }
+            foreach (var key in ChooseShaderParameters.Keys.Where(key => !filter.Contains(key.Item1)).ToList())
+            {
+                ChooseShaderParameters.Remove(key);
+            }
+        }
+
         public override void RemoveStoredChild(string child)
         {
             WillChange();

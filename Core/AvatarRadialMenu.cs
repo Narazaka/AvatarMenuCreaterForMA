@@ -29,6 +29,19 @@ namespace net.narazaka.avatarmenucreator
 #if UNITY_EDITOR
 
         public override IEnumerable<string> GetStoredChildren() => RadialBlendShapes.Keys.Select(key => key.Item1).Concat(RadialShaderParameters.Keys.Select(key => key.Item1)).Distinct();
+        public override void FilterStoredTargets(IEnumerable<string> children)
+        {
+            WillChange();
+            var filter = new HashSet<string>(children);
+            foreach (var key in RadialBlendShapes.Keys.Where(k => !filter.Contains(k.Item1)).ToList())
+            {
+                RadialBlendShapes.Remove(key);
+            }
+            foreach (var key in RadialShaderParameters.Keys.Where(k => !filter.Contains(k.Item1)).ToList())
+            {
+                RadialShaderParameters.Remove(key);
+            }
+        }
         public override void RemoveStoredChild(string child)
         {
             WillChange();
