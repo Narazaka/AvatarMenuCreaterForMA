@@ -81,8 +81,8 @@ namespace net.narazaka.avatarmenucreator
                 ShowToggleObjectControl(children, child);
 
                 var gameObjectRef = GetGameObject(child);
-                var names = Util.GetBlendShapeNames(gameObjectRef);
-                var parameters = ShaderParametersCache.GetFilteredShaderParameters(gameObjectRef);
+                var names = gameObjectRef == null ? ToggleBlendShapes.Names(child).ToList() : Util.GetBlendShapeNames(gameObjectRef);
+                var parameters = gameObjectRef == null ? ToggleShaderParameters.Names(child).ToFakeShaderParameters().ToList() : ShaderParametersCache.GetFilteredShaderParameters(gameObjectRef);
 
                 if (names.Count > 0 &&
                     FoldoutHeaderWithAddItemButton(

@@ -116,7 +116,7 @@ namespace net.narazaka.avatarmenucreator
             }
             EditorGUI.indentLevel--;
 
-            var allMaterials = children.ToDictionary(child => child, child => Util.GetMaterialSlots(GetGameObject(child)));
+            var allMaterials = children.ToDictionary(child => child, child => GetMaterialSlots(child));
 
             if (BulkSet)
             {
@@ -129,7 +129,7 @@ namespace net.narazaka.avatarmenucreator
 
         class MaterialItemContainer : ListTreeViewItemContainer<int>
         {
-            Material material;
+            public Material material;
 
             public MaterialItemContainer(int index, Material material) : base(index)
             {
@@ -150,7 +150,7 @@ namespace net.narazaka.avatarmenucreator
 
         protected override void OnMainGUI(IList<string> children)
         {
-            var allMaterials = children.ToDictionary(child => child, child => Util.GetMaterialSlots(GetGameObject(child)));
+            var allMaterials = children.ToDictionary(child => child, child => GetMaterialSlots(child));
 
             foreach (var child in children)
             {
@@ -197,7 +197,7 @@ namespace net.narazaka.avatarmenucreator
                         child,
                         "Materials",
                         ChooseMaterials.HasChild(child),
-                        () => materials.Select((material, index) => new MaterialItemContainer(index, material) as ListTreeViewItemContainer<int>).ToList(),
+                        () => materials.Select((material, index) => new MaterialItemContainer(index, material) as ListTreeViewItemContainer<int>).Where(m => (m as MaterialItemContainer).material != null).ToList(),
                         () => ChooseMaterials.Indexes(child).ToImmutableHashSet(),
                         index => AddChooseMaterial(children, child, index),
                         index => RemoveChooseMaterial(children, child, index)
@@ -209,8 +209,8 @@ namespace net.narazaka.avatarmenucreator
                 }
 
                 var gameObjectRef = GetGameObject(child);
-                var names = Util.GetBlendShapeNames(gameObjectRef);
-                var parameters = ShaderParametersCache.GetFilteredShaderParameters(gameObjectRef);
+                var names = gameObjectRef == null ? ChooseBlendShapes.Names(child).ToList() : Util.GetBlendShapeNames(gameObjectRef);
+                var parameters = gameObjectRef == null ? ChooseShaderParameters.Names(child).ToFakeShaderParameters().ToList() : ShaderParametersCache.GetFilteredShaderParameters(gameObjectRef);
                 if (names.Count > 0 &&
                     FoldoutHeaderWithAddItemButton(
                         child,
@@ -333,7 +333,7 @@ namespace net.narazaka.avatarmenucreator
         {
             foreach (var (child, index) in ChooseMaterials.Keys)
             {
-                var materials = Util.GetMaterialSlots(GetGameObject(child));
+                var materials = GetMaterialSlots(child);
                 if (index < materials.Length && materials[index] == sourceMaterial)
                 {
                     var values = ChooseMaterials[(child, index)];
@@ -346,10 +346,10 @@ namespace net.narazaka.avatarmenucreator
         {
             if (BulkSet)
             {
-                var mat = Util.GetMaterialSlots(GetGameObject(child))[index];
+                var mat = GetMaterialSlots(child)[index];
                 foreach (var c in children)
                 {
-                    var materials = Util.GetMaterialSlots(GetGameObject(c));
+                    var materials = GetMaterialSlots(c);
                     for (var i = 0; i < materials.Length; ++i)
                     {
                         if (materials[i] == mat)
@@ -371,17 +371,17 @@ namespace net.narazaka.avatarmenucreator
             if (ChooseMaterials.ContainsKey(key)) return;
             WillChange();
             ChooseMaterials[key] = new IntMaterialDictionary();
-            ChooseMaterials[key][0] = Util.GetMaterialSlots(GetGameObject(child))[index];
+            ChooseMaterials[key][0] = GetMaterialSlots(child)[index];
         }
 
         void RemoveChooseMaterial(IList<string> children, string child, int index)
         {
             if (BulkSet)
             {
-                var mat = Util.GetMaterialSlots(GetGameObject(child))[index];
+                var mat = GetMaterialSlots(child)[index];
                 foreach (var c in children)
                 {
-                    var materials = Util.GetMaterialSlots(GetGameObject(c));
+                    var materials = GetMaterialSlots(c);
                     for (var i = 0; i < materials.Length; ++i)
                     {
                         if (materials[i] == mat)
@@ -543,6 +543,9 @@ namespace net.narazaka.avatarmenucreator
             WillChange();
             choices.Remove(key);
         }
+
+        // with prefab shim
+        Material[] GetMaterialSlots(string child) => GetGameObject(child)?.GetMaterialSlots() ?? ChooseMaterials.MaterialSlots(child);
 #endif
     }
 }

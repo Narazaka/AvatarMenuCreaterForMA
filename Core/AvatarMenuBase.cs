@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 #if UNITY_EDITOR
@@ -93,6 +93,7 @@ namespace net.narazaka.avatarmenucreator
 
         protected GameObject GetGameObject(string child)
         {
+            if (BaseObject == null) return null;
             if (GameObjectCache == null) GameObjectCache = new Dictionary<string, GameObject>();
             if (!GameObjectCache.TryGetValue(child, out var gameObjectRef))
             {

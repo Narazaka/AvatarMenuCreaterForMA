@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
 using System.Linq;
@@ -42,11 +42,14 @@ namespace net.narazaka.avatarmenucreator.components.editor
                 }
             }
             var baseObject = GetParentAvatar();
-            var child = EditorGUILayout.ObjectField("オブジェクトを追加", null, typeof(GameObject), true) as GameObject;
-            if (child != null)
+            if (baseObject != null)
             {
-                UndoUtility.RecordObject(this, "Add Children");
-                Children.Add(Util.ChildPath(baseObject, child));
+                var child = EditorGUILayout.ObjectField("オブジェクトを追加", null, typeof(GameObject), true) as GameObject;
+                if (child != null)
+                {
+                    UndoUtility.RecordObject(this, "Add Children");
+                    Children.Add(Util.ChildPath(baseObject, child));
+                }
             }
 
             var children = Children;
@@ -63,7 +66,7 @@ namespace net.narazaka.avatarmenucreator.components.editor
                             toRemoves.Add(c);
                             break;
                         }
-                        if (baseObject.transform.Find(c) == null)
+                        if (baseObject != null && baseObject.transform.Find(c) == null)
                         {
                             EditorGUILayout.LabelField(EditorGUIUtility.IconContent("Warning"), GUILayout.Width(35));
                             toFilters.Add(c);
@@ -98,7 +101,7 @@ namespace net.narazaka.avatarmenucreator.components.editor
 
         GameObject GetParentAvatar()
         {
-            return Creator.GetComponentInParent<VRCAvatarDescriptor>().gameObject;
+            return Creator.GetComponentInParent<VRCAvatarDescriptor>()?.gameObject;
         }
     }
 }

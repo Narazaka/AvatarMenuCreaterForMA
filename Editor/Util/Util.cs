@@ -1,4 +1,4 @@
-﻿using System.Linq;
+using System.Linq;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -31,7 +31,7 @@ namespace net.narazaka.avatarmenucreator.editor.util
             return string.Join("/", paths.ToArray());
         }
 
-        public static Material[] GetMaterialSlots(GameObject gameObject)
+        public static Material[] GetMaterialSlots(this GameObject gameObject)
         {
             var renderer = gameObject.GetComponent<Renderer>();
             if (renderer == null) return new Material[0];
@@ -145,6 +145,15 @@ namespace net.narazaka.avatarmenucreator.editor.util
                 Material = mat,
                 Shader = mat?.shader,
                 ShaderParameters = mat == null ? new List<ShaderParameter>() : GetShaderParameters(mat.shader).ToList(),
+            });
+        }
+
+        public static IEnumerable<ShaderParameter> ToFakeShaderParameters(this IEnumerable<string> names)
+        {
+            return names.Select(name => new ShaderParameter
+            {
+                Name = name,
+                Type = UnityEngine.Rendering.ShaderPropertyType.Float,
             });
         }
 

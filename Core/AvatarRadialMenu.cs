@@ -150,8 +150,8 @@ namespace net.narazaka.avatarmenucreator
             {
                 EditorGUILayout.Space();
                 var gameObjectRef = GetGameObject(child);
-                var names = Util.GetBlendShapeNames(gameObjectRef);
-                var parameters = ShaderParametersCache.GetFilteredShaderParameters(gameObjectRef);
+                var names = gameObjectRef == null ? RadialBlendShapes.Names(child).ToList() : Util.GetBlendShapeNames(gameObjectRef);
+                var parameters = gameObjectRef == null ? RadialShaderParameters.Names(child).ToFakeShaderParameters().ToList() : ShaderParametersCache.GetFilteredShaderParameters(gameObjectRef);
                 var path = child;
                 if (names.Count > 0 || parameters.Count > 0)
                 {
