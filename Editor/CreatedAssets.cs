@@ -32,7 +32,7 @@ namespace net.narazaka.avatarmenucreator.editor
             modifyPrefab(baseObject);
         }
 
-        public void SaveAssets(IncludeAssetType includeAssetType, string basePath)
+        public void SaveAssets(IncludeAssetType includeAssetType, string basePath, Action<GameObject> addifionalModifyPrefab = null)
         {
             // prefab
             var prefabPath = $"{basePath}.prefab";
@@ -47,6 +47,7 @@ namespace net.narazaka.avatarmenucreator.editor
             prefab = PrefabUtility.LoadPrefabContents(prefabPath);
 
             modifyPrefab(prefab);
+            if (addifionalModifyPrefab != null) addifionalModifyPrefab(prefab);
 
             PrefabUtility.SaveAsPrefabAsset(prefab, prefabPath);
             PrefabUtility.UnloadPrefabContents(prefab);

@@ -1,10 +1,11 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
 using System.Linq;
 using VRC.SDK3.Avatars.Components;
 using net.narazaka.avatarmenucreator.editor.util;
 using nadena.dev.modular_avatar.core;
+using net.narazaka.avatarmenucreator.editor;
 
 namespace net.narazaka.avatarmenucreator.components.editor
 {
@@ -41,6 +42,33 @@ namespace net.narazaka.avatarmenucreator.components.editor
                     EditorGUILayout.HelpBox("MA Menu Installerのプレハブ開発者向け設定/インストールされるメニューが設定されていますが、無視されます。", MessageType.Warning);
                 }
             }
+
+            if (PrefabUtility.GetOutermostPrefabInstanceRoot(Creator.gameObject) == Creator.gameObject/* || !string.IsNullOrEmpty(AssetDatabase.GetAssetPath(Creator.gameObject))*/)
+            {
+                var newIncludeAssetType = (IncludeAssetType)EditorGUILayout.EnumPopup("保存形式", Creator.AvatarMenu.IncludeAssetType);
+                if (newIncludeAssetType != Creator.AvatarMenu.IncludeAssetType)
+                {
+                    UndoUtility.RecordObject(Creator, "change IncludeAssetType");
+                    Creator.AvatarMenu.IncludeAssetType = newIncludeAssetType;
+                }
+                if (GUILayout.Button("Create"))
+                {
+                    var prefabPath = AssetDatabase.GetAssetPath(Creator.gameObject);
+                    if (string.IsNullOrEmpty(prefabPath))
+                    {
+                        var prefab = PrefabUtility.GetCorrespondingObjectFromSource(Creator.gameObject);
+                        prefabPath = AssetDatabase.GetAssetPath(prefab);
+                    }
+                    if (string.IsNullOrEmpty(prefabPath))
+                    {
+                        return;
+                    }
+                    var (basePath, baseName) = Util.GetBasePathAndNameFromPrefabPath(prefabPath);
+                    var createAvatarMenu = CreateAvatarMenuBase.GetCreateAvatarMenu(Creator.AvatarMenu);
+                    createAvatarMenu.CreateAssets(baseName).SaveAssets(Creator.AvatarMenu.IncludeAssetType, basePath, (prefab) => CreateAvatarMenuBase.GetOrAddMenuCreatorComponent(prefab, Creator.AvatarMenu));
+                }
+            }
+
             var baseObject = GetParentAvatar();
             if (baseObject != null)
             {
@@ -101,6 +129,7 @@ namespace net.narazaka.avatarmenucreator.components.editor
 
         GameObject GetParentAvatar()
         {
+            if (Creator == null) return null;
             return Creator.GetComponentInParent<VRCAvatarDescriptor>()?.gameObject;
         }
     }

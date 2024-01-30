@@ -12,6 +12,7 @@ namespace net.narazaka.avatarmenucreator.collections.instance
         public Material[] MaterialSlots(string child)
         {
             var firstNonNullMaterials = Keys.Where(k => k.Item1 == child).Select(k => (k.Item2, this[k].OrderBy(kv => kv.Key).FirstOrDefault(kv => kv.Value != null).Value)).ToArray();
+            if (firstNonNullMaterials.Length == 0) return new Material[0];
             var slots = new Material[firstNonNullMaterials.Max(k => k.Item1) + 1];
             foreach (var (index, material) in firstNonNullMaterials)
             {

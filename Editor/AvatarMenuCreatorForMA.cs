@@ -158,6 +158,7 @@ namespace net.narazaka.avatarmenucreator.editor
                 if (GUILayout.Button("Create!"))
                 {
                     AvatarMenuBase avatarMenu = MenuType == MenuType.Toggle ? AvatarToggleMenu as AvatarMenuBase : MenuType == MenuType.Choose ? AvatarChooseMenu as AvatarMenuBase : AvatarRadialMenu as AvatarMenuBase;
+                    avatarMenu.IncludeAssetType = IncludeAssetType;
 
                     if (isComponent)
                     {
@@ -167,12 +168,21 @@ namespace net.narazaka.avatarmenucreator.editor
                     }
                     else
                     {
-                        var basePath = EditorUtility.SaveFilePanelInProject("保存場所", "New Menu", "prefab", "アセットの保存場所", SaveFolder);
-                        if (string.IsNullOrEmpty(basePath)) return;
-                        basePath = new System.Text.RegularExpressions.Regex(@"\.prefab").Replace(basePath, "");
-                        var baseName = System.IO.Path.GetFileNameWithoutExtension(basePath);
+                        System.Action<GameObject> modifyPrefab =
+#if NET_NARAZAKA_VRCHAT_AvatarMenuCreator_HAS_NDMF
+                            (GameObject prefab) =>
+                            {
+                                var creator = CreateAvatarMenuBase.GetOrAddMenuCreatorComponent(prefab, avatarMenu);
+                                creator.AvatarMenu.FilterStoredTargets(children);
+                            };
+#else
+                            (GameObject prefab) => { };
+#endif
+                        var prefabPath = EditorUtility.SaveFilePanelInProject("保存場所", "New Menu", "prefab", "アセットの保存場所", SaveFolder);
+                        if (string.IsNullOrEmpty(prefabPath)) return;
+                        var (basePath, baseName) = Util.GetBasePathAndNameFromPrefabPath(prefabPath);
                         var createAvatarMenu = CreateAvatarMenuBase.GetCreateAvatarMenu(avatarMenu);
-                        createAvatarMenu.CreateAssets(baseName, children).SaveAssets(IncludeAssetType, basePath);
+                        createAvatarMenu.CreateAssets(baseName, children).SaveAssets(IncludeAssetType, basePath, modifyPrefab);
                         SaveFolder = System.IO.Path.GetDirectoryName(basePath);
                     }
                 }
@@ -183,37 +193,10 @@ namespace net.narazaka.avatarmenucreator.editor
         public void SaveAsComponent(AvatarMenuBase avatarMenu, string[] children)
         {
             var obj = new GameObject(BaseName);
-            var creator = AddMenuCreatorComponent(obj, avatarMenu);
+            var creator = CreateAvatarMenuBase.GetOrAddMenuCreatorComponent(obj, avatarMenu);
             creator.AvatarMenu.FilterStoredTargets(children);
             obj.transform.SetParent(VRCAvatarDescriptor.transform, false);
             Undo.RegisterCreatedObjectUndo(obj, "Create Component");
-        }
-
-        AvatarMenuCreatorBase AddMenuCreatorComponent(GameObject obj, AvatarMenuBase avatarMenu)
-        {
-            switch (avatarMenu)
-            {
-                case AvatarToggleMenu a:
-                    {
-                        var creator = obj.AddComponent<AvatarToggleMenuCreator>();
-                        creator.AvatarToggleMenu = a.DeepCopy();
-                        return creator;
-                    }
-                case AvatarChooseMenu a:
-                    {
-                        var creator = obj.AddComponent<AvatarChooseMenuCreator>();
-                        creator.AvatarChooseMenu = a.DeepCopy();
-                        return creator;
-                    }
-                case AvatarRadialMenu a:
-                    {
-                        var creator = obj.AddComponent<AvatarRadialMenuCreator>();
-                        creator.AvatarRadialMenu = a.DeepCopy();
-                        return creator;
-                    }
-                default:
-                    throw new System.ArgumentException($"unknown menu type");
-            }
         }
 #endif
     }

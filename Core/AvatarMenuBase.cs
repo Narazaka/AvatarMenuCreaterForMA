@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using UnityEngine;
 #if UNITY_EDITOR
@@ -14,6 +14,8 @@ namespace net.narazaka.avatarmenucreator
         [NonSerialized]
         public bool BulkSet;
 
+        [SerializeField]
+        public IncludeAssetType IncludeAssetType = IncludeAssetType.AnimatorAndInclude;
         [SerializeField]
         public float TransitionSeconds;
         [SerializeField]

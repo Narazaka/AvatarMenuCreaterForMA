@@ -1,4 +1,4 @@
-using System.Linq;
+﻿using System.Linq;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -29,6 +29,13 @@ namespace net.narazaka.avatarmenucreator.editor.util
             }
             paths.Reverse();
             return string.Join("/", paths.ToArray());
+        }
+
+        public static (string basePath, string baseName) GetBasePathAndNameFromPrefabPath(string prefabPath)
+        {
+            var basePath = new System.Text.RegularExpressions.Regex(@"\.prefab").Replace(prefabPath, "");
+            var baseName = System.IO.Path.GetFileNameWithoutExtension(basePath);
+            return (basePath, baseName);
         }
 
         public static Material[] GetMaterialSlots(this GameObject gameObject)
