@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
@@ -154,7 +154,8 @@ namespace net.narazaka.avatarmenucreator
                     WillChange();
                     if (newHasSetting)
                     {
-                        indexes = new IntHashSet { 0 };
+                        indexes = new IntHashSet();
+                        indexes.Add(0);
                         ChooseObjects[child] = indexes;
                     }
                     else
