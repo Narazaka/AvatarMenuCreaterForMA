@@ -152,7 +152,7 @@ namespace net.narazaka.avatarmenucreator
                     EditorGUILayout.LabelField(path, EditorStyles.boldLabel);
                     EditorGUI.indentLevel++;
                     if (names.Count > 0 &&
-                        FoldoutHeaderWithAddStringButton(
+                        FoldoutHeaderWithAddItemButton(
                             child,
                             "BlendShapes",
                             RadialBlendShapes.HasChild(child),
@@ -167,7 +167,7 @@ namespace net.narazaka.avatarmenucreator
                         EditorGUI.indentLevel--;
                     }
                     if (parameters.Count > 0 &&
-                        FoldoutHeaderWithAddStringButton(
+                        FoldoutHeaderWithAddItemButton(
                             child,
                             "Shader Parameters",
                             RadialShaderParameters.HasChild(child),

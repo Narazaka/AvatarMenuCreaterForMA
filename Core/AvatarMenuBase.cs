@@ -170,20 +170,20 @@ namespace net.narazaka.avatarmenucreator
             return !newNotFoldout;
         }
 
-        protected void AddStringButton(Func<IList<string>> getChildren, Func<IEnumerable<string>> getExistChildren, Action<string> onAdd, Action<string> onRemove)
+        protected void AddItemButton<T>(Func<IList<T>> getChildren, Func<IEnumerable<T>> getExistChildren, Action<T> onAdd, Action<T> onRemove)
         {
             var rect = EditorGUILayout.GetControlRect(GUILayout.Width(20));
             if (GUI.Button(rect, "+"))
             {
-                PopupWindow.Show(rect, new ListPopupWindow(getChildren(), getExistChildren) { OnAdd = onAdd, OnRemove = onRemove });
+                PopupWindow.Show(rect, new ListPopupWindow<T>(getChildren(), getExistChildren) { OnAdd = onAdd, OnRemove = onRemove });
             }
         }
 
-        protected bool FoldoutHeaderWithAddStringButton(string child, string title, bool hasChildren, Func<IList<string>> getChildren, Func<IEnumerable<string>> getExistChildren, Action<string> onAdd, Action<string> onRemove)
+        protected bool FoldoutHeaderWithAddItemButton<T>(string child, string title, bool hasChildren, Func<IList<T>> getChildren, Func<IEnumerable<T>> getExistChildren, Action<T> onAdd, Action<T> onRemove)
         {
             EditorGUILayout.BeginHorizontal();
             var foldout = FoldoutHeader(child, title, hasChildren);
-            AddStringButton(getChildren, getExistChildren, onAdd, onRemove);
+            AddItemButton(getChildren, getExistChildren, onAdd, onRemove);
             EditorGUILayout.EndHorizontal();
             return foldout;
         }

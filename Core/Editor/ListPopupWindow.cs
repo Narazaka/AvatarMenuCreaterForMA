@@ -7,17 +7,17 @@ using UnityEditor.IMGUI.Controls;
 
 namespace net.narazaka.avatarmenucreator
 {
-    public class ListPopupWindow : PopupWindowContent
+    public class ListPopupWindow<T> : PopupWindowContent
     {
-        public Action<string> OnAdd;
-        public Action<string> OnRemove;
-        IList<string> Items;
-        Func<IEnumerable<string>> GetExistItems;
+        public Action<T> OnAdd;
+        public Action<T> OnRemove;
+        IList<T> Items;
+        Func<IEnumerable<T>> GetExistItems;
         SearchField SearchField;
         string SearchQuery;
-        ListTreeView TreeView;
+        ListTreeView<T> TreeView;
 
-        public ListPopupWindow(IList<string> items, Func<IEnumerable<string>> getExistItems)
+        public ListPopupWindow(IList<T> items, Func<IEnumerable<T>> getExistItems)
         {
             Items = items;
             GetExistItems = getExistItems;
@@ -33,7 +33,7 @@ namespace net.narazaka.avatarmenucreator
 
             if (TreeView == null)
             {
-                TreeView = new ListTreeView(new TreeViewState(), Items, GetExistItems)
+                TreeView = new ListTreeView<T>(new TreeViewState(), Items, GetExistItems)
                 {
                     OnAdd = OnAdd,
                     OnRemove = OnRemove,

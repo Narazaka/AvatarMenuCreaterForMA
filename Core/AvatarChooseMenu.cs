@@ -135,7 +135,7 @@ namespace net.narazaka.avatarmenucreator
                 var names = Util.GetBlendShapeNames(gameObjectRef);
                 var parameters = ShaderParametersCache.GetFilteredShaderParameters(gameObjectRef);
                 if (names.Count > 0 &&
-                    FoldoutHeaderWithAddStringButton(
+                    FoldoutHeaderWithAddItemButton(
                         child,
                         "BlendShapes",
                         ChooseBlendShapes.HasChild(child),
@@ -150,7 +150,7 @@ namespace net.narazaka.avatarmenucreator
                     EditorGUI.indentLevel--;
                 }
                 if (parameters.Count > 0 &&
-                    FoldoutHeaderWithAddStringButton(
+                    FoldoutHeaderWithAddItemButton(
                         child,
                         "Shader Parameters",
                         ChooseShaderParameters.HasChild(child),
