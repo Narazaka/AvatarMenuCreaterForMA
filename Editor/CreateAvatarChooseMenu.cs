@@ -126,6 +126,7 @@ namespace net.narazaka.avatarmenucreator.editor
                     subParameters = new VRCExpressionsMenu.Control.Parameter[] { },
                     value = i,
                     labels = new VRCExpressionsMenu.Control.Label[] { },
+                    icon = AvatarMenu.ChooseIcon(i),
                 }).ToList(),
             };
             menu.name = baseName;
@@ -144,6 +145,7 @@ namespace net.narazaka.avatarmenucreator.editor
                         value = 1,
                         labels = new VRCExpressionsMenu.Control.Label[] { },
                         subMenu = menu,
+                        icon = AvatarMenu.ChooseParentIcon,
                     },
                 },
             };

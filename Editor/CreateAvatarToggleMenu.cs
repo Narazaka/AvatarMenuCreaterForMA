@@ -197,6 +197,7 @@ namespace net.narazaka.avatarmenucreator.editor
                         subParameters = new VRCExpressionsMenu.Control.Parameter[] { },
                         value = 1,
                         labels = new VRCExpressionsMenu.Control.Label[] { },
+                        icon = AvatarMenu.ToggleIcon,
                     },
                 },
             };

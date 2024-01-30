@@ -22,6 +22,8 @@ namespace net.narazaka.avatarmenucreator
         public ToggleBlendShapeDictionary ToggleShaderParameters = new ToggleBlendShapeDictionary();
         [SerializeField]
         public bool ToggleDefaultValue;
+        [SerializeField]
+        public Texture2D ToggleIcon;
 
 #if UNITY_EDITOR
 
@@ -60,9 +62,13 @@ namespace net.narazaka.avatarmenucreator
 
         protected override void OnHeaderGUI(IList<string> children)
         {
-            ShowTransitionSeconds();
+            ToggleIcon = TextureField("アイコン", ToggleIcon);
             ToggleDefaultValue = Toggle("パラメーター初期値", ToggleDefaultValue);
             ShowSaved();
+
+            EditorGUILayout.Space();
+
+            ShowTransitionSeconds();
         }
 
         protected override void OnMainGUI(IList<string> children)

@@ -88,7 +88,7 @@ namespace net.narazaka.avatarmenucreator
 
         protected void ShowSaved()
         {
-            Saved = Toggle("Saved", Saved);
+            Saved = Toggle("パラメーター保存", Saved);
         }
 
         protected GameObject GetGameObject(string child)
@@ -262,6 +262,19 @@ namespace net.narazaka.avatarmenucreator
             using (var check = new EditorGUI.ChangeCheckScope())
             {
                 var newValue = EditorGUILayout.FloatField(value);
+                if (check.changed)
+                {
+                    WillChange();
+                }
+                return newValue;
+            }
+        }
+
+        protected Texture2D TextureField(string label, Texture2D texture2D)
+        {
+            using (var check = new EditorGUI.ChangeCheckScope())
+            {
+                var newValue = EditorGUILayout.ObjectField(label, texture2D, typeof(Texture2D), false, GUILayout.Height(18)) as Texture2D;
                 if (check.changed)
                 {
                     WillChange();

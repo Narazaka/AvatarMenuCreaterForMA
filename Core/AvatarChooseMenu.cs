@@ -28,6 +28,10 @@ namespace net.narazaka.avatarmenucreator
         public int ChooseCount = 2;
         [SerializeField]
         public IntStringDictionary ChooseNames = new IntStringDictionary();
+        [SerializeField]
+        public Texture2D ChooseParentIcon;
+        [SerializeField]
+        public IntTexture2DDictionary ChooseIcons = new IntTexture2DDictionary();
 
 #if UNITY_EDITOR
 
@@ -35,6 +39,12 @@ namespace net.narazaka.avatarmenucreator
         {
             if (ChooseNames.ContainsKey(index)) return ChooseNames[index];
             return $"選択肢{index}";
+        }
+
+        public Texture2D ChooseIcon(int index)
+        {
+            if (ChooseIcons.ContainsKey(index)) return ChooseIcons[index];
+            return null;
         }
 
         public override IEnumerable<string> GetStoredChildren() => ChooseObjects.Keys.Concat(ChooseMaterials.Keys.Select(key => key.Item1)).Concat(ChooseBlendShapes.Keys.Select(key => key.Item1)).Concat(ChooseShaderParameters.Keys.Select(key => key.Item1)).Distinct();
@@ -82,10 +92,15 @@ namespace net.narazaka.avatarmenucreator
 
         protected override void OnHeaderGUI(IList<string> children)
         {
-            ShowTransitionSeconds();
-
+            ChooseParentIcon = TextureField("親メニューアイコン", ChooseParentIcon);
             ChooseDefaultValue = IntField("パラメーター初期値", ChooseDefaultValue);
             ShowSaved();
+
+            EditorGUILayout.Space();
+
+            ShowTransitionSeconds();
+
+            EditorGUILayout.Space();
 
             ChooseCount = IntField("選択肢の数", ChooseCount);
 
@@ -97,6 +112,7 @@ namespace net.narazaka.avatarmenucreator
             for (var i = 0; i < ChooseCount; ++i)
             {
                 ChooseNames[i] = TextField($"選択肢{i}", ChooseName(i));
+                ChooseIcons[i] = TextureField(" ", ChooseIcon(i));
             }
             EditorGUI.indentLevel--;
 

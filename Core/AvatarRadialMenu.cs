@@ -26,6 +26,8 @@ namespace net.narazaka.avatarmenucreator
         public float RadialInactiveRangeMin = float.NaN;
         [SerializeField]
         public float RadialInactiveRangeMax = float.NaN;
+        [SerializeField]
+        public Texture2D RadialIcon;
 
 #if UNITY_EDITOR
 
@@ -62,10 +64,14 @@ namespace net.narazaka.avatarmenucreator
 
         protected override void OnHeaderGUI(IList<string> children)
         {
+            RadialIcon = TextureField("アイコン", RadialIcon);
             RadialDefaultValue = FloatField("パラメーター初期値", RadialDefaultValue);
             ShowSaved();
             if (RadialDefaultValue < 0) RadialDefaultValue = 0;
             if (RadialDefaultValue > 1) RadialDefaultValue = 1;
+
+            EditorGUILayout.Space();
+
             if (RadialInactiveRange)
             {
                 if (!EditorGUILayout.Toggle("無効領域を設定", true))

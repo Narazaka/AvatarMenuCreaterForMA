@@ -126,6 +126,7 @@ namespace net.narazaka.avatarmenucreator.editor
                         },
                         value = AvatarMenu.RadialDefaultValue,
                         labels = new VRCExpressionsMenu.Control.Label[] { },
+                        icon = AvatarMenu.RadialIcon,
                     },
                 },
             };
