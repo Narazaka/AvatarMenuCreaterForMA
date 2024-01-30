@@ -138,19 +138,8 @@ namespace net.narazaka.avatarmenucreator.editor
                 if (string.IsNullOrEmpty(basePath)) return;
                 basePath = new System.Text.RegularExpressions.Regex(@"\.prefab").Replace(basePath, "");
                 var baseName = System.IO.Path.GetFileNameWithoutExtension(basePath);
-                CreateAvatarMenuBase createAvatarMenu;
-                if (MenuType == MenuType.Toggle)
-                {
-                    createAvatarMenu = CreateAvatarMenuBase.GetCreateAvatarMenu(AvatarToggleMenu);
-                }
-                else if (MenuType == MenuType.Choose)
-                {
-                    createAvatarMenu = CreateAvatarMenuBase.GetCreateAvatarMenu(AvatarChooseMenu);
-                }
-                else
-                {
-                    createAvatarMenu = CreateAvatarMenuBase.GetCreateAvatarMenu(AvatarRadialMenu);
-                }
+                AvatarMenuBase avatarMenu = MenuType == MenuType.Toggle ? AvatarToggleMenu : MenuType == MenuType.Choose ? AvatarChooseMenu : AvatarRadialMenu;
+                var createAvatarMenu = CreateAvatarMenuBase.GetCreateAvatarMenu(avatarMenu);
                 createAvatarMenu.CreateAssets(baseName, children).SaveAssets(IncludeAssetType, basePath);
                 SaveFolder = System.IO.Path.GetDirectoryName(basePath);
             }
