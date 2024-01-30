@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
@@ -345,6 +345,7 @@ namespace net.narazaka.avatarmenucreator
             if (ChooseMaterials.ContainsKey(key)) return;
             WillChange();
             ChooseMaterials[key] = new IntMaterialDictionary();
+            ChooseMaterials[key][0] = Util.GetMaterialSlots(GetGameObject(child))[index];
         }
 
         void RemoveChooseMaterial(string child, int index)
