@@ -13,9 +13,9 @@ namespace net.narazaka.avatarmenucreator.editor
         AvatarRadialMenu AvatarMenu;
         public CreateAvatarRadialMenu(AvatarRadialMenu avatarRadialMenu) => AvatarMenu = avatarRadialMenu;
 
-        public override CreatedAssets CreateAssets(string baseName, string[] children)
+        public override CreatedAssets CreateAssets(string baseName, IEnumerable<string> children = null)
         {
-            var matchGameObjects = new HashSet<string>(children);
+            var matchGameObjects = new HashSet<string>(children ?? AvatarMenu.GetStoredChildren());
             // clip
             var clip = new AnimationClip();
             clip.name = baseName;

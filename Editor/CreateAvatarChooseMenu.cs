@@ -14,9 +14,9 @@ namespace net.narazaka.avatarmenucreator.editor
         AvatarChooseMenu AvatarMenu;
         public CreateAvatarChooseMenu(AvatarChooseMenu avatarChooseMenu) => AvatarMenu = avatarChooseMenu;
 
-        public override CreatedAssets CreateAssets(string baseName, string[] children)
+        public override CreatedAssets CreateAssets(string baseName, IEnumerable<string> children = null)
         {
-            var matchGameObjects = new HashSet<string>(children);
+            var matchGameObjects = new HashSet<string>(children ?? AvatarMenu.GetStoredChildren());
             // clip
             var choices = Enumerable.Range(0, AvatarMenu.ChooseCount).Select(i => new AnimationClip { name = $"{baseName}_{i}" }).ToList();
             foreach (var child in AvatarMenu.ChooseObjects.Keys)

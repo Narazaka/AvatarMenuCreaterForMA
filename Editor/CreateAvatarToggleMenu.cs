@@ -12,9 +12,9 @@ namespace net.narazaka.avatarmenucreator.editor
         AvatarToggleMenu AvatarMenu;
         public CreateAvatarToggleMenu(AvatarToggleMenu avatarToggleMenu) => AvatarMenu = avatarToggleMenu;
 
-        public override CreatedAssets CreateAssets(string baseName, string[] children)
+        public override CreatedAssets CreateAssets(string baseName, IEnumerable<string> children = null)
         {
-            var matchGameObjects = new HashSet<string>(children);
+            var matchGameObjects = new HashSet<string>(children ?? AvatarMenu.GetStoredChildren());
             // clip
             var active = new AnimationClip();
             active.name = $"{baseName}_active";

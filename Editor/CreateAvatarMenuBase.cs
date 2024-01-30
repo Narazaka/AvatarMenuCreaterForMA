@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+
 namespace net.narazaka.avatarmenucreator.editor
 {
     public abstract class CreateAvatarMenuBase
@@ -17,6 +19,6 @@ namespace net.narazaka.avatarmenucreator.editor
             }
         }
 
-        public abstract CreatedAssets CreateAssets(string baseName, string[] children);
+        public abstract CreatedAssets CreateAssets(string baseName, IEnumerable<string> children = null);
     }
 }
