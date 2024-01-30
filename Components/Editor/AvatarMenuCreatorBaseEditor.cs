@@ -69,7 +69,7 @@ namespace net.narazaka.avatarmenucreator.components.editor
                 children = children.Where(c => !toFilters.Contains(c)).ToList();
             }
 
-            var newBulkSet = EditorGUILayout.ToggleLeft("同名パラメーターや同マテリアルスロットを一括設定", BulkSet);
+            var newBulkSet = EditorGUILayout.ToggleLeft("同名パラメーターや同マテリアルスロットを一括設定", BulkSet, BulkSet ? EditorStyles.boldLabel : EditorStyles.label);
             if (newBulkSet != BulkSet)
             {
                 UndoUtility.RecordObject(this, "BulkSet");
