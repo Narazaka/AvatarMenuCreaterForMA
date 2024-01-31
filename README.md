@@ -4,14 +4,17 @@ AvatarMenuCreator for Modular Avatar
 
 ## 概要
 
-Modular Avatarでアバターのメニューを構成出来るようにする補助アセットです。
+Modular Avatarでアバターのメニューを構成出来るようにする補助ツールです。
 
-アバターのメニュー1項目をModular Avatarの1プレハブとして作成します。
+アバターのメニュー1項目をModular Avatarの1コンポーネントまたは1プレハブとして作成します。
 
-- オブジェクト・マテリアル・BlendShape・シェーダーパラメーターのトグル/選択肢制御（Toggle）
-- BlendShape・シェーダーパラメーターの無段階調整（Radial Puppet）
+・オブジェクト・BlendShape・シェーダーパラメーターのトグル制御（BoolでのToggle）
+・オブジェクト・BlendShape・シェーダーパラメーター・マテリアルの選択制御（Intでの複数Toggle）
+・BlendShape・シェーダーパラメーターの無段階調整（FloatのRadial Puppet）
 
-に対応しています。
+等が可能です。
+
+NDMF（Modular Avatar 1.8.0以降）のコンポーネントによる非破壊操作に対応していますが、Modular Avatar 1.7.7以前のバージョンでも動作します（この場合プレハブ生成機能のみ）。
 
 ## インストール
 
@@ -30,11 +33,11 @@ Modular Avatarでアバターのメニューを構成出来るようにする補
 
 1. 「Tools」→「Modular Avatar」→「AvatarMenuCreator for Modular Avatar」をクリックし、ツールを立ち上げます。
 
-2. アバターをツールに設定し、アバター以下の制御したいオブジェクトを選択した状態でツールで処理を設定します。（オブジェクトを選択してもツールのウインドウにカーソルを合わせないと表示が変わらないかも）
+2. アバターをツールに設定し、アバター以下の制御したいオブジェクトを選択した状態でツールで処理を設定します。
 
-3. 「Create!」ボタンを押して保存場所を選択すれば、Modular AvatarのPrefabが出来上がります。
+3. 「Create!」ボタンを押して保存名を選択すれば、コンポーネントまたはModular AvatarのPrefabが出来上がります。
 
-4. Prefabをアバターの中（直下でなくても良い）に置けば、Modular Avatarによってメニューが統合されます。
+4. コンポーネントはアバターの中に生成されているためそのままで動作します。保存されたPrefabはアバターの中（直下でなくても良い）に置けば、Modular Avatarによってメニューが統合されます。
 
 ## 更新履歴
 
