@@ -49,7 +49,7 @@ namespace net.narazaka.avatarmenucreator.editor.util
         {
             var shapekeyNames = new List<string>();
             var mesh = gameObject.GetComponent<SkinnedMeshRenderer>();
-            if (mesh == null) return shapekeyNames;
+            if (mesh == null || mesh.sharedMesh == null) return shapekeyNames;
             for (var i = 0; i < mesh.sharedMesh.blendShapeCount; ++i)
             {
                 var name = mesh.sharedMesh.GetBlendShapeName(i);
