@@ -31,9 +31,7 @@ namespace net.narazaka.avatarmenucreator.components.editor
 
         public override void OnInspectorGUI()
         {
-            var maMergeAnimator = Creator.GetComponent<ModularAvatarMergeAnimator>();
-            var maParameters = Creator.GetComponent<ModularAvatarParameters>();
-            var hasAssets = maMergeAnimator != null || maParameters != null;
+            var hasAssets = !Creator.IsEffective;
             if (hasAssets)
             {
                 EditorGUILayout.HelpBox("MA Merge AnimatorまたはMA Parametersがある場合、 このコンポーネントは影響せずそれらの設定がそのまま使われます。", MessageType.Info);

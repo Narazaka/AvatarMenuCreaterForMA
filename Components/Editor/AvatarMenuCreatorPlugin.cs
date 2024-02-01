@@ -19,7 +19,7 @@ namespace net.narazaka.avatarmenucreator.components.editor
                 var creators = ctx.AvatarRootTransform.GetComponentsInChildren<AvatarMenuCreatorBase>();
                 foreach (var creator in creators)
                 {
-                    if (creator.GetComponent<ModularAvatarMergeAnimator>() != null || creator.GetComponent<ModularAvatarParameters>() != null) continue;
+                    if (!creator.IsEffective) continue;
                     CreateAvatarMenuBase.GetCreateAvatarMenu(creator.AvatarMenu).CreateAssets(creator.name).StoreAssets(creator.gameObject);
                 }
             });
