@@ -21,6 +21,7 @@ namespace net.narazaka.avatarmenucreator.components.editor
                 {
                     if (!creator.IsEffective) continue;
                     CreateAvatarMenuBase.GetCreateAvatarMenu(creator.AvatarMenu).CreateAssets(creator.name).StoreAssets(creator.gameObject);
+                    UnityEngine.Object.DestroyImmediate(creator);
                 }
             });
         }
