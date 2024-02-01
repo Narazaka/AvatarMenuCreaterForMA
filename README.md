@@ -41,6 +41,8 @@ NDMF（Modular Avatar 1.8.0以降）のコンポーネントによる非破壊�
 
 ## 更新履歴
 
+- 1.7.1
+  - Meshが空のSkinnedMeshRendererでエラーになる問題を修正（AAO Merge SkinnedMesh 等でエラーにならなくなります）
 - 1.7.0
   - 新機能
     - NDMFに対応
