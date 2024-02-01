@@ -41,6 +41,8 @@ NDMF（Modular Avatar 1.8.0以降）のコンポーネントによる非破壊�
 
 ## 更新履歴
 
+- 1.8.1
+  - Avatar Optimizerの警告を削減
 - 1.8.0
   - AvatarParametersDriver連携を追加（コンポーネントに設定したパラメーターが出るようになります）
 - 1.7.1
