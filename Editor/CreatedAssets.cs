@@ -5,6 +5,8 @@ using UnityEditor.Animations;
 using UnityEditor;
 using UnityEngine;
 using VRC.SDK3.Avatars.ScriptableObjects;
+using nadena.dev.modular_avatar.core;
+using VRC.SDK3.Avatars.Components;
 
 namespace net.narazaka.avatarmenucreator.editor
 {
@@ -15,24 +17,24 @@ namespace net.narazaka.avatarmenucreator.editor
         IEnumerable<AnimationClip> clips;
         VRCExpressionsMenu menu;
         VRCExpressionsMenu parentMenu;
-        Action<GameObject> modifyPrefab;
+        IEnumerable<ParameterConfig> parameters;
 
-        public CreatedAssets(string baseName, AnimatorController controller, IEnumerable<AnimationClip> clips, VRCExpressionsMenu menu, VRCExpressionsMenu parentMenu, Action<GameObject> modifyPrefab)
+        public CreatedAssets(string baseName, AnimatorController controller, IEnumerable<AnimationClip> clips, VRCExpressionsMenu menu, VRCExpressionsMenu parentMenu, IEnumerable<ParameterConfig> parameters)
         {
             this.baseName = baseName;
             this.controller = controller;
             this.clips = clips;
             this.menu = menu;
             this.parentMenu = parentMenu;
-            this.modifyPrefab = modifyPrefab;
+            this.parameters = parameters;
         }
 
-        public void StoreAssets(GameObject baseObject)
+        public void StoreAssets(GameObject baseObject, bool forceInstallMenu = true)
         {
-            modifyPrefab(baseObject);
+            StoreToPrefab(baseObject, forceInstallMenu);
         }
 
-        public void SaveAssets(IncludeAssetType includeAssetType, string basePath, Action<GameObject> addifionalModifyPrefab = null)
+        public void SaveAssets(IncludeAssetType includeAssetType, string basePath, Action<GameObject> addifionalModifyPrefab = null, bool forceInstallMenu = true)
         {
             // prefab
             var prefabPath = $"{basePath}.prefab";
@@ -46,12 +48,34 @@ namespace net.narazaka.avatarmenucreator.editor
             SaveAssets(includeAssetType, baseName, basePath, controller, clips, menu, parentMenu);
             prefab = PrefabUtility.LoadPrefabContents(prefabPath);
 
-            modifyPrefab(prefab);
+            StoreToPrefab(prefab, forceInstallMenu);
+
             if (addifionalModifyPrefab != null) addifionalModifyPrefab(prefab);
 
             PrefabUtility.SaveAsPrefabAsset(prefab, prefabPath);
             PrefabUtility.UnloadPrefabContents(prefab);
             AssetDatabase.SaveAssets();
+        }
+
+        void StoreToPrefab(GameObject prefab, bool forceInstallMenu)
+        {
+            var menuInstaller = prefab.GetComponent<ModularAvatarMenuInstaller>();
+            if (menuInstaller == null && forceInstallMenu)
+            {
+                menuInstaller = prefab.AddComponent<ModularAvatarMenuInstaller>();
+            }
+            if (menuInstaller != null)
+            {
+                menuInstaller.menuToAppend = parentMenu == null ? menu : parentMenu;
+            }
+            var maParameters = prefab.GetOrAddComponent<ModularAvatarParameters>();
+            maParameters.parameters.Clear();
+            maParameters.parameters.AddRange(parameters);
+            var mergeAnimator = prefab.GetOrAddComponent<ModularAvatarMergeAnimator>();
+            mergeAnimator.animator = controller;
+            mergeAnimator.layerType = VRCAvatarDescriptor.AnimLayerType.FX;
+            mergeAnimator.pathMode = MergeAnimatorPathMode.Absolute;
+            mergeAnimator.matchAvatarWriteDefaults = true;
         }
 
         static void SaveAssets(IncludeAssetType includeAssetType, string baseName, string basePath, AnimatorController controller, IEnumerable<AnimationClip> clips, VRCExpressionsMenu menu, VRCExpressionsMenu parentMenu = null)

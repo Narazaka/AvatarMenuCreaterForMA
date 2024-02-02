@@ -150,24 +150,15 @@ namespace net.narazaka.avatarmenucreator.editor
                 },
             };
             parentMenu.name = $"{baseName}_parent";
-            return new CreatedAssets(baseName, controller, choices, menu, parentMenu, (prefab) =>
+            return new CreatedAssets(baseName, controller, choices, menu, parentMenu, new ParameterConfig[]
             {
-                var menuInstaller = prefab.GetOrAddComponent<ModularAvatarMenuInstaller>();
-                menuInstaller.menuToAppend = parentMenu;
-                var parameters = prefab.GetOrAddComponent<ModularAvatarParameters>();
-                parameters.parameters.Clear();
-                parameters.parameters.Add(new ParameterConfig
+                new ParameterConfig
                 {
                     nameOrPrefix = baseName,
                     defaultValue = AvatarMenu.ChooseDefaultValue,
                     syncType = ParameterSyncType.Int,
                     saved = AvatarMenu.Saved,
-                });
-                var mergeAnimator = prefab.GetOrAddComponent<ModularAvatarMergeAnimator>();
-                mergeAnimator.animator = controller;
-                mergeAnimator.layerType = VRCAvatarDescriptor.AnimLayerType.FX;
-                mergeAnimator.pathMode = MergeAnimatorPathMode.Absolute;
-                mergeAnimator.matchAvatarWriteDefaults = true;
+                },
             });
         }
     }

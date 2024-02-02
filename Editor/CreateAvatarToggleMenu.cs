@@ -202,24 +202,15 @@ namespace net.narazaka.avatarmenucreator.editor
                 },
             };
             menu.name = baseName;
-            return new CreatedAssets(baseName, controller, AvatarMenu.TransitionSeconds > 0 ? new AnimationClip[] { active, inactive, activate, inactivate } : new AnimationClip[] { active, inactive }, menu, null, (prefab) =>
+            return new CreatedAssets(baseName, controller, AvatarMenu.TransitionSeconds > 0 ? new AnimationClip[] { active, inactive, activate, inactivate } : new AnimationClip[] { active, inactive }, menu, null, new ParameterConfig[]
             {
-                var menuInstaller = prefab.GetOrAddComponent<ModularAvatarMenuInstaller>();
-                menuInstaller.menuToAppend = menu;
-                var parameters = prefab.GetOrAddComponent<ModularAvatarParameters>();
-                parameters.parameters.Clear();
-                parameters.parameters.Add(new ParameterConfig
+                new ParameterConfig
                 {
                     nameOrPrefix = baseName,
                     defaultValue = AvatarMenu.ToggleDefaultValue ? 1 : 0,
                     syncType = ParameterSyncType.Bool,
                     saved = AvatarMenu.Saved,
-                });
-                var mergeAnimator = prefab.GetOrAddComponent<ModularAvatarMergeAnimator>();
-                mergeAnimator.animator = controller;
-                mergeAnimator.layerType = VRCAvatarDescriptor.AnimLayerType.FX;
-                mergeAnimator.pathMode = MergeAnimatorPathMode.Absolute;
-                mergeAnimator.matchAvatarWriteDefaults = true;
+                },
             });
         }
     }
