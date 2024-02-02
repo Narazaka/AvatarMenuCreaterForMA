@@ -7,6 +7,7 @@ using UnityEngine;
 using VRC.SDK3.Avatars.ScriptableObjects;
 using nadena.dev.modular_avatar.core;
 using VRC.SDK3.Avatars.Components;
+using net.narazaka.avatarmenucreator.editor.util;
 
 namespace net.narazaka.avatarmenucreator.editor
 {
@@ -29,12 +30,12 @@ namespace net.narazaka.avatarmenucreator.editor
             this.parameters = parameters;
         }
 
-        public void StoreAssets(GameObject baseObject, bool forceInstallMenu = true)
+        public void StoreAssets(GameObject baseObject, bool isMenuInstaller = true)
         {
-            StoreToPrefab(baseObject, forceInstallMenu);
+            StoreToPrefab(baseObject, isMenuInstaller);
         }
 
-        public void SaveAssets(IncludeAssetType includeAssetType, string basePath, Action<GameObject> addifionalModifyPrefab = null, bool forceInstallMenu = true)
+        public void SaveAssets(IncludeAssetType includeAssetType, string basePath, Action<GameObject> addifionalModifyPrefab = null, bool isMenuInstaller = true)
         {
             // prefab
             var prefabPath = $"{basePath}.prefab";
@@ -48,7 +49,7 @@ namespace net.narazaka.avatarmenucreator.editor
             SaveAssets(includeAssetType, baseName, basePath, controller, clips, menu, parentMenu);
             prefab = PrefabUtility.LoadPrefabContents(prefabPath);
 
-            StoreToPrefab(prefab, forceInstallMenu);
+            StoreToPrefab(prefab, isMenuInstaller);
 
             if (addifionalModifyPrefab != null) addifionalModifyPrefab(prefab);
 
@@ -57,14 +58,20 @@ namespace net.narazaka.avatarmenucreator.editor
             AssetDatabase.SaveAssets();
         }
 
-        void StoreToPrefab(GameObject prefab, bool forceInstallMenu)
+        void StoreToPrefab(GameObject prefab, bool isMenuInstaller)
         {
             var menuInstaller = prefab.GetComponent<ModularAvatarMenuInstaller>();
-            if (menuInstaller == null && forceInstallMenu)
+            if (menuInstaller == null && isMenuInstaller)
             {
                 menuInstaller = prefab.AddComponent<ModularAvatarMenuInstaller>();
             }
-            if (menuInstaller != null)
+            if (menuInstaller == null)
+            {
+                var menuItem = prefab.GetOrAddComponent<ModularAvatarMenuItem>();
+                menuItem.Control = (parentMenu == null ? menu : parentMenu).controls[0].DeepCopy();
+                menuItem.MenuSource = SubmenuSource.MenuAsset;
+            }
+            else
             {
                 menuInstaller.menuToAppend = parentMenu == null ? menu : parentMenu;
             }
