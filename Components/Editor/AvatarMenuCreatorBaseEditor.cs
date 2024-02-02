@@ -31,6 +31,8 @@ namespace net.narazaka.avatarmenucreator.components.editor
 
         public override void OnInspectorGUI()
         {
+            var baseObject = GetParentAvatar();
+
             var hasAssets = !Creator.IsEffective;
             if (hasAssets)
             {
@@ -43,9 +45,11 @@ namespace net.narazaka.avatarmenucreator.components.editor
                 {
                     EditorGUILayout.HelpBox("MA Menu Installerのプレハブ開発者向け設定/インストールされるメニューが設定されていますが、無視されます。", MessageType.Warning);
                 }
+
+                EditorGUILayout.HelpBox("MA Menu Installerのインストール先にインストールされます。\nMA Menu Installer が無い場合は MA Menu Item のように振る舞います。 （ネストしたメニューなどに便利）", MessageType.Info);
             }
 
-            if (PrefabUtility.GetOutermostPrefabInstanceRoot(Creator.gameObject) == Creator.gameObject/* || !string.IsNullOrEmpty(AssetDatabase.GetAssetPath(Creator.gameObject))*/)
+            if (PrefabUtility.GetOutermostPrefabInstanceRoot(Creator.gameObject) == Creator.gameObject)
             {
                 if (FoldoutSave = EditorGUILayout.Foldout(FoldoutSave, "アセット生成（オプショナル）"))
                 {
@@ -87,8 +91,20 @@ namespace net.narazaka.avatarmenucreator.components.editor
                 }
                 EditorGUILayout.Space();
             }
+            else if (baseObject != null)
+            {
+                if (FoldoutSave = EditorGUILayout.Foldout(FoldoutSave, "アセット生成（オプショナル）"))
+                {
+                    EditorGUILayout.HelpBox("このオブジェクトをprefabにすると手動編集用にアセットを生成できます", MessageType.Info);
+                }
+                EditorGUILayout.Space();
+            }
 
-            var baseObject = GetParentAvatar();
+            if (baseObject == null)
+            {
+                EditorGUILayout.HelpBox("このコンポーネントが正しく動作するには、アバター内に配置する必要があります。", MessageType.Warning);
+            }
+
             if (baseObject != null)
             {
                 var child = EditorGUILayout.ObjectField("オブジェクトを追加", null, typeof(GameObject), true) as GameObject;
