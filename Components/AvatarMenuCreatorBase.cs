@@ -8,7 +8,6 @@ using VRC.SDKBase;
 namespace net.narazaka.avatarmenucreator.components
 {
     [DisallowMultipleComponent]
-    [RequireComponent(typeof(ModularAvatarMenuInstaller))]
     public abstract class AvatarMenuCreatorBase : MonoBehaviour, IEditorOnly
 #if NET_NARAZAKA_VRCHAT_AvatarMenuCreator_HAS_AvatarParametersDriver
         , net.narazaka.vrchat.avatar_parameters_driver.IParameterNameAndTypesProvider

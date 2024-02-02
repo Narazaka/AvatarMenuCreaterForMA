@@ -1,4 +1,5 @@
 #if NET_NARAZAKA_VRCHAT_AvatarMenuCreator_HAS_NDMF
+using nadena.dev.modular_avatar.core;
 using net.narazaka.avatarmenucreator.components;
 #endif
 using net.narazaka.avatarmenucreator.editor.util;
@@ -35,18 +36,21 @@ namespace net.narazaka.avatarmenucreator.editor
                     {
                         var creator = obj.GetOrAddComponent<AvatarToggleMenuCreator>();
                         creator.AvatarToggleMenu = a.DeepCopy();
+                        obj.GetOrAddComponent<ModularAvatarMenuInstaller>();
                         return creator;
                     }
                 case AvatarChooseMenu a:
                     {
                         var creator = obj.GetOrAddComponent<AvatarChooseMenuCreator>();
                         creator.AvatarChooseMenu = a.DeepCopy();
+                        obj.GetOrAddComponent<ModularAvatarMenuInstaller>();
                         return creator;
                     }
                 case AvatarRadialMenu a:
                     {
                         var creator = obj.GetOrAddComponent<AvatarRadialMenuCreator>();
                         creator.AvatarRadialMenu = a.DeepCopy();
+                        obj.GetOrAddComponent<ModularAvatarMenuInstaller>();
                         return creator;
                     }
                 default:
