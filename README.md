@@ -41,6 +41,8 @@ NDMF（Modular Avatar 1.8.0以降）のコンポーネントによる非破壊�
 
 ## 更新履歴
 
+- 1.9.0
+  - コンポーネントでMenuInstallerを削除するとMenuItemとして振る舞うように
 - 1.8.1
   - Avatar Optimizerの警告を削減
 - 1.8.0
