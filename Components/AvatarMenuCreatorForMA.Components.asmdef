@@ -3,7 +3,8 @@
     "references": [
         "AvatarMenuCreatorForMA.Core",
         "nadena.dev.modular-avatar.core",
-        "AvatarParametersDriver.Runtime"
+        "AvatarParametersDriver.Runtime",
+        "Narazaka.VRChat.AvatarParametersUtil"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],
@@ -24,6 +25,11 @@
             "name": "net.narazaka.vrchat.avatar-parameters-driver",
             "expression": "[1.1.0,2)",
             "define": "NET_NARAZAKA_VRCHAT_AvatarMenuCreator_HAS_AvatarParametersDriver"
+        },
+        {
+            "name": "net.narazaka.vrchat.avatar-parameters-util",
+            "expression": "[1.0.0,2)",
+            "define": "NET_NARAZAKA_VRCHAT_AvatarMenuCreator_HAS_AvatarParametersUtil"
         }
     ],
     "noEngineReferences": false

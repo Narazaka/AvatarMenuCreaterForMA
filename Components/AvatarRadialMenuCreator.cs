@@ -9,7 +9,7 @@ namespace net.narazaka.avatarmenucreator.components
         [SerializeField]
         public AvatarRadialMenu AvatarRadialMenu = new AvatarRadialMenu();
         public override AvatarMenuBase AvatarMenu => AvatarRadialMenu;
-#if NET_NARAZAKA_VRCHAT_AvatarMenuCreator_HAS_AvatarParametersDriver
+
         public override IEnumerable<VRCExpressionParameters.Parameter> GetEffectiveParameterNameAndTypes()
         {
             return new VRCExpressionParameters.Parameter[]
@@ -24,6 +24,5 @@ namespace net.narazaka.avatarmenucreator.components
                 },
             };
         }
-#endif
     }
 }

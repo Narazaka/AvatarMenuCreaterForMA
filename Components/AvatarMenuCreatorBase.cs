@@ -9,7 +9,9 @@ namespace net.narazaka.avatarmenucreator.components
 {
     [DisallowMultipleComponent]
     public abstract class AvatarMenuCreatorBase : MonoBehaviour, IEditorOnly
-#if NET_NARAZAKA_VRCHAT_AvatarMenuCreator_HAS_AvatarParametersDriver
+#if NET_NARAZAKA_VRCHAT_AvatarMenuCreator_HAS_AvatarParametersUtil
+        , Narazaka.VRChat.AvatarParametersUtil.IParameterNameAndTypesProvider
+#elif NET_NARAZAKA_VRCHAT_AvatarMenuCreator_HAS_AvatarParametersDriver
         , net.narazaka.vrchat.avatar_parameters_driver.IParameterNameAndTypesProvider
 #endif
     {
@@ -17,7 +19,6 @@ namespace net.narazaka.avatarmenucreator.components
 
         public bool IsEffective => GetComponent<ModularAvatarMergeAnimator>() == null && GetComponent<ModularAvatarParameters>() == null;
 
-#if NET_NARAZAKA_VRCHAT_AvatarMenuCreator_HAS_AvatarParametersDriver
         public IEnumerable<VRCExpressionParameters.Parameter> GetParameterNameAndTypes()
         {
             if (IsEffective)
@@ -31,6 +32,5 @@ namespace net.narazaka.avatarmenucreator.components
         }
 
         public abstract IEnumerable<VRCExpressionParameters.Parameter> GetEffectiveParameterNameAndTypes();
-#endif
     }
 }
