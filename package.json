@@ -12,7 +12,7 @@
   "url" : "https://github.com/Narazaka/AvatarMenuCreaterForMA.git",
   "vpmDependencies": {
     "com.vrchat.avatars": ">=3.0.9",
-    "nadena.dev.modular-avatar": ">=1.0.0"
+    "nadena.dev.modular-avatar": ">=1.0.0 <2.0.0-a"
   },
   "legacyFolders": {
     "Assets\\AvatarMenuCreaterForMA": "095273a7f0d90e54aa2e0b3b202fa526"

@@ -17,12 +17,12 @@
     "versionDefines": [
         {
             "name": "nadena.dev.ndmf",
-            "expression": "1.0.0",
+            "expression": "[1.0.0,2)",
             "define": "NET_NARAZAKA_VRCHAT_AvatarMenuCreator_HAS_NDMF"
         },
         {
             "name": "net.narazaka.vrchat.avatar-parameters-driver",
-            "expression": "1.1.0",
+            "expression": "[1.1.0,2)",
             "define": "NET_NARAZAKA_VRCHAT_AvatarMenuCreator_HAS_AvatarParametersDriver"
         }
     ],
