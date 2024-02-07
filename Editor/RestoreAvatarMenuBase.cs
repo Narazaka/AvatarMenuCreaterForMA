@@ -98,7 +98,7 @@ namespace net.narazaka.avatarmenucreator.editor
 
         protected void Assert(bool condition, string message)
         {
-            if (!condition) throw new System.ArgumentException(message);
+            if (!condition) throw new AssertException(message);
         }
 
         protected string ParameterName => ParameterConfig.nameOrPrefix;

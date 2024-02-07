@@ -43,8 +43,8 @@ namespace net.narazaka.avatarmenucreator.editor
                     {
                         Inactive = bindingGroup.GetCurve(Postfix.inactive)[0].value,
                         Active = bindingGroup.GetCurve(Postfix.active)[0].value,
-                        TransitionOffsetPercent = hasTransitionSeconds ? bindingGroup.GetCurve(Postfix.activate)[0].time / avatarMenu.TransitionSeconds : 0,
-                        TransitionDurationPercent = hasTransitionSeconds ? (bindingGroup.GetCurve(Postfix.activate)[1].time - bindingGroup.GetCurve(Postfix.activate)[0].time) / avatarMenu.TransitionSeconds : 100,
+                        TransitionOffsetPercent = hasTransitionSeconds ? bindingGroup.GetCurve(Postfix.activate)[0].time / avatarMenu.TransitionSeconds * 100 : 0,
+                        TransitionDurationPercent = hasTransitionSeconds ? (bindingGroup.GetCurve(Postfix.activate)[1].time - bindingGroup.GetCurve(Postfix.activate)[0].time) / avatarMenu.TransitionSeconds * 100 : 100,
                     };
                 }
                 else if (info.IsShaderParameter)
@@ -53,8 +53,8 @@ namespace net.narazaka.avatarmenucreator.editor
                     {
                         Inactive = bindingGroup.GetCurve(Postfix.inactive)[0].value,
                         Active = bindingGroup.GetCurve(Postfix.active)[0].value,
-                        TransitionOffsetPercent = hasTransitionSeconds ? bindingGroup.GetCurve(Postfix.activate)[0].time / avatarMenu.TransitionSeconds : 0,
-                        TransitionDurationPercent = hasTransitionSeconds ? (bindingGroup.GetCurve(Postfix.activate)[1].time - bindingGroup.GetCurve(Postfix.activate)[0].time) / avatarMenu.TransitionSeconds : 100,
+                        TransitionOffsetPercent = hasTransitionSeconds ? bindingGroup.GetCurve(Postfix.activate)[0].time / avatarMenu.TransitionSeconds * 100 : 0,
+                        TransitionDurationPercent = hasTransitionSeconds ? (bindingGroup.GetCurve(Postfix.activate)[1].time - bindingGroup.GetCurve(Postfix.activate)[0].time) / avatarMenu.TransitionSeconds * 100 : 100,
                     };
                 }
             }

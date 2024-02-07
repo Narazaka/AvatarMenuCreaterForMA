@@ -7,7 +7,6 @@ using net.narazaka.avatarmenucreator.editor.util;
 using nadena.dev.modular_avatar.core;
 using net.narazaka.avatarmenucreator.editor;
 using System;
-using System.ComponentModel;
 
 namespace net.narazaka.avatarmenucreator.components.editor
 {
@@ -22,8 +21,6 @@ namespace net.narazaka.avatarmenucreator.components.editor
         List<string> Children;
         [NonSerialized]
         bool FoldoutSave;
-        [NonSerialized]
-        bool FoldoutRestore;
 
         void OnEnable()
         {
@@ -90,17 +87,11 @@ namespace net.narazaka.avatarmenucreator.components.editor
                         {
                             EditorGUILayout.HelpBox("手動編集用にアセットを生成できます", MessageType.Info);
                         }
-                        if (FoldoutRestore = EditorGUILayout.Foldout(FoldoutRestore, "アセットから設定を復元（オプショナル）"))
+                        if (GUILayout.Button("アセット内容から設定を復元") && Restore(Creator.gameObject))
                         {
-                            using (new EditorGUI.IndentLevelScope())
-                            {
-                                if (GUILayout.Button("アセット内容から設定を復元") && Restore())
-                                {
-                                    return;
-                                }
-                                EditorGUILayout.HelpBox("アセットを手動で編集していた場合などは正確な復元にならない可能性があります。", MessageType.Warning);
-                            }
+                            return;
                         }
+                        EditorGUILayout.HelpBox("アセットを手動で編集していた場合などは正確な復元にならない可能性があります。", MessageType.Warning);
                     }
                 }
                 EditorGUILayout.Space();
@@ -182,75 +173,97 @@ namespace net.narazaka.avatarmenucreator.components.editor
             return Creator.GetComponentInParent<VRCAvatarDescriptor>()?.gameObject;
         }
 
-        bool Restore()
+        [MenuItem("CONTEXT/ModularAvatarParameters/AvatarMenuCreator for MA/アセット内容から設定を復元")]
+        [MenuItem("CONTEXT/ModularAvatarMergeAnimator/AvatarMenuCreator for MA/アセット内容から設定を復元")]
+        static void RestoreFromMenu(MenuCommand command)
+        {
+            var creator = command.context as Component;
+            if (creator == null) return;
+            Restore(creator.gameObject);
+        }
+
+        static bool Restore(GameObject gameObject)
         {
             try
             {
-                var avatarMenuBase = RestoreAvatarMenuBase<AvatarMenuBase>.RestoreAssets(Creator.gameObject);
+                var avatarMenuBase = RestoreAvatarMenuBase<AvatarMenuBase>.RestoreAssets(gameObject);
+                var creator = gameObject.GetComponent<AvatarMenuCreatorBase>();
+                if (creator == null)
+                {
+                    creator = CreateAvatarMenuBase.GetOrAddMenuCreatorComponentOnly(gameObject, avatarMenuBase);
+                }
+
                 if (avatarMenuBase != null)
                 {
-                    UndoUtility.RecordObject(Creator, "Restore Assets");
+                    UndoUtility.RecordObject(creator, "Restore Assets");
                     if (avatarMenuBase is AvatarToggleMenu avatarMenu)
                     {
-                        if (Creator is AvatarToggleMenuCreator toggleMenuCreator)
+                        if (creator is AvatarToggleMenuCreator toggleMenuCreator)
                         {
-                            UndoUtility.RecordObject(Creator, "Restore Assets");
+                            UndoUtility.RecordObject(creator, "Restore Assets");
                             toggleMenuCreator.AvatarToggleMenu = avatarMenu;
+                            EditorUtility.DisplayDialog("成功", "復元に成功しました", "OK");
                             return true;
                         }
                         else
                         {
                             if (EditorUtility.DisplayDialog("警告", "今のコンポーネントと別のコンポーネントに置き換わります。\n続行しますか？", "OK", "Cancel"))
                             {
-                                UndoUtility.RecordObject(Creator, "Restore Assets destroy component");
-                                var go = Creator.gameObject;
-                                DestroyImmediate(Creator);
+                                UndoUtility.RecordObject(creator, "Restore Assets destroy component");
+                                var go = creator.gameObject;
+                                DestroyImmediate(creator);
                                 var component = go.AddComponent<AvatarToggleMenuCreator>();
                                 component.AvatarToggleMenu = avatarMenu;
                                 Undo.RegisterCreatedObjectUndo(component, "Restore Assets create component");
+                                EditorUtility.DisplayDialog("成功", "復元に成功しました", "OK");
                                 return true;
                             }
                         }
                     }
                     else if (avatarMenuBase is AvatarChooseMenu avatarChooseMenu)
                     {
-                        if (Creator is AvatarChooseMenuCreator chooseMenuCreator)
+                        if (creator is AvatarChooseMenuCreator chooseMenuCreator)
                         {
-                            UndoUtility.RecordObject(Creator, "Restore Assets");
+                            UndoUtility.RecordObject(creator, "Restore Assets");
                             chooseMenuCreator.AvatarChooseMenu = avatarChooseMenu;
+                            EditorUtility.DisplayDialog("成功", "復元に成功しました", "OK");
                             return true;
                         }
                         else
                         {
                             if (EditorUtility.DisplayDialog("警告", "今のコンポーネントと別のコンポーネントに置き換わります。\n続行しますか？", "OK", "Cancel"))
                             {
-                                UndoUtility.RecordObject(Creator, "Restore Assets destroy component");
-                                var go = Creator.gameObject;
-                                DestroyImmediate(Creator);
+                                UndoUtility.RecordObject(creator, "Restore Assets destroy component");
+                                var go = creator.gameObject;
+                                DestroyImmediate(creator);
                                 var component = go.AddComponent<AvatarChooseMenuCreator>();
                                 component.AvatarChooseMenu = avatarChooseMenu;
                                 Undo.RegisterCreatedObjectUndo(component, "Restore Assets create component");
+                                EditorUtility.DisplayDialog("成功", "復元に成功しました", "OK");
                                 return true;
                             }
                         }
                     }
                     else if (avatarMenuBase is AvatarRadialMenu avatarRadialMenu)
                     {
-                        if (Creator is AvatarRadialMenuCreator radialMenuCreator)
+                        if (creator is AvatarRadialMenuCreator radialMenuCreator)
                         {
-                            UndoUtility.RecordObject(Creator, "Restore Assets");
+                            UndoUtility.RecordObject(creator, "Restore Assets");
                             radialMenuCreator.AvatarRadialMenu = avatarRadialMenu;
+                            EditorUtility.DisplayDialog("成功", "復元に成功しました", "OK");
+                            return true;
                         }
                         else
                         {
                             if (EditorUtility.DisplayDialog("警告", "今のコンポーネントと別のコンポーネントに置き換わります。\n続行しますか？", "OK", "Cancel"))
                             {
-                                UndoUtility.RecordObject(Creator, "Restore Assets destroy component");
-                                var go = Creator.gameObject;
-                                DestroyImmediate(Creator);
+                                UndoUtility.RecordObject(creator, "Restore Assets destroy component");
+                                var go = creator.gameObject;
+                                DestroyImmediate(creator);
                                 var component = go.AddComponent<AvatarRadialMenuCreator>();
                                 component.AvatarRadialMenu = avatarRadialMenu;
                                 Undo.RegisterCreatedObjectUndo(component, "Restore Assets create component");
+                                EditorUtility.DisplayDialog("成功", "復元に成功しました", "OK");
                                 return true;
                             }
                         }
@@ -261,9 +274,14 @@ namespace net.narazaka.avatarmenucreator.components.editor
                     EditorUtility.DisplayDialog("復元に失敗しました", "適切な復元法が見つかりません", "OK");
                 }
             }
+            catch (AssertException e)
+            {
+                EditorUtility.DisplayDialog("復元に失敗しました", e.Message, "OK");
+            }
             catch (Exception e)
             {
-                EditorUtility.DisplayDialog("復元に失敗しました", e.ToString(), "OK");
+                EditorUtility.DisplayDialog("復元に失敗しました", $"想定外エラーです\nツール作者 @narazaka にスクリーンショットを添えて連絡して下さい\n\n{e}", "OK");
+                Debug.LogError(e);
             }
             return false;
         }

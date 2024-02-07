@@ -34,7 +34,7 @@ namespace net.narazaka.avatarmenucreator.editor
             }
 
 
-            var bindingGroups = MakeBindingGroups(values);
+            var bindingGroups = MakeBindingGroups(values.Cast<object>().ToArray());
             foreach (var info in bindingGroups.Keys)
             {
                 var bindingGroup = bindingGroups[info];

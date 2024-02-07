@@ -30,27 +30,31 @@ namespace net.narazaka.avatarmenucreator.editor
 #if NET_NARAZAKA_VRCHAT_AvatarMenuCreator_HAS_NDMF
         public static AvatarMenuCreatorBase GetOrAddMenuCreatorComponent(GameObject obj, AvatarMenuBase avatarMenu)
         {
+            var creator = GetOrAddMenuCreatorComponentOnly(obj, avatarMenu);
+            creator.gameObject.GetOrAddComponent<ModularAvatarMenuInstaller>();
+            return creator;
+        }
+
+        public static AvatarMenuCreatorBase GetOrAddMenuCreatorComponentOnly(GameObject obj, AvatarMenuBase avatarMenu)
+        {
             switch (avatarMenu)
             {
                 case AvatarToggleMenu a:
                     {
                         var creator = obj.GetOrAddComponent<AvatarToggleMenuCreator>();
                         creator.AvatarToggleMenu = a.DeepCopy();
-                        obj.GetOrAddComponent<ModularAvatarMenuInstaller>();
                         return creator;
                     }
                 case AvatarChooseMenu a:
                     {
                         var creator = obj.GetOrAddComponent<AvatarChooseMenuCreator>();
                         creator.AvatarChooseMenu = a.DeepCopy();
-                        obj.GetOrAddComponent<ModularAvatarMenuInstaller>();
                         return creator;
                     }
                 case AvatarRadialMenu a:
                     {
                         var creator = obj.GetOrAddComponent<AvatarRadialMenuCreator>();
                         creator.AvatarRadialMenu = a.DeepCopy();
-                        obj.GetOrAddComponent<ModularAvatarMenuInstaller>();
                         return creator;
                     }
                 default:

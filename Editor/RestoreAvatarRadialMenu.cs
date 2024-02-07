@@ -40,11 +40,9 @@ namespace net.narazaka.avatarmenucreator.editor
                         avatarMenu.RadialInactiveRangeMax = transition.conditions[0].threshold;
                     }
                 }
-                avatarMenu.RadialInactiveRangeMin = Transition(Postfix.inactive, null).conditions[0].threshold;
-                avatarMenu.RadialInactiveRangeMax = Transition(null, Postfix.inactive).conditions[0].threshold;
             }
 
-            var bindingGroups = MakeBindingGroups(null);
+            var bindingGroups = MakeBindingGroups(new object[] { null });
             foreach (var info in bindingGroups.Keys)
             {
                 var bindingGroup = bindingGroups[info];
@@ -71,13 +69,13 @@ namespace net.narazaka.avatarmenucreator.editor
         public override void CheckAssets()
         {
             base.CheckAssets();
-            Assert(MenuControl.parameter.name == ParameterName, "VRCExpressionsMenuのパラメーター名とMA Parametersのパラメーター名が一致するべきです");
+            Assert(MenuControl.GetSubParameter(0)?.name == ParameterName, "VRCExpressionsMenuのパラメーター名とMA Parametersのパラメーター名が一致するべきです");
             Assert(MenuControl.type == VRCExpressionsMenu.Control.ControlType.RadialPuppet, "VRCExpressionsMenuのタイプはRadialPuppetであるべきです");
             Assert(Animator.parameters[0].type == AnimatorControllerParameterType.Float, "Animatorのパラメーター型はFloatであるべきです");
             Assert(ParameterConfig.syncType == ParameterSyncType.Float, "MA Parametersのパラメーター型はFloatであるべきです");
             Assert(Clip(null) != null, "AnimatorのStateには連続変化モーションが必要です");
-            Assert(State(null).speedParameterActive, "連続変化のspeedParameterはtrueであるべきです");
-            Assert(State(null).speedParameter == ParameterName, "連続変化のspeedParameter名とMA Parametersのパラメーター名が一致するべきです");
+            Assert(State(null).timeParameterActive, "連続変化のtimeParameterがチェックされているべきです");
+            Assert(State(null).timeParameter == ParameterName, "連続変化のtimeParameter名とMA Parametersのパラメーター名が一致するべきです");
 
             if (State(Postfix.inactive) != null)
             {
