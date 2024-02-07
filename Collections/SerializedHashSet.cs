@@ -18,6 +18,7 @@ namespace net.narazaka.avatarmenucreator.collections
         public bool Remove(V value) => hashSet.Remove(value);
         public void Clear() => hashSet.Clear();
         public bool Contains(V value) => hashSet.Contains(value);
+        public void UnionWith(IEnumerable<V> other) => hashSet.UnionWith(other);
 
         public void OnAfterDeserialize()
         {
