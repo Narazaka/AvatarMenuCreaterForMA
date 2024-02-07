@@ -153,13 +153,16 @@ namespace net.narazaka.avatarmenucreator.editor
 #endif
             if (isComponent)
             {
-                var newMakeMultipleObjects = EditorGUILayout.ToggleLeft("選択オブジェクト一つごとにメニューを作成", MakeMultipleObjects);
-                if (newMakeMultipleObjects != MakeMultipleObjects)
+                if (MenuType != MenuType.Choose)
                 {
-                    UndoUtility.RecordObject(this, "MakeMultipleObjects");
-                    MakeMultipleObjects = newMakeMultipleObjects;
+                    var newMakeMultipleObjects = EditorGUILayout.ToggleLeft("選択オブジェクト一つごとにメニューを作成", MakeMultipleObjects);
+                    if (newMakeMultipleObjects != MakeMultipleObjects)
+                    {
+                        UndoUtility.RecordObject(this, "MakeMultipleObjects");
+                        MakeMultipleObjects = newMakeMultipleObjects;
+                    }
                 }
-                if (!MakeMultipleObjects)
+                if (!MakeMultipleObjectsEffective)
                 {
                     var newBaseName = EditorGUILayout.TextField("名前", BaseName);
                     if (newBaseName != BaseName)
@@ -179,7 +182,7 @@ namespace net.narazaka.avatarmenucreator.editor
                     if (isComponent)
                     {
 #if NET_NARAZAKA_VRCHAT_AvatarMenuCreator_HAS_NDMF
-                        if (MakeMultipleObjects)
+                        if (MakeMultipleObjectsEffective)
                         {
                             foreach (var child in children)
                             {
@@ -214,6 +217,8 @@ namespace net.narazaka.avatarmenucreator.editor
                 }
             }
         }
+
+        public bool MakeMultipleObjectsEffective => MakeMultipleObjects && MenuType != MenuType.Choose;
 
 #if NET_NARAZAKA_VRCHAT_AvatarMenuCreator_HAS_NDMF
         public void SaveAsComponent(AvatarMenuBase avatarMenu, string baseName, string[] children)
