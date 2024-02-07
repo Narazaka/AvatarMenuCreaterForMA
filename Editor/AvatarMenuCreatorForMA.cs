@@ -64,9 +64,6 @@ namespace net.narazaka.avatarmenucreator.editor
             {
                 UndoUtility.RecordObject(this, "BulkSet");
                 BulkSet = newBulkSet;
-                AvatarToggleMenu.BulkSet = BulkSet;
-                AvatarChooseMenu.BulkSet = BulkSet;
-                AvatarRadialMenu.BulkSet = BulkSet;
             }
         }
 
@@ -122,6 +119,9 @@ namespace net.narazaka.avatarmenucreator.editor
             }
 
             ShowBulkSet();
+            AvatarToggleMenu.BulkSet = BulkSet;
+            AvatarChooseMenu.BulkSet = BulkSet;
+            AvatarRadialMenu.BulkSet = BulkSet;
             AvatarToggleMenu.BaseObject = VRCAvatarDescriptor.gameObject;
             AvatarChooseMenu.BaseObject = VRCAvatarDescriptor.gameObject;
             AvatarRadialMenu.BaseObject = VRCAvatarDescriptor.gameObject;
