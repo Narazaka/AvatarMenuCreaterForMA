@@ -187,6 +187,11 @@ namespace net.narazaka.avatarmenucreator.components.editor
             try
             {
                 var avatarMenuBase = RestoreAvatarMenuBase<AvatarMenuBase>.RestoreAssets(gameObject);
+                if (avatarMenuBase == null)
+                {
+                    EditorUtility.DisplayDialog("復元に失敗しました", "適切な復元法が見つかりません", "OK");
+                    return false;
+                }
                 var creator = gameObject.GetComponent<AvatarMenuCreatorBase>();
                 if (creator == null)
                 {
