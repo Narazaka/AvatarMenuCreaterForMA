@@ -34,6 +34,8 @@ namespace net.narazaka.avatarmenucreator.editor
 
         [SerializeField]
         string BaseName;
+        [SerializeField]
+        bool MakeMultipleObjects;
 
         string SaveFolder = "Assets";
 
@@ -151,14 +153,23 @@ namespace net.narazaka.avatarmenucreator.editor
 #endif
             if (isComponent)
             {
-                var newBaseName = EditorGUILayout.TextField("名前", BaseName);
-                if (newBaseName != BaseName)
+                var newMakeMultipleObjects = EditorGUILayout.ToggleLeft("選択オブジェクト一つごとにメニューを作成", MakeMultipleObjects);
+                if (newMakeMultipleObjects != MakeMultipleObjects)
                 {
-                    UndoUtility.RecordObject(this, "BaseName");
-                    BaseName = newBaseName;
+                    UndoUtility.RecordObject(this, "MakeMultipleObjects");
+                    MakeMultipleObjects = newMakeMultipleObjects;
+                }
+                if (!MakeMultipleObjects)
+                {
+                    var newBaseName = EditorGUILayout.TextField("名前", BaseName);
+                    if (newBaseName != BaseName)
+                    {
+                        UndoUtility.RecordObject(this, "BaseName");
+                        BaseName = newBaseName;
+                    }
                 }
             }
-            using (new EditorGUI.DisabledScope(isComponent && string.IsNullOrEmpty(BaseName)))
+            using (new EditorGUI.DisabledScope(isComponent && !MakeMultipleObjects && string.IsNullOrEmpty(BaseName)))
             {
                 if (GUILayout.Button("Create!"))
                 {
@@ -168,7 +179,17 @@ namespace net.narazaka.avatarmenucreator.editor
                     if (isComponent)
                     {
 #if NET_NARAZAKA_VRCHAT_AvatarMenuCreator_HAS_NDMF
-                        SaveAsComponent(avatarMenu, children);
+                        if (MakeMultipleObjects)
+                        {
+                            foreach (var child in children)
+                            {
+                                SaveAsComponent(avatarMenu, System.IO.Path.GetFileName(child), new string[] { child });
+                            }
+                        }
+                        else
+                        {
+                            SaveAsComponent(avatarMenu, BaseName, children);
+                        }
 #endif
                     }
                     else
@@ -195,9 +216,9 @@ namespace net.narazaka.avatarmenucreator.editor
         }
 
 #if NET_NARAZAKA_VRCHAT_AvatarMenuCreator_HAS_NDMF
-        public void SaveAsComponent(AvatarMenuBase avatarMenu, string[] children)
+        public void SaveAsComponent(AvatarMenuBase avatarMenu, string baseName, string[] children)
         {
-            var obj = new GameObject(BaseName);
+            var obj = new GameObject(baseName);
             var creator = CreateAvatarMenuBase.GetOrAddMenuCreatorComponent(obj, avatarMenu);
             creator.AvatarMenu.FilterStoredTargets(children);
             obj.transform.SetParent(VRCAvatarDescriptor.transform, false);
