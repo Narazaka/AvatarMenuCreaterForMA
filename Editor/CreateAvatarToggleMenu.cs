@@ -43,12 +43,12 @@ namespace net.narazaka.avatarmenucreator.editor
                 var value = AvatarMenu.ToggleBlendShapes[(child, name)];
                 var curvePath = child;
                 var curveName = $"blendShape.{name}";
-                active.SetCurve(curvePath, typeof(SkinnedMeshRenderer), curveName, new AnimationCurve(new Keyframe(0 / 60.0f, value.Active)));
-                inactive.SetCurve(curvePath, typeof(SkinnedMeshRenderer), curveName, new AnimationCurve(new Keyframe(0 / 60.0f, value.Inactive)));
+                active.SetCurve(curvePath, typeof(SkinnedMeshRenderer), curveName, value.ActiveCurve());
+                inactive.SetCurve(curvePath, typeof(SkinnedMeshRenderer), curveName, value.InactiveCurve());
                 if (AvatarMenu.TransitionSeconds > 0)
                 {
-                    activate.SetCurve(curvePath, typeof(SkinnedMeshRenderer), curveName, new AnimationCurve(new Keyframe(AvatarMenu.TransitionSeconds * value.ActivateStartRate, value.Inactive), new Keyframe(AvatarMenu.TransitionSeconds * value.ActivateEndRate, value.Active)));
-                    inactivate.SetCurve(curvePath, typeof(SkinnedMeshRenderer), curveName, new AnimationCurve(new Keyframe(AvatarMenu.TransitionSeconds * value.InactivateStartRate, value.Active), new Keyframe(AvatarMenu.TransitionSeconds * value.InactivateEndRate, value.Inactive)));
+                    activate.SetCurve(curvePath, typeof(SkinnedMeshRenderer), curveName, value.ActivateCurve(AvatarMenu.TransitionSeconds));
+                    inactivate.SetCurve(curvePath, typeof(SkinnedMeshRenderer), curveName, value.InactivateCurve(AvatarMenu.TransitionSeconds));
                 }
             }
             foreach (var (child, name) in AvatarMenu.ToggleShaderParameters.Keys)
@@ -57,12 +57,12 @@ namespace net.narazaka.avatarmenucreator.editor
                 var value = AvatarMenu.ToggleShaderParameters[(child, name)];
                 var curvePath = child;
                 var curveName = $"material.{name}";
-                active.SetCurve(curvePath, typeof(Renderer), curveName, new AnimationCurve(new Keyframe(0 / 60.0f, value.Active)));
-                inactive.SetCurve(curvePath, typeof(Renderer), curveName, new AnimationCurve(new Keyframe(0 / 60.0f, value.Inactive)));
+                active.SetCurve(curvePath, typeof(Renderer), curveName, value.ActiveCurve());
+                inactive.SetCurve(curvePath, typeof(Renderer), curveName, value.InactiveCurve());
                 if (AvatarMenu.TransitionSeconds > 0)
                 {
-                    activate.SetCurve(curvePath, typeof(Renderer), curveName, new AnimationCurve(new Keyframe(AvatarMenu.TransitionSeconds * value.ActivateStartRate, value.Inactive), new Keyframe(AvatarMenu.TransitionSeconds * value.ActivateEndRate, value.Active)));
-                    inactivate.SetCurve(curvePath, typeof(Renderer), curveName, new AnimationCurve(new Keyframe(AvatarMenu.TransitionSeconds * value.InactivateStartRate, value.Active), new Keyframe(AvatarMenu.TransitionSeconds * value.InactivateEndRate, value.Inactive)));
+                    activate.SetCurve(curvePath, typeof(Renderer), curveName, value.ActivateCurve(AvatarMenu.TransitionSeconds));
+                    inactivate.SetCurve(curvePath, typeof(Renderer), curveName, value.InactivateCurve(AvatarMenu.TransitionSeconds));
                 }
             }
             // controller
