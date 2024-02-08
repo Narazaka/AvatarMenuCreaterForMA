@@ -41,6 +41,8 @@ NDMF（Modular Avatar 1.8.0以降）のコンポーネントによる非破壊�
 
 ## 更新履歴
 
+- 1.11.0-beta.4
+  - マテリアル変更がSkinnedMeshRendererにしか適用されなかった問題を修正
 - 1.11.0-beta.3
   - 想定外エラーを低減
 - 1.11.0-beta.2
