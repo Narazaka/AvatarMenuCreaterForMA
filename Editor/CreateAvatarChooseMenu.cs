@@ -36,7 +36,7 @@ namespace net.narazaka.avatarmenucreator.editor
                 var curveName = $"m_Materials.Array.data[{index}]";
                 for (var i = 0; i < AvatarMenu.ChooseCount; ++i)
                 {
-                    AnimationUtility.SetObjectReferenceCurve(choices[i], EditorCurveBinding.PPtrCurve(curvePath, typeof(SkinnedMeshRenderer), curveName), new ObjectReferenceKeyframe[] { new ObjectReferenceKeyframe { time = 0, value = value.ContainsKey(i) ? value[i] : null } });
+                    AnimationUtility.SetObjectReferenceCurve(choices[i], EditorCurveBinding.PPtrCurve(curvePath, typeof(Renderer), curveName), new ObjectReferenceKeyframe[] { new ObjectReferenceKeyframe { time = 0, value = value.ContainsKey(i) ? value[i] : null } });
                 }
             }
             foreach (var (child, name) in AvatarMenu.ChooseBlendShapes.Keys)
