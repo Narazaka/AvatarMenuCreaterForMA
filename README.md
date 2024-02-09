@@ -41,6 +41,8 @@ NDMF（Modular Avatar 1.8.0以降）のコンポーネントによる非破壊�
 
 ## 更新履歴
 
+- 1.11.0-rc.3
+  - PC/AndroidでAnimatorのみ生成しないオプションを追加
 - 1.11.0-rc.2
   - AvatarParametersDriver連携をパラメーター名別指定に対応
 - 1.11.0-rc.1
