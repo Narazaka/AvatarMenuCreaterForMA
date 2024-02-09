@@ -24,10 +24,6 @@ namespace net.narazaka.avatarmenucreator
         public string ParameterName;
         [SerializeField]
         public bool InternalParameter = false;
-        [SerializeField]
-        public bool BuildPC = true;
-        [SerializeField]
-        public bool BuildQuest = true;
 
 #if UNITY_EDITOR
         [NonSerialized]
@@ -49,7 +45,6 @@ namespace net.narazaka.avatarmenucreator
         HashSet<string> FoldoutGameObjects = new HashSet<string>();
         Dictionary<string, HashSet<string>> FoldoutGroups = new Dictionary<string, HashSet<string>>();
         Vector2 ScrollPosition;
-        bool FoldoutPlatforms;
 
         protected Util.ShaderParametersCache ShaderParametersCache = new Util.ShaderParametersCache();
         Dictionary<string, GameObject> GameObjectCache = new Dictionary<string, GameObject>();
@@ -106,18 +101,6 @@ namespace net.narazaka.avatarmenucreator
         {
             ParameterName = TextField("パラメーター名(オプショナル)", ParameterName);
             InternalParameter = Toggle("パラメーター内部値", InternalParameter);
-        }
-
-        public void ShowPlatforms()
-        {
-            if (FoldoutPlatforms = EditorGUILayout.Foldout(FoldoutPlatforms, "プラットフォーム"))
-            {
-                EditorGUI.indentLevel++;
-                EditorGUILayout.HelpBox("チェックされていないプラットフォームではAnimatorが生成されません", MessageType.Info);
-                BuildPC = Toggle("PC", BuildPC);
-                BuildQuest = Toggle("Quest", BuildQuest);
-                EditorGUI.indentLevel--;
-            }
         }
 
         protected GameObject GetGameObject(string child)

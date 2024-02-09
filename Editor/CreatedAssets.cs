@@ -30,12 +30,12 @@ namespace net.narazaka.avatarmenucreator.editor
             this.parameters = parameters;
         }
 
-        public void StoreAssets(GameObject baseObject, bool forceMenuInstaller = true, bool attachAnimator = true)
+        public void StoreAssets(GameObject baseObject, bool isMenuInstaller = true)
         {
-            StoreToPrefab(baseObject, forceMenuInstaller, attachAnimator);
+            StoreToPrefab(baseObject, isMenuInstaller);
         }
 
-        public void SaveAssets(IncludeAssetType includeAssetType, string basePath, Action<GameObject> addifionalModifyPrefab = null, bool forceMenuInstaller = true)
+        public void SaveAssets(IncludeAssetType includeAssetType, string basePath, Action<GameObject> addifionalModifyPrefab = null, bool isMenuInstaller = true)
         {
             // prefab
             var prefabPath = $"{basePath}.prefab";
@@ -49,7 +49,7 @@ namespace net.narazaka.avatarmenucreator.editor
             SaveAssets(includeAssetType, baseName, basePath, controller, clips, menu, parentMenu);
             prefab = PrefabUtility.LoadPrefabContents(prefabPath);
 
-            StoreToPrefab(prefab, forceMenuInstaller);
+            StoreToPrefab(prefab, isMenuInstaller);
 
             if (addifionalModifyPrefab != null) addifionalModifyPrefab(prefab);
 
@@ -58,10 +58,10 @@ namespace net.narazaka.avatarmenucreator.editor
             AssetDatabase.SaveAssets();
         }
 
-        void StoreToPrefab(GameObject prefab, bool forceMenuInstaller, bool attachAnimator = true)
+        void StoreToPrefab(GameObject prefab, bool isMenuInstaller)
         {
             var menuInstaller = prefab.GetComponent<ModularAvatarMenuInstaller>();
-            if (menuInstaller == null && forceMenuInstaller)
+            if (menuInstaller == null && isMenuInstaller)
             {
                 menuInstaller = prefab.AddComponent<ModularAvatarMenuInstaller>();
             }
@@ -78,14 +78,11 @@ namespace net.narazaka.avatarmenucreator.editor
             var maParameters = prefab.GetOrAddComponent<ModularAvatarParameters>();
             maParameters.parameters.Clear();
             maParameters.parameters.AddRange(parameters);
-            if (attachAnimator)
-            {
-                var mergeAnimator = prefab.GetOrAddComponent<ModularAvatarMergeAnimator>();
-                mergeAnimator.animator = controller;
-                mergeAnimator.layerType = VRCAvatarDescriptor.AnimLayerType.FX;
-                mergeAnimator.pathMode = MergeAnimatorPathMode.Absolute;
-                mergeAnimator.matchAvatarWriteDefaults = true;
-            }
+            var mergeAnimator = prefab.GetOrAddComponent<ModularAvatarMergeAnimator>();
+            mergeAnimator.animator = controller;
+            mergeAnimator.layerType = VRCAvatarDescriptor.AnimLayerType.FX;
+            mergeAnimator.pathMode = MergeAnimatorPathMode.Absolute;
+            mergeAnimator.matchAvatarWriteDefaults = true;
         }
 
         static void SaveAssets(IncludeAssetType includeAssetType, string baseName, string basePath, AnimatorController controller, IEnumerable<AnimationClip> clips, VRCExpressionsMenu menu, VRCExpressionsMenu parentMenu = null)
