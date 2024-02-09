@@ -25,6 +25,8 @@ namespace net.narazaka.avatarmenucreator.components.editor
                         creator.AvatarMenu.BuildPC;
 #elif UNITY_ANDROID
                         creator.AvatarMenu.BuildAndroid;
+#else
+                        true;
 #endif
                     CreateAvatarMenuBase.GetCreateAvatarMenu(creator.AvatarMenu).CreateAssets(creator.name).StoreAssets(creator.gameObject, forceMenuInstaller: false, attachAnimator: attachAnimator);
                     UnityEngine.Object.DestroyImmediate(creator);

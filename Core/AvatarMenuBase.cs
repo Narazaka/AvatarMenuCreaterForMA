@@ -27,7 +27,7 @@ namespace net.narazaka.avatarmenucreator
         [SerializeField]
         public bool BuildPC = true;
         [SerializeField]
-        public bool BuildQuest = true;
+        public bool BuildAndroid = true;
 
 #if UNITY_EDITOR
         [NonSerialized]
@@ -115,7 +115,7 @@ namespace net.narazaka.avatarmenucreator
                 EditorGUI.indentLevel++;
                 EditorGUILayout.HelpBox("チェックされていないプラットフォームではAnimatorが生成されません", MessageType.Info);
                 BuildPC = Toggle("PC", BuildPC);
-                BuildQuest = Toggle("Quest", BuildQuest);
+                BuildAndroid = Toggle("Quest", BuildAndroid);
                 EditorGUI.indentLevel--;
             }
         }
