@@ -152,7 +152,6 @@ namespace net.narazaka.avatarmenucreator.components.editor
             if (toFilters.Count > 0)
             {
                 EditorGUILayout.HelpBox("Some children are not found in the avatar.", MessageType.Warning);
-                children = children.Where(c => !toFilters.Contains(c)).ToList();
             }
 
             var newBulkSet = EditorGUILayout.ToggleLeft("同名パラメーターや同マテリアルスロットを一括設定", BulkSet, BulkSet ? EditorStyles.boldLabel : EditorStyles.label);
