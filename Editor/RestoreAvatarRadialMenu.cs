@@ -22,6 +22,8 @@ namespace net.narazaka.avatarmenucreator.editor
             var avatarMenu = new AvatarRadialMenu();
             avatarMenu.RadialDefaultValue = ParameterConfig.defaultValue;
             avatarMenu.Saved = ParameterConfig.saved;
+            avatarMenu.InternalParameter = ParameterConfig.internalParameter;
+            avatarMenu.ParameterName = StoreParameterName;
             avatarMenu.RadialIcon = Menu.controls[0].icon;
 
             avatarMenu.RadialInactiveRange = State(Postfix.inactive) != null;

@@ -22,6 +22,8 @@ namespace net.narazaka.avatarmenucreator.editor
             var avatarMenu = new AvatarChooseMenu();
             avatarMenu.ChooseDefaultValue = Mathf.RoundToInt(ParameterConfig.defaultValue);
             avatarMenu.Saved = ParameterConfig.saved;
+            avatarMenu.InternalParameter = ParameterConfig.internalParameter;
+            avatarMenu.ParameterName = StoreParameterName;
             avatarMenu.ChooseParentIcon = Menu.controls[0].icon;
             avatarMenu.TransitionSeconds = AnyTransition(0).duration;
             var childControls = Menu.controls[0].subMenu.controls;

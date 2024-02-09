@@ -21,6 +21,8 @@ namespace net.narazaka.avatarmenucreator.editor
             var avatarMenu = new AvatarToggleMenu();
             avatarMenu.ToggleDefaultValue = ParameterConfig.defaultValue >= 0.5f;
             avatarMenu.Saved = ParameterConfig.saved;
+            avatarMenu.InternalParameter = ParameterConfig.internalParameter;
+            avatarMenu.ParameterName = StoreParameterName;
             avatarMenu.ToggleIcon = Menu.controls[0].icon;
 
             var hasTransitionSeconds = State(Postfix.activate) != null;

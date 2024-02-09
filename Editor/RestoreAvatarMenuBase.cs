@@ -102,7 +102,9 @@ namespace net.narazaka.avatarmenucreator.editor
         }
 
         protected string ParameterName => ParameterConfig.nameOrPrefix;
-        protected string WithName(object postfix = null) => postfix == null ? ParameterName : $"{ParameterName}_{postfix}";
+        protected string ObjectName => Animator.layers.Length == 0 ? "__Object_name_not_found__" : Animator.layers[0].name;
+        protected string StoreParameterName => ParameterName == ObjectName ? null : ParameterName;
+        protected string WithName(object postfix = null) => postfix == null ? ObjectName : $"{ObjectName}_{postfix}";
         protected VRCExpressionsMenu.Control MenuControl => Menu.controls[0];
         protected AnimatorStateMachine StateMachine => Animator.layers[0].stateMachine;
         protected IEnumerable<AnimatorState> States => StateMachine.states.Select(s => s.state);
@@ -159,7 +161,7 @@ namespace net.narazaka.avatarmenucreator.editor
 
         protected class BindingGroup
         {
-            public string ParameterName;
+            public string ObjectName;
             public Dictionary<string, AnimationCurve> curves = new Dictionary<string, AnimationCurve>();
             public Dictionary<string, ObjectReferenceKeyframe[]> objectReferenceCurves = new Dictionary<string, ObjectReferenceKeyframe[]>();
 
@@ -183,7 +185,7 @@ namespace net.narazaka.avatarmenucreator.editor
                 return objectReferenceCurves[WithName(postfix)];
             }
 
-            protected string WithName(object postfix = null) => postfix == null ? ParameterName : $"{ParameterName}_{postfix}";
+            protected string WithName(object postfix = null) => postfix == null ? ObjectName : $"{ObjectName}_{postfix}";
         }
 
         protected Dictionary<BindingInfo, BindingGroup> MakeBindingGroups(params object[] postfixes)
@@ -199,7 +201,7 @@ namespace net.narazaka.avatarmenucreator.editor
                     var info = new BindingInfo { path = binding.path, type = binding.type, propertyName = binding.propertyName };
                     if (!bindingGroups.TryGetValue(info, out var bindingGroup))
                     {
-                        bindingGroups[info] = bindingGroup = new BindingGroup { ParameterName = ParameterName };
+                        bindingGroups[info] = bindingGroup = new BindingGroup { ObjectName = ObjectName };
                     }
                     bindingGroup.AddCurve(name, AnimationUtility.GetEditorCurve(Clip(postfix), binding));
                 }
@@ -208,7 +210,7 @@ namespace net.narazaka.avatarmenucreator.editor
                     var info = new BindingInfo { path = binding.path, type = binding.type, propertyName = binding.propertyName };
                     if (!bindingGroups.TryGetValue(info, out var bindingGroup))
                     {
-                        bindingGroups[info] = bindingGroup = new BindingGroup { ParameterName = ParameterName };
+                        bindingGroups[info] = bindingGroup = new BindingGroup { ObjectName = ObjectName };
                     }
                     bindingGroup.AddObjectReferenceCurve(name, AnimationUtility.GetObjectReferenceCurve(Clip(postfix), binding));
                 }
