@@ -16,7 +16,7 @@ namespace net.narazaka.avatarmenucreator.components
             {
                 new VRCExpressionParameters.Parameter
                 {
-                    name = name,
+                    name = ParameterName,
                     valueType = VRCExpressionParameters.ValueType.Float,
                     defaultValue = AvatarRadialMenu.RadialDefaultValue,
                     saved = AvatarMenu.Saved,

@@ -16,7 +16,7 @@ namespace net.narazaka.avatarmenucreator.components
             {
                 new VRCExpressionParameters.Parameter
                 {
-                    name = name,
+                    name = ParameterName,
                     valueType = VRCExpressionParameters.ValueType.Bool,
                     defaultValue = AvatarToggleMenu.ToggleDefaultValue ? 1 : 0,
                     saved = AvatarMenu.Saved,

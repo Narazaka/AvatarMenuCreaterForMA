@@ -16,7 +16,7 @@ namespace net.narazaka.avatarmenucreator.components
             {
                 new VRCExpressionParameters.Parameter
                 {
-                    name = name,
+                    name = ParameterName,
                     valueType = VRCExpressionParameters.ValueType.Int,
                     defaultValue = AvatarChooseMenu.ChooseDefaultValue,
                     saved = AvatarMenu.Saved,
