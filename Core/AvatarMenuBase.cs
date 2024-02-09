@@ -45,7 +45,6 @@ namespace net.narazaka.avatarmenucreator
         HashSet<string> FoldoutGameObjects = new HashSet<string>();
         Dictionary<string, HashSet<string>> FoldoutGroups = new Dictionary<string, HashSet<string>>();
         Vector2 ScrollPosition;
-        bool FoldoutParameterDetail;
 
         protected Util.ShaderParametersCache ShaderParametersCache = new Util.ShaderParametersCache();
         Dictionary<string, GameObject> GameObjectCache = new Dictionary<string, GameObject>();
@@ -100,14 +99,8 @@ namespace net.narazaka.avatarmenucreator
 
         protected void ShowDetailMenu()
         {
-            if (FoldoutParameterDetail = EditorGUILayout.Foldout(FoldoutParameterDetail, "パラメーター詳細設定"))
-            {
-                EditorGUI.indentLevel++;
-                ParameterName = TextField("パラメーター名", ParameterName);
-                EditorGUILayout.HelpBox("パラメーター名が空の場合オブジェクト名が使われます", MessageType.Info);
-                InternalParameter = Toggle("パラメーター内部値", InternalParameter);
-                EditorGUI.indentLevel--;
-            }
+            ParameterName = TextField("パラメーター名(オプショナル)", ParameterName);
+            InternalParameter = Toggle("パラメーター内部値", InternalParameter);
         }
 
         protected GameObject GetGameObject(string child)
