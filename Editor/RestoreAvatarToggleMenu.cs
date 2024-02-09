@@ -64,55 +64,55 @@ namespace net.narazaka.avatarmenucreator.editor
         public override void CheckAssets()
         {
             base.CheckAssets();
-            Assert(MenuControl.parameter.name == ParameterName, "VRCExpressionsMenu‚Ìƒpƒ‰ƒ[ƒ^[–¼‚ÆMA Parameters‚Ìƒpƒ‰ƒ[ƒ^[–¼‚ªˆê’v‚·‚é‚×‚«‚Å‚·");
-            Assert(MenuControl.type == VRCExpressionsMenu.Control.ControlType.Toggle, "VRCExpressionsMenu‚Ìƒ^ƒCƒv‚ÍToggle‚Å‚ ‚é‚×‚«‚Å‚·");
-            Assert(MenuControl.value == 1, "VRCExpressionsMenu‚Ì’l‚Í1‚Å‚ ‚é‚×‚«‚Å‚·");
-            Assert(Animator.parameters[0].type == AnimatorControllerParameterType.Bool, "Animator‚Ìƒpƒ‰ƒ[ƒ^[Œ^‚ÍBool‚Å‚ ‚é‚×‚«‚Å‚·");
-            Assert(ParameterConfig.syncType == ParameterSyncType.Bool, "MA Parameters‚Ìƒpƒ‰ƒ[ƒ^[Œ^‚ÍBool‚Å‚ ‚é‚×‚«‚Å‚·");
-            Assert(Clip(Postfix.inactive) != null, "Animator‚ÌState‚É‚Íinactiveƒ‚[ƒVƒ‡ƒ“‚ª•K—v‚Å‚·");
-            Assert(Clip(Postfix.active) != null, "Animator‚ÌState‚É‚Íactiveƒ‚[ƒVƒ‡ƒ“‚ª•K—v‚Å‚·");
+            Assert(MenuControl.parameter.name == ParameterName, "VRCExpressionsMenuã®ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿ãƒ¼åã¨MA Parametersã®ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿ãƒ¼åãŒä¸€è‡´ã™ã‚‹ã¹ãã§ã™");
+            Assert(MenuControl.type == VRCExpressionsMenu.Control.ControlType.Toggle, "VRCExpressionsMenuã®ã‚¿ã‚¤ãƒ—ã¯Toggleã§ã‚ã‚‹ã¹ãã§ã™");
+            Assert(MenuControl.value == 1, "VRCExpressionsMenuã®å€¤ã¯1ã§ã‚ã‚‹ã¹ãã§ã™");
+            Assert(Animator.parameters[0].type == AnimatorControllerParameterType.Bool, "Animatorã®ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿ãƒ¼å‹ã¯Boolã§ã‚ã‚‹ã¹ãã§ã™");
+            Assert(ParameterConfig.syncType == ParameterSyncType.Bool, "MA Parametersã®ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿ãƒ¼å‹ã¯Boolã§ã‚ã‚‹ã¹ãã§ã™");
+            Assert(Clip(Postfix.inactive) != null, "Animatorã®Stateã«ã¯inactiveãƒ¢ãƒ¼ã‚·ãƒ§ãƒ³ãŒå¿…è¦ã§ã™");
+            Assert(Clip(Postfix.active) != null, "Animatorã®Stateã«ã¯activeãƒ¢ãƒ¼ã‚·ãƒ§ãƒ³ãŒå¿…è¦ã§ã™");
 
             var hasTransitionSeconds = State(Postfix.activate) != null;
             if (hasTransitionSeconds)
             {
-                Assert(Clip(Postfix.inactivate) != null, "Animator‚ÌState‚É‚Íinactivateƒ‚[ƒVƒ‡ƒ“‚ª•K—v‚Å‚·");
-                Assert(Clip(Postfix.activate) != null, "Animator‚ÌState‚É‚Íactivateƒ‚[ƒVƒ‡ƒ“‚ª•K—v‚Å‚·");
+                Assert(Clip(Postfix.inactivate) != null, "Animatorã®Stateã«ã¯inactivateãƒ¢ãƒ¼ã‚·ãƒ§ãƒ³ãŒå¿…è¦ã§ã™");
+                Assert(Clip(Postfix.activate) != null, "Animatorã®Stateã«ã¯activateãƒ¢ãƒ¼ã‚·ãƒ§ãƒ³ãŒå¿…è¦ã§ã™");
             }
             if (hasTransitionSeconds)
             {
-                Assert(Transition(Postfix.inactive, Postfix.activate)?.conditions.Length == 1, "inactive‚©‚çactivate‚Ö‚Ì‘JˆÚ‚É‚ÍğŒ‚ª1‚Â•K—v‚Å‚·");
-                Assert(Transition(Postfix.activate, Postfix.active)?.conditions.Length == 0, "activate‚©‚çactive‚Ö‚Ì‘JˆÚ‚É‚ÍğŒ‚ª•s—v‚Å‚·");
-                Assert(Transition(Postfix.active, Postfix.inactivate)?.conditions.Length == 1, "active‚©‚çinactivate‚Ö‚Ì‘JˆÚ‚É‚ÍğŒ‚ª1‚Â•K—v‚Å‚·");
-                Assert(Transition(Postfix.inactivate, Postfix.inactive)?.conditions.Length == 0, "inactivate‚©‚çinactive‚Ö‚Ì‘JˆÚ‚É‚ÍğŒ‚ª•s—v‚Å‚·");
+                Assert(Transition(Postfix.inactive, Postfix.activate)?.conditions.Length == 1, "inactiveã‹ã‚‰activateã¸ã®é·ç§»ã«ã¯æ¡ä»¶ãŒ1ã¤å¿…è¦ã§ã™");
+                Assert(Transition(Postfix.activate, Postfix.active)?.conditions.Length == 0, "activateã‹ã‚‰activeã¸ã®é·ç§»ã«ã¯æ¡ä»¶ãŒä¸è¦ã§ã™");
+                Assert(Transition(Postfix.active, Postfix.inactivate)?.conditions.Length == 1, "activeã‹ã‚‰inactivateã¸ã®é·ç§»ã«ã¯æ¡ä»¶ãŒ1ã¤å¿…è¦ã§ã™");
+                Assert(Transition(Postfix.inactivate, Postfix.inactive)?.conditions.Length == 0, "inactivateã‹ã‚‰inactiveã¸ã®é·ç§»ã«ã¯æ¡ä»¶ãŒä¸è¦ã§ã™");
 
-                Assert(Transition(Postfix.inactive, Postfix.activate).hasExitTime == false, "inactive‚©‚çactivate‚Ö‚Ì‘JˆÚ‚ÍhasExitTime‚ªfalse‚Å‚ ‚é‚×‚«‚Å‚·");
+                Assert(Transition(Postfix.inactive, Postfix.activate).hasExitTime == false, "inactiveã‹ã‚‰activateã¸ã®é·ç§»ã¯hasExitTimeãŒfalseã§ã‚ã‚‹ã¹ãã§ã™");
                 var activateCondition = Transition(Postfix.inactive, Postfix.activate).conditions[0];
-                Assert(activateCondition.mode == AnimatorConditionMode.If, "inactive‚©‚çactivate‚Ö‚Ì‘JˆÚ‚ÍğŒ‚ªtrue‚Å‚ ‚é‚×‚«‚Å‚·");
-                Assert(activateCondition.parameter == ParameterName, "inactive‚©‚çactivate‚Ö‚Ì‘JˆÚ‚Ìƒpƒ‰ƒ[ƒ^[–¼‚ÆMA Parameters‚Ìƒpƒ‰ƒ[ƒ^[–¼‚ªˆê’v‚·‚é‚×‚«‚Å‚·");
-                Assert(Transition(Postfix.active, Postfix.inactivate).hasExitTime == false, "active‚©‚çinactivate‚Ö‚Ì‘JˆÚ‚ÍhasExitTime‚ªfalse‚Å‚ ‚é‚×‚«‚Å‚·");
+                Assert(activateCondition.mode == AnimatorConditionMode.If, "inactiveã‹ã‚‰activateã¸ã®é·ç§»ã¯æ¡ä»¶ãŒtrueã§ã‚ã‚‹ã¹ãã§ã™");
+                Assert(activateCondition.parameter == ParameterName, "inactiveã‹ã‚‰activateã¸ã®é·ç§»ã®ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿ãƒ¼åã¨MA Parametersã®ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿ãƒ¼åãŒä¸€è‡´ã™ã‚‹ã¹ãã§ã™");
+                Assert(Transition(Postfix.active, Postfix.inactivate).hasExitTime == false, "activeã‹ã‚‰inactivateã¸ã®é·ç§»ã¯hasExitTimeãŒfalseã§ã‚ã‚‹ã¹ãã§ã™");
                 var inactivateCondition = Transition(Postfix.active, Postfix.inactivate).conditions[0];
-                Assert(inactivateCondition.mode == AnimatorConditionMode.IfNot, "active‚©‚çinactivate‚Ö‚Ì‘JˆÚ‚ÍğŒ‚ªfalse‚Å‚ ‚é‚×‚«‚Å‚·");
-                Assert(inactivateCondition.parameter == ParameterName, "active‚©‚çinactivate‚Ö‚Ì‘JˆÚ‚Ìƒpƒ‰ƒ[ƒ^[–¼‚ÆMA Parameters‚Ìƒpƒ‰ƒ[ƒ^[–¼‚ªˆê’v‚·‚é‚×‚«‚Å‚·");
-                Assert(Transition(Postfix.activate, Postfix.active).hasExitTime == true, "activate‚©‚çactive‚Ö‚Ì‘JˆÚ‚ÍhasExitTime‚ªtrue‚Å‚ ‚é‚×‚«‚Å‚·");
-                Assert(Transition(Postfix.inactivate, Postfix.inactive).hasExitTime == true, "inactivate‚©‚çinactive‚Ö‚Ì‘JˆÚ‚ÍhasExitTime‚ªtrue‚Å‚ ‚é‚×‚«‚Å‚·");
-                Assert(Transition(Postfix.activate, Postfix.active).exitTime == 1, "activate‚©‚çactive‚Ö‚Ì‘JˆÚ‚ÌexitTime‚Í1‚Å‚ ‚é‚×‚«‚Å‚·");
-                Assert(Transition(Postfix.inactivate, Postfix.inactive).exitTime == 1, "inactivate‚©‚çinactive‚Ö‚Ì‘JˆÚ‚ÌexitTime‚Í1‚Å‚ ‚é‚×‚«‚Å‚·");
+                Assert(inactivateCondition.mode == AnimatorConditionMode.IfNot, "activeã‹ã‚‰inactivateã¸ã®é·ç§»ã¯æ¡ä»¶ãŒfalseã§ã‚ã‚‹ã¹ãã§ã™");
+                Assert(inactivateCondition.parameter == ParameterName, "activeã‹ã‚‰inactivateã¸ã®é·ç§»ã®ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿ãƒ¼åã¨MA Parametersã®ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿ãƒ¼åãŒä¸€è‡´ã™ã‚‹ã¹ãã§ã™");
+                Assert(Transition(Postfix.activate, Postfix.active).hasExitTime == true, "activateã‹ã‚‰activeã¸ã®é·ç§»ã¯hasExitTimeãŒtrueã§ã‚ã‚‹ã¹ãã§ã™");
+                Assert(Transition(Postfix.inactivate, Postfix.inactive).hasExitTime == true, "inactivateã‹ã‚‰inactiveã¸ã®é·ç§»ã¯hasExitTimeãŒtrueã§ã‚ã‚‹ã¹ãã§ã™");
+                Assert(Transition(Postfix.activate, Postfix.active).exitTime == 1, "activateã‹ã‚‰activeã¸ã®é·ç§»ã®exitTimeã¯1ã§ã‚ã‚‹ã¹ãã§ã™");
+                Assert(Transition(Postfix.inactivate, Postfix.inactive).exitTime == 1, "inactivateã‹ã‚‰inactiveã¸ã®é·ç§»ã®exitTimeã¯1ã§ã‚ã‚‹ã¹ãã§ã™");
 
-                Assert(Clip(Postfix.activate).length == Clip(Postfix.inactivate).length, "activate‚Æinactivate‚Ì’·‚³‚Í“¯‚¶‚Å‚ ‚é‚×‚«‚Å‚·");
+                Assert(Clip(Postfix.activate).length == Clip(Postfix.inactivate).length, "activateã¨inactivateã®é•·ã•ã¯åŒã˜ã§ã‚ã‚‹ã¹ãã§ã™");
             }
             else
             {
-                Assert(Transition(Postfix.inactive, Postfix.active)?.conditions.Length == 1, "inactive‚©‚çactive‚Ö‚Ì‘JˆÚ‚É‚ÍğŒ‚ª1‚Â•K—v‚Å‚·");
-                Assert(Transition(Postfix.active, Postfix.inactive)?.conditions.Length == 1, "active‚©‚çinactive‚Ö‚Ì‘JˆÚ‚É‚ÍğŒ‚ª1‚Â•K—v‚Å‚·");
+                Assert(Transition(Postfix.inactive, Postfix.active)?.conditions.Length == 1, "inactiveã‹ã‚‰activeã¸ã®é·ç§»ã«ã¯æ¡ä»¶ãŒ1ã¤å¿…è¦ã§ã™");
+                Assert(Transition(Postfix.active, Postfix.inactive)?.conditions.Length == 1, "activeã‹ã‚‰inactiveã¸ã®é·ç§»ã«ã¯æ¡ä»¶ãŒ1ã¤å¿…è¦ã§ã™");
 
-                Assert(Transition(Postfix.inactive, Postfix.active).hasExitTime == false, "inactive‚©‚çactive‚Ö‚Ì‘JˆÚ‚ÍhasExitTime‚ªfalse‚Å‚ ‚é‚×‚«‚Å‚·");
+                Assert(Transition(Postfix.inactive, Postfix.active).hasExitTime == false, "inactiveã‹ã‚‰activeã¸ã®é·ç§»ã¯hasExitTimeãŒfalseã§ã‚ã‚‹ã¹ãã§ã™");
                 var activeCondition = Transition(Postfix.inactive, Postfix.active).conditions[0];
-                Assert(activeCondition.mode == AnimatorConditionMode.If, "inactive‚©‚çactive‚Ö‚Ì‘JˆÚ‚ÍğŒ‚ªtrue‚Å‚ ‚é‚×‚«‚Å‚·");
-                Assert(activeCondition.parameter == ParameterName, "inactive‚©‚çactive‚Ö‚Ì‘JˆÚ‚Ìƒpƒ‰ƒ[ƒ^[–¼‚ÆMA Parameters‚Ìƒpƒ‰ƒ[ƒ^[–¼‚ªˆê’v‚·‚é‚×‚«‚Å‚·");
-                Assert(Transition(Postfix.active, Postfix.inactive).hasExitTime == false, "active‚©‚çinactive‚Ö‚Ì‘JˆÚ‚ÍhasExitTime‚ªfalse‚Å‚ ‚é‚×‚«‚Å‚·");
+                Assert(activeCondition.mode == AnimatorConditionMode.If, "inactiveã‹ã‚‰activeã¸ã®é·ç§»ã¯æ¡ä»¶ãŒtrueã§ã‚ã‚‹ã¹ãã§ã™");
+                Assert(activeCondition.parameter == ParameterName, "inactiveã‹ã‚‰activeã¸ã®é·ç§»ã®ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿ãƒ¼åã¨MA Parametersã®ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿ãƒ¼åãŒä¸€è‡´ã™ã‚‹ã¹ãã§ã™");
+                Assert(Transition(Postfix.active, Postfix.inactive).hasExitTime == false, "activeã‹ã‚‰inactiveã¸ã®é·ç§»ã¯hasExitTimeãŒfalseã§ã‚ã‚‹ã¹ãã§ã™");
                 var inactiveCondition = Transition(Postfix.active, Postfix.inactive).conditions[0];
-                Assert(inactiveCondition.mode == AnimatorConditionMode.IfNot, "active‚©‚çinactive‚Ö‚Ì‘JˆÚ‚ÍğŒ‚ªfalse‚Å‚ ‚é‚×‚«‚Å‚·");
-                Assert(inactiveCondition.parameter == ParameterName, "active‚©‚çinactive‚Ö‚Ì‘JˆÚ‚Ìƒpƒ‰ƒ[ƒ^[–¼‚ÆMA Parameters‚Ìƒpƒ‰ƒ[ƒ^[–¼‚ªˆê’v‚·‚é‚×‚«‚Å‚·");
+                Assert(inactiveCondition.mode == AnimatorConditionMode.IfNot, "activeã‹ã‚‰inactiveã¸ã®é·ç§»ã¯æ¡ä»¶ãŒfalseã§ã‚ã‚‹ã¹ãã§ã™");
+                Assert(inactiveCondition.parameter == ParameterName, "activeã‹ã‚‰inactiveã¸ã®é·ç§»ã®ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿ãƒ¼åã¨MA Parametersã®ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿ãƒ¼åãŒä¸€è‡´ã™ã‚‹ã¹ãã§ã™");
             }
         }
     }

@@ -74,19 +74,19 @@ namespace net.narazaka.avatarmenucreator.editor
         public override void CheckAssets()
         {
             base.CheckAssets();
-            Assert(MenuControl.type == VRCExpressionsMenu.Control.ControlType.SubMenu, "VRCExpressionsMenu‚Ìƒ^ƒCƒv‚ÍSubMenu‚Å‚ ‚é‚×‚«‚Å‚·");
-            Assert(MenuControl.subMenu != null, "VRCExpressionsMenu‚ÌSubMenu‚ª‚ ‚é‚×‚«‚Å‚·");
+            Assert(MenuControl.type == VRCExpressionsMenu.Control.ControlType.SubMenu, "VRCExpressionsMenuã®ã‚¿ã‚¤ãƒ—ã¯SubMenuã§ã‚ã‚‹ã¹ãã§ã™");
+            Assert(MenuControl.subMenu != null, "VRCExpressionsMenuã®SubMenuãŒã‚ã‚‹ã¹ãã§ã™");
             var childControls = Menu.controls[0].subMenu.controls;
             var values = childControls.Select((c, i) => Mathf.RoundToInt(c.value)).OrderBy(v => v).ToArray();
-            Assert(childControls.All(c => c.parameter.name == ParameterName), "VRCExpressionsMenu‚Ìƒpƒ‰ƒ[ƒ^[–¼‚ÆMA Parameters‚Ìƒpƒ‰ƒ[ƒ^[–¼‚ªˆê’v‚·‚é‚×‚«‚Å‚·");
-            Assert(values.Select((v, i) => v == i).All(v => v), "VRCExpressionsMenu‚Ìƒpƒ‰ƒ[ƒ^[’l‚Í‘S‚Ä‚Ì’l‚ª‚ ‚é‚×‚«‚Å‚·");
-            Assert(Animator.parameters[0].type == AnimatorControllerParameterType.Int, "Animator‚Ìƒpƒ‰ƒ[ƒ^[Œ^‚ÍInt‚Å‚ ‚é‚×‚«‚Å‚·");
-            Assert(ParameterConfig.syncType == ParameterSyncType.Int, "MA Parameters‚Ìƒpƒ‰ƒ[ƒ^[Œ^‚ÍInt‚Å‚ ‚é‚×‚«‚Å‚·");
-            Assert(values.All(v => Clip(v) != null), "Animator‚ÌState‚É‚ÍŠe‘I‘ğˆ‚Ìƒ‚[ƒVƒ‡ƒ“‚ª•K—v‚Å‚·");
-            Assert(values.All(v => AnyTransition(v) != null), "Animator‚ÌAnyState‚É‚ÍŠe‘I‘ğˆ‚Ö‚Ì‘JˆÚ‚ª•K—v‚Å‚·");
-            Assert(values.Select(v => AnyTransition(v).duration).Distinct().Count() == 1, "Animator‚ÌAnyState‚Ìduration‚Í‘S‚Ä“¯ˆê‚Å‚ ‚é‚×‚«‚Å‚·");
-            Assert(values.All(v => AnyTransition(v).conditions.Length == 1), "Animator‚ÌAnyState‚É‚ÍŠe‘I‘ğˆ‚Ö‚Ì‘JˆÚğŒ‚ª1‚Â‚ ‚é‚×‚«‚Å‚·");
-            Assert(values.All(v => AnyTransition(v).conditions[0].mode == AnimatorConditionMode.Equals && (int)AnyTransition(v).conditions[0].threshold == v), "Animator‚ÌAnyState‚É‚ÍŠe‘I‘ğˆ‚Ö‚Ì‘JˆÚğŒ‚ª’l‚Æ“™‚µ‚¢•K—v‚ª‚ ‚è‚Ü‚·");
+            Assert(childControls.All(c => c.parameter.name == ParameterName), "VRCExpressionsMenuã®ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿ãƒ¼åã¨MA Parametersã®ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿ãƒ¼åãŒä¸€è‡´ã™ã‚‹ã¹ãã§ã™");
+            Assert(values.Select((v, i) => v == i).All(v => v), "VRCExpressionsMenuã®ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿ãƒ¼å€¤ã¯å…¨ã¦ã®å€¤ãŒã‚ã‚‹ã¹ãã§ã™");
+            Assert(Animator.parameters[0].type == AnimatorControllerParameterType.Int, "Animatorã®ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿ãƒ¼å‹ã¯Intã§ã‚ã‚‹ã¹ãã§ã™");
+            Assert(ParameterConfig.syncType == ParameterSyncType.Int, "MA Parametersã®ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿ãƒ¼å‹ã¯Intã§ã‚ã‚‹ã¹ãã§ã™");
+            Assert(values.All(v => Clip(v) != null), "Animatorã®Stateã«ã¯å„é¸æŠè‚¢ã®ãƒ¢ãƒ¼ã‚·ãƒ§ãƒ³ãŒå¿…è¦ã§ã™");
+            Assert(values.All(v => AnyTransition(v) != null), "Animatorã®AnyStateã«ã¯å„é¸æŠè‚¢ã¸ã®é·ç§»ãŒå¿…è¦ã§ã™");
+            Assert(values.Select(v => AnyTransition(v).duration).Distinct().Count() == 1, "Animatorã®AnyStateã®durationã¯å…¨ã¦åŒä¸€ã§ã‚ã‚‹ã¹ãã§ã™");
+            Assert(values.All(v => AnyTransition(v).conditions.Length == 1), "Animatorã®AnyStateã«ã¯å„é¸æŠè‚¢ã¸ã®é·ç§»æ¡ä»¶ãŒ1ã¤ã‚ã‚‹ã¹ãã§ã™");
+            Assert(values.All(v => AnyTransition(v).conditions[0].mode == AnimatorConditionMode.Equals && (int)AnyTransition(v).conditions[0].threshold == v), "Animatorã®AnyStateã«ã¯å„é¸æŠè‚¢ã¸ã®é·ç§»æ¡ä»¶ãŒå€¤ã¨ç­‰ã—ã„å¿…è¦ãŒã‚ã‚Šã¾ã™");
         }
     }
 }

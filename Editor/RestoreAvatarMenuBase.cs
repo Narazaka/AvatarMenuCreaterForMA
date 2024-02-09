@@ -57,17 +57,17 @@ namespace net.narazaka.avatarmenucreator.editor
 
         public virtual void CheckAssets()
         {
-            Assert(Animator.parameters[0].name == ParameterName, "Animator‚Ìƒpƒ‰ƒ[ƒ^[–¼‚ÆMA Parameters‚Ìƒpƒ‰ƒ[ƒ^[–¼‚ªˆê’v‚·‚é‚×‚«‚Å‚·");
-            Assert(Menu.controls.Count == 1, "VRCExpressionsMenu‚ÌƒRƒ“ƒgƒ[ƒ‹‚ª1‚Â‚Å‚ ‚é‚×‚«‚Å‚·");
-            Assert(Animator.parameters.Length >= 1, "Animator‚Ìƒpƒ‰ƒ[ƒ^[‚ª‚ ‚é‚×‚«‚Å‚·");
-            Assert(Animator.layers.Length >= 1, "Animator‚ÌƒŒƒCƒ„[‚ª‚ ‚é‚×‚«‚Å‚·");
+            Assert(Animator.parameters[0].name == ParameterName, "Animatorã®ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿ãƒ¼åã¨MA Parametersã®ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿ãƒ¼åãŒä¸€è‡´ã™ã‚‹ã¹ãã§ã™");
+            Assert(Menu.controls.Count == 1, "VRCExpressionsMenuã®ã‚³ãƒ³ãƒˆãƒ­ãƒ¼ãƒ«ãŒ1ã¤ã§ã‚ã‚‹ã¹ãã§ã™");
+            Assert(Animator.parameters.Length >= 1, "Animatorã®ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿ãƒ¼ãŒã‚ã‚‹ã¹ãã§ã™");
+            Assert(Animator.layers.Length >= 1, "Animatorã®ãƒ¬ã‚¤ãƒ¤ãƒ¼ãŒã‚ã‚‹ã¹ãã§ã™");
         }
 
         public virtual void StrictCheckAssets()
         {
             CheckAssets();
-            Assert(Animator.parameters.Length == 1, "Animator‚Ìƒpƒ‰ƒ[ƒ^[‚ª1‚Â‚Å‚ ‚é‚×‚«‚Å‚·");
-            Assert(Animator.layers.Length == 1, "Animator‚ÌƒŒƒCƒ„[‚ª1‚Â‚Å‚ ‚é‚×‚«‚Å‚·");
+            Assert(Animator.parameters.Length == 1, "Animatorã®ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿ãƒ¼ãŒ1ã¤ã§ã‚ã‚‹ã¹ãã§ã™");
+            Assert(Animator.layers.Length == 1, "Animatorã®ãƒ¬ã‚¤ãƒ¤ãƒ¼ãŒ1ã¤ã§ã‚ã‚‹ã¹ãã§ã™");
         }
 
         public bool SafeCheckAssets()
