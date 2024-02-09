@@ -155,7 +155,7 @@ namespace net.narazaka.avatarmenucreator
                 var path = child;
                 if (names.Count > 0 || parameters.Count > 0)
                 {
-                    EditorGUILayout.LabelField(path, EditorStyles.boldLabel);
+                    GameObjectHeader(child);
                     EditorGUI.indentLevel++;
                     if (names.Count > 0 &&
                         FoldoutHeaderWithAddItemButton(

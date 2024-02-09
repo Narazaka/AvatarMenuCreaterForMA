@@ -76,7 +76,7 @@ namespace net.narazaka.avatarmenucreator
             foreach (var child in children)
             {
                 EditorGUILayout.Space();
-                EditorGUILayout.LabelField(child, EditorStyles.boldLabel);
+                GameObjectHeader(child);
                 EditorGUI.indentLevel++;
                 ShowToggleObjectControl(children, child);
 

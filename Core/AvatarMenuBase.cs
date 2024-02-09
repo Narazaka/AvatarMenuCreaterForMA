@@ -99,7 +99,8 @@ namespace net.narazaka.avatarmenucreator
             if (GameObjectCache == null) GameObjectCache = new Dictionary<string, GameObject>();
             if (!GameObjectCache.TryGetValue(child, out var gameObjectRef))
             {
-                GameObjectCache[child] = gameObjectRef = BaseObject.transform.Find(child).gameObject;
+                var transform = BaseObject.transform.Find(child);
+                GameObjectCache[child] = gameObjectRef = transform == null ? null : transform.gameObject;
             }
             return gameObjectRef;
         }
@@ -109,22 +110,22 @@ namespace net.narazaka.avatarmenucreator
             GameObjectCache = null;
         }
 
-        protected bool FoldoutGameObjectHeader(string child, string title)
+        protected void GameObjectHeader(string child)
         {
-            var foldout = FoldoutGameObjects.Contains(child);
-            var newFoldout = EditorGUILayout.Foldout(foldout, title);
-            if (newFoldout != foldout)
+            EditorGUILayout.BeginHorizontal();
+            EditorGUILayout.LabelField(child, EditorStyles.boldLabel);
+            var gameObjectRef = GetGameObject(child);
+            if (gameObjectRef == null)
             {
-                if (newFoldout)
-                {
-                    FoldoutGameObjects.Add(child);
-                }
-                else
-                {
-                    FoldoutGameObjects.Remove(child);
-                }
+                EditorGUILayout.LabelField(EditorGUIUtility.IconContent("Warning"), GUILayout.Width(35));
             }
-            return newFoldout;
+            else
+            {
+                EditorGUI.BeginDisabledGroup(true);
+                EditorGUILayout.ObjectField(gameObjectRef, typeof(GameObject), true);
+                EditorGUI.EndDisabledGroup();
+            }
+            EditorGUILayout.EndHorizontal();
         }
 
         protected bool FoldoutHeader(string child, string title, bool hasChildren = true)
