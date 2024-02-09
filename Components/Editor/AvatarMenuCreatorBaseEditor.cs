@@ -163,6 +163,7 @@ namespace net.narazaka.avatarmenucreator.components.editor
             }
 
             Creator.AvatarMenu.BaseObject = baseObject;
+            Creator.AvatarMenu.ShowPlatforms();
             Creator.AvatarMenu.OnAvatarMenuGUI(children);
         }
 
