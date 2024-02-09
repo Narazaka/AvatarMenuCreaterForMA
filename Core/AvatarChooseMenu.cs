@@ -95,6 +95,7 @@ namespace net.narazaka.avatarmenucreator
             ChooseParentIcon = TextureField("親メニューアイコン", ChooseParentIcon);
             ChooseDefaultValue = IntField("パラメーター初期値", ChooseDefaultValue);
             ShowSaved();
+            ShowDetailMenu();
 
             EditorGUILayout.Space();
 

@@ -15,6 +15,7 @@ namespace net.narazaka.avatarmenucreator.editor
         public override CreatedAssets CreateAssets(string baseName, IEnumerable<string> children = null)
         {
             var matchGameObjects = new HashSet<string>(children ?? AvatarMenu.GetStoredChildren());
+            var parameterName = string.IsNullOrEmpty(AvatarMenu.ParameterName) ? baseName : AvatarMenu.ParameterName;
             // clip
             var active = new AnimationClip();
             active.name = $"{baseName}_active";
@@ -67,7 +68,7 @@ namespace net.narazaka.avatarmenucreator.editor
             }
             // controller
             var controller = new AnimatorController();
-            controller.AddParameter(new AnimatorControllerParameter { name = baseName, type = AnimatorControllerParameterType.Bool, defaultBool = false });
+            controller.AddParameter(new AnimatorControllerParameter { name = parameterName, type = AnimatorControllerParameterType.Bool, defaultBool = false });
             if (controller.layers.Length == 0) controller.AddLayer(baseName);
             var layer = controller.layers[0];
             layer.name = baseName;
@@ -93,7 +94,7 @@ namespace net.narazaka.avatarmenucreator.editor
                 new AnimatorCondition
                 {
                     mode = AnimatorConditionMode.If,
-                    parameter = baseName,
+                    parameter = parameterName,
                     threshold = 1,
                 },
             };
@@ -106,7 +107,7 @@ namespace net.narazaka.avatarmenucreator.editor
                 new AnimatorCondition
                 {
                     mode = AnimatorConditionMode.IfNot,
-                    parameter = baseName,
+                    parameter = parameterName,
                     threshold = 1,
                 },
             };
@@ -127,7 +128,7 @@ namespace net.narazaka.avatarmenucreator.editor
                     new AnimatorCondition
                     {
                         mode = AnimatorConditionMode.If,
-                        parameter = baseName,
+                        parameter = parameterName,
                         threshold = 1,
                     },
                 };
@@ -144,7 +145,7 @@ namespace net.narazaka.avatarmenucreator.editor
                     new AnimatorCondition
                     {
                         mode = AnimatorConditionMode.IfNot,
-                        parameter = baseName,
+                        parameter = parameterName,
                         threshold = 1,
                     },
                 };
@@ -164,7 +165,7 @@ namespace net.narazaka.avatarmenucreator.editor
                     new AnimatorCondition
                     {
                         mode = AnimatorConditionMode.If,
-                        parameter = baseName,
+                        parameter = parameterName,
                         threshold = 1,
                     },
                 };
@@ -177,7 +178,7 @@ namespace net.narazaka.avatarmenucreator.editor
                     new AnimatorCondition
                     {
                         mode = AnimatorConditionMode.IfNot,
-                        parameter = baseName,
+                        parameter = parameterName,
                         threshold = 1,
                     },
                 };
@@ -192,7 +193,7 @@ namespace net.narazaka.avatarmenucreator.editor
                         type = VRCExpressionsMenu.Control.ControlType.Toggle,
                         parameter = new VRCExpressionsMenu.Control.Parameter
                         {
-                            name = baseName,
+                            name = parameterName,
                         },
                         subParameters = new VRCExpressionsMenu.Control.Parameter[] { },
                         value = 1,
@@ -206,10 +207,11 @@ namespace net.narazaka.avatarmenucreator.editor
             {
                 new ParameterConfig
                 {
-                    nameOrPrefix = baseName,
+                    nameOrPrefix = parameterName,
                     defaultValue = AvatarMenu.ToggleDefaultValue ? 1 : 0,
                     syncType = ParameterSyncType.Bool,
                     saved = AvatarMenu.Saved,
+                    internalParameter = AvatarMenu.InternalParameter,
                 },
             });
         }

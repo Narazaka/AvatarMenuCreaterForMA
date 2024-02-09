@@ -65,6 +65,7 @@ namespace net.narazaka.avatarmenucreator
             ToggleIcon = TextureField("アイコン", ToggleIcon);
             ToggleDefaultValue = Toggle("パラメーター初期値", ToggleDefaultValue);
             ShowSaved();
+            ShowDetailMenu();
 
             EditorGUILayout.Space();
 

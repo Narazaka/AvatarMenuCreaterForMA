@@ -16,6 +16,7 @@ namespace net.narazaka.avatarmenucreator.editor
         public override CreatedAssets CreateAssets(string baseName, IEnumerable<string> children = null)
         {
             var matchGameObjects = new HashSet<string>(children ?? AvatarMenu.GetStoredChildren());
+            var parameterName = string.IsNullOrEmpty(AvatarMenu.ParameterName) ? baseName : AvatarMenu.ParameterName;
             // clip
             var clip = new AnimationClip();
             clip.name = baseName;
@@ -33,14 +34,14 @@ namespace net.narazaka.avatarmenucreator.editor
             }
             // controller
             var controller = new AnimatorController();
-            controller.AddParameter(new AnimatorControllerParameter { name = baseName, type = AnimatorControllerParameterType.Float, defaultFloat = AvatarMenu.RadialDefaultValue });
+            controller.AddParameter(new AnimatorControllerParameter { name = parameterName, type = AnimatorControllerParameterType.Float, defaultFloat = AvatarMenu.RadialDefaultValue });
             if (controller.layers.Length == 0) controller.AddLayer(baseName);
             var layer = controller.layers[0];
             layer.name = baseName;
             layer.stateMachine.name = baseName;
             var state = layer.stateMachine.AddState(baseName, new Vector3(300, 0));
             state.timeParameterActive = true;
-            state.timeParameter = baseName;
+            state.timeParameter = parameterName;
             state.motion = clip;
             state.writeDefaultValues = false;
             AnimationClip emptyClip = null;
@@ -62,7 +63,7 @@ namespace net.narazaka.avatarmenucreator.editor
                     toInactiveConditions.Add(new AnimatorCondition
                     {
                         mode = AnimatorConditionMode.Greater,
-                        parameter = baseName,
+                        parameter = parameterName,
                         threshold = AvatarMenu.RadialInactiveRangeMin,
                     });
                 }
@@ -71,7 +72,7 @@ namespace net.narazaka.avatarmenucreator.editor
                     toInactiveConditions.Add(new AnimatorCondition
                     {
                         mode = AnimatorConditionMode.Less,
-                        parameter = baseName,
+                        parameter = parameterName,
                         threshold = AvatarMenu.RadialInactiveRangeMax,
                     });
                 }
@@ -88,7 +89,7 @@ namespace net.narazaka.avatarmenucreator.editor
                         new AnimatorCondition
                         {
                             mode = AnimatorConditionMode.Less,
-                            parameter = baseName,
+                            parameter = parameterName,
                             threshold = AvatarMenu.RadialInactiveRangeMin,
                         },
                     };
@@ -104,7 +105,7 @@ namespace net.narazaka.avatarmenucreator.editor
                         new AnimatorCondition
                         {
                             mode = AnimatorConditionMode.Greater,
-                            parameter = baseName,
+                            parameter = parameterName,
                             threshold = AvatarMenu.RadialInactiveRangeMax,
                         },
                     };
@@ -121,7 +122,7 @@ namespace net.narazaka.avatarmenucreator.editor
                         subParameters = new VRCExpressionsMenu.Control.Parameter[] {
                             new VRCExpressionsMenu.Control.Parameter
                             {
-                                name = baseName,
+                                name = parameterName,
                             }
                         },
                         value = AvatarMenu.RadialDefaultValue,
@@ -136,10 +137,11 @@ namespace net.narazaka.avatarmenucreator.editor
             {
                 new ParameterConfig
                 {
-                    nameOrPrefix = baseName,
+                    nameOrPrefix = parameterName,
                     defaultValue = AvatarMenu.RadialDefaultValue,
                     syncType = ParameterSyncType.Float,
                     saved = AvatarMenu.Saved,
+                    internalParameter = AvatarMenu.InternalParameter,
                 },
             });
         }

@@ -67,6 +67,7 @@ namespace net.narazaka.avatarmenucreator
             RadialIcon = TextureField("アイコン", RadialIcon);
             RadialDefaultValue = FloatField("パラメーター初期値", RadialDefaultValue);
             ShowSaved();
+            ShowDetailMenu();
             if (RadialDefaultValue < 0) RadialDefaultValue = 0;
             if (RadialDefaultValue > 1) RadialDefaultValue = 1;
 

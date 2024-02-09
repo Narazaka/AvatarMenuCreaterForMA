@@ -17,6 +17,7 @@ namespace net.narazaka.avatarmenucreator.editor
         public override CreatedAssets CreateAssets(string baseName, IEnumerable<string> children = null)
         {
             var matchGameObjects = new HashSet<string>(children ?? AvatarMenu.GetStoredChildren());
+            var parameterName = string.IsNullOrEmpty(AvatarMenu.ParameterName) ? baseName : AvatarMenu.ParameterName;
             // clip
             var choices = Enumerable.Range(0, AvatarMenu.ChooseCount).Select(i => new AnimationClip { name = $"{baseName}_{i}" }).ToList();
             foreach (var child in AvatarMenu.ChooseObjects.Keys)
@@ -63,7 +64,7 @@ namespace net.narazaka.avatarmenucreator.editor
             }
             // controller
             var controller = new AnimatorController();
-            controller.AddParameter(new AnimatorControllerParameter { name = baseName, type = AnimatorControllerParameterType.Int, defaultInt = 0 });
+            controller.AddParameter(new AnimatorControllerParameter { name = parameterName, type = AnimatorControllerParameterType.Int, defaultInt = 0 });
             if (controller.layers.Length == 0) controller.AddLayer(baseName);
             var layer = controller.layers[0];
             layer.name = baseName;
@@ -93,7 +94,7 @@ namespace net.narazaka.avatarmenucreator.editor
                     new AnimatorCondition
                     {
                         mode = AnimatorConditionMode.Equals,
-                        parameter = baseName,
+                        parameter = parameterName,
                         threshold = i,
                     },
                 };
@@ -107,7 +108,7 @@ namespace net.narazaka.avatarmenucreator.editor
                     new AnimatorCondition
                     {
                         mode = AnimatorConditionMode.Equals,
-                        parameter = baseName,
+                        parameter = parameterName,
                         threshold = i,
                     },
                 };
@@ -121,7 +122,7 @@ namespace net.narazaka.avatarmenucreator.editor
                     type = VRCExpressionsMenu.Control.ControlType.Toggle,
                     parameter = new VRCExpressionsMenu.Control.Parameter
                     {
-                        name = baseName,
+                        name = parameterName,
                     },
                     subParameters = new VRCExpressionsMenu.Control.Parameter[] { },
                     value = i,
@@ -154,10 +155,11 @@ namespace net.narazaka.avatarmenucreator.editor
             {
                 new ParameterConfig
                 {
-                    nameOrPrefix = baseName,
+                    nameOrPrefix = parameterName,
                     defaultValue = AvatarMenu.ChooseDefaultValue,
                     syncType = ParameterSyncType.Int,
                     saved = AvatarMenu.Saved,
+                    internalParameter = AvatarMenu.InternalParameter,
                 },
             });
         }
