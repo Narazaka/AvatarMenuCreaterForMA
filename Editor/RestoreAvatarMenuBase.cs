@@ -102,7 +102,7 @@ namespace net.narazaka.avatarmenucreator.editor
         }
 
         protected string ParameterName => ParameterConfig.nameOrPrefix;
-        protected string ObjectName => Animator.layers.Length == 0 ? "__Object_name_not_found__" : Animator.layers[0].name;
+        protected string ObjectName => Animator.layers.Length == 0 ? "__Object_name_not_found__" : Animator.layers[0].name == "Base Layer" ? ParameterName : Animator.layers[0].name;
         protected string StoreParameterName => ParameterName == ObjectName ? null : ParameterName;
         protected string WithName(object postfix = null) => postfix == null ? ObjectName : $"{ObjectName}_{postfix}";
         protected VRCExpressionsMenu.Control MenuControl => Menu.controls[0];
