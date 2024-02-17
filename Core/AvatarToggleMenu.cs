@@ -204,6 +204,11 @@ namespace net.narazaka.avatarmenucreator
                                 EditorGUIUtility.labelWidth = 0;
                                 EditorGUI.indentLevel--;
                             }
+                            // 過去互換性
+                            if (newValue.TransitionDurationPercent <= 0)
+                            {
+                                EditorGUILayout.HelpBox("変化時間%は0より大きく設定して下さい", MessageType.Error);
+                            }
                         }
                         if (!value.Equals(newValue))
                         {
@@ -220,7 +225,7 @@ namespace net.narazaka.avatarmenucreator
                             }
                             if (newValue.TransitionOffsetPercent < 0) newValue.TransitionOffsetPercent = 0;
                             if (newValue.TransitionOffsetPercent > 100) newValue.TransitionOffsetPercent = 100;
-                            if (newValue.TransitionDurationPercent < 0) newValue.TransitionDurationPercent = 0;
+                            if (newValue.TransitionDurationPercent <= 0) newValue.TransitionDurationPercent = 1;
                             if (newValue.TransitionDurationPercent > 100) newValue.TransitionDurationPercent = 100;
                             if (newValue.TransitionOffsetPercent + newValue.TransitionDurationPercent > 100)
                             {
