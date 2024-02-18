@@ -99,6 +99,7 @@ namespace net.narazaka.avatarmenucreator.editor
 
             if (VRCAvatarDescriptor == null)
             {
+                VRCAvatarDescriptor = null;
                 EditorGUILayout.LabelField("対象のアバターを選択して下さい");
                 return;
             }
