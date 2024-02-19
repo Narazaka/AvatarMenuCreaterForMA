@@ -46,6 +46,25 @@ namespace net.narazaka.avatarmenucreator.components.editor
             if (hasAssets)
             {
                 EditorGUILayout.HelpBox("MA Merge AnimatorまたはMA Parametersがある場合、 このコンポーネントは影響せずそれらの設定がそのまま使われます。", MessageType.Info);
+                if (GUILayout.Button("コンポーネントの設定を優先する") && EditorUtility.DisplayDialog("本当に削除しますか？", "MA Merge AnimatorとMA Parametersを削除します。\nMA Menu Installerのインストールされるメニューをリセットします。", "OK", "Cancel"))
+                {
+                    var mergeAnimator = Creator.GetComponent<ModularAvatarMergeAnimator>();
+                    if (mergeAnimator != null)
+                    {
+                        Undo.DestroyObjectImmediate(mergeAnimator);
+                    }
+                    var parameters = Creator.GetComponent<ModularAvatarParameters>();
+                    if (parameters != null)
+                    {
+                        Undo.DestroyObjectImmediate(parameters);
+                    }
+                    var maMenuInstaller = Creator.GetComponent<ModularAvatarMenuInstaller>();
+                    if (maMenuInstaller != null)
+                    {
+                        Undo.RecordObject(maMenuInstaller, "Remove MA Components");
+                        maMenuInstaller.menuToAppend = null;
+                    }
+                }
             }
             else
             {
@@ -56,6 +75,33 @@ namespace net.narazaka.avatarmenucreator.components.editor
                 }
 
                 EditorGUILayout.HelpBox("MA Menu Installerのインストール先にインストールされます。\nMA Menu Installer が無い場合は MA Menu Item のように振る舞います。 （ネストしたメニューなどに便利）", MessageType.Info);
+                if (baseObject != null)
+                {
+                    var parentMenuItem = Creator.transform.parent.GetComponent<ModularAvatarMenuItem>();
+                    if (parentMenuItem != null && parentMenuItem.Control.type == VRC.SDK3.Avatars.ScriptableObjects.VRCExpressionsMenu.Control.ControlType.SubMenu && parentMenuItem.MenuSource == SubmenuSource.Children)
+                    {
+                        if (maMenuInstaller != null)
+                        {
+                            EditorGUILayout.HelpBox("MA Menu Itemのサブメニュー配下にあります。\nMA Menu Installerがなくてもインストールできます。", MessageType.Info);
+                            if (GUILayout.Button("MA Menu Installerを削除") && EditorUtility.DisplayDialog("本当に削除しますか？", "MA Menu Installerを削除します", "OK", "Cancel"))
+                            {
+                                Undo.DestroyObjectImmediate(maMenuInstaller);
+                            }
+                        }
+                    }
+                    else
+                    {
+                        if (maMenuInstaller == null)
+                        {
+                            EditorGUILayout.HelpBox("MA Menu Itemのサブメニュー配下にありません。\nMA Menu Installerが必要です。", MessageType.Warning);
+                            if (GUILayout.Button("MA Menu Installerを追加"))
+                            {
+                                var installer = Creator.gameObject.AddComponent<ModularAvatarMenuInstaller>();
+                                Undo.RegisterCreatedObjectUndo(installer, "Remove MA Menu Installer");
+                            }
+                        }
+                    }
+                }
             }
 
             if (PrefabUtility.GetOutermostPrefabInstanceRoot(Creator.gameObject) == Creator.gameObject)
