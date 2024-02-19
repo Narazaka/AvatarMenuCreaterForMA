@@ -17,6 +17,8 @@ namespace net.narazaka.avatarmenucreator
         [SerializeField]
         public ToggleTypeDictionary ToggleObjects = new ToggleTypeDictionary();
         [SerializeField]
+        public ToggleMaterialDictionary ToggleMaterials = new ToggleMaterialDictionary();
+        [SerializeField]
         public ToggleBlendShapeDictionary ToggleBlendShapes = new ToggleBlendShapeDictionary();
         [SerializeField]
         public ToggleBlendShapeDictionary ToggleShaderParameters = new ToggleBlendShapeDictionary();
@@ -27,13 +29,14 @@ namespace net.narazaka.avatarmenucreator
 
 #if UNITY_EDITOR
 
-        public override IEnumerable<string> GetStoredChildren() => ToggleObjects.Keys.Concat(ToggleBlendShapes.Keys.Select(k => k.Item1)).Concat(ToggleShaderParameters.Keys.Select(k => k.Item1)).Distinct();
+        public override IEnumerable<string> GetStoredChildren() => ToggleObjects.Keys.Concat(ToggleMaterials.Keys.Select(k => k.Item1)).Concat(ToggleBlendShapes.Keys.Select(k => k.Item1)).Concat(ToggleShaderParameters.Keys.Select(k => k.Item1)).Distinct();
         public override void ReplaceStoredChild(string oldChild, string newChild)
         {
-            if (ToggleObjects.ContainsKey(oldChild) || ToggleBlendShapes.ContainsPrimaryKey(oldChild) || ToggleShaderParameters.ContainsPrimaryKey(oldChild))
+            if (ToggleObjects.ContainsKey(oldChild) || ToggleMaterials.ContainsPrimaryKey(oldChild) || ToggleBlendShapes.ContainsPrimaryKey(oldChild) || ToggleShaderParameters.ContainsPrimaryKey(oldChild))
             {
                 WillChange();
                 ToggleObjects.ReplaceKey(oldChild, newChild);
+                ToggleMaterials.ReplacePrimaryKey(oldChild, newChild);
                 ToggleBlendShapes.ReplacePrimaryKey(oldChild, newChild);
                 ToggleShaderParameters.ReplacePrimaryKey(oldChild, newChild);
             }
@@ -45,6 +48,10 @@ namespace net.narazaka.avatarmenucreator
             foreach (var key in ToggleObjects.Keys.Where(k => !filter.Contains(k)).ToList())
             {
                 ToggleObjects.Remove(key);
+            }
+            foreach (var key in ToggleMaterials.Keys.Where(k => !filter.Contains(k.Item1)).ToList())
+            {
+                ToggleMaterials.Remove(key);
             }
             foreach (var key in ToggleBlendShapes.Keys.Where(k => !filter.Contains(k.Item1)).ToList())
             {
@@ -59,6 +66,10 @@ namespace net.narazaka.avatarmenucreator
         {
             WillChange();
             ToggleObjects.Remove(child);
+            foreach (var key in ToggleMaterials.Keys.Where(k => k.Item1 == child).ToList())
+            {
+                ToggleMaterials.Remove(key);
+            }
             foreach (var key in ToggleBlendShapes.Keys.Where(k => k.Item1 == child).ToList())
             {
                 ToggleBlendShapes.Remove(key);
@@ -80,10 +91,22 @@ namespace net.narazaka.avatarmenucreator
             EditorGUILayout.Space();
 
             ShowTransitionSeconds();
+
+            var allMaterials = children.ToDictionary(child => child, child => GetMaterialSlots(child));
+
+            if (BulkSet)
+            {
+                if (FoldoutHeader("", "一括設定", true))
+                {
+                    ShowToggleBulkMaterialControl(allMaterials);
+                }
+            }
         }
 
         protected override void OnMainGUI(IList<string> children)
         {
+            var allMaterials = children.ToDictionary(child => child, child => GetMaterialSlots(child));
+
             foreach (var child in children)
             {
                 EditorGUILayout.Space();
@@ -94,6 +117,23 @@ namespace net.narazaka.avatarmenucreator
                 var gameObjectRef = GetGameObject(child);
                 var names = gameObjectRef == null ? ToggleBlendShapes.Names(child).ToList() : Util.GetBlendShapeNames(gameObjectRef);
                 var parameters = gameObjectRef == null ? ToggleShaderParameters.Names(child).ToFakeShaderParameters().ToList() : ShaderParametersCache.GetFilteredShaderParameters(gameObjectRef);
+
+                var materials = allMaterials[child];
+                if (materials.Length > 0 &&
+                    FoldoutHeaderWithAddItemButton(
+                        child,
+                        "Materials",
+                        ToggleMaterials.HasChild(child),
+                        () => materials.Select((material, index) => new MaterialItemContainer(index, material) as ListTreeViewItemContainer<int>).Where(m => (m as MaterialItemContainer).material != null).ToList(),
+                        () => ToggleMaterials.Indexes(child).ToImmutableHashSet(),
+                        index => AddToggleMaterial(children, child, index),
+                        index => RemoveToggleMaterial(children, child, index)
+                        ))
+                {
+                    EditorGUI.indentLevel++;
+                    ShowToggleMaterialControl(children, child, materials);
+                    EditorGUI.indentLevel--;
+                }
 
                 if (names.Count > 0 &&
                     FoldoutHeaderWithAddItemButton(
@@ -174,6 +214,200 @@ namespace net.narazaka.avatarmenucreator
                 }
             }
 
+        }
+
+        void ShowToggleMaterialControl(IList<string> children, string child, Material[] materials)
+        {
+            for (var i = 0; i < materials.Length; ++i)
+            {
+                var key = (child, i);
+                ToggleMaterial value;
+                if (ToggleMaterials.TryGetValue(key, out value))
+                {
+                    if (ShowToggleMaterialToggle(i, materials[i], true))
+                    {
+                        var newValue = new ToggleMaterial();
+                        EditorGUI.indentLevel++;
+                        using (new EditorGUILayout.HorizontalScope())
+                        {
+                            EditorGUIUtility.labelWidth = 70;
+                            newValue.Inactive = EditorGUILayout.ObjectField("OFF", value.Inactive, typeof(Material), false) as Material;
+                            newValue.Active = EditorGUILayout.ObjectField("ON", value.Active, typeof(Material), false) as Material;
+                            EditorGUIUtility.labelWidth = 0;
+                        }
+                        if (TransitionSeconds > 0)
+                        {
+                            EditorGUIUtility.labelWidth = 110;
+                            newValue.TransitionOffsetPercent = EditorGUILayout.FloatField("変化待機%", value.TransitionOffsetPercent, GUILayout.Width(140));
+                            EditorGUIUtility.labelWidth = 0;
+                        }
+                        if (!value.Equals(newValue))
+                        {
+                            WillChange();
+                            ToggleMaterials[key] = newValue;
+                            if (BulkSet)
+                            {
+                                BulkSetToggleMaterial(materials[i], newValue, value.ChangedProp(newValue));
+                            }
+                        }
+                        EditorGUI.indentLevel--;
+                    }
+                    else
+                    {
+                        RemoveToggleMaterial(children, child, i);
+                    }
+                }
+            }
+        }
+
+        bool ShowToggleMaterialToggle(int index, Material material, bool value)
+        {
+            using (new EditorGUILayout.HorizontalScope())
+            {
+                EditorGUIUtility.labelWidth = 40;
+                var result = EditorGUILayout.ToggleLeft($"[{index}]", value, GUILayout.Width(80));
+                EditorGUIUtility.labelWidth = 0;
+                using (new EditorGUI.DisabledGroupScope(true))
+                {
+                    EditorGUILayout.ObjectField(material, typeof(Material), false);
+                }
+                return result;
+            }
+        }
+
+        void BulkSetToggleMaterial(Material sourceMaterial, ToggleMaterial toggleMaterial, string changedProp)
+        {
+            var matches = new List<(string, int)>();
+            foreach (var (child, index) in ToggleMaterials.Keys)
+            {
+                var materials = GetMaterialSlots(child);
+                if (index < materials.Length && materials[index] == sourceMaterial)
+                {
+                    matches.Add((child, index));
+                }
+            }
+            foreach (var key in matches)
+            {
+                ToggleMaterials[key] = ToggleMaterials[key].SetProp(changedProp, toggleMaterial.GetProp(changedProp));
+            }
+        }
+
+        void AddToggleMaterial(IList<string> children, string child, int index)
+        {
+            if (BulkSet)
+            {
+                var mat = GetMaterialSlots(child)[index];
+                foreach (var c in children)
+                {
+                    var materials = GetMaterialSlots(c);
+                    for (var i = 0; i < materials.Length; ++i)
+                    {
+                        if (materials[i] == mat)
+                        {
+                            AddToggleMaterialSingle(c, i);
+                        }
+                    }
+                }
+            }
+            else
+            {
+                AddToggleMaterialSingle(child, index);
+            }
+        }
+
+        void AddToggleMaterialSingle(string child, int index)
+        {
+            var key = (child, index);
+            if (ToggleMaterials.ContainsKey(key)) return;
+            WillChange();
+            var toggleMaterial = new ToggleMaterial();
+            toggleMaterial.Inactive = GetMaterialSlots(child)[index];
+            ToggleMaterials[key] = toggleMaterial;
+        }
+
+        void RemoveToggleMaterial(IList<string> children, string child, int index)
+        {
+            if (BulkSet)
+            {
+                var mat = GetMaterialSlots(child)[index];
+                foreach (var c in children)
+                {
+                    var materials = GetMaterialSlots(c);
+                    for (var i = 0; i < materials.Length; ++i)
+                    {
+                        if (materials[i] == mat)
+                        {
+                            RemoveToggleMaterialSingle(c, i);
+                        }
+                    }
+                }
+            }
+            else
+            {
+                RemoveToggleMaterialSingle(child, index);
+            }
+        }
+
+        void RemoveToggleMaterialSingle(string child, int index)
+        {
+            var key = (child, index);
+            if (!ToggleMaterials.ContainsKey(key)) return;
+            WillChange();
+            ToggleMaterials.Remove(key);
+        }
+
+        void ShowToggleBulkMaterialControl(Dictionary<string, Material[]> allMaterials)
+        {
+            Func<(string, int), Material> keyToMaterial = ((string, int) key) => allMaterials.TryGetValue(key.Item1, out var m) && m != null && m.Length > key.Item2 ? m[key.Item2] : null;
+            var sourceMaterials = ToggleMaterials.Keys.Select(keyToMaterial).Where(m => m != null).Distinct().ToList();
+            var chooseMaterialGroups = ToggleMaterials.Keys.GroupBy(keyToMaterial).Where(m => m.Key != null).ToDictionary(group => group.Key, group => group.ToList());
+            foreach (var sourceMaterial in sourceMaterials)
+            {
+                using (new EditorGUI.DisabledGroupScope(true))
+                {
+                    EditorGUILayout.ObjectField(sourceMaterial, typeof(Material), false);
+                }
+                EditorGUI.indentLevel++;
+                var inactiveMaterials = chooseMaterialGroups[sourceMaterial].Select(key => ToggleMaterials.TryGetValue(key, out var tm) ? tm.Inactive : null).Distinct().ToList();
+                var activeMaterials = chooseMaterialGroups[sourceMaterial].Select(key => ToggleMaterials.TryGetValue(key, out var tm) ? tm.Active : null).Distinct().ToList();
+                var transitionOffsetPercents = chooseMaterialGroups[sourceMaterial].Select(key => ToggleMaterials.TryGetValue(key, out var tm) ? tm.TransitionOffsetPercent : 0).Distinct().ToList();
+                var value = new ToggleMaterial { Inactive = inactiveMaterials[0], Active = activeMaterials[0], TransitionOffsetPercent = transitionOffsetPercents[0] };
+                var newValue = new ToggleMaterial();
+                using (new EditorGUILayout.HorizontalScope())
+                {
+                    EditorGUIUtility.labelWidth = 70;
+                    newValue.Inactive = EditorGUILayout.ObjectField("OFF", value.Inactive, typeof(Material), false) as Material;
+                    newValue.Active = EditorGUILayout.ObjectField("ON", value.Active, typeof(Material), false) as Material;
+                    EditorGUIUtility.labelWidth = 0;
+                }
+                if (TransitionSeconds > 0)
+                {
+                    EditorGUIUtility.labelWidth = 110;
+                    newValue.TransitionOffsetPercent = EditorGUILayout.FloatField("変化待機%", value.TransitionOffsetPercent, GUILayout.Width(140));
+                    EditorGUIUtility.labelWidth = 0;
+                }
+                if (!value.Equals(newValue))
+                {
+                    WillChange();
+                    BulkSetToggleMaterial(sourceMaterial, newValue, value.ChangedProp(newValue));
+                }
+                if (inactiveMaterials.Count != 1)
+                {
+                    EditorGUILayout.HelpBox("OFFに複数のマテリアルが選択されています", MessageType.Warning);
+                }
+                if (activeMaterials.Count != 1)
+                {
+                    EditorGUILayout.HelpBox("ONに複数のマテリアルが選択されています", MessageType.Warning);
+                }
+                if (TransitionSeconds > 0)
+                {
+                    if (transitionOffsetPercents.Count != 1)
+                    {
+                        EditorGUILayout.HelpBox("複数の変化待機%が設定されています", MessageType.Warning);
+                    }
+                }
+                EditorGUI.indentLevel--;
+            }
         }
 
         void ShowToggleBlendShapeControl(
@@ -318,6 +552,9 @@ namespace net.narazaka.avatarmenucreator
             WillChange();
             toggles.Remove(key);
         }
+
+        // with prefab shim
+        Material[] GetMaterialSlots(string child) => GetGameObject(child)?.GetMaterialSlots() ?? ToggleMaterials.MaterialSlots(child);
 #endif
     }
 }

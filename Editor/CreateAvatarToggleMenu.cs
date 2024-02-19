@@ -1,5 +1,6 @@
 using nadena.dev.modular_avatar.core;
 using System.Collections.Generic;
+using UnityEditor;
 using UnityEditor.Animations;
 using UnityEngine;
 using VRC.SDK3.Avatars.Components;
@@ -36,6 +37,21 @@ namespace net.narazaka.avatarmenucreator.editor
                 {
                     activate.SetCurve(curvePath, typeof(GameObject), "m_IsActive", new AnimationCurve(new Keyframe(0 / 60.0f, 1), new Keyframe(AvatarMenu.TransitionSeconds, activeValue ? 1 : 0)));
                     inactivate.SetCurve(curvePath, typeof(GameObject), "m_IsActive", new AnimationCurve(new Keyframe(0 / 60.0f, 1), new Keyframe(AvatarMenu.TransitionSeconds, activeValue ? 0 : 1)));
+                }
+            }
+            foreach (var (child, index) in AvatarMenu.ToggleMaterials.Keys)
+            {
+                if (!matchGameObjects.Contains(child)) continue;
+                var value = AvatarMenu.ToggleMaterials[(child, index)];
+                var curvePath = child;
+                var curveName = $"m_Materials.Array.data[{index}]";
+                var binding = EditorCurveBinding.PPtrCurve(curvePath, typeof(Renderer), curveName);
+                AnimationUtility.SetObjectReferenceCurve(active, binding, value.ActiveCurve());
+                AnimationUtility.SetObjectReferenceCurve(inactive, binding, value.InactiveCurve());
+                if (AvatarMenu.TransitionSeconds > 0)
+                {
+                    AnimationUtility.SetObjectReferenceCurve(activate, binding, value.ActivateCurve(AvatarMenu.TransitionSeconds));
+                    AnimationUtility.SetObjectReferenceCurve(inactivate, binding, value.InactivateCurve(AvatarMenu.TransitionSeconds));
                 }
             }
             foreach (var (child, name) in AvatarMenu.ToggleBlendShapes.Keys)
