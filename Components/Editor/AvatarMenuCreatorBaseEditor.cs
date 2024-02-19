@@ -259,8 +259,8 @@ namespace net.narazaka.avatarmenucreator.components.editor
             {
                 UndoUtility.RecordObject(this, "BulkSet");
                 BulkSet = newBulkSet;
-                Creator.AvatarMenu.BulkSet = BulkSet;
             }
+            Creator.AvatarMenu.BulkSet = BulkSet;
 
             Creator.AvatarMenu.BaseObject = baseObject;
             Creator.AvatarMenu.OnAvatarMenuGUI(children);
