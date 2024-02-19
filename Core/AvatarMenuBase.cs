@@ -50,6 +50,7 @@ namespace net.narazaka.avatarmenucreator
         Dictionary<string, GameObject> GameObjectCache = new Dictionary<string, GameObject>();
 
         public abstract IEnumerable<string> GetStoredChildren();
+        public abstract void ReplaceStoredChild(string oldChild, string newChild);
         public abstract void FilterStoredTargets(IEnumerable<string> children);
         public abstract void RemoveStoredChild(string child);
         protected abstract void OnHeaderGUI(IList<string> children);

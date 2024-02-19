@@ -13,6 +13,14 @@ namespace net.narazaka.avatarmenucreator.collections
         [SerializeField]
         V[] values;
 
+        public void ReplaceKey(K oldKey, K newKey)
+        {
+            if (!ContainsKey(oldKey)) return;
+            var value = this[oldKey];
+            Remove(oldKey);
+            this[newKey] = value;
+        }
+
         public virtual K DefaultKey => default;
         public void OnAfterDeserialize()
         {

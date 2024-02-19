@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace net.narazaka.avatarmenucreator.collections
@@ -12,6 +13,25 @@ namespace net.narazaka.avatarmenucreator.collections
         K2[] keys2;
         [SerializeField]
         V[] values;
+
+        public bool ContainsPrimaryKey(K1 key) => Keys.Any(k => k.Item1.Equals(key));
+        public void ReplacePrimaryKey(K1 oldKey, K1 newKey)
+        {
+            foreach (var key in Keys.Where(k => k.Item1.Equals(oldKey)).ToList())
+            {
+                var value = this[key];
+                Remove(key);
+                this[(newKey, key.Item2)] = value;
+            }
+        }
+
+        public void ReplaceKey((K1, K2) oldKey, (K1, K2) newKey)
+        {
+            if (!ContainsKey(oldKey)) return;
+            var value = this[oldKey];
+            Remove(oldKey);
+            this[newKey] = value;
+        }
 
         public virtual (K1, K2) DefaultKey => default;
         public void OnAfterDeserialize()

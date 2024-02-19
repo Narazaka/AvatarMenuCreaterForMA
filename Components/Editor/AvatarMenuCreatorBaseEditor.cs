@@ -21,11 +21,20 @@ namespace net.narazaka.avatarmenucreator.components.editor
         List<string> Children;
         [NonSerialized]
         bool FoldoutSave;
+        [NonSerialized]
+        string EditChild;
+        [NonSerialized]
+        string EditChildNew;
 
         void OnEnable()
         {
             Creator = target as AvatarMenuCreatorBase;
             Creator.AvatarMenu.UndoObject = Creator;
+            UpdateChildren();
+        }
+
+        void UpdateChildren()
+        {
             Children = Creator.AvatarMenu.GetStoredChildren().ToList();
         }
 
@@ -131,15 +140,60 @@ namespace net.narazaka.avatarmenucreator.components.editor
                     {
                         if (GUILayout.Button("×", GUILayout.Width(20)))
                         {
-                            toRemoves.Add(c);
+                            if (EditorUtility.DisplayDialog("本当に削除しますか？", c, "OK", "Cancel")) toRemoves.Add(c);
                             break;
+                        }
+                        if (GUILayout.Button(EditorGUIUtility.IconContent("editicon.sml"), GUILayout.Width(20)))
+                        {
+                            if (EditChild == null)
+                            {
+                                EditChild = c;
+                                EditChildNew = c;
+                            }
+                            else
+                            {
+                                EditChild = null;
+                                EditChildNew = null;
+                            }
+                        }
+                        if (EditChild == c)
+                        {
+                            EditChildNew = EditorGUILayout.TextField(EditChildNew);
+                            var newObj = EditorGUILayout.ObjectField(null, typeof(GameObject), true);
+                            if (newObj != null)
+                            {
+                                var newPath = Util.ChildPath(baseObject, newObj as GameObject);
+                                if (EditorUtility.DisplayDialog("本当に変更しますか？", $"{c} -> {newPath}", "OK", "Cancel"))
+                                {
+                                    Creator.AvatarMenu.ReplaceStoredChild(EditChild, newPath);
+                                    UpdateChildren();
+                                    EditChild = null;
+                                    EditChildNew = null;
+                                }
+                            }
+                            using (new EditorGUI.DisabledScope(c == EditChildNew))
+                            {
+                                if (GUILayout.Button("OK"))
+                                {
+                                    if (EditorUtility.DisplayDialog("本当に変更しますか？", $"{c} -> {EditChildNew}", "OK", "Cancel"))
+                                    {
+                                        Creator.AvatarMenu.ReplaceStoredChild(EditChild, EditChildNew);
+                                        UpdateChildren();
+                                        EditChild = null;
+                                        EditChildNew = null;
+                                    }
+                                }
+                            }
                         }
                         if (baseObject != null && baseObject.transform.Find(c) == null)
                         {
                             EditorGUILayout.LabelField(EditorGUIUtility.IconContent("Warning"), GUILayout.Width(35));
                             toFilters.Add(c);
                         }
-                        EditorGUILayout.LabelField(c);
+                        if (EditChild != c)
+                        {
+                            EditorGUILayout.LabelField(c);
+                        }
                     }
                 }
             }
@@ -151,7 +205,7 @@ namespace net.narazaka.avatarmenucreator.components.editor
             }
             if (toFilters.Count > 0)
             {
-                EditorGUILayout.HelpBox("Some children are not found in the avatar.", MessageType.Warning);
+                EditorGUILayout.HelpBox("アバターに存在しないオブジェクト名が指定されています", MessageType.Warning);
             }
 
             var newBulkSet = EditorGUILayout.ToggleLeft("同名パラメーターや同マテリアルスロットを一括設定", BulkSet, BulkSet ? EditorStyles.boldLabel : EditorStyles.label);
