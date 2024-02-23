@@ -10,6 +10,7 @@
   "license": "Zlib",
   "type": "tool",
   "url" : "https://github.com/Narazaka/AvatarMenuCreaterForMA.git",
+  "unity": "2019.4",
   "vpmDependencies": {
     "com.vrchat.avatars": ">=3.0.9",
     "nadena.dev.modular-avatar": ">=1.0.0 <2.0.0-a"
