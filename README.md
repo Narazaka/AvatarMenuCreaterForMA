@@ -39,6 +39,8 @@ NDMF（Modular Avatar 1.8.0以降）のコンポーネントによる非破壊�
 
 4. コンポーネントはアバターの中に生成されているためそのままで動作します。保存されたPrefabはアバターの中（直下でなくても良い）に置けば、Modular Avatarによってメニューが統合されます。
 
+また使い方の解説スライド資料があります→[Modular Avatarで着せ替えメニューを作ろう！ Avatar Menu Creator for MA +α の解説](https://narazaka.github.io/AvatarMenuCreatorForMA-doc/index.pdf)
+
 ## 更新履歴
 
 - 1.13.0
