@@ -11,10 +11,31 @@ namespace net.narazaka.avatarmenucreator
         public Material Inactive;
         public Material Active;
         public float TransitionOffsetPercent;
+        [SerializeField]
+        bool OmitInactive;
+        [SerializeField]
+        bool OmitActive;
+
+        public bool UseInactive
+        {
+            get => !OmitInactive;
+            set => OmitInactive = !value;
+        }
+        public bool UseActive
+        {
+            get => !OmitActive;
+            set => OmitActive = !value;
+        }
+        public bool HasAdvanced => OmitInactive || OmitActive;
+        public ToggleMaterial ResetAdvanced()
+        {
+            OmitInactive = OmitActive = false;
+            return this;
+        }
 
         public bool Equals(ToggleMaterial other)
         {
-            return Inactive == other.Inactive && Active == other.Active && TransitionOffsetPercent == other.TransitionOffsetPercent;
+            return Inactive == other.Inactive && Active == other.Active && TransitionOffsetPercent == other.TransitionOffsetPercent && UseInactive == other.UseInactive && UseActive == other.UseActive;
         }
 
         public string ChangedProp(ToggleMaterial other)
@@ -22,6 +43,8 @@ namespace net.narazaka.avatarmenucreator
             if (Inactive != other.Inactive) return nameof(Inactive);
             if (Active != other.Active) return nameof(Active);
             if (TransitionOffsetPercent != other.TransitionOffsetPercent) return nameof(TransitionOffsetPercent);
+            if (UseInactive != other.UseInactive) return nameof(UseInactive);
+            if (UseActive != other.UseActive) return nameof(UseActive);
             return "";
         }
 
@@ -30,6 +53,8 @@ namespace net.narazaka.avatarmenucreator
             if (name == nameof(Inactive)) return Inactive;
             if (name == nameof(Active)) return Active;
             if (name == nameof(TransitionOffsetPercent)) return TransitionOffsetPercent;
+            if (name == nameof(UseInactive)) return UseInactive;
+            if (name == nameof(UseActive)) return UseActive;
             return null;
         }
 
@@ -38,6 +63,8 @@ namespace net.narazaka.avatarmenucreator
             if (name == nameof(Inactive)) Inactive = value as Material;
             if (name == nameof(Active)) Active = value as Material;
             if (name == nameof(TransitionOffsetPercent)) TransitionOffsetPercent = (float)value;
+            if (name == nameof(UseInactive)) UseInactive = (bool)value;
+            if (name == nameof(UseActive)) UseActive = (bool)value;
             return this;
         }
 

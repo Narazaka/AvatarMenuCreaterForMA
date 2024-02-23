@@ -30,9 +30,10 @@ namespace net.narazaka.avatarmenucreator.editor
             {
                 if (!matchGameObjects.Contains(child)) continue;
                 var activeValue = AvatarMenu.ToggleObjects[child] == ToggleType.ON;
+                var use = AvatarMenu.ToggleObjectUsings.TryGetValue(child, out var usingValue) ? usingValue : ToggleUsing.Both;
                 var curvePath = child;
-                active.SetCurve(curvePath, typeof(GameObject), "m_IsActive", new AnimationCurve(new Keyframe(0 / 60.0f, activeValue ? 1 : 0)));
-                inactive.SetCurve(curvePath, typeof(GameObject), "m_IsActive", new AnimationCurve(new Keyframe(0 / 60.0f, activeValue ? 0 : 1)));
+                if (use != ToggleUsing.OFF) active.SetCurve(curvePath, typeof(GameObject), "m_IsActive", new AnimationCurve(new Keyframe(0 / 60.0f, activeValue ? 1 : 0)));
+                if (use != ToggleUsing.ON) inactive.SetCurve(curvePath, typeof(GameObject), "m_IsActive", new AnimationCurve(new Keyframe(0 / 60.0f, activeValue ? 0 : 1)));
                 if (AvatarMenu.TransitionSeconds > 0)
                 {
                     activate.SetCurve(curvePath, typeof(GameObject), "m_IsActive", new AnimationCurve(new Keyframe(0 / 60.0f, 1), new Keyframe(AvatarMenu.TransitionSeconds, activeValue ? 1 : 0)));
@@ -46,8 +47,8 @@ namespace net.narazaka.avatarmenucreator.editor
                 var curvePath = child;
                 var curveName = $"m_Materials.Array.data[{index}]";
                 var binding = EditorCurveBinding.PPtrCurve(curvePath, typeof(Renderer), curveName);
-                AnimationUtility.SetObjectReferenceCurve(active, binding, value.ActiveCurve());
-                AnimationUtility.SetObjectReferenceCurve(inactive, binding, value.InactiveCurve());
+                if (value.UseActive) AnimationUtility.SetObjectReferenceCurve(active, binding, value.ActiveCurve());
+                if (value.UseInactive) AnimationUtility.SetObjectReferenceCurve(inactive, binding, value.InactiveCurve());
                 if (AvatarMenu.TransitionSeconds > 0)
                 {
                     AnimationUtility.SetObjectReferenceCurve(activate, binding, value.ActivateCurve(AvatarMenu.TransitionSeconds));
@@ -60,8 +61,8 @@ namespace net.narazaka.avatarmenucreator.editor
                 var value = AvatarMenu.ToggleBlendShapes[(child, name)];
                 var curvePath = child;
                 var curveName = $"blendShape.{name}";
-                active.SetCurve(curvePath, typeof(SkinnedMeshRenderer), curveName, value.ActiveCurve());
-                inactive.SetCurve(curvePath, typeof(SkinnedMeshRenderer), curveName, value.InactiveCurve());
+                if (value.UseActive) active.SetCurve(curvePath, typeof(SkinnedMeshRenderer), curveName, value.ActiveCurve());
+                if (value.UseInactive) inactive.SetCurve(curvePath, typeof(SkinnedMeshRenderer), curveName, value.InactiveCurve());
                 if (AvatarMenu.TransitionSeconds > 0)
                 {
                     activate.SetCurve(curvePath, typeof(SkinnedMeshRenderer), curveName, value.ActivateCurve(AvatarMenu.TransitionSeconds));
@@ -74,8 +75,8 @@ namespace net.narazaka.avatarmenucreator.editor
                 var value = AvatarMenu.ToggleShaderParameters[(child, name)];
                 var curvePath = child;
                 var curveName = $"material.{name}";
-                active.SetCurve(curvePath, typeof(Renderer), curveName, value.ActiveCurve());
-                inactive.SetCurve(curvePath, typeof(Renderer), curveName, value.InactiveCurve());
+                if (value.UseActive) active.SetCurve(curvePath, typeof(Renderer), curveName, value.ActiveCurve());
+                if (value.UseInactive) inactive.SetCurve(curvePath, typeof(Renderer), curveName, value.InactiveCurve());
                 if (AvatarMenu.TransitionSeconds > 0)
                 {
                     activate.SetCurve(curvePath, typeof(Renderer), curveName, value.ActivateCurve(AvatarMenu.TransitionSeconds));
