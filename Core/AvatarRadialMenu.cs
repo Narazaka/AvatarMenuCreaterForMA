@@ -187,7 +187,7 @@ namespace net.narazaka.avatarmenucreator
                             child,
                             "Shader Parameters",
                             RadialShaderParameters.HasChild(child),
-                            () => parameters.ToStrings().ToList(),
+                            () => parameters.Select(p => new NameAndDescriptionItemContainer(p) as ListTreeViewItemContainer<string>).ToList(),
                             () => RadialShaderParameters.Names(child).ToImmutableHashSet(),
                             name => AddRadialBlendShape(RadialShaderParameters, children, child, name, 1),
                             name => RemoveRadialBlendShape(RadialShaderParameters, children, child, name)

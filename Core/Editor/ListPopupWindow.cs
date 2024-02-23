@@ -30,6 +30,11 @@ namespace net.narazaka.avatarmenucreator
             GetExistItems = getExistItems;
         }
 
+        public override Vector2 GetWindowSize()
+        {
+            return new Vector2(300f, 200f);
+        }
+
         public override void OnGUI(Rect rect)
         {
             if (SearchField == null) SearchField = new SearchField();
