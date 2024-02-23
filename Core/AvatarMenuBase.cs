@@ -101,7 +101,13 @@ namespace net.narazaka.avatarmenucreator
         protected void ShowDetailMenu()
         {
             ParameterName = TextField("パラメーター名(オプショナル)", ParameterName);
-            InternalParameter = Toggle("パラメーター内部値", InternalParameter);
+            var internalParameterLabel =
+#if UNITY_2022_1_OR_NEWER && !NET_NARAZAKA_VRCHAT_AvatarMenuCreator_HAS_MA_BEFORE_1_8
+                "パラメーター自動リネーム";
+#else
+                "パラメーター内部値";
+#endif
+            InternalParameter = Toggle(internalParameterLabel, InternalParameter);
         }
 
         protected GameObject GetGameObject(string child)

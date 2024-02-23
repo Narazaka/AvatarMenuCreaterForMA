@@ -17,6 +17,11 @@
             "name": "nadena.dev.ndmf",
             "expression": "[1.0.0,2)",
             "define": "NET_NARAZAKA_VRCHAT_AvatarMenuCreator_HAS_NDMF"
+        },
+        {
+            "name": "nadena.dev.modular-avatar",
+            "expression": "[1.0.0,1.9.0)",
+            "define": "NET_NARAZAKA_VRCHAT_AvatarMenuCreator_HAS_MA_BEFORE_1_8"
         }
     ],
     "noEngineReferences": false
