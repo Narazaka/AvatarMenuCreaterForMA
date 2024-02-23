@@ -297,6 +297,19 @@ namespace net.narazaka.avatarmenucreator
                 return newValue;
             }
         }
+
+        protected Texture2D TextureField(Texture2D texture2D)
+        {
+            using (var check = new EditorGUI.ChangeCheckScope())
+            {
+                var newValue = EditorGUILayout.ObjectField(texture2D, typeof(Texture2D), false, GUILayout.Height(18)) as Texture2D;
+                if (check.changed)
+                {
+                    WillChange();
+                }
+                return newValue;
+            }
+        }
 #endif
     }
 }

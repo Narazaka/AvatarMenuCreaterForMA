@@ -121,11 +121,23 @@ namespace net.narazaka.avatarmenucreator
             if (ChooseDefaultValue >= ChooseCount) ChooseDefaultValue = ChooseCount - 1;
 
             EditorGUI.indentLevel++;
+            EditorGUIUtility.labelWidth = 65;
             for (var i = 0; i < ChooseCount; ++i)
             {
+                EditorGUILayout.BeginHorizontal();
                 ChooseNames[i] = TextField($"選択肢{i}", ChooseName(i));
-                ChooseIcons[i] = TextureField(" ", ChooseIcon(i));
+                ChooseIcons[i] = TextureField(ChooseIcon(i));
+                if (GUILayout.Button("↑", GUILayout.Width(19)))
+                {
+                    MoveChoice(i, i > 0 ? i - 1 : ChooseCount - 1);
+                }
+                if (GUILayout.Button("↓", GUILayout.Width(19)))
+                {
+                    MoveChoice(i, i < ChooseCount - 1 ? i + 1 : 0);
+                }
+                EditorGUILayout.EndHorizontal();
             }
+            EditorGUIUtility.labelWidth = 0;
             EditorGUI.indentLevel--;
 
             var allMaterials = children.ToDictionary(child => child, child => GetMaterialSlots(child));
@@ -233,6 +245,43 @@ namespace net.narazaka.avatarmenucreator
                     EditorGUI.indentLevel--;
                 }
                 EditorGUI.indentLevel--;
+            }
+        }
+
+        void MoveChoice(int from, int to)
+        {
+            WillChange();
+            ChooseNames.SwapKey(from, to);
+            ChooseIcons.SwapKey(from, to);
+            foreach (var indexes in ChooseObjects.Values)
+            {
+                var hasFrom = indexes.Contains(from);
+                var hasTo = indexes.Contains(to);
+                if (hasFrom != hasTo)
+                {
+                    if (hasFrom)
+                    {
+                        indexes.Remove(from);
+                        indexes.Add(to);
+                    }
+                    else
+                    {
+                        indexes.Remove(to);
+                        indexes.Add(from);
+                    }
+                }
+            }
+            foreach (var value in ChooseMaterials.Values)
+            {
+                value.SwapKey(from, to);
+            }
+            foreach (var value in ChooseBlendShapes.Values)
+            {
+                value.SwapKey(from, to);
+            }
+            foreach (var value in ChooseShaderParameters.Values)
+            {
+                value.SwapKey(from, to);
             }
         }
 
