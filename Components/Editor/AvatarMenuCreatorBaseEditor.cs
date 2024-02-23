@@ -116,6 +116,10 @@ namespace net.narazaka.avatarmenucreator.components.editor
                             UndoUtility.RecordObject(Creator, "change IncludeAssetType");
                             Creator.AvatarMenu.IncludeAssetType = newIncludeAssetType;
                         }
+                        if (Creator.AvatarMenu is AvatarToggleMenu toggleMenu && toggleMenu.UseAdvanced)
+                        {
+                            EditorGUILayout.HelpBox("アセットからの復元機能は高度な設定に対応していません\n生成後のアセットから設定を復元することは出来ません", MessageType.Warning);
+                        }
                         EditorGUI.BeginDisabledGroup(Creator.AvatarMenu.IncludeAssetType == IncludeAssetType.Component);
                         if (GUILayout.Button(hasAssets ? "この設定でアセットを再生成" : "この設定でアセットを生成"))
                         {

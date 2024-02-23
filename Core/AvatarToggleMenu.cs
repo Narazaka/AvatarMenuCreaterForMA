@@ -140,7 +140,6 @@ namespace net.narazaka.avatarmenucreator
             if (UseAdvanced)
             {
                 EditorGUILayout.HelpBox("高度な設定を有効にすると、ONまたはOFF片方だけ制御する設定ができます。", MessageType.Info);
-                EditorGUILayout.HelpBox("アセットからの復元機能は高度な設定に対応していません", MessageType.Warning);
             }
 
             EditorGUILayout.Space();
