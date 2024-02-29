@@ -341,8 +341,8 @@ namespace net.narazaka.avatarmenucreator
                         {
                             using (new EditorGUILayout.HorizontalScope())
                             {
-                                newValue.UseActive = EditorGUILayout.Toggle("ONのみ制御", value.UseActive);
-                                newValue.UseInactive = EditorGUILayout.Toggle("OFFのみ制御", value.UseInactive);
+                                newValue.UseActive = EditorGUILayout.Toggle("ONを制御", value.UseActive);
+                                newValue.UseInactive = EditorGUILayout.Toggle("OFFを制御", value.UseInactive);
                             }
                         }
                         if (!value.Equals(newValue))
