@@ -59,7 +59,7 @@ namespace net.narazaka.avatarmenucreator.editor
 
         void ShowBulkSet()
         {
-            var newBulkSet = EditorGUILayout.ToggleLeft("同名パラメーターや同マテリアルスロットを一括設定", BulkSet, BulkSet ? EditorStyles.boldLabel : EditorStyles.label);
+            var newBulkSet = EditorGUILayout.ToggleLeft(T.同名パラメーターや同マテリアルスロットを一括設定, BulkSet, BulkSet ? EditorStyles.boldLabel : EditorStyles.label);
             if (newBulkSet != BulkSet)
             {
                 UndoUtility.RecordObject(this, "BulkSet");
@@ -100,7 +100,7 @@ namespace net.narazaka.avatarmenucreator.editor
             if (VRCAvatarDescriptor == null)
             {
                 VRCAvatarDescriptor = null;
-                EditorGUILayout.LabelField("対象のアバターを選択して下さい");
+                EditorGUILayout.LabelField(T.対象のアバターを選択して下さい);
                 return;
             }
 
@@ -108,11 +108,11 @@ namespace net.narazaka.avatarmenucreator.editor
 
             if (children.Length == 0 || (children.Length == 1 && selectedGameObjects[0] == VRCAvatarDescriptor.gameObject))
             {
-                EditorGUILayout.LabelField("対象のオブジェクトを選択して下さい");
+                EditorGUILayout.LabelField(T.対象のオブジェクトを選択して下さい);
                 return;
             }
 
-            var newMenuType = (MenuType)EditorGUILayout.EnumPopup(MenuType);
+            var newMenuType = (MenuType)EnumPopupUtility.EnumPopup(MenuType);
             if (newMenuType != MenuType)
             {
                 UndoUtility.RecordObject(this, "MenuType");
@@ -140,7 +140,7 @@ namespace net.narazaka.avatarmenucreator.editor
                 AvatarRadialMenu.OnAvatarMenuGUI(children);
             }
 
-            var newIncludeAssetType = (IncludeAssetType)EditorGUILayout.EnumPopup("保存形式", IncludeAssetType);
+            var newIncludeAssetType = (IncludeAssetType)EnumPopupUtility.EnumPopup(T.保存形式, IncludeAssetType);
             if (newIncludeAssetType != IncludeAssetType)
             {
                 UndoUtility.RecordObject(this, "IncludeAssetType");
@@ -156,7 +156,7 @@ namespace net.narazaka.avatarmenucreator.editor
             {
                 if (MenuType != MenuType.Choose)
                 {
-                    var newMakeMultipleObjects = EditorGUILayout.ToggleLeft("選択オブジェクト一つごとにメニューを作成", MakeMultipleObjects);
+                    var newMakeMultipleObjects = EditorGUILayout.ToggleLeft(T.選択オブジェクト一つごとにメニューを作成, MakeMultipleObjects);
                     if (newMakeMultipleObjects != MakeMultipleObjects)
                     {
                         UndoUtility.RecordObject(this, "MakeMultipleObjects");
@@ -165,7 +165,7 @@ namespace net.narazaka.avatarmenucreator.editor
                 }
                 if (!MakeMultipleObjectsEffective)
                 {
-                    var newBaseName = EditorGUILayout.TextField("名前", BaseName);
+                    var newBaseName = EditorGUILayout.TextField(T.名前, BaseName);
                     if (newBaseName != BaseName)
                     {
                         UndoUtility.RecordObject(this, "BaseName");
@@ -208,7 +208,7 @@ namespace net.narazaka.avatarmenucreator.editor
 #else
                             (GameObject prefab) => { };
 #endif
-                        var prefabPath = EditorUtility.SaveFilePanelInProject("保存場所", "New Menu", "prefab", "アセットの保存場所", SaveFolder);
+                        var prefabPath = EditorUtility.SaveFilePanelInProject(T.保存場所, "New Menu", "prefab", T.保存場所, SaveFolder);
                         if (string.IsNullOrEmpty(prefabPath)) return;
                         var (basePath, baseName) = Util.GetBasePathAndNameFromPrefabPath(prefabPath);
                         var createAvatarMenu = CreateAvatarMenuBase.GetCreateAvatarMenu(avatarMenu);

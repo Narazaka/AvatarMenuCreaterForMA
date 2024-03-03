@@ -72,7 +72,7 @@ namespace net.narazaka.avatarmenucreator
         {
             using (var check = new EditorGUI.ChangeCheckScope())
             {
-                var newTransitionSeconds = EditorGUILayout.FloatField("徐々に変化（秒数）", TransitionSeconds);
+                var newTransitionSeconds = EditorGUILayout.FloatField(T.徐々に変化_start_秒数_end_, TransitionSeconds);
                 if (check.changed)
                 {
                     WillChange();
@@ -84,28 +84,28 @@ namespace net.narazaka.avatarmenucreator
             {
                 if (!IsSuitableForTransition())
                 {
-                    EditorGUILayout.HelpBox("徐々に変化するものの指定が有りません", MessageType.Warning);
+                    EditorGUILayout.HelpBox(T.徐々に変化するものの指定が有りません, MessageType.Warning);
                 }
                 else
                 {
-                    EditorGUILayout.HelpBox("指定時間かけて変化します", MessageType.Info);
+                    EditorGUILayout.HelpBox(T.指定時間かけて変化します, MessageType.Info);
                 }
             }
         }
 
         protected void ShowSaved()
         {
-            Saved = Toggle("パラメーター保存", Saved);
+            Saved = Toggle(T.パラメーター保存, Saved);
         }
 
         protected void ShowDetailMenu()
         {
-            ParameterName = TextField("パラメーター名(オプショナル)", ParameterName);
+            ParameterName = TextField(T.パラメーター名_start_オプショナル_end_, ParameterName);
             var internalParameterLabel =
 #if UNITY_2022_1_OR_NEWER && !NET_NARAZAKA_VRCHAT_AvatarMenuCreator_HAS_MA_BEFORE_1_8
-                "パラメーター自動リネーム";
+                T.パラメーター自動リネーム;
 #else
-                "パラメーター内部値";
+                T.パラメーター内部値;
 #endif
             InternalParameter = Toggle(internalParameterLabel, InternalParameter);
         }

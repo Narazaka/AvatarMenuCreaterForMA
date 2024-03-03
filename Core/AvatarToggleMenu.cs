@@ -50,7 +50,7 @@ namespace net.narazaka.avatarmenucreator
                 {
                     if (!value && HasAdvanced)
                     {
-                        if (EditorUtility.DisplayDialog("高度な設定の削除", "高度な設定がリセットされます\n本当に高度な設定を無効にしますか？", "OK", "Cancel"))
+                        if (EditorUtility.DisplayDialog(T.高度な設定の削除, T.高度な設定がリセットされます_n_本当に高度な設定を無効にしますか_Q_, "OK", "Cancel"))
                         {
                             _UseAdvanced = value;
                             WillChange();
@@ -132,14 +132,14 @@ namespace net.narazaka.avatarmenucreator
 
         protected override void OnHeaderGUI(IList<string> children)
         {
-            ToggleIcon = TextureField("アイコン", ToggleIcon);
-            ToggleDefaultValue = Toggle("パラメーター初期値", ToggleDefaultValue);
+            ToggleIcon = TextureField(T.アイコン, ToggleIcon);
+            ToggleDefaultValue = Toggle(T.パラメーター初期値, ToggleDefaultValue);
             ShowSaved();
             ShowDetailMenu();
-            UseAdvanced = EditorGUILayout.Toggle("高度な設定", UseAdvanced);
+            UseAdvanced = EditorGUILayout.Toggle(T.高度な設定, UseAdvanced);
             if (UseAdvanced)
             {
-                EditorGUILayout.HelpBox("高度な設定を有効にすると、ONまたはOFF片方だけ制御する設定ができます。", MessageType.Info);
+                EditorGUILayout.HelpBox(T.高度な設定を有効にするとヽONまたはOFF片方だけ制御する設定ができますゝ, MessageType.Info);
             }
 
             EditorGUILayout.Space();
@@ -150,7 +150,7 @@ namespace net.narazaka.avatarmenucreator
 
             if (BulkSet)
             {
-                if (FoldoutHeader("", "一括設定", true))
+                if (FoldoutHeader("", T.一括設定, true))
                 {
                     ShowToggleBulkMaterialControl(allMaterials);
                 }
@@ -234,10 +234,10 @@ namespace net.narazaka.avatarmenucreator
             using (new EditorGUILayout.HorizontalScope())
             {
                 EditorGUIUtility.labelWidth = 75;
-                if (EditorGUILayout.Toggle("制御しない", type == ToggleType.None) && type != ToggleType.None) newType = ToggleType.None;
-                if (EditorGUILayout.Toggle("ON=表示", type == ToggleType.ON) && type != ToggleType.ON) newType = ToggleType.ON;
+                if (EditorGUILayout.Toggle(T.制御しない, type == ToggleType.None) && type != ToggleType.None) newType = ToggleType.None;
+                if (EditorGUILayout.Toggle(T.ON_eq_表示, type == ToggleType.ON) && type != ToggleType.ON) newType = ToggleType.ON;
                 EditorGUIUtility.labelWidth = 80;
-                if (EditorGUILayout.Toggle("ON=非表示", type == ToggleType.OFF) && type != ToggleType.OFF) newType = ToggleType.OFF;
+                if (EditorGUILayout.Toggle(T.ON_eq_非表示, type == ToggleType.OFF) && type != ToggleType.OFF) newType = ToggleType.OFF;
                 EditorGUIUtility.labelWidth = 0;
             }
             // Debug.Log($"{type} {newType}");
@@ -277,10 +277,10 @@ namespace net.narazaka.avatarmenucreator
                     }
                     var newUse = use;
                     EditorGUIUtility.labelWidth = 70;
-                    if (EditorGUILayout.Toggle("両方制御", use == ToggleUsing.Both) && use != ToggleUsing.Both) newUse = ToggleUsing.Both;
+                    if (EditorGUILayout.Toggle(T.両方制御, use == ToggleUsing.Both) && use != ToggleUsing.Both) newUse = ToggleUsing.Both;
                     EditorGUIUtility.labelWidth = 90;
-                    if (EditorGUILayout.Toggle("ONのみ制御", use == ToggleUsing.ON) && use != ToggleUsing.ON) newUse = ToggleUsing.ON;
-                    if (EditorGUILayout.Toggle("OFFのみ制御", use == ToggleUsing.OFF) && use != ToggleUsing.OFF) newUse = ToggleUsing.OFF;
+                    if (EditorGUILayout.Toggle(T.ONのみ制御, use == ToggleUsing.ON) && use != ToggleUsing.ON) newUse = ToggleUsing.ON;
+                    if (EditorGUILayout.Toggle(T.OFFのみ制御, use == ToggleUsing.OFF) && use != ToggleUsing.OFF) newUse = ToggleUsing.OFF;
                     EditorGUIUtility.labelWidth = 0;
                     if (use != newUse)
                     {
@@ -334,15 +334,15 @@ namespace net.narazaka.avatarmenucreator
                         if (TransitionSeconds > 0)
                         {
                             EditorGUIUtility.labelWidth = 110;
-                            newValue.TransitionOffsetPercent = EditorGUILayout.FloatField("変化待機%", value.TransitionOffsetPercent, GUILayout.Width(140));
+                            newValue.TransitionOffsetPercent = EditorGUILayout.FloatField(T.変化待機_per_, value.TransitionOffsetPercent, GUILayout.Width(140));
                             EditorGUIUtility.labelWidth = 0;
                         }
                         if (UseAdvanced)
                         {
                             using (new EditorGUILayout.HorizontalScope())
                             {
-                                newValue.UseActive = EditorGUILayout.Toggle("ONを制御", value.UseActive);
-                                newValue.UseInactive = EditorGUILayout.Toggle("OFFを制御", value.UseInactive);
+                                newValue.UseActive = EditorGUILayout.Toggle(T.ONを制御, value.UseActive);
+                                newValue.UseInactive = EditorGUILayout.Toggle(T.OFFを制御, value.UseInactive);
                             }
                         }
                         if (!value.Equals(newValue))
@@ -489,15 +489,15 @@ namespace net.narazaka.avatarmenucreator
                 if (TransitionSeconds > 0)
                 {
                     EditorGUIUtility.labelWidth = 110;
-                    newValue.TransitionOffsetPercent = EditorGUILayout.FloatField("変化待機%", value.TransitionOffsetPercent, GUILayout.Width(140));
+                    newValue.TransitionOffsetPercent = EditorGUILayout.FloatField(T.変化待機_per_, value.TransitionOffsetPercent, GUILayout.Width(140));
                     EditorGUIUtility.labelWidth = 0;
                 }
                 if (UseAdvanced)
                 {
                     using (new EditorGUILayout.HorizontalScope())
                     {
-                        newValue.UseActive = EditorGUILayout.Toggle("ONを制御", value.UseActive);
-                        newValue.UseInactive = EditorGUILayout.Toggle("OFFを制御", value.UseInactive);
+                        newValue.UseActive = EditorGUILayout.Toggle(T.ONを制御, value.UseActive);
+                        newValue.UseInactive = EditorGUILayout.Toggle(T.OFFを制御, value.UseInactive);
                     }
                 }
                 if (!value.Equals(newValue))
@@ -507,28 +507,28 @@ namespace net.narazaka.avatarmenucreator
                 }
                 if (inactiveMaterials.Count != 1)
                 {
-                    EditorGUILayout.HelpBox("OFFに複数のマテリアルが選択されています", MessageType.Warning);
+                    EditorGUILayout.HelpBox(T.OFFに複数のマテリアルが選択されています, MessageType.Warning);
                 }
                 if (activeMaterials.Count != 1)
                 {
-                    EditorGUILayout.HelpBox("ONに複数のマテリアルが選択されています", MessageType.Warning);
+                    EditorGUILayout.HelpBox(T.ONに複数のマテリアルが選択されています, MessageType.Warning);
                 }
                 if (TransitionSeconds > 0)
                 {
                     if (transitionOffsetPercents.Count != 1)
                     {
-                        EditorGUILayout.HelpBox("複数の変化待機%が設定されています", MessageType.Warning);
+                        EditorGUILayout.HelpBox(T.複数の変化待機_per_が設定されています, MessageType.Warning);
                     }
                 }
                 if (UseAdvanced)
                 {
                     if (useActives.Count != 1)
                     {
-                        EditorGUILayout.HelpBox("ONを制御に複数の設定がされています", MessageType.Warning);
+                        EditorGUILayout.HelpBox(T.ONを制御に複数の設定がされています, MessageType.Warning);
                     }
                     if (useInactives.Count != 1)
                     {
-                        EditorGUILayout.HelpBox("OFFを制御に複数の設定がされています", MessageType.Warning);
+                        EditorGUILayout.HelpBox(T.OFFを制御に複数の設定がされています, MessageType.Warning);
                     }
                 }
                 EditorGUI.indentLevel--;
@@ -568,15 +568,15 @@ namespace net.narazaka.avatarmenucreator
                             {
                                 EditorGUI.indentLevel++;
                                 EditorGUIUtility.labelWidth = 110;
-                                newValue.TransitionOffsetPercent = EditorGUILayout.FloatField("変化待機%", value.TransitionOffsetPercent, GUILayout.Width(140));
-                                newValue.TransitionDurationPercent = EditorGUILayout.FloatField("変化時間%", value.TransitionDurationPercent, GUILayout.Width(140));
+                                newValue.TransitionOffsetPercent = EditorGUILayout.FloatField(T.変化待機_per_, value.TransitionOffsetPercent, GUILayout.Width(140));
+                                newValue.TransitionDurationPercent = EditorGUILayout.FloatField(T.変化時間_per_, value.TransitionDurationPercent, GUILayout.Width(140));
                                 EditorGUIUtility.labelWidth = 0;
                                 EditorGUI.indentLevel--;
                             }
                             // 過去互換性
                             if (newValue.TransitionDurationPercent <= 0)
                             {
-                                EditorGUILayout.HelpBox("変化時間%は0より大きく設定して下さい", MessageType.Error);
+                                EditorGUILayout.HelpBox(T.変化時間_per_は0より大きく設定して下さい, MessageType.Error);
                             }
                         }
                         if (UseAdvanced)
@@ -584,8 +584,8 @@ namespace net.narazaka.avatarmenucreator
                             using (new EditorGUILayout.HorizontalScope())
                             {
                                 EditorGUI.indentLevel++;
-                                newValue.UseActive = EditorGUILayout.Toggle("ONを制御", value.UseActive);
-                                newValue.UseInactive = EditorGUILayout.Toggle("OFFを制御", value.UseInactive);
+                                newValue.UseActive = EditorGUILayout.Toggle(T.ONを制御, value.UseActive);
+                                newValue.UseInactive = EditorGUILayout.Toggle(T.OFFを制御, value.UseInactive);
                                 EditorGUI.indentLevel--;
                             }
                         }

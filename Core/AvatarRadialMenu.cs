@@ -73,8 +73,8 @@ namespace net.narazaka.avatarmenucreator
 
         protected override void OnHeaderGUI(IList<string> children)
         {
-            RadialIcon = TextureField("アイコン", RadialIcon);
-            RadialDefaultValue = FloatField("パラメーター初期値", RadialDefaultValue);
+            RadialIcon = TextureField(T.アイコン, RadialIcon);
+            RadialDefaultValue = FloatField(T.パラメーター初期値, RadialDefaultValue);
             ShowSaved();
             ShowDetailMenu();
             if (RadialDefaultValue < 0) RadialDefaultValue = 0;
@@ -84,19 +84,19 @@ namespace net.narazaka.avatarmenucreator
 
             if (RadialInactiveRange)
             {
-                if (!EditorGUILayout.Toggle("無効領域を設定", true))
+                if (!EditorGUILayout.Toggle(T.無効領域を設定, true))
                 {
                     WillChange();
                     RadialInactiveRange = false;
                 }
-                EditorGUILayout.HelpBox("アニメーションが影響しないパラメーター領域を設定します", MessageType.Info);
+                EditorGUILayout.HelpBox(T.アニメーションが影響しないパラメーター領域を設定します, MessageType.Info);
                 using (new EditorGUI.IndentLevelScope())
                 {
                     using (new EditorGUILayout.HorizontalScope())
                     {
                         if (float.IsNaN(RadialInactiveRangeMin))
                         {
-                            var active = EditorGUILayout.ToggleLeft("これより大きい場合", false);
+                            var active = EditorGUILayout.ToggleLeft(T.これより大きい場合, false);
                             if (active)
                             {
                                 WillChange();
@@ -105,7 +105,7 @@ namespace net.narazaka.avatarmenucreator
                         }
                         else
                         {
-                            var active = EditorGUILayout.ToggleLeft("これより大きい場合", true);
+                            var active = EditorGUILayout.ToggleLeft(T.これより大きい場合, true);
                             if (active)
                             {
                                 RadialInactiveRangeMin = FloatField(RadialInactiveRangeMin);
@@ -121,7 +121,7 @@ namespace net.narazaka.avatarmenucreator
                     {
                         if (float.IsNaN(RadialInactiveRangeMax))
                         {
-                            var active = EditorGUILayout.ToggleLeft("これより小さい場合", false);
+                            var active = EditorGUILayout.ToggleLeft(T.これより小さい場合, false);
                             if (active)
                             {
                                 WillChange();
@@ -130,7 +130,7 @@ namespace net.narazaka.avatarmenucreator
                         }
                         else
                         {
-                            var active = EditorGUILayout.ToggleLeft("これより小さい場合", true);
+                            var active = EditorGUILayout.ToggleLeft(T.これより小さい場合, true);
                             if (active)
                             {
                                 RadialInactiveRangeMax = FloatField(RadialInactiveRangeMax);
@@ -146,7 +146,7 @@ namespace net.narazaka.avatarmenucreator
             }
             else
             {
-                if (EditorGUILayout.Toggle("無効領域を設定", false))
+                if (EditorGUILayout.Toggle(T.無効領域を設定, false))
                 {
                     WillChange();
                     RadialInactiveRange = true;
@@ -201,7 +201,7 @@ namespace net.narazaka.avatarmenucreator
                 }
                 else
                 {
-                    EditorGUILayout.LabelField($"{path} (BlendShape/Shader Parameterなし)", EditorStyles.boldLabel);
+                    EditorGUILayout.LabelField($"{path} ({T.BlendShape_sl_Shader_Parameterなし})", EditorStyles.boldLabel);
                 }
             }
         }
@@ -227,13 +227,13 @@ namespace net.narazaka.avatarmenucreator
                         using (new EditorGUILayout.HorizontalScope())
                         {
                             EditorGUI.indentLevel++;
-                            EditorGUIUtility.labelWidth = 60;
-                            newValue.Start = EditorGUILayout.FloatField("始", value.Start, GUILayout.Width(90));
-                            newValue.End = EditorGUILayout.FloatField("終", value.End, GUILayout.Width(90));
+                            EditorGUIUtility.labelWidth = 75;
+                            newValue.Start = EditorGUILayout.FloatField(T.始, value.Start, GUILayout.Width(105));
+                            newValue.End = EditorGUILayout.FloatField(T.終, value.End, GUILayout.Width(105));
                             EditorGUIUtility.labelWidth = 70;
                             using (new EditorGUI.DisabledGroupScope(true))
                             {
-                                EditorGUILayout.FloatField("初期", value.Start * (1 - RadialDefaultValue) + value.End * RadialDefaultValue, GUILayout.Width(100));
+                                EditorGUILayout.FloatField(T.初期, value.Start * (1 - RadialDefaultValue) + value.End * RadialDefaultValue, GUILayout.Width(100));
                             }
                             EditorGUIUtility.labelWidth = 0;
                             EditorGUI.indentLevel--;

@@ -4,11 +4,14 @@ namespace net.narazaka.avatarmenucreator.editor
 {
     enum MenuType
     {
-        [InspectorName("ON／OFF")]
+        [Japanese("ON／OFF")]
+        [English("Toggle")]
         Toggle,
-        [InspectorName("選択式")]
+        [Japanese("選択式")]
+        [English("Select")]
         Choose,
-        [InspectorName("無段階制御")]
+        [Japanese("無段階制御")]
+        [English("Range")]
         Slider,
     }
 }

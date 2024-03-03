@@ -4,14 +4,18 @@ namespace net.narazaka.avatarmenucreator
 {
     public enum IncludeAssetType
     {
-        [InspectorName("全て個別に保存")]
+        [Japanese("全て個別に保存")]
+        [English("All saved individually")]
         Extract,
-        [InspectorName("prefabとanimator")]
+        [Japanese("prefabとanimator")]
+        [English("prefab & animator")]
         AnimatorAndInclude,
-        [InspectorName("全てprefabに含める")]
+        [Japanese("全てprefabに含める")]
+        [English("one prefab")]
         Include,
 #if NET_NARAZAKA_VRCHAT_AvatarMenuCreator_HAS_NDMF
-        [InspectorName("コンポーネントとして保持")]
+        [Japanese("コンポーネントとして保持")]
+        [English("as component")]
         Component,
 #endif
     }

@@ -45,8 +45,8 @@ namespace net.narazaka.avatarmenucreator.components.editor
             var hasAssets = !Creator.IsEffective;
             if (hasAssets)
             {
-                EditorGUILayout.HelpBox("MA Merge AnimatorまたはMA Parametersがある場合、 このコンポーネントは影響せずそれらの設定がそのまま使われます。", MessageType.Info);
-                if (GUILayout.Button("コンポーネントの設定を優先する") && EditorUtility.DisplayDialog("本当に削除しますか？", "MA Merge AnimatorとMA Parametersを削除します。\nMA Menu Installerのインストールされるメニューをリセットします。", "OK", "Cancel"))
+                EditorGUILayout.HelpBox(T.MA_Merge_AnimatorまたはMA_Parametersがある場合ヽ_このコンポーネントは影響せずそれらの設定がそのまま使われますゝ, MessageType.Info);
+                if (GUILayout.Button(T.コンポーネントの設定を優先する) && EditorUtility.DisplayDialog(T.本当に削除しますか_Q_, T.MA_Merge_AnimatorとMA_Parametersを削除しますゝ_n_MA_Menu_Installerのインストールされるメニューをリセットしますゝ, "OK", "Cancel"))
                 {
                     var mergeAnimator = Creator.GetComponent<ModularAvatarMergeAnimator>();
                     if (mergeAnimator != null)
@@ -71,10 +71,10 @@ namespace net.narazaka.avatarmenucreator.components.editor
                 var maMenuInstaller = Creator.GetComponent<ModularAvatarMenuInstaller>();
                 if (maMenuInstaller?.menuToAppend != null)
                 {
-                    EditorGUILayout.HelpBox("MA Menu Installerのプレハブ開発者向け設定/インストールされるメニューが設定されていますが、無視されます。", MessageType.Warning);
+                    EditorGUILayout.HelpBox(T.MA_Menu_Installerのプレハブ開発者向け設定_sl_インストールされるメニューが設定されていますがヽ無視されますゝ, MessageType.Warning);
                 }
 
-                EditorGUILayout.HelpBox("MA Menu Installerのインストール先にインストールされます。\nMA Menu Installer が無い場合は MA Menu Item のように振る舞います。 （ネストしたメニューなどに便利）", MessageType.Info);
+                EditorGUILayout.HelpBox(T.MA_Menu_Installerのインストール先にインストールされますゝ_n_MA_Menu_Installer_が無い場合は_MA_Menu_Item_のように振る舞いますゝ__start_ネストしたメニューなどに便利_end_, MessageType.Info);
                 if (baseObject != null)
                 {
                     var parentMenuItem = Creator.transform.parent.GetComponent<ModularAvatarMenuItem>();
@@ -82,8 +82,8 @@ namespace net.narazaka.avatarmenucreator.components.editor
                     {
                         if (maMenuInstaller != null)
                         {
-                            EditorGUILayout.HelpBox("MA Menu Itemのサブメニュー配下にあります。\nMA Menu Installerがなくてもインストールできます。", MessageType.Info);
-                            if (GUILayout.Button("MA Menu Installerを削除") && EditorUtility.DisplayDialog("本当に削除しますか？", "MA Menu Installerを削除します", "OK", "Cancel"))
+                            EditorGUILayout.HelpBox(T.MA_Menu_Itemのサブメニュー配下にありますゝ_n_MA_Menu_Installerがなくてもインストールできますゝ, MessageType.Info);
+                            if (GUILayout.Button(T.MA_Menu_Installerを削除) && EditorUtility.DisplayDialog(T.本当に削除しますか_Q_, T.MA_Menu_Installerを削除します, "OK", "Cancel"))
                             {
                                 Undo.DestroyObjectImmediate(maMenuInstaller);
                             }
@@ -93,8 +93,8 @@ namespace net.narazaka.avatarmenucreator.components.editor
                     {
                         if (maMenuInstaller == null)
                         {
-                            EditorGUILayout.HelpBox("MA Menu Itemのサブメニュー配下にありません。\nMA Menu Installerが必要です。", MessageType.Warning);
-                            if (GUILayout.Button("MA Menu Installerを追加"))
+                            EditorGUILayout.HelpBox(T.MA_Menu_Itemのサブメニュー配下にありませんゝ_n_MA_Menu_Installerが必要ですゝ, MessageType.Warning);
+                            if (GUILayout.Button(T.MA_Menu_Installerを追加))
                             {
                                 var installer = Creator.gameObject.AddComponent<ModularAvatarMenuInstaller>();
                                 Undo.RegisterCreatedObjectUndo(installer, "Remove MA Menu Installer");
@@ -106,11 +106,11 @@ namespace net.narazaka.avatarmenucreator.components.editor
 
             if (PrefabUtility.GetOutermostPrefabInstanceRoot(Creator.gameObject) == Creator.gameObject)
             {
-                if (FoldoutSave = EditorGUILayout.Foldout(FoldoutSave, hasAssets ? "アセット生成/復元（オプショナル）" : "アセット生成（オプショナル）"))
+                if (FoldoutSave = EditorGUILayout.Foldout(FoldoutSave, hasAssets ? T.アセット生成_復元_オプショナル : T.アセット生成_オプショナル))
                 {
                     using (new EditorGUI.IndentLevelScope())
                     {
-                        var newIncludeAssetType = (IncludeAssetType)EditorGUILayout.EnumPopup("保存形式", Creator.AvatarMenu.IncludeAssetType);
+                        var newIncludeAssetType = (IncludeAssetType)EnumPopupUtility.EnumPopup(T.保存形式, Creator.AvatarMenu.IncludeAssetType);
                         if (newIncludeAssetType != Creator.AvatarMenu.IncludeAssetType)
                         {
                             UndoUtility.RecordObject(Creator, "change IncludeAssetType");
@@ -118,10 +118,10 @@ namespace net.narazaka.avatarmenucreator.components.editor
                         }
                         if (Creator.AvatarMenu is AvatarToggleMenu toggleMenu && toggleMenu.UseAdvanced)
                         {
-                            EditorGUILayout.HelpBox("アセットからの復元機能は高度な設定に対応していません\n生成後のアセットから設定を復元することは出来ません", MessageType.Warning);
+                            EditorGUILayout.HelpBox(T.アセットからの復元機能は高度な設定に対応していません_n_生成後のアセットから設定を復元することは出来ません, MessageType.Warning);
                         }
                         EditorGUI.BeginDisabledGroup(Creator.AvatarMenu.IncludeAssetType == IncludeAssetType.Component);
-                        if (GUILayout.Button(hasAssets ? "この設定でアセットを再生成" : "この設定でアセットを生成"))
+                        if (GUILayout.Button(hasAssets ? T.この設定でアセットを再生成 : T.この設定でアセットを生成))
                         {
                             var prefabPath = AssetDatabase.GetAssetPath(Creator.gameObject);
                             if (string.IsNullOrEmpty(prefabPath))
@@ -140,38 +140,38 @@ namespace net.narazaka.avatarmenucreator.components.editor
                         EditorGUI.EndDisabledGroup();
                         if (hasAssets)
                         {
-                            EditorGUILayout.HelpBox("設定を変えてアセットを再生成出来ます", MessageType.Info);
+                            EditorGUILayout.HelpBox(T.設定を変えてアセットを再生成出来ます, MessageType.Info);
                         }
                         else
                         {
-                            EditorGUILayout.HelpBox("手動編集用にアセットを生成できます", MessageType.Info);
+                            EditorGUILayout.HelpBox(T.手動編集用にアセットを生成できます, MessageType.Info);
                         }
-                        if (GUILayout.Button("アセット内容から設定を復元") && Restore(Creator.gameObject))
+                        if (GUILayout.Button(T.アセット内容から設定を復元) && Restore(Creator.gameObject))
                         {
                             return;
                         }
-                        EditorGUILayout.HelpBox("アセットを手動で編集していた場合などは正確な復元にならない可能性があります。", MessageType.Warning);
+                        EditorGUILayout.HelpBox(T.アセットを手動で編集していた場合などは正確な復元にならない可能性があります, MessageType.Warning);
                     }
                 }
                 EditorGUILayout.Space();
             }
             else if (baseObject != null)
             {
-                if (FoldoutSave = EditorGUILayout.Foldout(FoldoutSave, "アセット生成（オプショナル）"))
+                if (FoldoutSave = EditorGUILayout.Foldout(FoldoutSave, T.アセット生成_オプショナル))
                 {
-                    EditorGUILayout.HelpBox("このオブジェクトをprefabにすると手動編集用にアセットを生成できます", MessageType.Info);
+                    EditorGUILayout.HelpBox(T.このオブジェクトをprefabにすると手動編集用にアセットを生成できます, MessageType.Info);
                 }
                 EditorGUILayout.Space();
             }
 
             if (baseObject == null)
             {
-                EditorGUILayout.HelpBox("このコンポーネントが正しく動作するには、アバター内に配置する必要があります。", MessageType.Warning);
+                EditorGUILayout.HelpBox(T.このコンポーネントが正しく動作するにはヽアバター内に配置する必要がありますゝ, MessageType.Warning);
             }
 
             if (baseObject != null)
             {
-                var child = EditorGUILayout.ObjectField("オブジェクトを追加", null, typeof(GameObject), true) as GameObject;
+                var child = EditorGUILayout.ObjectField(T.オブジェクトを追加, null, typeof(GameObject), true) as GameObject;
                 if (child != null)
                 {
                     UndoUtility.RecordObject(this, "Add Children");
@@ -190,7 +190,7 @@ namespace net.narazaka.avatarmenucreator.components.editor
                     {
                         if (GUILayout.Button("×", GUILayout.Width(20)))
                         {
-                            if (EditorUtility.DisplayDialog("本当に削除しますか？", c, "OK", "Cancel")) toRemoves.Add(c);
+                            if (EditorUtility.DisplayDialog(T.本当に削除しますか_Q_, c, "OK", "Cancel")) toRemoves.Add(c);
                             break;
                         }
                         if (GUILayout.Button(EditorGUIUtility.IconContent("editicon.sml"), GUILayout.Width(20)))
@@ -213,7 +213,7 @@ namespace net.narazaka.avatarmenucreator.components.editor
                             if (newObj != null)
                             {
                                 var newPath = Util.ChildPath(baseObject, newObj as GameObject);
-                                if (EditorUtility.DisplayDialog("本当に変更しますか？", $"{c} -> {newPath}", "OK", "Cancel"))
+                                if (EditorUtility.DisplayDialog(T.本当に変更しますか_Q_, $"{c} -> {newPath}", "OK", "Cancel"))
                                 {
                                     Creator.AvatarMenu.ReplaceStoredChild(EditChild, newPath);
                                     UpdateChildren();
@@ -225,7 +225,7 @@ namespace net.narazaka.avatarmenucreator.components.editor
                             {
                                 if (GUILayout.Button("OK"))
                                 {
-                                    if (EditorUtility.DisplayDialog("本当に変更しますか？", $"{c} -> {EditChildNew}", "OK", "Cancel"))
+                                    if (EditorUtility.DisplayDialog(T.本当に変更しますか_Q_, $"{c} -> {EditChildNew}", "OK", "Cancel"))
                                     {
                                         Creator.AvatarMenu.ReplaceStoredChild(EditChild, EditChildNew);
                                         UpdateChildren();
@@ -255,10 +255,10 @@ namespace net.narazaka.avatarmenucreator.components.editor
             }
             if (toFilters.Count > 0)
             {
-                EditorGUILayout.HelpBox("アバターに存在しないオブジェクト名が指定されています", MessageType.Warning);
+                EditorGUILayout.HelpBox(T.アバターに存在しないオブジェクト名が指定されています, MessageType.Warning);
             }
 
-            var newBulkSet = EditorGUILayout.ToggleLeft("同名パラメーターや同マテリアルスロットを一括設定", BulkSet, BulkSet ? EditorStyles.boldLabel : EditorStyles.label);
+            var newBulkSet = EditorGUILayout.ToggleLeft(T.同名パラメーターや同マテリアルスロットを一括設定, BulkSet, BulkSet ? EditorStyles.boldLabel : EditorStyles.label);
             if (newBulkSet != BulkSet)
             {
                 UndoUtility.RecordObject(this, "BulkSet");
@@ -276,8 +276,8 @@ namespace net.narazaka.avatarmenucreator.components.editor
             return Creator.GetComponentInParent<VRCAvatarDescriptor>()?.gameObject;
         }
 
-        [MenuItem("CONTEXT/ModularAvatarParameters/AvatarMenuCreator for MA/アセット内容から設定を復元")]
-        [MenuItem("CONTEXT/ModularAvatarMergeAnimator/AvatarMenuCreator for MA/アセット内容から設定を復元")]
+        [MenuItem("CONTEXT/ModularAvatarParameters/AvatarMenuCreator for MA/アセット内容から設定を復元 (Restore)")]
+        [MenuItem("CONTEXT/ModularAvatarMergeAnimator/AvatarMenuCreator for MA/アセット内容から設定を復元 (Restore)")]
         static void RestoreFromMenu(MenuCommand command)
         {
             var creator = command.context as Component;
@@ -292,7 +292,7 @@ namespace net.narazaka.avatarmenucreator.components.editor
                 var avatarMenuBase = RestoreAvatarMenuBase<AvatarMenuBase>.RestoreAssets(gameObject);
                 if (avatarMenuBase == null)
                 {
-                    EditorUtility.DisplayDialog("復元に失敗しました", "適切な復元法が見つかりません", "OK");
+                    EditorUtility.DisplayDialog(T.復元に失敗しました, T.適切な復元法が見つかりません, "OK");
                     return false;
                 }
                 var creator = gameObject.GetComponent<AvatarMenuCreatorBase>();
@@ -310,12 +310,12 @@ namespace net.narazaka.avatarmenucreator.components.editor
                         {
                             UndoUtility.RecordObject(creator, "Restore Assets");
                             toggleMenuCreator.AvatarToggleMenu = avatarMenu;
-                            EditorUtility.DisplayDialog("成功", "復元に成功しました", "OK");
+                            EditorUtility.DisplayDialog(T.成功, T.復元に成功しました, "OK");
                             return true;
                         }
                         else
                         {
-                            if (EditorUtility.DisplayDialog("警告", "今のコンポーネントと別のコンポーネントに置き換わります。\n続行しますか？", "OK", "Cancel"))
+                            if (EditorUtility.DisplayDialog(T.警告, T.今のコンポーネントと別のコンポーネントに置き換わりますゝ_n_続行しますか_Q_, "OK", "Cancel"))
                             {
                                 UndoUtility.RecordObject(creator, "Restore Assets destroy component");
                                 var go = creator.gameObject;
@@ -323,7 +323,7 @@ namespace net.narazaka.avatarmenucreator.components.editor
                                 var component = go.AddComponent<AvatarToggleMenuCreator>();
                                 component.AvatarToggleMenu = avatarMenu;
                                 Undo.RegisterCreatedObjectUndo(component, "Restore Assets create component");
-                                EditorUtility.DisplayDialog("成功", "復元に成功しました", "OK");
+                                EditorUtility.DisplayDialog(T.成功, T.復元に成功しました, "OK");
                                 return true;
                             }
                         }
@@ -334,12 +334,12 @@ namespace net.narazaka.avatarmenucreator.components.editor
                         {
                             UndoUtility.RecordObject(creator, "Restore Assets");
                             chooseMenuCreator.AvatarChooseMenu = avatarChooseMenu;
-                            EditorUtility.DisplayDialog("成功", "復元に成功しました", "OK");
+                            EditorUtility.DisplayDialog(T.成功, T.復元に成功しました, "OK");
                             return true;
                         }
                         else
                         {
-                            if (EditorUtility.DisplayDialog("警告", "今のコンポーネントと別のコンポーネントに置き換わります。\n続行しますか？", "OK", "Cancel"))
+                            if (EditorUtility.DisplayDialog(T.警告, T.今のコンポーネントと別のコンポーネントに置き換わりますゝ_n_続行しますか_Q_, "OK", "Cancel"))
                             {
                                 UndoUtility.RecordObject(creator, "Restore Assets destroy component");
                                 var go = creator.gameObject;
@@ -347,7 +347,7 @@ namespace net.narazaka.avatarmenucreator.components.editor
                                 var component = go.AddComponent<AvatarChooseMenuCreator>();
                                 component.AvatarChooseMenu = avatarChooseMenu;
                                 Undo.RegisterCreatedObjectUndo(component, "Restore Assets create component");
-                                EditorUtility.DisplayDialog("成功", "復元に成功しました", "OK");
+                                EditorUtility.DisplayDialog(T.成功, T.復元に成功しました, "OK");
                                 return true;
                             }
                         }
@@ -358,12 +358,12 @@ namespace net.narazaka.avatarmenucreator.components.editor
                         {
                             UndoUtility.RecordObject(creator, "Restore Assets");
                             radialMenuCreator.AvatarRadialMenu = avatarRadialMenu;
-                            EditorUtility.DisplayDialog("成功", "復元に成功しました", "OK");
+                            EditorUtility.DisplayDialog(T.成功, T.復元に成功しました, "OK");
                             return true;
                         }
                         else
                         {
-                            if (EditorUtility.DisplayDialog("警告", "今のコンポーネントと別のコンポーネントに置き換わります。\n続行しますか？", "OK", "Cancel"))
+                            if (EditorUtility.DisplayDialog(T.警告, T.今のコンポーネントと別のコンポーネントに置き換わりますゝ_n_続行しますか_Q_, "OK", "Cancel"))
                             {
                                 UndoUtility.RecordObject(creator, "Restore Assets destroy component");
                                 var go = creator.gameObject;
@@ -371,7 +371,7 @@ namespace net.narazaka.avatarmenucreator.components.editor
                                 var component = go.AddComponent<AvatarRadialMenuCreator>();
                                 component.AvatarRadialMenu = avatarRadialMenu;
                                 Undo.RegisterCreatedObjectUndo(component, "Restore Assets create component");
-                                EditorUtility.DisplayDialog("成功", "復元に成功しました", "OK");
+                                EditorUtility.DisplayDialog(T.成功, T.復元に成功しました, "OK");
                                 return true;
                             }
                         }
@@ -379,16 +379,16 @@ namespace net.narazaka.avatarmenucreator.components.editor
                 }
                 else
                 {
-                    EditorUtility.DisplayDialog("復元に失敗しました", "適切な復元法が見つかりません", "OK");
+                    EditorUtility.DisplayDialog(T.復元に失敗しました, T.適切な復元法が見つかりません, "OK");
                 }
             }
             catch (AssertException e)
             {
-                EditorUtility.DisplayDialog("復元に失敗しました", e.Message, "OK");
+                EditorUtility.DisplayDialog(T.復元に失敗しました, e.Message, "OK");
             }
             catch (Exception e)
             {
-                EditorUtility.DisplayDialog("復元に失敗しました", $"想定外エラーです\nツール作者 @narazaka にスクリーンショットを添えて連絡して下さい\n\n{e}", "OK");
+                EditorUtility.DisplayDialog(T.復元に失敗しました, $"{T.想定外エラーです_ツール作者_narazaka_にスクリーンショットを添えて連絡して下さい}\n\n{e}", "OK");
                 Debug.LogError(e);
             }
             return false;

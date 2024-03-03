@@ -38,7 +38,7 @@ namespace net.narazaka.avatarmenucreator
         public string ChooseName(int index)
         {
             if (ChooseNames.ContainsKey(index)) return ChooseNames[index];
-            return $"選択肢{index}";
+            return $"{T.選択肢}{index}";
         }
 
         public Texture2D ChooseIcon(int index)
@@ -103,8 +103,8 @@ namespace net.narazaka.avatarmenucreator
 
         protected override void OnHeaderGUI(IList<string> children)
         {
-            ChooseParentIcon = TextureField("親メニューアイコン", ChooseParentIcon);
-            ChooseDefaultValue = IntField("パラメーター初期値", ChooseDefaultValue);
+            ChooseParentIcon = TextureField(T.親メニューアイコン, ChooseParentIcon);
+            ChooseDefaultValue = IntField(T.パラメーター初期値, ChooseDefaultValue);
             ShowSaved();
             ShowDetailMenu();
 
@@ -114,7 +114,7 @@ namespace net.narazaka.avatarmenucreator
 
             EditorGUILayout.Space();
 
-            ChooseCount = IntField("選択肢の数", ChooseCount);
+            ChooseCount = IntField(T.選択肢の数, ChooseCount);
 
             if (ChooseCount < 1) ChooseCount = 1;
             if (ChooseDefaultValue < 0) ChooseDefaultValue = 0;
@@ -125,7 +125,7 @@ namespace net.narazaka.avatarmenucreator
             for (var i = 0; i < ChooseCount; ++i)
             {
                 EditorGUILayout.BeginHorizontal();
-                ChooseNames[i] = TextField($"選択肢{i}", ChooseName(i));
+                ChooseNames[i] = TextField($"{T.選択肢}{i}", ChooseName(i));
                 ChooseIcons[i] = TextureField(ChooseIcon(i));
                 if (GUILayout.Button("↑", GUILayout.Width(19)))
                 {
@@ -144,7 +144,7 @@ namespace net.narazaka.avatarmenucreator
 
             if (BulkSet)
             {
-                if (FoldoutHeader("", "一括設定", true))
+                if (FoldoutHeader("", T.一括設定, true))
                 {
                     ShowChooseBulkMaterialControl(allMaterials);
                 }
@@ -169,7 +169,7 @@ namespace net.narazaka.avatarmenucreator
                 var hasSetting = indexes.Count > 0;
                 var foldoutGameObject = FoldoutHeader(child, "GameObject", hasSetting);
                 EditorGUIUtility.labelWidth = 40;
-                var newHasSetting = EditorGUILayout.Toggle("制御", hasSetting, GUILayout.Width(57));
+                var newHasSetting = EditorGUILayout.Toggle(T.制御, hasSetting, GUILayout.Width(57));
                 EditorGUIUtility.labelWidth = 0;
                 if (hasSetting != newHasSetting)
                 {
@@ -469,7 +469,7 @@ namespace net.narazaka.avatarmenucreator
                     }
                     if (materials.Count != 1)
                     {
-                        EditorGUILayout.HelpBox("複数のマテリアルが選択されています", MessageType.Warning);
+                        EditorGUILayout.HelpBox(T.複数のマテリアルが選択されています, MessageType.Warning);
                     }
                 }
                 EditorGUI.indentLevel--;

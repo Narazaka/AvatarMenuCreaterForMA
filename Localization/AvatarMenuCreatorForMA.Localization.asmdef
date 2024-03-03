@@ -1,0 +1,22 @@
+{
+    "name": "AvatarMenuCreatorForMA.Localization",
+    "rootNamespace": "",
+    "references": [
+        "nadena.dev.ndmf"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": false,
+    "defineConstraints": [],
+    "versionDefines": [
+        {
+            "name": "nadena.dev.ndmf",
+            "expression": "[1.0.0,2)",
+            "define": "HAS_NDMF"
+        }
+    ],
+    "noEngineReferences": false
+}

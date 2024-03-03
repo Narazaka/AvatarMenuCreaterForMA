@@ -1,11 +1,13 @@
 {
     "name": "AvatarMenuCreatorForMA.Editor",
+    "rootNamespace": "",
     "references": [
         "nadena.dev.modular-avatar.core",
         "AvatarMenuCreatorForMA.Core",
         "AvatarMenuCreatorForMA.Editor.Util",
         "AvatarMenuCreatorForMA.Collections",
-        "AvatarMenuCreatorForMA.Components"
+        "AvatarMenuCreatorForMA.Components",
+        "AvatarMenuCreatorForMA.Localization"
     ],
     "includePlatforms": [
         "Editor"
