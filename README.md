@@ -31,6 +31,8 @@ NDMF（Modular Avatar 1.8.0以降）のコンポーネントによる非破壊�
 
 ## 使い方
 
+使い方の解説スライド資料があります→[Modular Avatarで着せ替えメニューを作ろう！ Avatar Menu Creator for MA +α の解説](https://narazaka.github.io/AvatarMenuCreatorForMA-doc/index.html)
+
 1. 「Tools」→「Modular Avatar」→「AvatarMenuCreator for Modular Avatar」をクリックし、ツールを立ち上げます。
 
 2. アバターをツールに設定し、アバター以下の制御したいオブジェクトを選択した状態でツールで処理を設定します。
@@ -39,12 +41,12 @@ NDMF（Modular Avatar 1.8.0以降）のコンポーネントによる非破壊�
 
 4. コンポーネントはアバターの中に生成されているためそのままで動作します。保存されたPrefabはアバターの中（直下でなくても良い）に置けば、Modular Avatarによってメニューが統合されます。
 
-また使い方の解説スライド資料があります→[Modular Avatarで着せ替えメニューを作ろう！ Avatar Menu Creator for MA +α の解説](https://narazaka.github.io/AvatarMenuCreatorForMA-doc/index.pdf)
-
 ## 更新履歴
 
 - 1.15.0
   - なんちゃって英語対応
+    - Modular Avatar 1.8.0以降で利用可能です
+    - Modular Avatarでの言語選択と同期します
 - 1.14.1
   - 高度な設定内の文言を修正
 - 1.14.0
