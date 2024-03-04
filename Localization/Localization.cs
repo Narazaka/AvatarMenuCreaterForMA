@@ -1,4 +1,3 @@
-#if UNITY_EDITOR
 using System.Linq;
 using System.Reflection;
 
@@ -19,7 +18,7 @@ namespace net.narazaka.avatarmenucreator
             }
         }
 
-#if HAS_NDMF
+#if HAS_NDMF && UNITY_EDITOR
         static string LanguageName => nadena.dev.ndmf.localization.LanguagePrefs.Language;
 #else
         static string LanguageName => "ja-jp";
@@ -57,4 +56,3 @@ namespace net.narazaka.avatarmenucreator
         }
     }
 }
-#endif
