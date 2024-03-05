@@ -78,7 +78,8 @@ namespace net.narazaka.avatarmenucreator.components.editor
                 if (baseObject != null)
                 {
                     var parentMenuItem = Creator.transform.parent.GetComponent<ModularAvatarMenuItem>();
-                    if (parentMenuItem != null && parentMenuItem.Control.type == VRC.SDK3.Avatars.ScriptableObjects.VRCExpressionsMenu.Control.ControlType.SubMenu && parentMenuItem.MenuSource == SubmenuSource.Children)
+                    var parentChooseMenu = Creator.transform.parent.GetComponent<AvatarChooseMenuCreator>();
+                    if (parentChooseMenu != null || (parentMenuItem != null && parentMenuItem.Control.type == VRC.SDK3.Avatars.ScriptableObjects.VRCExpressionsMenu.Control.ControlType.SubMenu && parentMenuItem.MenuSource == SubmenuSource.Children))
                     {
                         if (maMenuInstaller != null)
                         {

@@ -65,11 +65,23 @@ namespace net.narazaka.avatarmenucreator.editor
             {
                 menuInstaller = prefab.AddComponent<ModularAvatarMenuInstaller>();
             }
-            if (menuInstaller == null)
+            if (menuInstaller == null || !isMenuInstaller)
             {
+#if !NET_NARAZAKA_VRCHAT_AvatarMenuCreator_HAS_NO_MENU_MA
                 var menuItem = prefab.GetOrAddComponent<ModularAvatarMenuItem>();
                 menuItem.Control = (parentMenu == null ? menu : parentMenu).controls[0].DeepCopy();
-                menuItem.MenuSource = SubmenuSource.MenuAsset;
+                if (parentMenu != null)
+                {
+                    menuItem.MenuSource = SubmenuSource.Children;
+                    foreach (var control in menu.controls)
+                    {
+                        var menuGo = new GameObject(control.name);
+                        menuGo.transform.SetParent(prefab.transform);
+                        var subMenuItem = menuGo.AddComponent<ModularAvatarMenuItem>();
+                        subMenuItem.Control = control.DeepCopy();
+                    }
+                }
+#endif
             }
             else
             {
