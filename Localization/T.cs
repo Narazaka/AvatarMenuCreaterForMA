@@ -161,7 +161,7 @@ namespace net.narazaka.avatarmenucreator
         [English("Parameter Default")]
         public static string パラメーター初期値 => L;
 
-        [English("Anvanced")]
+        [English("Advanced")]
         public static string 高度な設定 => L;
 
         [English("When advanced settings are enabled, you can set the control to ON or OFF one side only.")]
