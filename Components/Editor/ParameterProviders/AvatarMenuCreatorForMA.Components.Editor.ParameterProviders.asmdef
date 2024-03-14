@@ -1,0 +1,31 @@
+{
+    "name": "AvatarMenuCreatorForMA.Components.Editor.ParameterProviders",
+    "rootNamespace": "",
+    "references": [
+        "nadena.dev.ndmf",
+        "nadena.dev.ndmf.vrchat",
+        "AvatarMenuCreatorForMA.Components",
+        "AvatarMenuCreatorForMA.Core",
+        "AvatarMenuCreatorForMA.Editor.Util",
+        "AvatarMenuCreatorForMA.Components.Editor"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": false,
+    "defineConstraints": [
+        "HAS_NDMF_ParameterProvider"
+    ],
+    "versionDefines": [
+        {
+            "name": "nadena.dev.ndmf",
+            "expression": "[1.4.0-rc.1,2)",
+            "define": "HAS_NDMF_ParameterProvider"
+        }
+    ],
+    "noEngineReferences": false
+}
