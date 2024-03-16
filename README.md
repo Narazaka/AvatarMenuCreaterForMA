@@ -43,6 +43,8 @@ NDMF（Modular Avatar 1.8.0以降）のコンポーネントによる非破壊�
 
 ## 更新履歴
 
+- 1.17.0-rc.0
+  - NDMF 1.4.0-rc.x Parameter Provider対応
 - 1.16.1
   - fix typo
 - 1.16.0
