@@ -23,7 +23,7 @@
     "versionDefines": [
         {
             "name": "nadena.dev.ndmf",
-            "expression": "[1.4.0-rc.1,2)",
+            "expression": "[1.4.0-rc.2,2)",
             "define": "HAS_NDMF_ParameterProvider"
         }
     ],

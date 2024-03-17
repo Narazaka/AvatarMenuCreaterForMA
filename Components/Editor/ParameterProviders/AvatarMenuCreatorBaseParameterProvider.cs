@@ -9,6 +9,7 @@ using System.Linq;
 
 namespace net.narazaka.avatarmenucreator.editor
 {
+    [ParameterProviderFor(typeof(AvatarMenuCreatorBase))]
     internal class AvatarMenuCreatorBaseParameterProvider : IParameterProvider
     {
         readonly AvatarMenuCreatorBase Menu;
