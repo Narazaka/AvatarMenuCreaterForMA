@@ -1,6 +1,7 @@
 ﻿using System.Linq;
 using System.Collections.Generic;
 using UnityEngine;
+using VRC.SDK3.Avatars.ScriptableObjects;
 
 namespace net.narazaka.avatarmenucreator.editor.util
 {
@@ -244,5 +245,21 @@ namespace net.narazaka.avatarmenucreator.editor.util
             descriptions
                 .SelectMany(desc => desc.ShaderParameters)
                 .Distinct(new ShaderParameterComparator());
+
+
+        public static AnimatorControllerParameterType ToAnimatorControllerParameterType(this VRCExpressionParameters.ValueType valueType)
+        {
+            switch (valueType)
+            {
+                case VRCExpressionParameters.ValueType.Bool:
+                    return AnimatorControllerParameterType.Bool;
+                case VRCExpressionParameters.ValueType.Float:
+                    return AnimatorControllerParameterType.Float;
+                case VRCExpressionParameters.ValueType.Int:
+                    return AnimatorControllerParameterType.Int;
+                default:
+                    throw new System.ArgumentOutOfRangeException(nameof(valueType));
+            }
+        }
     }
 }

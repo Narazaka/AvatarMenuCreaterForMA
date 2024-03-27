@@ -33,6 +33,6 @@ namespace net.narazaka.avatarmenucreator.components
 
         public abstract IEnumerable<VRCExpressionParameters.Parameter> GetEffectiveParameterNameAndTypes();
 
-        protected string ParameterName => string.IsNullOrEmpty(AvatarMenu.ParameterName) ? name : AvatarMenu.ParameterName;
+        public string ParameterName => string.IsNullOrEmpty(AvatarMenu.ParameterName) ? name : AvatarMenu.ParameterName;
     }
 }
