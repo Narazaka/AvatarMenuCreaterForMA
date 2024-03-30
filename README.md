@@ -43,6 +43,8 @@ NDMF（Modular Avatar 1.8.0以降）のコンポーネントによる非破壊�
 
 ## 更新履歴
 
+- 1.17.1
+  - Unity 2019でコンパイルエラーになる問題を修正
 - 1.17.0
   - NDMF 1.4.0 Parameter Providerに対応
 - 1.17.0-rc.1
