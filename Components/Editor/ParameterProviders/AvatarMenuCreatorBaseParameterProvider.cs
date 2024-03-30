@@ -19,7 +19,7 @@ namespace net.narazaka.avatarmenucreator.editor
             Menu = c;
         }
 
-        public IEnumerable<ProvidedParameter> GetSuppliedParameters([AllowNull] BuildContext context = null)
+        public IEnumerable<ProvidedParameter> GetSuppliedParameters(BuildContext context = null)
         {
             return Menu.GetParameterNameAndTypes().Select(p =>
                 new ProvidedParameter(p.name, ParameterNamespace.Animator, Menu, AvatarMenuCreatorPlugin.Instance, p.valueType.ToAnimatorControllerParameterType())
