@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
@@ -233,7 +233,13 @@ namespace net.narazaka.avatarmenucreator
                             EditorGUIUtility.labelWidth = 70;
                             using (new EditorGUI.DisabledGroupScope(true))
                             {
-                                EditorGUILayout.FloatField(T.初期, value.Start * (1 - RadialDefaultValue) + value.End * RadialDefaultValue, GUILayout.Width(100));
+                                EditorGUILayout.FloatField(
+                                    T.初期,
+                                    RadialDefaultValue * 100 < value.StartOffsetPercent ? value.Start :
+                                    RadialDefaultValue * 100 > value.EndOffsetPercent ? value.End :
+                                    (value.Start * (value.EndOffsetPercent - RadialDefaultValue * 100) + value.End * (RadialDefaultValue * 100 - value.StartOffsetPercent)) / (value.EndOffsetPercent - value.StartOffsetPercent),
+                                    GUILayout.Width(100)
+                                    );
                             }
                             EditorGUIUtility.labelWidth = 0;
                             EditorGUI.indentLevel--;
