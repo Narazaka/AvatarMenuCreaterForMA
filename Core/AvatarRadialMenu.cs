@@ -459,11 +459,11 @@ namespace net.narazaka.avatarmenucreator
             }
         }
 
-        void BulkSetTransformComponent(RadialVector3Dictionary values, RadialVector3 radialVector3, string changedProp)
+        void BulkSetTransformComponent(RadialVector3Dictionary values, RadialVector3 value, string changedProp)
         {
             foreach (var key in values.Keys.ToArray())
             {
-                values[key] = values[key].SetProp(changedProp, radialVector3.GetProp(changedProp));
+                values[key] = values[key].SetProp(changedProp, value.GetProp(changedProp));
             }
         }
 
