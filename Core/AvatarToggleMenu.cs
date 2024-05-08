@@ -758,7 +758,7 @@ namespace net.narazaka.avatarmenucreator
             {
                 if (EditorGUILayout.ToggleLeft(title, true))
                 {
-                    var newValue = new ToggleVector3 { TransitionDurationPercent = 100 };
+                    var newValue = new ToggleVector3();
                     EditorGUI.indentLevel++;
                     var widemode = EditorGUIUtility.wideMode;
                     EditorGUIUtility.wideMode = true;

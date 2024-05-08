@@ -8,12 +8,12 @@ using UnityEditor;
 namespace net.narazaka.avatarmenucreator
 {
     [Serializable]
-    public struct ToggleVector3 : System.IEquatable<ToggleVector3>
+    public class ToggleVector3 : System.IEquatable<ToggleVector3>
     {
         public Vector3 Inactive;
         public Vector3 Active;
         public float TransitionOffsetPercent;
-        public float TransitionDurationPercent;
+        public float TransitionDurationPercent = 100;
         [SerializeField]
         bool OmitInactive;
         [SerializeField]

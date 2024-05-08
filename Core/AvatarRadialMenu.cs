@@ -199,62 +199,55 @@ namespace net.narazaka.avatarmenucreator
                 var names = gameObjectRef == null ? RadialBlendShapes.Names(child).ToList() : Util.GetBlendShapeNames(gameObjectRef);
                 var parameters = gameObjectRef == null ? RadialShaderParameters.Names(child).ToFakeShaderParameters().ToList() : ShaderParametersCache.GetFilteredShaderParameters(gameObjectRef);
                 var path = child;
-                if (names.Count > 0 || parameters.Count > 0)
-                {
-                    GameObjectHeader(child);
-                    EditorGUI.indentLevel++;
-                    if (names.Count > 0 &&
-                        FoldoutHeaderWithAddItemButton(
-                            child,
-                            "BlendShapes",
-                            RadialBlendShapes.HasChild(child),
-                            () => names,
-                            () => RadialBlendShapes.Names(child).ToImmutableHashSet(),
-                            name => AddRadialBlendShape(RadialBlendShapes, children, child, name),
-                            name => RemoveRadialBlendShape(RadialBlendShapes, children, child, name)
-                            ))
-                    {
-                        EditorGUI.indentLevel++;
-                        ShowRadialBlendShapeControl(children, child, RadialBlendShapes, names.ToNames());
-                        EditorGUI.indentLevel--;
-                    }
-                    if (parameters.Count > 0 &&
-                        FoldoutHeaderWithAddItemButton(
-                            child,
-                            "Shader Parameters",
-                            RadialShaderParameters.HasChild(child),
-                            () => parameters.Select(p => new NameAndDescriptionItemContainer(p) as ListTreeViewItemContainer<string>).ToList(),
-                            () => RadialShaderParameters.Names(child).ToImmutableHashSet(),
-                            name => AddRadialBlendShape(RadialShaderParameters, children, child, name, 1),
-                            name => RemoveRadialBlendShape(RadialShaderParameters, children, child, name)
-                            ))
-                    {
-                        EditorGUI.indentLevel++;
-                        ShowRadialBlendShapeControl(children, child, RadialShaderParameters, parameters, minValue: null, maxValue: null);
-                        EditorGUI.indentLevel--;
-                    }
-                    if (FoldoutHeaderWithAddItemButton(
+                GameObjectHeader(child);
+                EditorGUI.indentLevel++;
+                if (names.Count > 0 &&
+                    FoldoutHeaderWithAddItemButton(
                         child,
-                        "Transform",
-                        Positions.ContainsKey(child) || Rotations.ContainsKey(child) || Scales.ContainsKey(child),
-                        () => TransformComponentNames.Select(s => new NameAndDescriptionItemContainer(new Util.NameWithDescription { Name = s }) as ListTreeViewItemContainer<string>).ToList(),
-                        () => TransformComponentNames.Where(s => TransformComponent(s).ContainsKey(child)).ToImmutableHashSet(),
-                        name => AddTransformComponent(TransformComponent(name), children, child),
-                        name => RemoveTransformComponent(TransformComponent(name), children, child)
+                        "BlendShapes",
+                        RadialBlendShapes.HasChild(child),
+                        () => names,
+                        () => RadialBlendShapes.Names(child).ToImmutableHashSet(),
+                        name => AddRadialBlendShape(RadialBlendShapes, children, child, name),
+                        name => RemoveRadialBlendShape(RadialBlendShapes, children, child, name)
                         ))
-                    {
-                        EditorGUI.indentLevel++;
-                        if (Positions.ContainsKey(child)) ShowTransformComponentControl(children, child, Positions, "Position");
-                        if (Rotations.ContainsKey(child)) ShowTransformComponentControl(children, child, Rotations, "Rotation");
-                        if (Scales.ContainsKey(child)) ShowTransformComponentControl(children, child, Scales, "Scale");
-                        EditorGUI.indentLevel--;
-                    }
+                {
+                    EditorGUI.indentLevel++;
+                    ShowRadialBlendShapeControl(children, child, RadialBlendShapes, names.ToNames());
                     EditorGUI.indentLevel--;
                 }
-                else
+                if (parameters.Count > 0 &&
+                    FoldoutHeaderWithAddItemButton(
+                        child,
+                        "Shader Parameters",
+                        RadialShaderParameters.HasChild(child),
+                        () => parameters.Select(p => new NameAndDescriptionItemContainer(p) as ListTreeViewItemContainer<string>).ToList(),
+                        () => RadialShaderParameters.Names(child).ToImmutableHashSet(),
+                        name => AddRadialBlendShape(RadialShaderParameters, children, child, name, 1),
+                        name => RemoveRadialBlendShape(RadialShaderParameters, children, child, name)
+                        ))
                 {
-                    EditorGUILayout.LabelField($"{path} ({T.BlendShape_sl_Shader_Parameterなし})", EditorStyles.boldLabel);
+                    EditorGUI.indentLevel++;
+                    ShowRadialBlendShapeControl(children, child, RadialShaderParameters, parameters, minValue: null, maxValue: null);
+                    EditorGUI.indentLevel--;
                 }
+                if (FoldoutHeaderWithAddItemButton(
+                    child,
+                    "Transform",
+                    Positions.ContainsKey(child) || Rotations.ContainsKey(child) || Scales.ContainsKey(child),
+                    () => TransformComponentNames.Select(s => new NameAndDescriptionItemContainer(new Util.NameWithDescription { Name = s }) as ListTreeViewItemContainer<string>).ToList(),
+                    () => TransformComponentNames.Where(s => TransformComponent(s).ContainsKey(child)).ToImmutableHashSet(),
+                    name => AddTransformComponent(TransformComponent(name), children, child),
+                    name => RemoveTransformComponent(TransformComponent(name), children, child)
+                    ))
+                {
+                    EditorGUI.indentLevel++;
+                    if (Positions.ContainsKey(child)) ShowTransformComponentControl(children, child, Positions, "Position");
+                    if (Rotations.ContainsKey(child)) ShowTransformComponentControl(children, child, Rotations, "Rotation");
+                    if (Scales.ContainsKey(child)) ShowTransformComponentControl(children, child, Scales, "Scale");
+                    EditorGUI.indentLevel--;
+                }
+                EditorGUI.indentLevel--;
             }
         }
 
