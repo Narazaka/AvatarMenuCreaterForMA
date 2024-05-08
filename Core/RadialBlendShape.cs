@@ -3,20 +3,24 @@
 namespace net.narazaka.avatarmenucreator
 {
     [Serializable]
-    public struct RadialBlendShape : System.IEquatable<RadialBlendShape>
+    public class RadialBlendShape : System.IEquatable<RadialBlendShape>
     {
         public float Start;
         public float End;
+        public float StartOffsetPercent;
+        public float EndOffsetPercent = 100;
 
         public bool Equals(RadialBlendShape other)
         {
-            return Start == other.Start && End == other.End;
+            return Start == other.Start && End == other.End && StartOffsetPercent == other.StartOffsetPercent && EndOffsetPercent == other.EndOffsetPercent;
         }
 
         public string ChangedProp(RadialBlendShape other)
         {
             if (Start != other.Start) return nameof(Start);
             if (End != other.End) return nameof(End);
+            if (StartOffsetPercent != other.StartOffsetPercent) return nameof(StartOffsetPercent);
+            if (EndOffsetPercent != other.EndOffsetPercent) return nameof(EndOffsetPercent);
             return "";
         }
 
@@ -24,6 +28,8 @@ namespace net.narazaka.avatarmenucreator
         {
             if (name == nameof(Start)) return Start;
             if (name == nameof(End)) return End;
+            if (name == nameof(StartOffsetPercent)) return StartOffsetPercent;
+            if (name == nameof(EndOffsetPercent)) return EndOffsetPercent;
             return 0;
         }
 
@@ -31,6 +37,8 @@ namespace net.narazaka.avatarmenucreator
         {
             if (name == nameof(Start)) Start = value;
             if (name == nameof(End)) End = value;
+            if (name == nameof(StartOffsetPercent)) StartOffsetPercent = value;
+            if (name == nameof(EndOffsetPercent)) EndOffsetPercent = value;
             return this;
         }
     }

@@ -238,6 +238,15 @@ namespace net.narazaka.avatarmenucreator
                             EditorGUIUtility.labelWidth = 0;
                             EditorGUI.indentLevel--;
                         }
+                        using (new EditorGUILayout.HorizontalScope())
+                        {
+                            EditorGUI.indentLevel++;
+                            EditorGUIUtility.labelWidth = 120;
+                            newValue.StartOffsetPercent = EditorGUILayout.FloatField(T.始offset_per_, value.StartOffsetPercent, GUILayout.Width(150));
+                            newValue.EndOffsetPercent = EditorGUILayout.FloatField(T.終offset_per_, value.EndOffsetPercent, GUILayout.Width(150));
+                            EditorGUIUtility.labelWidth = 0;
+                            EditorGUI.indentLevel--;
+                        }
                         if (!value.Equals(newValue))
                         {
                             WillChange();
@@ -251,6 +260,10 @@ namespace net.narazaka.avatarmenucreator
                                 if (newValue.Start > (float)maxValue) newValue.Start = (float)maxValue;
                                 if (newValue.End > (float)maxValue) newValue.End = (float)maxValue;
                             }
+                            if (newValue.StartOffsetPercent < 0) newValue.StartOffsetPercent = 0;
+                            if (newValue.EndOffsetPercent < 0) newValue.EndOffsetPercent = 0;
+                            if (newValue.StartOffsetPercent > 100) newValue.StartOffsetPercent = 100;
+                            if (newValue.EndOffsetPercent > 100) newValue.EndOffsetPercent = 100;
 
                             radials[key] = newValue;
                             if (BulkSet)

@@ -260,6 +260,12 @@ namespace net.narazaka.avatarmenucreator
         [English("End")]
         public static string 終 => L;
 
+        [English("Start offset%")]
+        public static string 始offset_per_ => L;
+
+        [English("End offset%")]
+        public static string 終offset_per_ => L;
+
         [English("There is nothing to control.")]
         public static string BlendShape_sl_Shader_Parameterなし => L;
     }

@@ -24,13 +24,13 @@ namespace net.narazaka.avatarmenucreator.editor
             {
                 if (!matchGameObjects.Contains(child)) continue;
                 var value = AvatarMenu.RadialBlendShapes[(child, name)];
-                clip.SetCurve(child, typeof(SkinnedMeshRenderer), $"blendShape.{name}", SetAutoTangentMode(new AnimationCurve(new Keyframe(0 / 60.0f, value.Start), new Keyframe(1 / 60.0f, value.End))));
+                clip.SetCurve(child, typeof(SkinnedMeshRenderer), $"blendShape.{name}", FullAnimationCurve(new Keyframe(value.StartOffsetPercent, value.Start), new Keyframe(value.EndOffsetPercent, value.End)));
             }
             foreach (var (child, name) in AvatarMenu.RadialShaderParameters.Keys)
             {
                 if (!matchGameObjects.Contains(child)) continue;
                 var value = AvatarMenu.RadialShaderParameters[(child, name)];
-                clip.SetCurve(child, typeof(Renderer), $"material.{name}", SetAutoTangentMode(new AnimationCurve(new Keyframe(0 / 60.0f, value.Start), new Keyframe(1 / 60.0f, value.End))));
+                clip.SetCurve(child, typeof(Renderer), $"material.{name}", FullAnimationCurve(new Keyframe(value.StartOffsetPercent, value.Start), new Keyframe(value.EndOffsetPercent, value.End)));
             }
             // controller
             var controller = new AnimatorController();
@@ -146,13 +146,23 @@ namespace net.narazaka.avatarmenucreator.editor
             });
         }
 
+        AnimationCurve FullAnimationCurve(Keyframe start, Keyframe end)
+        {
+            var curve = new AnimationCurve(start, end);
+            if (end.time < 100)
+            {
+                curve.AddKey(100, end.value);
+            }
+            SetAutoTangentMode(curve);
+            return curve;
+        }
+
         AnimationCurve SetAutoTangentMode(AnimationCurve curve)
         {
-            for (var i = 0; i < curve.length; ++i)
-            {
-                AnimationUtility.SetKeyLeftTangentMode(curve, i, AnimationUtility.TangentMode.Auto);
-                AnimationUtility.SetKeyRightTangentMode(curve, i, AnimationUtility.TangentMode.Auto);
-            }
+            AnimationUtility.SetKeyLeftTangentMode(curve, 0, AnimationUtility.TangentMode.Constant);
+            AnimationUtility.SetKeyRightTangentMode(curve, 0, AnimationUtility.TangentMode.Linear);
+            AnimationUtility.SetKeyLeftTangentMode(curve, 1, AnimationUtility.TangentMode.Linear);
+            AnimationUtility.SetKeyRightTangentMode(curve, 1, AnimationUtility.TangentMode.Constant);
             return curve;
         }
     }
