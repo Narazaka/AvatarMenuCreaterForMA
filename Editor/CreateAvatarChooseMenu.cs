@@ -1,4 +1,5 @@
 using nadena.dev.modular_avatar.core;
+using net.narazaka.avatarmenucreator.collections.instance;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEditor;
@@ -61,6 +62,21 @@ namespace net.narazaka.avatarmenucreator.editor
                 {
                     choices[i].SetCurve(curvePath, typeof(Renderer), curveName, new AnimationCurve(new Keyframe(0, value.ContainsKey(i) ? value[i] : 0)));
                 }
+            }
+            foreach (var child in AvatarMenu.Positions.Keys)
+            {
+                if (!matchGameObjects.Contains(child)) continue;
+                SetTransformCurve(choices, child, "localPosition", AvatarMenu.Positions[child]);
+            }
+            foreach (var child in AvatarMenu.Rotations.Keys)
+            {
+                if (!matchGameObjects.Contains(child)) continue;
+                SetTransformCurve(choices, child, "localEulerAnglesRaw", AvatarMenu.Rotations[child]);
+            }
+            foreach (var child in AvatarMenu.Scales.Keys)
+            {
+                if (!matchGameObjects.Contains(child)) continue;
+                SetTransformCurve(choices, child, "localScale", AvatarMenu.Scales[child]);
             }
             // controller
             var controller = new AnimatorController();
@@ -162,6 +178,16 @@ namespace net.narazaka.avatarmenucreator.editor
                     internalParameter = AvatarMenu.InternalParameter,
                 },
             });
+        }
+
+        void SetTransformCurve(List<AnimationClip> choices, string path, string property, IntVector3Dictionary value)
+        {
+            for (var i = 0; i < AvatarMenu.ChooseCount; ++i)
+            {
+                choices[i].SetCurve(path, typeof(Transform), property + ".x", new AnimationCurve(new Keyframe(0, value[i].x)));
+                choices[i].SetCurve(path, typeof(Transform), property + ".y", new AnimationCurve(new Keyframe(0, value[i].y)));
+                choices[i].SetCurve(path, typeof(Transform), property + ".z", new AnimationCurve(new Keyframe(0, value[i].z)));
+            }
         }
     }
 }

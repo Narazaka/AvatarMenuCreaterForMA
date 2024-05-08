@@ -23,6 +23,12 @@ namespace net.narazaka.avatarmenucreator
         [SerializeField]
         public ChooseBlendShapeDictionary ChooseShaderParameters = new ChooseBlendShapeDictionary();
         [SerializeField]
+        public ChooseVector3Dictionary Positions = new ChooseVector3Dictionary();
+        [SerializeField]
+        public ChooseVector3Dictionary Rotations = new ChooseVector3Dictionary();
+        [SerializeField]
+        public ChooseVector3Dictionary Scales = new ChooseVector3Dictionary();
+        [SerializeField]
         public int ChooseDefaultValue;
         [SerializeField]
         public int ChooseCount = 2;
@@ -34,6 +40,18 @@ namespace net.narazaka.avatarmenucreator
         public IntTexture2DDictionary ChooseIcons = new IntTexture2DDictionary();
 
 #if UNITY_EDITOR
+
+        static readonly string[] TransformComponentNames = new[] { "Position", "Rotation", "Scale" };
+        ChooseVector3Dictionary TransformComponent(string transformComponentName)
+        {
+            switch (transformComponentName)
+            {
+                case "Position": return Positions;
+                case "Rotation": return Rotations;
+                case "Scale": return Scales;
+                default: throw new ArgumentException();
+            }
+        }
 
         public string ChooseName(int index)
         {
@@ -47,16 +65,19 @@ namespace net.narazaka.avatarmenucreator
             return null;
         }
 
-        public override IEnumerable<string> GetStoredChildren() => ChooseObjects.Keys.Concat(ChooseMaterials.Keys.Select(key => key.Item1)).Concat(ChooseBlendShapes.Keys.Select(key => key.Item1)).Concat(ChooseShaderParameters.Keys.Select(key => key.Item1)).Distinct();
+        public override IEnumerable<string> GetStoredChildren() => ChooseObjects.Keys.Concat(ChooseMaterials.Keys.Select(key => key.Item1)).Concat(ChooseBlendShapes.Keys.Select(key => key.Item1)).Concat(ChooseShaderParameters.Keys.Select(key => key.Item1)).Concat(Positions.Keys).Concat(Rotations.Keys).Concat(Scales.Keys).Distinct();
 
         public override void ReplaceStoredChild(string oldChild, string newChild)
         {
-            if (ChooseObjects.ContainsKey(oldChild) || ChooseMaterials.ContainsPrimaryKey(oldChild) || ChooseBlendShapes.ContainsPrimaryKey(oldChild) || ChooseShaderParameters.ContainsPrimaryKey(oldChild))
+            if (ChooseObjects.ContainsKey(oldChild) || ChooseMaterials.ContainsPrimaryKey(oldChild) || ChooseBlendShapes.ContainsPrimaryKey(oldChild) || ChooseShaderParameters.ContainsPrimaryKey(oldChild) || Positions.ContainsKey(oldChild) || Rotations.ContainsKey(oldChild) || Scales.ContainsKey(oldChild))
             {
                 ChooseObjects.ReplaceKey(oldChild, newChild);
                 ChooseMaterials.ReplacePrimaryKey(oldChild, newChild);
                 ChooseBlendShapes.ReplacePrimaryKey(oldChild, newChild);
                 ChooseShaderParameters.ReplacePrimaryKey(oldChild, newChild);
+                Positions.ReplaceKey(oldChild, newChild);
+                Rotations.ReplaceKey(oldChild, newChild);
+                Scales.ReplaceKey(oldChild, newChild);
             }
         }
 
@@ -79,6 +100,18 @@ namespace net.narazaka.avatarmenucreator
             {
                 ChooseShaderParameters.Remove(key);
             }
+            foreach (var child in Positions.Keys.Where(child => !filter.Contains(child)).ToList())
+            {
+                Positions.Remove(child);
+            }
+            foreach (var child in Rotations.Keys.Where(child => !filter.Contains(child)).ToList())
+            {
+                Rotations.Remove(child);
+            }
+            foreach (var child in Scales.Keys.Where(child => !filter.Contains(child)).ToList())
+            {
+                Scales.Remove(child);
+            }
         }
 
         public override void RemoveStoredChild(string child)
@@ -97,9 +130,12 @@ namespace net.narazaka.avatarmenucreator
             {
                 ChooseShaderParameters.Remove(key);
             }
+            Positions.Remove(child);
+            Rotations.Remove(child);
+            Scales.Remove(child);
         }
 
-        protected override bool IsSuitableForTransition() => ChooseBlendShapes.Count > 0 || ChooseShaderParameters.Count > 0;
+        protected override bool IsSuitableForTransition() => ChooseBlendShapes.Count > 0 || ChooseShaderParameters.Count > 0 || Positions.Count > 0 || Rotations.Count > 0 || Scales.Count > 0;
 
         protected override void OnHeaderGUI(IList<string> children)
         {
@@ -242,6 +278,22 @@ namespace net.narazaka.avatarmenucreator
                 {
                     EditorGUI.indentLevel++;
                     ShowChooseBlendShapeControl(children, child, ChooseShaderParameters, parameters, minValue: null, maxValue: null);
+                    EditorGUI.indentLevel--;
+                }
+                if (FoldoutHeaderWithAddItemButton(
+                    child,
+                    "Transform",
+                    Positions.ContainsKey(child) || Rotations.ContainsKey(child) || Scales.ContainsKey(child),
+                    () => TransformComponentNames.Select(s => new NameAndDescriptionItemContainer(new Util.NameWithDescription { Name = s }) as ListTreeViewItemContainer<string>).ToList(),
+                    () => TransformComponentNames.Where(s => TransformComponent(s).ContainsKey(child)).ToImmutableHashSet(),
+                    name => AddTransformComponent(TransformComponent(name), children, child),
+                    name => RemoveTransformComponent(TransformComponent(name), children, child)
+                    ))
+                {
+                    EditorGUI.indentLevel++;
+                    if (Positions.ContainsKey(child)) ShowTransformComponentControl(children, child, Positions, "Position");
+                    if (Rotations.ContainsKey(child)) ShowTransformComponentControl(children, child, Rotations, "Rotation");
+                    if (Scales.ContainsKey(child)) ShowTransformComponentControl(children, child, Scales, "Scale");
                     EditorGUI.indentLevel--;
                 }
                 EditorGUI.indentLevel--;
@@ -582,6 +634,92 @@ namespace net.narazaka.avatarmenucreator
             if (!choices.ContainsKey(key)) return;
             WillChange();
             choices.Remove(key);
+        }
+
+        void ShowTransformComponentControl(IList<string> children, string child, ChooseVector3Dictionary choices, string title)
+        {
+            if (choices.TryGetValue(child, out var values))
+            {
+                if (EditorGUILayout.ToggleLeft(title, true))
+                {
+                    EditorGUI.indentLevel++;
+                    var widemode = EditorGUIUtility.wideMode;
+                    EditorGUIUtility.wideMode = true;
+                    for (var i = 0; i < ChooseCount; ++i)
+                    {
+                        var value = values.ContainsKey(i) ? values[i] : Vector3.zero;
+                        var newValue = EditorGUILayout.Vector3Field(ChooseName(i), value);
+
+                        if (value != newValue)
+                        {
+                            WillChange();
+                            values[i] = newValue;
+                            if (BulkSet)
+                            {
+                                BulkSetTransformComponent(choices, i, newValue);
+                            }
+                        }
+                    }
+                    EditorGUIUtility.wideMode = widemode;
+                    EditorGUI.indentLevel--;
+                }
+                else
+                {
+                    RemoveTransformComponent(choices, children, child);
+                }
+            }
+        }
+
+        void BulkSetTransformComponent(ChooseVector3Dictionary values, int choiseIndex, Vector3 choiceValue)
+        {
+            foreach (var key in values.Keys.ToArray())
+            {
+                values[key][choiseIndex] = choiceValue;
+            }
+        }
+
+        void AddTransformComponent(ChooseVector3Dictionary values, IList<string> children, string child)
+        {
+            if (BulkSet)
+            {
+                foreach (var c in children)
+                {
+                    AddTransformComponentSingle(values, c);
+                }
+            }
+            else
+            {
+                AddTransformComponentSingle(values, child);
+            }
+        }
+
+        void AddTransformComponentSingle(ChooseVector3Dictionary values, string child)
+        {
+            if (values.ContainsKey(child)) return;
+            WillChange();
+            values[child] = new IntVector3Dictionary();
+        }
+
+        void RemoveTransformComponent(ChooseVector3Dictionary values, IList<string> children, string child)
+        {
+            if (BulkSet)
+            {
+                foreach (var c in children)
+                {
+                    RemoveTransformComponentSingle(values, c);
+                }
+            }
+            else
+            {
+                RemoveTransformComponentSingle(values, child);
+            }
+        }
+
+        void RemoveTransformComponentSingle(ChooseVector3Dictionary values, string child)
+        {
+            if (!values.ContainsKey(child)) return;
+            WillChange();
+            values.Remove(child);
         }
 
         // with prefab shim
