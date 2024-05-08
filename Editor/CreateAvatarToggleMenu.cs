@@ -83,6 +83,45 @@ namespace net.narazaka.avatarmenucreator.editor
                     inactivate.SetCurve(curvePath, typeof(Renderer), curveName, value.InactivateCurve(AvatarMenu.TransitionSeconds));
                 }
             }
+            foreach (var child in AvatarMenu.Positions.Keys)
+            {
+                if (!matchGameObjects.Contains(child)) continue;
+                var value = AvatarMenu.Positions[child];
+                var curvePath = child;
+                if (value.UseActive) foreach (var (propertyName, curve) in value.ActiveCurve("localPosition")) active.SetCurve(curvePath, typeof(Transform), propertyName, curve);
+                if (value.UseInactive) foreach (var (propertyName, curve) in value.InactiveCurve("localPosition")) inactive.SetCurve(curvePath, typeof(Transform), propertyName, curve);
+                if (AvatarMenu.TransitionSeconds > 0)
+                {
+                    foreach (var (propertyName, curve) in value.ActivateCurve("localPosition", AvatarMenu.TransitionSeconds)) activate.SetCurve(curvePath, typeof(Transform), propertyName, curve);
+                    foreach (var (propertyName, curve) in value.InactivateCurve("localPosition", AvatarMenu.TransitionSeconds)) inactivate.SetCurve(curvePath, typeof(Transform), propertyName, curve);
+                }
+            }
+            foreach (var child in AvatarMenu.Rotations.Keys)
+            {
+                if (!matchGameObjects.Contains(child)) continue;
+                var value = AvatarMenu.Rotations[child];
+                var curvePath = child;
+                if (value.UseActive) foreach (var (propertyName, curve) in value.ActiveCurve("localEulerAnglesRaw")) active.SetCurve(curvePath, typeof(Transform), propertyName, curve);
+                if (value.UseInactive) foreach (var (propertyName, curve) in value.InactiveCurve("localEulerAnglesRaw")) inactive.SetCurve(curvePath, typeof(Transform), propertyName, curve);
+                if (AvatarMenu.TransitionSeconds > 0)
+                {
+                    foreach (var (propertyName, curve) in value.ActivateCurve("localEulerAnglesRaw", AvatarMenu.TransitionSeconds)) activate.SetCurve(curvePath, typeof(Transform), propertyName, curve);
+                    foreach (var (propertyName, curve) in value.InactivateCurve("localEulerAnglesRaw", AvatarMenu.TransitionSeconds)) inactivate.SetCurve(curvePath, typeof(Transform), propertyName, curve);
+                }
+            }
+            foreach (var child in AvatarMenu.Scales.Keys)
+            {
+                if (!matchGameObjects.Contains(child)) continue;
+                var value = AvatarMenu.Scales[child];
+                var curvePath = child;
+                if (value.UseActive) foreach (var (propertyName, curve) in value.ActiveCurve("localScale")) active.SetCurve(curvePath, typeof(Transform), propertyName, curve);
+                if (value.UseInactive) foreach (var (propertyName, curve) in value.InactiveCurve("localScale")) inactive.SetCurve(curvePath, typeof(Transform), propertyName, curve);
+                if (AvatarMenu.TransitionSeconds > 0)
+                {
+                    foreach (var (propertyName, curve) in value.ActivateCurve("localScale", AvatarMenu.TransitionSeconds)) activate.SetCurve(curvePath, typeof(Transform), propertyName, curve);
+                    foreach (var (propertyName, curve) in value.InactivateCurve("localScale", AvatarMenu.TransitionSeconds)) inactivate.SetCurve(curvePath, typeof(Transform), propertyName, curve);    
+                }
+            }
             // controller
             var controller = new AnimatorController();
             controller.AddParameter(new AnimatorControllerParameter { name = parameterName, type = AnimatorControllerParameterType.Bool, defaultBool = false });

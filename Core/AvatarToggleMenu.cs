@@ -25,11 +25,29 @@ namespace net.narazaka.avatarmenucreator
         [SerializeField]
         public ToggleBlendShapeDictionary ToggleShaderParameters = new ToggleBlendShapeDictionary();
         [SerializeField]
+        public ToggleVector3Dictionary Positions = new ToggleVector3Dictionary();
+        [SerializeField]
+        public ToggleVector3Dictionary Rotations = new ToggleVector3Dictionary();
+        [SerializeField]
+        public ToggleVector3Dictionary Scales = new ToggleVector3Dictionary();
+        [SerializeField]
         public bool ToggleDefaultValue;
         [SerializeField]
         public Texture2D ToggleIcon;
 
 #if UNITY_EDITOR
+
+        static readonly string[] TransformComponentNames = new[] { "Position", "Rotation", "Scale" };
+        ToggleVector3Dictionary TransformComponent(string transformComponentName)
+        {
+            switch (transformComponentName)
+            {
+                case "Position": return Positions;
+                case "Rotation": return Rotations;
+                case "Scale": return Scales;
+                default: throw new ArgumentException();
+            }
+        }
 
         [NonSerialized]
         bool _UseAdvanced;
@@ -67,6 +85,18 @@ namespace net.narazaka.avatarmenucreator
                             {
                                 ToggleShaderParameters[key] = ToggleShaderParameters[key].ResetAdvanced();
                             }
+                            foreach (var key in Positions.Keys.ToList())
+                            {
+                                Positions[key] = Positions[key].ResetAdvanced();
+                            }
+                            foreach (var key in Rotations.Keys.ToList())
+                            {
+                                Rotations[key] = Rotations[key].ResetAdvanced();
+                            }
+                            foreach (var key in Scales.Keys.ToList())
+                            {
+                                Scales[key] = Scales[key].ResetAdvanced();
+                            }
                         }
                     }
                     else
@@ -76,18 +106,21 @@ namespace net.narazaka.avatarmenucreator
                 }
             }
         }
-        bool HasAdvanced => ToggleObjectUsings.Count > 0 || ToggleMaterials.Any(t => t.Value.HasAdvanced) || ToggleBlendShapes.Any(t => t.Value.HasAdvanced) || ToggleShaderParameters.Any(t => t.Value.HasAdvanced);
+        bool HasAdvanced => ToggleObjectUsings.Count > 0 || ToggleMaterials.Any(t => t.Value.HasAdvanced) || ToggleBlendShapes.Any(t => t.Value.HasAdvanced) || ToggleShaderParameters.Any(t => t.Value.HasAdvanced) || Positions.Any(t => t.Value.HasAdvanced) || Rotations.Any(t => t.Value.HasAdvanced) || Scales.Any(t => t.Value.HasAdvanced);
 
-        public override IEnumerable<string> GetStoredChildren() => ToggleObjects.Keys.Concat(ToggleMaterials.Keys.Select(k => k.Item1)).Concat(ToggleBlendShapes.Keys.Select(k => k.Item1)).Concat(ToggleShaderParameters.Keys.Select(k => k.Item1)).Distinct();
+        public override IEnumerable<string> GetStoredChildren() => ToggleObjects.Keys.Concat(ToggleMaterials.Keys.Select(k => k.Item1)).Concat(ToggleBlendShapes.Keys.Select(k => k.Item1)).Concat(ToggleShaderParameters.Keys.Select(k => k.Item1)).Concat(Positions.Keys).Concat(Rotations.Keys).Concat(Scales.Keys).Distinct();
         public override void ReplaceStoredChild(string oldChild, string newChild)
         {
-            if (ToggleObjects.ContainsKey(oldChild) || ToggleMaterials.ContainsPrimaryKey(oldChild) || ToggleBlendShapes.ContainsPrimaryKey(oldChild) || ToggleShaderParameters.ContainsPrimaryKey(oldChild))
+            if (ToggleObjects.ContainsKey(oldChild) || ToggleMaterials.ContainsPrimaryKey(oldChild) || ToggleBlendShapes.ContainsPrimaryKey(oldChild) || ToggleShaderParameters.ContainsPrimaryKey(oldChild) || Positions.ContainsKey(oldChild) || Rotations.ContainsKey(oldChild) || Scales.ContainsKey(oldChild))
             {
                 WillChange();
                 ToggleObjects.ReplaceKey(oldChild, newChild);
                 ToggleMaterials.ReplacePrimaryKey(oldChild, newChild);
                 ToggleBlendShapes.ReplacePrimaryKey(oldChild, newChild);
                 ToggleShaderParameters.ReplacePrimaryKey(oldChild, newChild);
+                Positions.ReplaceKey(oldChild, newChild);
+                Rotations.ReplaceKey(oldChild, newChild);
+                Scales.ReplaceKey(oldChild, newChild);
             }
         }
         public override void FilterStoredTargets(IEnumerable<string> children)
@@ -110,6 +143,18 @@ namespace net.narazaka.avatarmenucreator
             {
                 ToggleShaderParameters.Remove(key);
             }
+            foreach (var key in Positions.Keys.Where(k => !filter.Contains(k)).ToList())
+            {
+                Positions.Remove(key);
+            }
+            foreach (var key in Rotations.Keys.Where(k => !filter.Contains(k)).ToList())
+            {
+                Rotations.Remove(key);
+            }
+            foreach (var key in Scales.Keys.Where(k => !filter.Contains(k)).ToList())
+            {
+                Scales.Remove(key);
+            }
         }
         public override void RemoveStoredChild(string child)
         {
@@ -127,8 +172,11 @@ namespace net.narazaka.avatarmenucreator
             {
                 ToggleShaderParameters.Remove(key);
             }
+            Positions.Remove(child);
+            Rotations.Remove(child);
+            Scales.Remove(child);
         }
-        protected override bool IsSuitableForTransition() => ToggleBlendShapes.Count > 0 || ToggleShaderParameters.Count > 0;
+        protected override bool IsSuitableForTransition() => ToggleBlendShapes.Count > 0 || ToggleShaderParameters.Count > 0 || Positions.Count > 0 || Rotations.Count > 0 || Scales.Count > 0;
 
         protected override void OnHeaderGUI(IList<string> children)
         {
@@ -217,6 +265,22 @@ namespace net.narazaka.avatarmenucreator
                 {
                     EditorGUI.indentLevel++;
                     ShowToggleBlendShapeControl(children, child, ToggleShaderParameters, parameters, minValue: null, maxValue: null);
+                    EditorGUI.indentLevel--;
+                }
+                if (FoldoutHeaderWithAddItemButton(
+                    child,
+                    "Transform",
+                    Positions.ContainsKey(child) || Rotations.ContainsKey(child) || Scales.ContainsKey(child),
+                    () => TransformComponentNames.Select(s => new NameAndDescriptionItemContainer(new Util.NameWithDescription { Name = s }) as ListTreeViewItemContainer<string>).ToList(),
+                    () => TransformComponentNames.Where(s => TransformComponent(s).ContainsKey(child)).ToImmutableHashSet(),
+                    name => AddTransformComponent(TransformComponent(name), children, child),
+                    name => RemoveTransformComponent(TransformComponent(name), children, child)
+                    ))
+                {
+                    EditorGUI.indentLevel++;
+                    if (Positions.ContainsKey(child)) ShowTransformComponentControl(children, child, Positions, "Position");
+                    if (Rotations.ContainsKey(child)) ShowTransformComponentControl(children, child, Rotations, "Rotation");
+                    if (Scales.ContainsKey(child)) ShowTransformComponentControl(children, child, Scales, "Scale");
                     EditorGUI.indentLevel--;
                 }
                 EditorGUI.indentLevel--;
@@ -686,6 +750,122 @@ namespace net.narazaka.avatarmenucreator
             if (!toggles.ContainsKey(key)) return;
             WillChange();
             toggles.Remove(key);
+        }
+
+        void ShowTransformComponentControl(IList<string> children, string child, ToggleVector3Dictionary values, string title)
+        {
+            if (values.TryGetValue(child, out var value))
+            {
+                if (EditorGUILayout.ToggleLeft(title, true))
+                {
+                    var newValue = new ToggleVector3 { TransitionDurationPercent = 100 };
+                    EditorGUI.indentLevel++;
+                    var widemode = EditorGUIUtility.wideMode;
+                    EditorGUIUtility.wideMode = true;
+                    EditorGUIUtility.labelWidth = 70;
+                    newValue.Inactive = EditorGUILayout.Vector3Field("OFF", value.Inactive);
+                    newValue.Active = EditorGUILayout.Vector3Field("ON", value.Active);
+                    EditorGUIUtility.labelWidth = 0;
+                    EditorGUIUtility.wideMode = widemode;
+                    EditorGUI.indentLevel--;
+                    if (TransitionSeconds > 0)
+                    {
+                        using (new EditorGUILayout.HorizontalScope())
+                        {
+                            EditorGUI.indentLevel++;
+                            EditorGUIUtility.labelWidth = 110;
+                            newValue.TransitionOffsetPercent = EditorGUILayout.FloatField(T.変化待機_per_, value.TransitionOffsetPercent, GUILayout.Width(140));
+                            newValue.TransitionDurationPercent = EditorGUILayout.FloatField(T.変化時間_per_, value.TransitionDurationPercent, GUILayout.Width(140));
+                            EditorGUIUtility.labelWidth = 0;
+                            EditorGUI.indentLevel--;
+                        }
+                    }
+                    if (UseAdvanced)
+                    {
+                        using (new EditorGUILayout.HorizontalScope())
+                        {
+                            EditorGUI.indentLevel++;
+                            newValue.UseActive = EditorGUILayout.Toggle(T.ONを制御, value.UseActive);
+                            newValue.UseInactive = EditorGUILayout.Toggle(T.OFFを制御, value.UseInactive);
+                            EditorGUI.indentLevel--;
+                        }
+                    }
+                    if (!value.Equals(newValue))
+                    {
+                        WillChange();
+                        if (newValue.TransitionOffsetPercent < 0) newValue.TransitionOffsetPercent = 0;
+                        if (newValue.TransitionOffsetPercent > 100) newValue.TransitionOffsetPercent = 100;
+                        if (newValue.TransitionDurationPercent <= 0) newValue.TransitionDurationPercent = 1;
+                        if (newValue.TransitionDurationPercent > 100) newValue.TransitionDurationPercent = 100;
+                        if (newValue.TransitionOffsetPercent + newValue.TransitionDurationPercent > 100)
+                        {
+                            newValue.TransitionDurationPercent = 100 - newValue.TransitionOffsetPercent;
+                        }
+
+                        values[child] = newValue;
+                        if (BulkSet)
+                        {
+                            BulkSetTransformComponent(values, newValue, value.ChangedProp(newValue));
+                        }
+                    }
+                }
+                else
+                {
+                    RemoveTransformComponent(values, children, child);
+                }
+            }
+        }
+
+        void BulkSetTransformComponent(ToggleVector3Dictionary values, ToggleVector3 value, string changedProp)
+        {
+            foreach (var key in values.Keys.ToArray())
+            {
+                values[key] = values[key].SetProp(changedProp, value.GetProp(changedProp));
+            }
+        }
+
+        void AddTransformComponent(ToggleVector3Dictionary values, IList<string> children, string child)
+        {
+            if (BulkSet)
+            {
+                foreach (var c in children)
+                {
+                    AddTransformComponentSingle(values, c);
+                }
+            }
+            else
+            {
+                AddTransformComponentSingle(values, child);
+            }
+        }
+
+        void AddTransformComponentSingle(ToggleVector3Dictionary values, string child)
+        {
+            if (values.ContainsKey(child)) return;
+            WillChange();
+            values[child] = new ToggleVector3();
+        }
+
+        void RemoveTransformComponent(ToggleVector3Dictionary values, IList<string> children, string child)
+        {
+            if (BulkSet)
+            {
+                foreach (var c in children)
+                {
+                    RemoveTransformComponentSingle(values, c);
+                }
+            }
+            else
+            {
+                RemoveTransformComponentSingle(values, child);
+            }
+        }
+
+        void RemoveTransformComponentSingle(ToggleVector3Dictionary values, string child)
+        {
+            if (!values.ContainsKey(child)) return;
+            WillChange();
+            values.Remove(child);
         }
 
         // with prefab shim
