@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
@@ -19,6 +19,12 @@ namespace net.narazaka.avatarmenucreator
         [SerializeField]
         public RadialBlendShapeDictionary RadialShaderParameters = new RadialBlendShapeDictionary();
         [SerializeField]
+        public RadialVector3Dictionary Positions = new RadialVector3Dictionary();
+        [SerializeField]
+        public RadialVector3Dictionary Rotations = new RadialVector3Dictionary();
+        [SerializeField]
+        public RadialVector3Dictionary Scales = new RadialVector3Dictionary();
+        [SerializeField]
         public float RadialDefaultValue;
         [SerializeField]
         public bool RadialInactiveRange;
@@ -31,14 +37,29 @@ namespace net.narazaka.avatarmenucreator
 
 #if UNITY_EDITOR
 
-        public override IEnumerable<string> GetStoredChildren() => RadialBlendShapes.Keys.Select(key => key.Item1).Concat(RadialShaderParameters.Keys.Select(key => key.Item1)).Distinct();
+        static readonly string[] TransformComponentNames = new[] { "Position", "Rotation", "Scale" };
+        RadialVector3Dictionary TransformComponent(string transformComponentName)
+        {
+            switch (transformComponentName)
+            {
+                case "Position": return Positions;
+                case "Rotation": return Rotations;
+                case "Scale": return Scales;
+                default: throw new ArgumentException();
+            }
+        }
+
+        public override IEnumerable<string> GetStoredChildren() => RadialBlendShapes.Keys.Select(key => key.Item1).Concat(RadialShaderParameters.Keys.Select(key => key.Item1)).Concat(Positions.Keys).Concat(Rotations.Keys).Concat(Scales.Keys).Distinct();
         public override void ReplaceStoredChild(string oldChild, string newChild)
         {
-            if (RadialBlendShapes.ContainsPrimaryKey(oldChild) || RadialShaderParameters.ContainsPrimaryKey(oldChild))
+            if (RadialBlendShapes.ContainsPrimaryKey(oldChild) || RadialShaderParameters.ContainsPrimaryKey(oldChild) || Positions.ContainsKey(oldChild) || Rotations.ContainsKey(oldChild) || Scales.ContainsKey(oldChild))
             {
                 WillChange();
                 RadialBlendShapes.ReplacePrimaryKey(oldChild, newChild);
                 RadialShaderParameters.ReplacePrimaryKey(oldChild, newChild);
+                Positions.ReplaceKey(oldChild, newChild);
+                Rotations.ReplaceKey(oldChild, newChild);
+                Scales.ReplaceKey(oldChild, newChild);
             }
         }
         public override void FilterStoredTargets(IEnumerable<string> children)
@@ -53,6 +74,18 @@ namespace net.narazaka.avatarmenucreator
             {
                 RadialShaderParameters.Remove(key);
             }
+            foreach (var key in Positions.Keys.Where(k => !filter.Contains(k)).ToList())
+            {
+                Positions.Remove(key);
+            }
+            foreach (var key in Rotations.Keys.Where(k => !filter.Contains(k)).ToList())
+            {
+                Rotations.Remove(key);
+            }
+            foreach (var key in Scales.Keys.Where(k => !filter.Contains(k)).ToList())
+            {
+                Scales.Remove(key);
+            }
         }
         public override void RemoveStoredChild(string child)
         {
@@ -65,6 +98,9 @@ namespace net.narazaka.avatarmenucreator
             {
                 RadialShaderParameters.Remove(key);
             }
+            Positions.Remove(child);
+            Rotations.Remove(child);
+            Scales.Remove(child);
         }
         protected override bool IsSuitableForTransition()
         {
@@ -195,6 +231,22 @@ namespace net.narazaka.avatarmenucreator
                     {
                         EditorGUI.indentLevel++;
                         ShowRadialBlendShapeControl(children, child, RadialShaderParameters, parameters, minValue: null, maxValue: null);
+                        EditorGUI.indentLevel--;
+                    }
+                    if (FoldoutHeaderWithAddItemButton(
+                        child,
+                        "Transform",
+                        Positions.ContainsKey(child) || Rotations.ContainsKey(child) || Scales.ContainsKey(child),
+                        () => TransformComponentNames.Select(s => new NameAndDescriptionItemContainer(new Util.NameWithDescription { Name = s }) as ListTreeViewItemContainer<string>).ToList(),
+                        () => TransformComponentNames.Where(s => TransformComponent(s).ContainsKey(child)).ToImmutableHashSet(),
+                        name => AddTransformComponent(TransformComponent(name), children, child),
+                        name => RemoveTransformComponent(TransformComponent(name), children, child)
+                        ))
+                    {
+                        EditorGUI.indentLevel++;
+                        if (Positions.ContainsKey(child)) ShowTransformComponentControl(children, child, Positions, "Position");
+                        if (Rotations.ContainsKey(child)) ShowTransformComponentControl(children, child, Rotations, "Rotation");
+                        if (Scales.ContainsKey(child)) ShowTransformComponentControl(children, child, Scales, "Scale");
                         EditorGUI.indentLevel--;
                     }
                     EditorGUI.indentLevel--;
@@ -346,6 +398,117 @@ namespace net.narazaka.avatarmenucreator
             if (!radials.ContainsKey(key)) return;
             WillChange();
             radials.Remove(key);
+        }
+
+        void ShowTransformComponentControl(IList<string> children, string child, RadialVector3Dictionary values, string title)
+        {
+            if (values.TryGetValue(child, out var value))
+            {
+                if (EditorGUILayout.ToggleLeft(title, true))
+                {
+                    var newValue = new RadialVector3();
+                    {
+                        EditorGUI.indentLevel++;
+                        var widemode = EditorGUIUtility.wideMode;
+                        EditorGUIUtility.wideMode = true;
+                        EditorGUIUtility.labelWidth = 75;
+                        newValue.Start = EditorGUILayout.Vector3Field(T.始, value.Start);
+                        newValue.End = EditorGUILayout.Vector3Field(T.終, value.End);
+                        EditorGUIUtility.labelWidth = 70;
+                        using (new EditorGUI.DisabledGroupScope(true))
+                        {
+                            EditorGUILayout.Vector3Field(
+                                T.初期,
+                                RadialDefaultValue * 100 < value.StartOffsetPercent ? value.Start :
+                                RadialDefaultValue * 100 > value.EndOffsetPercent ? value.End :
+                                (value.Start * (value.EndOffsetPercent - RadialDefaultValue * 100) + value.End * (RadialDefaultValue * 100 - value.StartOffsetPercent)) / (value.EndOffsetPercent - value.StartOffsetPercent)
+                                );
+                        }
+                        EditorGUIUtility.wideMode = widemode;
+                        EditorGUIUtility.labelWidth = 0;
+                        EditorGUI.indentLevel--;
+                    }
+                    using (new EditorGUILayout.HorizontalScope())
+                    {
+                        EditorGUI.indentLevel++;
+                        EditorGUIUtility.labelWidth = 120;
+                        newValue.StartOffsetPercent = EditorGUILayout.FloatField(T.始offset_per_, value.StartOffsetPercent, GUILayout.Width(150));
+                        newValue.EndOffsetPercent = EditorGUILayout.FloatField(T.終offset_per_, value.EndOffsetPercent, GUILayout.Width(150));
+                        EditorGUIUtility.labelWidth = 0;
+                        EditorGUI.indentLevel--;
+                    }
+                    if (!value.Equals(newValue))
+                    {
+                        WillChange();
+                        if (newValue.StartOffsetPercent < 0) newValue.StartOffsetPercent = 0;
+                        if (newValue.EndOffsetPercent < 0) newValue.EndOffsetPercent = 0;
+                        if (newValue.StartOffsetPercent > 100) newValue.StartOffsetPercent = 100;
+                        if (newValue.EndOffsetPercent > 100) newValue.EndOffsetPercent = 100;
+
+                        values[child] = newValue;
+                        if (BulkSet)
+                        {
+                            BulkSetTransformComponent(values, newValue, value.ChangedProp(newValue));
+                        }
+                    }
+                }
+                else
+                {
+                    RemoveTransformComponent(values, children, child);
+                }
+            }
+        }
+
+        void BulkSetTransformComponent(RadialVector3Dictionary values, RadialVector3 radialVector3, string changedProp)
+        {
+            foreach (var key in values.Keys.ToArray())
+            {
+                values[key] = values[key].SetProp(changedProp, radialVector3.GetProp(changedProp));
+            }
+        }
+
+        void AddTransformComponent(RadialVector3Dictionary values, IList<string> children, string child)
+        {
+            if (BulkSet)
+            {
+                foreach (var c in children)
+                {
+                    AddTransformComponentSingle(values, c);
+                }
+            }
+            else
+            {
+                AddTransformComponentSingle(values, child);
+            }
+        }
+
+        void AddTransformComponentSingle(RadialVector3Dictionary values, string child)
+        {
+            if (values.ContainsKey(child)) return;
+            WillChange();
+            values[child] = new RadialVector3();
+        }
+
+        void RemoveTransformComponent(RadialVector3Dictionary values, IList<string> children, string child)
+        {
+            if (BulkSet)
+            {
+                foreach (var c in children)
+                {
+                    RemoveTransformComponentSingle(values, c);
+                }
+            }
+            else
+            {
+                RemoveTransformComponentSingle(values, child);
+            }
+        }
+
+        void RemoveTransformComponentSingle(RadialVector3Dictionary values, string child)
+        {
+            if (!values.ContainsKey(child)) return;
+            WillChange();
+            values.Remove(child);
         }
 #endif
     }

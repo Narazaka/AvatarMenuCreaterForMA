@@ -5,6 +5,7 @@ using UnityEditor.Animations;
 using UnityEngine;
 using VRC.SDK3.Avatars.Components;
 using VRC.SDK3.Avatars.ScriptableObjects;
+using YamlDotNet.Core.Tokens;
 
 namespace net.narazaka.avatarmenucreator.editor
 {
@@ -31,6 +32,24 @@ namespace net.narazaka.avatarmenucreator.editor
                 if (!matchGameObjects.Contains(child)) continue;
                 var value = AvatarMenu.RadialShaderParameters[(child, name)];
                 clip.SetCurve(child, typeof(Renderer), $"material.{name}", FullAnimationCurve(new Keyframe(value.StartOffsetPercent, value.Start), new Keyframe(value.EndOffsetPercent, value.End)));
+            }
+            foreach (var child in AvatarMenu.Positions.Keys)
+            {
+                if (!matchGameObjects.Contains(child)) continue;
+                var value = AvatarMenu.Positions[child];
+                SetTransformCurve(clip, child, "localPosition", value);
+            }
+            foreach (var child in AvatarMenu.Rotations.Keys)
+            {
+                if (!matchGameObjects.Contains(child)) continue;
+                var value = AvatarMenu.Rotations[child];
+                SetTransformCurve(clip, child, "localEulerAnglesRaw", value);
+            }
+            foreach (var child in AvatarMenu.Scales.Keys)
+            {
+                if (!matchGameObjects.Contains(child)) continue;
+                var value = AvatarMenu.Scales[child];
+                SetTransformCurve(clip, child, "localScale", value);
             }
             // controller
             var controller = new AnimatorController();
@@ -164,6 +183,13 @@ namespace net.narazaka.avatarmenucreator.editor
             AnimationUtility.SetKeyLeftTangentMode(curve, 1, AnimationUtility.TangentMode.Linear);
             AnimationUtility.SetKeyRightTangentMode(curve, 1, AnimationUtility.TangentMode.Constant);
             return curve;
+        }
+
+        void SetTransformCurve(AnimationClip clip, string child, string propertyName, RadialVector3 value)
+        {
+            clip.SetCurve(child, typeof(Transform), $"{propertyName}.x", FullAnimationCurve(new Keyframe(value.StartOffsetPercent, value.Start.x), new Keyframe(value.EndOffsetPercent, value.End.x)));
+            clip.SetCurve(child, typeof(Transform), $"{propertyName}.y", FullAnimationCurve(new Keyframe(value.StartOffsetPercent, value.Start.y), new Keyframe(value.EndOffsetPercent, value.End.y)));
+            clip.SetCurve(child, typeof(Transform), $"{propertyName}.z", FullAnimationCurve(new Keyframe(value.StartOffsetPercent, value.Start.z), new Keyframe(value.EndOffsetPercent, value.End.z)));
         }
     }
 }
