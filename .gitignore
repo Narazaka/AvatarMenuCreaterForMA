@@ -1,2 +1,6 @@
 /Test/gen~/*
 !/Test/gen~/.keep
+
+# GameCI
+/[Aa]rtifacts/
+/[Cc]odeCoverage/
