@@ -119,7 +119,7 @@ jobs:
         run: |
           printf '%s\n' "$REPOS" | while IFS= read -r url; do
             if [ -n "${url:-}" ]; then
-              echo "vrc-get repo add -- \"$url\"" >&2
+              echo ">> vrc-get repo add -- \"$url\"" >&2
               vrc-get repo add -- "$url"
             fi
           done
@@ -130,12 +130,13 @@ jobs:
           PACKAGES: ${{ matrix.packages }}
         run: |
           if [ -n "${{ matrix.vrcsdk-type }}" ] ; then
+            echo ">> vrc-get install --yes com.vrchat.${{ matrix.vrcsdk-type }} ${{ matrix.vrcsdk-version }}" >&2
             vrc-get install --yes com.vrchat.${{ matrix.vrcsdk-type }} ${{ matrix.vrcsdk-version }}
           fi
           if [ -n "${PACKAGES:-}" ] ; then
             printf '%s\n' "$PACKAGES" | while IFS= read -r p; do
               if [ -n "${p:-}" ]; then
-                echo "vrc-get install --yes $p" >&2
+                echo ">> vrc-get install --yes $p" >&2
                 vrc-get install --yes $p
               fi
             done
