@@ -13,6 +13,7 @@ jobs:
       DISPATCH_TOKEN: ${{ secrets.DISPATCH_TOKEN }}
     with:
       repo: AvatarMenuCreaterForMA
+      ref: master
 
   release:
     needs: test
