@@ -5,12 +5,17 @@ on:
   pull_request_target: {}
   workflow_dispatch: {}
 
-permissions:
-  checks: write
-
 jobs:
+  release:
+    needs: test
+    if: ${{ startsWith(github.ref, 'refs/tags/v') }}
+    permissions:
+      contents: write
+    uses: Narazaka/vpm-repos/.github/workflows/release.yml@main
   test:
     uses: Narazaka/vpm-repos/.github/workflows/gameci.yml@main
+    permissions:
+      checks: write
     secrets:
       UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
       UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
