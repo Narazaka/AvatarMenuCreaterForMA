@@ -6,12 +6,21 @@ on:
   workflow_dispatch: {}
 
 jobs:
+  call-build-listing:
+    needs: release
+    uses: Narazaka/vpm-repos/.github/workflows/call-build-listing.yml@main
+    secrets:
+      DISPATCH_TOKEN: ${{ secrets.DISPATCH_TOKEN }}
+    with:
+      repo: AvatarMenuCreaterForMA
+
   release:
     needs: test
     if: ${{ startsWith(github.ref, 'refs/tags/v') }}
     permissions:
       contents: write
     uses: Narazaka/vpm-repos/.github/workflows/release.yml@main
+
   test:
     uses: Narazaka/vpm-repos/.github/workflows/gameci.yml@main
     permissions:
