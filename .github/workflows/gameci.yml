@@ -57,6 +57,19 @@ jobs:
         with:
           repository: vrchat-community/template-avatar
 
+      - name: Checkout project assets
+        uses: actions/checkout@v4
+        with:
+          repository: Narazaka/AvatarMenuCreaterForMA
+          ref: gameci
+          path: project-assets
+
+      - name: Setup Project
+        run: |
+          cp -R project-assets/.github/workflows/ProjectRoot/${{ inputs.unity }}/* .
+          rm -rf project-assets
+          rm -rf Packages/com.vrchat.core.bootstrap
+
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
@@ -72,11 +85,6 @@ jobs:
       - name: Place package
         run: |
           mv TargetPackage Packages/${{ steps.packageName.outputs.prop }}
-
-      - name: Setup Project
-        run: |
-          cp -R Packages/net.narazaka.vrchat.avatar-menu-creater-for-ma/.github/workflows/ProjectRoot/${{ inputs.unity }}/* .
-          rm -rf Packages/com.vrchat.core.bootstrap
 
       - name: Setup vrc-get
         uses: anatawa12/sh-actions/setup-vrc-get@master
@@ -124,9 +132,9 @@ jobs:
         id: case-name
         run: |
           if [ -n "${{ inputs.name }}" ] ; then
-            echo "name=${{ inputs.unity }} ${{ inputs.vrcsdk-type }}-${{ inputs.vrcsdk-version }} ${{ inputs.name }}" >> $GITHUB_OUTPUT
+            echo "name=${{ inputs.unity }} SDK-${{ inputs.vrcsdk-version }} ${{ inputs.name }}" >> $GITHUB_OUTPUT
           else
-            echo "name=${{ inputs.unity }} ${{ inputs.vrcsdk-type }}-${{ inputs.vrcsdk-version }}" >> $GITHUB_OUTPUT
+            echo "name=${{ inputs.unity }} SDK-${{ inputs.vrcsdk-version }}" >> $GITHUB_OUTPUT
           fi
 
       # Test
