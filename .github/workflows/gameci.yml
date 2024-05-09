@@ -81,11 +81,21 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
-          path: Packages/net.narazaka.vrchat.avatar-menu-creater-for-ma
+          path: TargetPackage
+
+      - name: get packageName
+        id: packageName
+        uses: notiz-dev/github-action-json-property@7c8cf5cc36eb85d8d287a8086a39dac59628eb31
+        with:
+          path: "TargetPackage/package.json"
+          prop_path: "name"
+
+      - name: Place package
+        run: |
+          mv TargetPackage Packages/${{ steps.packageName.outputs.prop }}
 
       - name: Setup Project
         run: |
-          echo "m_EditorVersion: ${{ matrix.unity }}" > ProjectSettings/ProjectVersion.txt
           cp -R Packages/net.narazaka.vrchat.avatar-menu-creater-for-ma/.github/workflows/ProjectRoot/${{ matrix.unity }}/* .
           rm -rf Packages/com.vrchat.core.bootstrap
 
@@ -95,13 +105,11 @@ jobs:
       - name: Resolve VPM packages
         run: |
           vrc-get repo add https://vpm.nadena.dev/vpm.json
+          vrc-get repo add https://vpm.narazaka.net/index.json
           vrc-get install --yes com.vrchat.avatars ${{ matrix.vrcsdk }}
           vrc-get install --yes nadena.dev.modular-avatar ${{ matrix.ma }}
 
       - uses: anatawa12/sh-actions/resolve-vpm-packages@master
-        with:
-          repos: |
-            https://vpm.narazaka.net/index.json
 
       # Cache
       - uses: actions/cache@v3
