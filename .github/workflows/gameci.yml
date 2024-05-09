@@ -14,64 +14,68 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
+        repos:
+          - |
+            https://vpm.nadena.dev/vpm.json
+            https://vpm.narazaka.net/index.json
         include:
           - unity: 2019.4.31f1
-            ma: 1.1.1
-            vrcsdk: 3.1.9
+            packages: nadena.dev.modular-avatar 1.1.1
+            vrcsdk-avatars: 3.1.9
           - unity: 2019.4.31f1
-            ma: 1.1.1
-            vrcsdk: 3.2.0
+            packages: nadena.dev.modular-avatar 1.1.1
+            vrcsdk-avatars: 3.2.0
           - unity: 2019.4.31f1
-            ma: 1.1.1
-            vrcsdk: 3.4.2
+            packages: nadena.dev.modular-avatar 1.1.1
+            vrcsdk-avatars: 3.4.2
 
           - unity: 2019.4.31f1
-            ma: 1.5.1
-            vrcsdk: 3.2.0
+            packages: nadena.dev.modular-avatar 1.5.1
+            vrcsdk-avatars: 3.2.0
           - unity: 2019.4.31f1
-            ma: 1.5.1
-            vrcsdk: 3.4.2
+            packages: nadena.dev.modular-avatar 1.5.1
+            vrcsdk-avatars: 3.4.2
 
           - unity: 2019.4.31f1
-            ma: 1.7.7
-            vrcsdk: 3.2.0
+            packages: nadena.dev.modular-avatar 1.7.7
+            vrcsdk-avatars: 3.2.0
           - unity: 2019.4.31f1
-            ma: 1.7.7
-            vrcsdk: 3.4.2
+            packages: nadena.dev.modular-avatar 1.7.7
+            vrcsdk-avatars: 3.4.2
 
           - unity: 2019.4.31f1
-            ma: 1.8.4
-            vrcsdk: 3.2.0
+            packages: nadena.dev.modular-avatar 1.8.4
+            vrcsdk-avatars: 3.2.0
           - unity: 2019.4.31f1
-            ma: 1.8.4
-            vrcsdk: 3.4.2
+            packages: nadena.dev.modular-avatar 1.8.4
+            vrcsdk-avatars: 3.4.2
           - unity: 2022.3.6f1
-            ma: 1.8.4
-            vrcsdk: 3.5.2
+            packages: nadena.dev.modular-avatar 1.8.4
+            vrcsdk-avatars: 3.5.2
 
           - unity: 2019.4.31f1
-            ma: 1.9.2
-            vrcsdk: 3.2.0
+            packages: nadena.dev.modular-avatar 1.9.2
+            vrcsdk-avatars: 3.2.0
           - unity: 2019.4.31f1
-            ma: 1.9.2
-            vrcsdk: 3.4.2
+            packages: nadena.dev.modular-avatar 1.9.2
+            vrcsdk-avatars: 3.4.2
           - unity: 2022.3.6f1
-            ma: 1.9.2
-            vrcsdk: 3.5.2
+            packages: nadena.dev.modular-avatar 1.9.2
+            vrcsdk-avatars: 3.5.2
 
           - unity: 2019.4.31f1
-            ma: 1.9.8
-            vrcsdk: 3.4.2
+            packages: nadena.dev.modular-avatar 1.9.8
+            vrcsdk-avatars: 3.4.2
           - unity: 2022.3.6f1
-            ma: 1.9.8
-            vrcsdk: 3.5.2
+            packages: nadena.dev.modular-avatar 1.9.8
+            vrcsdk-avatars: 3.5.2
 
           - unity: 2019.4.31f1
-            ma: 1.9.12
-            vrcsdk: 3.4.2
+            packages: nadena.dev.modular-avatar 1.9.12
+            vrcsdk-avatars: 3.4.2
           - unity: 2022.3.6f1
-            ma: 1.9.12
-            vrcsdk: 3.5.2
+            packages: nadena.dev.modular-avatar 1.9.12
+            vrcsdk-avatars: 3.5.2
     steps:
       - name: Checkout template
         uses: actions/checkout@v4
@@ -102,12 +106,35 @@ jobs:
       - name: Setup vrc-get
         uses: anatawa12/sh-actions/setup-vrc-get@master
 
-      - name: Resolve VPM packages
+      - name: Add VPM repositories
+        shell: bash
+        env:
+          REPOS: ${{ matrix.repos }}
         run: |
-          vrc-get repo add https://vpm.nadena.dev/vpm.json
-          vrc-get repo add https://vpm.narazaka.net/index.json
-          vrc-get install --yes com.vrchat.avatars ${{ matrix.vrcsdk }}
-          vrc-get install --yes nadena.dev.modular-avatar ${{ matrix.ma }}
+          printf '%s\n' "$REPOS" | while IFS= read -r url; do
+            if [ -n "${url:-}" ]; then
+              echo "vrc-get repo add -- \"$url\"" >&2
+              vrc-get repo add -- "$url"
+            fi
+          done
+
+      - name: Resolve VPM packages
+        shell: bash
+        env:
+          PACKAGES: ${{ matrix.packages }}
+        run: |
+          if [ -n "${{ matrix.vrcsdk-avatars }}" ] ; then
+            vrc-get install --yes com.vrchat.avatars ${{ matrix.vrcsdk-avatars }}
+          fi
+          if [ -n "${{ matrix.vrcsdk-worlds }}" ] ; then
+            vrc-get install --yes com.vrchat.worlds ${{ matrix.vrcsdk-worlds }}
+          fi
+          printf '%s\n' "$PACKAGES" | while IFS= read -r p; do
+            if [ -n "${p:-}" ]; then
+              echo "vrc-get install --yes $p" >&2
+              vrc-get install --yes $p
+            fi
+          done
 
       - uses: anatawa12/sh-actions/resolve-vpm-packages@master
 
