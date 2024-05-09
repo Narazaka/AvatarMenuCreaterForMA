@@ -1,0 +1,138 @@
+name: GameCI
+
+on:
+  push: {}
+  pull_request_target: {}
+  workflow_dispatch: {}
+
+jobs:
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+    permissions:
+      checks: write
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - unity: 2019.4.31f1
+            ma: 1.1.1
+            vrcsdk: 3.1.9
+          - unity: 2019.4.31f1
+            ma: 1.1.1
+            vrcsdk: 3.2.0
+          - unity: 2019.4.31f1
+            ma: 1.1.1
+            vrcsdk: 3.4.2
+
+          - unity: 2019.4.31f1
+            ma: 1.5.1
+            vrcsdk: 3.2.0
+          - unity: 2019.4.31f1
+            ma: 1.5.1
+            vrcsdk: 3.4.2
+
+          - unity: 2019.4.31f1
+            ma: 1.7.7
+            vrcsdk: 3.2.0
+          - unity: 2019.4.31f1
+            ma: 1.7.7
+            vrcsdk: 3.4.2
+
+          - unity: 2019.4.31f1
+            ma: 1.8.4
+            vrcsdk: 3.2.0
+          - unity: 2019.4.31f1
+            ma: 1.8.4
+            vrcsdk: 3.4.2
+          - unity: 2022.3.6f1
+            ma: 1.8.4
+            vrcsdk: 3.5.2
+
+          - unity: 2019.4.31f1
+            ma: 1.9.2
+            vrcsdk: 3.2.0
+          - unity: 2019.4.31f1
+            ma: 1.9.2
+            vrcsdk: 3.4.2
+          - unity: 2022.3.6f1
+            ma: 1.9.2
+            vrcsdk: 3.5.2
+
+          - unity: 2019.4.31f1
+            ma: 1.9.8
+            vrcsdk: 3.4.2
+          - unity: 2022.3.6f1
+            ma: 1.9.8
+            vrcsdk: 3.5.2
+
+          - unity: 2019.4.31f1
+            ma: 1.9.12
+            vrcsdk: 3.4.2
+          - unity: 2022.3.6f1
+            ma: 1.9.12
+            vrcsdk: 3.5.2
+    steps:
+      - name: Checkout template
+        uses: actions/checkout@v4
+        with:
+          repository: vrchat-community/template-avatar
+
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          path: Packages/net.narazaka.vrchat.avatar-menu-creater-for-ma
+
+      - name: Setup Project
+        run: |
+          echo "m_EditorVersion: ${{ matrix.unity }}" > ProjectSettings/ProjectVersion.txt
+          cp -R Packages/net.narazaka.vrchat.avatar-menu-creater-for-ma/.github/workflows/ProjectRoot/${{ matrix.unity }}/* .
+          rm -rf Packages/com.vrchat.core.bootstrap
+
+      - name: Setup vrc-get
+        uses: anatawa12/sh-actions/setup-vrc-get@master
+
+      - name: Resolve VPM packages
+        run: |
+          vrc-get repo add https://vpm.nadena.dev/vpm.json
+          vrc-get install --yes com.vrchat.avatars ${{ matrix.vrcsdk }}
+          vrc-get install --yes nadena.dev.modular-avatar ${{ matrix.ma }}
+
+      - uses: anatawa12/sh-actions/resolve-vpm-packages@master
+        with:
+          repos: |
+            https://vpm.narazaka.net/index.json
+
+      # Cache
+      - uses: actions/cache@v3
+        with:
+          path: Library
+          key: Library-unity=${{ matrix.unity }}-ma=${{ matrix.ma }}-vrcsdk=${{ matrix.vrcsdk }}
+          restore-keys: Library-unity=${{ matrix.unity }}-ma=${{ matrix.ma }}-vrcsdk=${{ matrix.vrcsdk }}
+
+      # Test
+      - name: Run tests
+        id: gameci
+        uses: game-ci/unity-test-runner@v4
+        env:
+          UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
+          UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
+          UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
+        with:
+          githubToken: ${{ secrets.GITHUB_TOKEN }}
+          testMode: EditMode
+          customParameters: -nographics -assemblyNames AvatarMenuCreatorForMA.Test
+          checkName: Test Unity=${{ matrix.unity }} MA=${{ matrix.ma }} VRCSDK=${{ matrix.vrcsdk }}
+          coverageOptions: generateAdditionalMetrics;generateHtmlReport;generateBadgeReport;assemblyFilters:+AvatarMenuCreatorForMA.*,-AvatarMenuCreatorForMA.Test
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: Test Unity=${{ matrix.unity }} MA=${{ matrix.ma }} VRCSDK=${{ matrix.vrcsdk }}
+          path: ${{ steps.gameci.outputs.artifactsPath }}
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: Coverage Unity=${{ matrix.unity }} MA=${{ matrix.ma }} VRCSDK=${{ matrix.vrcsdk }}
+          path: ${{ steps.gameci.outputs.coveragePath }}
