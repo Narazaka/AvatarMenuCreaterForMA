@@ -18,6 +18,8 @@ jobs:
           - |
             https://vpm.nadena.dev/vpm.json
             https://vpm.narazaka.net/index.json
+        name:
+          - MA=*
         vrcsdk-type:
           - avatars
         assemblyNames:
@@ -153,7 +155,12 @@ jobs:
 
       - name: Set case name
         id: case-name
-        run: echo "name=Test ${{ matrix.unity }} ${{ matrix.vrcsdk-type }}-${{ matrix.vrcsdk-version }}" >> $GITHUB_OUTPUT
+        run: |
+          if [ -n "${{ matrix.name }}" ] ; then
+            echo "name=${{ matrix.unity }} ${{ matrix.vrcsdk-type }}-${{ matrix.vrcsdk-version }} ${{ matrix.name }}" >> $GITHUB_OUTPUT
+          else
+            echo "name=${{ matrix.unity }} ${{ matrix.vrcsdk-type }}-${{ matrix.vrcsdk-version }}" >> $GITHUB_OUTPUT
+          fi
 
       # Test
       - name: Run tests
