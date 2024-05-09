@@ -24,25 +24,25 @@ namespace net.narazaka.avatarmenucreator
             Keyframes[Keyframes.Length - 1] = new Vector3Keyframe(time, value);
         }
 
-        public (string propertyName, AnimationCurve curve)[] GetCurves(string prefix)
+        public NamedAnimationCurve[] GetCurves(string prefix)
         {
-            var curves = new (string propertyName, AnimationCurve curve)[3];
+            var curves = new NamedAnimationCurve[3];
             for (int i = 0; i < 3; i++)
             {
                 var curve = new AnimationCurve(Keyframes.Select(keyframe => new Keyframe(keyframe.Time, keyframe.Value[i])).ToArray());
-                curves[i] = ($"{prefix}.{PropertyNames[i]}", curve);
+                curves[i] = new NamedAnimationCurve($"{prefix}.{PropertyNames[i]}", curve);
             }
             return curves;
         }
 
-        public static (string propertyName, AnimationCurve curve)[] SetTangentModes((string propertyName, AnimationCurve curve)[] curves)
+        public static NamedAnimationCurve[] SetTangentModes(NamedAnimationCurve[] curves)
         {
-            foreach (var (_, curve) in curves)
+            foreach (var c in curves)
             {
-                AnimationUtility.SetKeyLeftTangentMode(curve, 0, AnimationUtility.TangentMode.Constant);
-                AnimationUtility.SetKeyRightTangentMode(curve, 0, AnimationUtility.TangentMode.Linear);
-                AnimationUtility.SetKeyLeftTangentMode(curve, 1, AnimationUtility.TangentMode.Linear);
-                AnimationUtility.SetKeyRightTangentMode(curve, 1, AnimationUtility.TangentMode.Constant);
+                AnimationUtility.SetKeyLeftTangentMode(c.curve, 0, AnimationUtility.TangentMode.Constant);
+                AnimationUtility.SetKeyRightTangentMode(c.curve, 0, AnimationUtility.TangentMode.Linear);
+                AnimationUtility.SetKeyLeftTangentMode(c.curve, 1, AnimationUtility.TangentMode.Linear);
+                AnimationUtility.SetKeyRightTangentMode(c.curve, 1, AnimationUtility.TangentMode.Constant);
             }
             return curves;
         }

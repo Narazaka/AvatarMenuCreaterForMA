@@ -84,15 +84,15 @@ namespace net.narazaka.avatarmenucreator
         public bool NeedInactivateEndKey { get => 1f - InactivateEndRate >= 1f / 60; }
 
 #if UNITY_EDITOR
-        public (string, AnimationCurve)[] ActiveCurve(string prefix) => new Vector3AnimationCurve(new Vector3Keyframe(0 / 60.0f, Active)).GetCurves(prefix);
-        public (string, AnimationCurve)[] InactiveCurve(string prefix) => new Vector3AnimationCurve(new Vector3Keyframe(0 / 60.0f, Inactive)).GetCurves(prefix);
-        public (string, AnimationCurve)[] ActivateCurve(string prefix, float transitionSeconds)
+        public NamedAnimationCurve[] ActiveCurve(string prefix) => new Vector3AnimationCurve(new Vector3Keyframe(0 / 60.0f, Active)).GetCurves(prefix);
+        public NamedAnimationCurve[] InactiveCurve(string prefix) => new Vector3AnimationCurve(new Vector3Keyframe(0 / 60.0f, Inactive)).GetCurves(prefix);
+        public NamedAnimationCurve[] ActivateCurve(string prefix, float transitionSeconds)
         {
             var curve = new Vector3AnimationCurve(new Vector3Keyframe(transitionSeconds * ActivateStartRate, Inactive), new Vector3Keyframe(transitionSeconds * ActivateEndRate, Active));
             if (NeedActivateEndKey) curve.AddKey(transitionSeconds, Active);
             return Vector3AnimationCurve.SetTangentModes(curve.GetCurves(prefix));
         }
-        public (string, AnimationCurve)[] InactivateCurve(string prefix, float transitionSeconds)
+        public NamedAnimationCurve[] InactivateCurve(string prefix, float transitionSeconds)
         {
             var curve = new Vector3AnimationCurve(new Vector3Keyframe(transitionSeconds * InactivateStartRate, Active), new Vector3Keyframe(transitionSeconds * InactivateEndRate, Inactive));
             if (NeedInactivateEndKey) curve.AddKey(transitionSeconds, Inactive);

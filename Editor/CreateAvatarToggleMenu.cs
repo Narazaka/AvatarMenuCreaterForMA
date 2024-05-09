@@ -88,12 +88,12 @@ namespace net.narazaka.avatarmenucreator.editor
                 if (!matchGameObjects.Contains(child)) continue;
                 var value = AvatarMenu.Positions[child];
                 var curvePath = child;
-                if (value.UseActive) foreach (var (propertyName, curve) in value.ActiveCurve("localPosition")) active.SetCurve(curvePath, typeof(Transform), propertyName, curve);
-                if (value.UseInactive) foreach (var (propertyName, curve) in value.InactiveCurve("localPosition")) inactive.SetCurve(curvePath, typeof(Transform), propertyName, curve);
+                if (value.UseActive) foreach (var c in value.ActiveCurve("localPosition")) active.SetCurve(curvePath, typeof(Transform), c.propertyName, c.curve);
+                if (value.UseInactive) foreach (var c in value.InactiveCurve("localPosition")) inactive.SetCurve(curvePath, typeof(Transform), c.propertyName, c.curve);
                 if (AvatarMenu.TransitionSeconds > 0)
                 {
-                    foreach (var (propertyName, curve) in value.ActivateCurve("localPosition", AvatarMenu.TransitionSeconds)) activate.SetCurve(curvePath, typeof(Transform), propertyName, curve);
-                    foreach (var (propertyName, curve) in value.InactivateCurve("localPosition", AvatarMenu.TransitionSeconds)) inactivate.SetCurve(curvePath, typeof(Transform), propertyName, curve);
+                    foreach (var c in value.ActivateCurve("localPosition", AvatarMenu.TransitionSeconds)) activate.SetCurve(curvePath, typeof(Transform), c.propertyName, c.curve);
+                    foreach (var c in value.InactivateCurve("localPosition", AvatarMenu.TransitionSeconds)) inactivate.SetCurve(curvePath, typeof(Transform), c.propertyName, c.curve);
                 }
             }
             foreach (var child in AvatarMenu.Rotations.Keys)
@@ -101,12 +101,12 @@ namespace net.narazaka.avatarmenucreator.editor
                 if (!matchGameObjects.Contains(child)) continue;
                 var value = AvatarMenu.Rotations[child];
                 var curvePath = child;
-                if (value.UseActive) foreach (var (propertyName, curve) in value.ActiveCurve("localEulerAnglesRaw")) active.SetCurve(curvePath, typeof(Transform), propertyName, curve);
-                if (value.UseInactive) foreach (var (propertyName, curve) in value.InactiveCurve("localEulerAnglesRaw")) inactive.SetCurve(curvePath, typeof(Transform), propertyName, curve);
+                if (value.UseActive) foreach (var c in value.ActiveCurve("localEulerAnglesRaw")) active.SetCurve(curvePath, typeof(Transform), c.propertyName, c.curve);
+                if (value.UseInactive) foreach (var c in value.InactiveCurve("localEulerAnglesRaw")) inactive.SetCurve(curvePath, typeof(Transform), c.propertyName, c.curve);
                 if (AvatarMenu.TransitionSeconds > 0)
                 {
-                    foreach (var (propertyName, curve) in value.ActivateCurve("localEulerAnglesRaw", AvatarMenu.TransitionSeconds)) activate.SetCurve(curvePath, typeof(Transform), propertyName, curve);
-                    foreach (var (propertyName, curve) in value.InactivateCurve("localEulerAnglesRaw", AvatarMenu.TransitionSeconds)) inactivate.SetCurve(curvePath, typeof(Transform), propertyName, curve);
+                    foreach (var c in value.ActivateCurve("localEulerAnglesRaw", AvatarMenu.TransitionSeconds)) activate.SetCurve(curvePath, typeof(Transform), c.propertyName, c.curve);
+                    foreach (var c in value.InactivateCurve("localEulerAnglesRaw", AvatarMenu.TransitionSeconds)) inactivate.SetCurve(curvePath, typeof(Transform), c.propertyName, c.curve);
                 }
             }
             foreach (var child in AvatarMenu.Scales.Keys)
@@ -114,12 +114,12 @@ namespace net.narazaka.avatarmenucreator.editor
                 if (!matchGameObjects.Contains(child)) continue;
                 var value = AvatarMenu.Scales[child];
                 var curvePath = child;
-                if (value.UseActive) foreach (var (propertyName, curve) in value.ActiveCurve("localScale")) active.SetCurve(curvePath, typeof(Transform), propertyName, curve);
-                if (value.UseInactive) foreach (var (propertyName, curve) in value.InactiveCurve("localScale")) inactive.SetCurve(curvePath, typeof(Transform), propertyName, curve);
+                if (value.UseActive) foreach (var c in value.ActiveCurve("localScale")) active.SetCurve(curvePath, typeof(Transform), c.propertyName, c.curve);
+                if (value.UseInactive) foreach (var c in value.InactiveCurve("localScale")) inactive.SetCurve(curvePath, typeof(Transform), c.propertyName, c.curve);
                 if (AvatarMenu.TransitionSeconds > 0)
                 {
-                    foreach (var (propertyName, curve) in value.ActivateCurve("localScale", AvatarMenu.TransitionSeconds)) activate.SetCurve(curvePath, typeof(Transform), propertyName, curve);
-                    foreach (var (propertyName, curve) in value.InactivateCurve("localScale", AvatarMenu.TransitionSeconds)) inactivate.SetCurve(curvePath, typeof(Transform), propertyName, curve);    
+                    foreach (var c in value.ActivateCurve("localScale", AvatarMenu.TransitionSeconds)) activate.SetCurve(curvePath, typeof(Transform), c.propertyName, c.curve);
+                    foreach (var c in value.InactivateCurve("localScale", AvatarMenu.TransitionSeconds)) inactivate.SetCurve(curvePath, typeof(Transform), c.propertyName, c.curve);    
                 }
             }
             // controller
