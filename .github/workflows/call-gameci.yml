@@ -10,7 +10,7 @@ permissions:
 
 jobs:
   test:
-    uses: Narazaka/AvatarMenuCreaterForMA/.github/workflows/gameci.yml@gameci
+    uses: Narazaka/vpm-repos/.github/workflows/gameci.yml@main
     secrets:
       UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
       UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
