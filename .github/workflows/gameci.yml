@@ -95,7 +95,7 @@ jobs:
 
       - name: get packageName
         id: packageName
-        uses: notiz-dev/github-action-json-property@7c8cf5cc36eb85d8d287a8086a39dac59628eb31
+        uses: notiz-dev/github-action-json-property@7a701887f4b568b23eb7b78bb0fc49aaeb1b68d3
         with:
           path: "TargetPackage/package.json"
           prop_path: "name"
