@@ -5,10 +5,8 @@ on:
   release:
     types:
     - published
-    - unpublished
     - created
     - edited
-    - deleted
     - prereleased
     - released
 
