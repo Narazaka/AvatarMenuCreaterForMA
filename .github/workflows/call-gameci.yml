@@ -1,0 +1,89 @@
+name: GameCI
+
+on:
+  push: {}
+  pull_request_target: {}
+  workflow_dispatch: {}
+
+permissions:
+  checks: write
+
+jobs:
+  test:
+    uses: Narazaka/AvatarMenuCreaterForMA/.github/workflows/gameci.yml@gameci
+    secrets:
+      UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
+      UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
+      UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
+    with:
+      unity: ${{ matrix.unity }}
+      vrcsdk-type: avatars
+      vrcsdk-version: ${{ matrix.vrcsdk-version }}
+      repos: |
+        https://vpm.nadena.dev/vpm.json
+        https://vpm.narazaka.net/index.json
+      packages: nadena.dev.modular-avatar ${{ matrix.ma }}
+      name: MA=${{ matrix.ma }}
+      assemblyNames: AvatarMenuCreatorForMA.Test
+      assemblyFilters: +AvatarMenuCreatorForMA.*,-AvatarMenuCreatorForMA.Test
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - unity: 2019.4.31f1
+            ma: 1.1.1
+            vrcsdk-version: 3.1.9
+          - unity: 2019.4.31f1
+            ma: 1.1.1
+            vrcsdk-version: 3.2.0
+          - unity: 2019.4.31f1
+            ma: 1.1.1
+            vrcsdk-version: 3.4.2
+
+          - unity: 2019.4.31f1
+            ma: 1.5.1
+            vrcsdk-version: 3.2.0
+          - unity: 2019.4.31f1
+            ma: 1.5.1
+            vrcsdk-version: 3.4.2
+
+          - unity: 2019.4.31f1
+            ma: 1.7.7
+            vrcsdk-version: 3.2.0
+          - unity: 2019.4.31f1
+            ma: 1.7.7
+            vrcsdk-version: 3.4.2
+
+          - unity: 2019.4.31f1
+            ma: 1.8.4
+            vrcsdk-version: 3.2.0
+          - unity: 2019.4.31f1
+            ma: 1.8.4
+            vrcsdk-version: 3.4.2
+          - unity: 2022.3.6f1
+            ma: 1.8.4
+            vrcsdk-version: 3.5.2
+
+          - unity: 2019.4.31f1
+            ma: 1.9.2
+            vrcsdk-version: 3.2.0
+          - unity: 2019.4.31f1
+            ma: 1.9.2
+            vrcsdk-version: 3.4.2
+          - unity: 2022.3.6f1
+            ma: 1.9.2
+            vrcsdk-version: 3.5.2
+
+          - unity: 2019.4.31f1
+            ma: 1.9.8
+            vrcsdk-version: 3.4.2
+          - unity: 2022.3.6f1
+            ma: 1.9.8
+            vrcsdk-version: 3.5.2
+
+          - unity: 2019.4.31f1
+            ma: 1.9.12
+            vrcsdk-version: 3.4.2
+          - unity: 2022.3.6f1
+            ma: 1.9.12
+            vrcsdk-version: 3.5.2

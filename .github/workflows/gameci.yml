@@ -1,89 +1,56 @@
 name: GameCI
 
 on:
-  push: {}
-  pull_request_target: {}
-  workflow_dispatch: {}
+  workflow_call:
+    secrets:
+      UNITY_LICENSE:
+        required: true
+      UNITY_EMAIL:
+        required: true
+      UNITY_PASSWORD:
+        required: true
+    inputs:
+      unity:
+        type: string
+        default: '2022.3.6f1'
+        description: '2022.3.6f1'
+      vrcsdk-type:
+        type: string
+        description: 'avatars|worlds'
+      vrcsdk-version:
+        type: string
+        description: '3.5.2'
+      repos:
+        type: string
+        description: "https://vpm.nadena.dev/vpm.json\nhttps://vpm.narazaka.net/index.json"
+      packages:
+        type: string
+        description: "nadena.dev.modular-avatar 1.1.1\nnet.narazaka.vrchat.avatar-menu-creater-for-ma 1.17.1"
+      name:
+        type: string
+        description: 'case name postfix'
+      customParameters:
+        type: string
+        description: '-nographics'
+        default: '-nographics'
+      coverageOptions:
+        type: string
+        description: 'generateAdditionalMetrics;generateHtmlReport;generateBadgeReport'
+        default: 'generateAdditionalMetrics;generateHtmlReport;generateBadgeReport'
+      assemblyNames:
+        type: string
+        description: 'AvatarMenuCreatorForMA.Test;AvatarMenuCreatorForMA.Core.Test'
+      assemblyFilters:
+        type: string
+        description: '+AvatarMenuCreatorForMA.*,-AvatarMenuCreatorForMA.Test'
+
+permissions:
+  checks: write
 
 jobs:
   test:
     name: Test
     runs-on: ubuntu-latest
-    permissions:
-      checks: write
-    strategy:
-      fail-fast: false
-      matrix:
-        repos:
-          - |
-            https://vpm.nadena.dev/vpm.json
-            https://vpm.narazaka.net/index.json
-        name:
-          - MA=*
-        vrcsdk-type:
-          - avatars
-        assemblyNames:
-          - AvatarMenuCreatorForMA.Test
-        assemblyFilters:
-          - +AvatarMenuCreatorForMA.*,-AvatarMenuCreatorForMA.Test
-        include:
-          - unity: 2019.4.31f1
-            packages: nadena.dev.modular-avatar 1.1.1
-            vrcsdk-version: 3.1.9
-          - unity: 2019.4.31f1
-            packages: nadena.dev.modular-avatar 1.1.1
-            vrcsdk-version: 3.2.0
-          - unity: 2019.4.31f1
-            packages: nadena.dev.modular-avatar 1.1.1
-            vrcsdk-version: 3.4.2
-
-          - unity: 2019.4.31f1
-            packages: nadena.dev.modular-avatar 1.5.1
-            vrcsdk-version: 3.2.0
-          - unity: 2019.4.31f1
-            packages: nadena.dev.modular-avatar 1.5.1
-            vrcsdk-version: 3.4.2
-
-          - unity: 2019.4.31f1
-            packages: nadena.dev.modular-avatar 1.7.7
-            vrcsdk-version: 3.2.0
-          - unity: 2019.4.31f1
-            packages: nadena.dev.modular-avatar 1.7.7
-            vrcsdk-version: 3.4.2
-
-          - unity: 2019.4.31f1
-            packages: nadena.dev.modular-avatar 1.8.4
-            vrcsdk-version: 3.2.0
-          - unity: 2019.4.31f1
-            packages: nadena.dev.modular-avatar 1.8.4
-            vrcsdk-version: 3.4.2
-          - unity: 2022.3.6f1
-            packages: nadena.dev.modular-avatar 1.8.4
-            vrcsdk-version: 3.5.2
-
-          - unity: 2019.4.31f1
-            packages: nadena.dev.modular-avatar 1.9.2
-            vrcsdk-version: 3.2.0
-          - unity: 2019.4.31f1
-            packages: nadena.dev.modular-avatar 1.9.2
-            vrcsdk-version: 3.4.2
-          - unity: 2022.3.6f1
-            packages: nadena.dev.modular-avatar 1.9.2
-            vrcsdk-version: 3.5.2
-
-          - unity: 2019.4.31f1
-            packages: nadena.dev.modular-avatar 1.9.8
-            vrcsdk-version: 3.4.2
-          - unity: 2022.3.6f1
-            packages: nadena.dev.modular-avatar 1.9.8
-            vrcsdk-version: 3.5.2
-
-          - unity: 2019.4.31f1
-            packages: nadena.dev.modular-avatar 1.9.12
-            vrcsdk-version: 3.4.2
-          - unity: 2022.3.6f1
-            packages: nadena.dev.modular-avatar 1.9.12
-            vrcsdk-version: 3.5.2
     steps:
       - name: Checkout template
         uses: actions/checkout@v4
@@ -108,7 +75,7 @@ jobs:
 
       - name: Setup Project
         run: |
-          cp -R Packages/net.narazaka.vrchat.avatar-menu-creater-for-ma/.github/workflows/ProjectRoot/${{ matrix.unity }}/* .
+          cp -R Packages/net.narazaka.vrchat.avatar-menu-creater-for-ma/.github/workflows/ProjectRoot/${{ inputs.unity }}/* .
           rm -rf Packages/com.vrchat.core.bootstrap
 
       - name: Setup vrc-get
@@ -117,7 +84,7 @@ jobs:
       - name: Add VPM repositories
         shell: bash
         env:
-          REPOS: ${{ matrix.repos }}
+          REPOS: ${{ inputs.repos }}
         run: |
           printf '%s\n' "$REPOS" | while IFS= read -r url; do
             if [ -n "${url:-}" ]; then
@@ -129,11 +96,11 @@ jobs:
       - name: Resolve VPM packages
         shell: bash
         env:
-          PACKAGES: ${{ matrix.packages }}
+          PACKAGES: ${{ inputs.packages }}
         run: |
-          if [ -n "${{ matrix.vrcsdk-type }}" ] ; then
-            echo ">> vrc-get install --yes com.vrchat.${{ matrix.vrcsdk-type }} ${{ matrix.vrcsdk-version }}" >&2
-            vrc-get install --yes com.vrchat.${{ matrix.vrcsdk-type }} ${{ matrix.vrcsdk-version }}
+          if [ -n "${{ inputs.vrcsdk-type }}" ] ; then
+            echo ">> vrc-get install --yes com.vrchat.${{ inputs.vrcsdk-type }} ${{ inputs.vrcsdk-version }}" >&2
+            vrc-get install --yes com.vrchat.${{ inputs.vrcsdk-type }} ${{ inputs.vrcsdk-version }}
           fi
           if [ -n "${PACKAGES:-}" ] ; then
             printf '%s\n' "$PACKAGES" | while IFS= read -r p; do
@@ -150,16 +117,16 @@ jobs:
       - uses: actions/cache@v3
         with:
           path: Library
-          key: Library-unity=${{ matrix.unity }}-vrcsdk=${{ matrix.vrcsdk-type }}-${{ matrix.vrcsdk-version }}-packages=${{ matrix.packages }}
-          restore-keys: Library-unity=${{ matrix.unity }}-
+          key: Library-unity=${{ inputs.unity }}-vrcsdk=${{ inputs.vrcsdk-type }}-${{ inputs.vrcsdk-version }}-packages=${{ inputs.packages }}
+          restore-keys: Library-unity=${{ inputs.unity }}-
 
       - name: Set case name
         id: case-name
         run: |
-          if [ -n "${{ matrix.name }}" ] ; then
-            echo "name=${{ matrix.unity }} ${{ matrix.vrcsdk-type }}-${{ matrix.vrcsdk-version }} ${{ matrix.name }}" >> $GITHUB_OUTPUT
+          if [ -n "${{ inputs.name }}" ] ; then
+            echo "name=${{ inputs.unity }} ${{ inputs.vrcsdk-type }}-${{ inputs.vrcsdk-version }} ${{ inputs.name }}" >> $GITHUB_OUTPUT
           else
-            echo "name=${{ matrix.unity }} ${{ matrix.vrcsdk-type }}-${{ matrix.vrcsdk-version }}" >> $GITHUB_OUTPUT
+            echo "name=${{ inputs.unity }} ${{ inputs.vrcsdk-type }}-${{ inputs.vrcsdk-version }}" >> $GITHUB_OUTPUT
           fi
 
       # Test
@@ -173,9 +140,9 @@ jobs:
         with:
           githubToken: ${{ secrets.GITHUB_TOKEN }}
           testMode: EditMode
-          customParameters: -nographics -assemblyNames ${{ matrix.assemblyNames }}
+          customParameters: ${{ inputs.customParameters }} ${{ inputs.assemblyNames != '' && format('-assemblyNames {0}', inputs.assemblyNames) || '' }}
           checkName: ${{ steps.case-name.outputs.name }}
-          coverageOptions: generateAdditionalMetrics;generateHtmlReport;generateBadgeReport;assemblyFilters:${{ matrix.assemblyFilters }}
+          coverageOptions: ${{ inputs.coverageOptions }}${{ inputs.assemblyFilters != '' && format(';assemblyFilters:{0}', inputs.assemblyFilters) || '' }}
 
       - uses: actions/upload-artifact@v4
         if: always()
