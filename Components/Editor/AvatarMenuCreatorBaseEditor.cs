@@ -10,6 +10,7 @@ using System;
 
 namespace net.narazaka.avatarmenucreator.components.editor
 {
+    [CanEditMultipleObjects]
     [CustomEditor(typeof(AvatarMenuCreatorBase), true)]
     public class AvatarMenuCreatorBaseEditor : Editor
     {
@@ -39,6 +40,18 @@ namespace net.narazaka.avatarmenucreator.components.editor
         }
 
         public override void OnInspectorGUI()
+        {
+            if (targets.Length == 1)
+            {
+                OnInspectorGUISingle();
+            }
+            else
+            {
+                OnInspectorGUIMultiple();
+            }
+        }
+
+        void OnInspectorGUISingle()
         {
             var baseObject = GetParentAvatar();
 
@@ -269,6 +282,11 @@ namespace net.narazaka.avatarmenucreator.components.editor
 
             Creator.AvatarMenu.BaseObject = baseObject;
             Creator.AvatarMenu.OnAvatarMenuGUI(children);
+        }
+
+        void OnInspectorGUIMultiple()
+        {
+            Creator.AvatarMenu.OnMultiAvatarMenuGUI(Creator.AvatarMenuProperty(serializedObject));
         }
 
         GameObject GetParentAvatar()

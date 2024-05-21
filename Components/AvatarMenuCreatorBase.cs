@@ -16,6 +16,9 @@ namespace net.narazaka.avatarmenucreator.components
 #endif
     {
         public abstract AvatarMenuBase AvatarMenu { get; }
+#if UNITY_EDITOR
+        public abstract UnityEditor.SerializedProperty AvatarMenuProperty(UnityEditor.SerializedObject serializedObject);
+#endif
 
         public bool IsEffective => GetComponent<ModularAvatarMergeAnimator>() == null && GetComponent<ModularAvatarParameters>() == null;
 

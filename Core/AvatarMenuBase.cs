@@ -55,6 +55,7 @@ namespace net.narazaka.avatarmenucreator
         public abstract void RemoveStoredChild(string child);
         protected abstract void OnHeaderGUI(IList<string> children);
         protected abstract void OnMainGUI(IList<string> children);
+        protected abstract void OnMultiGUI(SerializedProperty serializedProperty);
         protected abstract bool IsSuitableForTransition();
 
         public void OnAvatarMenuGUI(IList<string> children)
@@ -65,6 +66,15 @@ namespace net.narazaka.avatarmenucreator
             {
                 ScrollPosition = scrollView.scrollPosition;
                 OnMainGUI(children);
+            }
+        }
+
+        public void OnMultiAvatarMenuGUI(SerializedProperty serializedProperty)
+        {
+            using (var scrollView = new EditorGUILayout.ScrollViewScope(ScrollPosition))
+            {
+                ScrollPosition = scrollView.scrollPosition;
+                OnMultiGUI(serializedProperty);
             }
         }
 
@@ -93,9 +103,21 @@ namespace net.narazaka.avatarmenucreator
             }
         }
 
+        protected void ShowTransitionSecondsMulti(SerializedProperty serializedProperty)
+        {
+            var transitionSeconds = serializedProperty.FindPropertyRelative(nameof(TransitionSeconds));
+            EditorGUILayout.PropertyField(transitionSeconds, new GUIContent(T.徐々に変化_start_秒数_end_));
+            if (transitionSeconds.floatValue < 0) transitionSeconds.floatValue = 0;
+        }
+
         protected void ShowSaved()
         {
             Saved = Toggle(T.パラメーター保存, Saved);
+        }
+
+        protected void ShowSavedMulti(SerializedProperty serializedProperty)
+        {
+            EditorGUILayout.PropertyField(serializedProperty.FindPropertyRelative(nameof(Saved)), new GUIContent(T.パラメーター保存));
         }
 
         protected void ShowDetailMenu()
@@ -108,6 +130,18 @@ namespace net.narazaka.avatarmenucreator
                 T.パラメーター内部値;
 #endif
             InternalParameter = Toggle(internalParameterLabel, InternalParameter);
+        }
+
+        protected void ShowDetailMenuMulti(SerializedProperty serializedProperty)
+        {
+            // EditorGUILayout.PropertyField(serializedProperty.FindPropertyRelative(nameof(ParameterName)), new GUIContent(T.パラメーター名_start_オプショナル_end_));
+            var internalParameterLabel =
+#if UNITY_2022_1_OR_NEWER && !NET_NARAZAKA_VRCHAT_AvatarMenuCreator_HAS_MA_BEFORE_1_8
+                T.パラメーター自動リネーム;
+#else
+                T.パラメーター内部値;
+#endif
+            EditorGUILayout.PropertyField(serializedProperty.FindPropertyRelative(nameof(InternalParameter)), new GUIContent(internalParameterLabel));
         }
 
         protected GameObject GetGameObject(string child)

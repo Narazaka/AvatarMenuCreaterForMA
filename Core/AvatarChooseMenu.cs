@@ -137,6 +137,18 @@ namespace net.narazaka.avatarmenucreator
 
         protected override bool IsSuitableForTransition() => ChooseBlendShapes.Count > 0 || ChooseShaderParameters.Count > 0 || Positions.Count > 0 || Rotations.Count > 0 || Scales.Count > 0;
 
+        protected override void OnMultiGUI(SerializedProperty serializedProperty)
+        {
+            var serializedObject = serializedProperty.serializedObject;
+            serializedObject.Update();
+            EditorGUILayout.PropertyField(serializedProperty.FindPropertyRelative(nameof(ChooseParentIcon)), new GUIContent(T.親メニューアイコン));
+            EditorGUILayout.PropertyField(serializedProperty.FindPropertyRelative(nameof(ChooseDefaultValue)), new GUIContent(T.パラメーター初期値));
+            ShowSavedMulti(serializedProperty);
+            ShowDetailMenuMulti(serializedProperty);
+            ShowTransitionSecondsMulti(serializedProperty);
+            serializedObject.ApplyModifiedProperties();
+        }
+
         protected override void OnHeaderGUI(IList<string> children)
         {
             ChooseParentIcon = TextureField(T.親メニューアイコン, ChooseParentIcon);

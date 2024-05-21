@@ -178,6 +178,18 @@ namespace net.narazaka.avatarmenucreator
         }
         protected override bool IsSuitableForTransition() => ToggleBlendShapes.Count > 0 || ToggleShaderParameters.Count > 0 || Positions.Count > 0 || Rotations.Count > 0 || Scales.Count > 0;
 
+        protected override void OnMultiGUI(SerializedProperty serializedProperty)
+        {
+            var serializedObject = serializedProperty.serializedObject;
+            serializedObject.Update();
+            EditorGUILayout.PropertyField(serializedProperty.FindPropertyRelative(nameof(ToggleIcon)), new GUIContent(T.アイコン));
+            EditorGUILayout.PropertyField(serializedProperty.FindPropertyRelative(nameof(ToggleDefaultValue)), new GUIContent(T.パラメーター初期値));
+            ShowSavedMulti(serializedProperty);
+            ShowDetailMenuMulti(serializedProperty);
+            ShowTransitionSecondsMulti(serializedProperty);
+            serializedObject.ApplyModifiedProperties();
+        }
+
         protected override void OnHeaderGUI(IList<string> children)
         {
             ToggleIcon = TextureField(T.アイコン, ToggleIcon);

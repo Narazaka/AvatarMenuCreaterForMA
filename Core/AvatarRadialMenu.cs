@@ -107,6 +107,18 @@ namespace net.narazaka.avatarmenucreator
             return false;
         }
 
+        protected override void OnMultiGUI(SerializedProperty serializedProperty)
+        {
+            var serializedObject = serializedProperty.serializedObject;
+            serializedObject.Update();
+            serializedObject.FindProperty(nameof(AvatarRadialMenu));
+            EditorGUILayout.PropertyField(serializedProperty.FindPropertyRelative(nameof(RadialIcon)), new GUIContent(T.アイコン));
+            EditorGUILayout.PropertyField(serializedProperty.FindPropertyRelative(nameof(RadialDefaultValue)), new GUIContent(T.パラメーター初期値));
+            ShowSavedMulti(serializedProperty);
+            ShowDetailMenuMulti(serializedProperty);
+            serializedObject.ApplyModifiedProperties();
+        }
+
         protected override void OnHeaderGUI(IList<string> children)
         {
             RadialIcon = TextureField(T.アイコン, RadialIcon);

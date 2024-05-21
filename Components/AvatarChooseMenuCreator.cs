@@ -9,6 +9,9 @@ namespace net.narazaka.avatarmenucreator.components
         [SerializeField]
         public AvatarChooseMenu AvatarChooseMenu = new AvatarChooseMenu();
         public override AvatarMenuBase AvatarMenu => AvatarChooseMenu;
+#if UNITY_EDITOR
+        public override UnityEditor.SerializedProperty AvatarMenuProperty(UnityEditor.SerializedObject serializedObject) => serializedObject.FindProperty(nameof(AvatarChooseMenu));
+#endif
 
         public override IEnumerable<VRCExpressionParameters.Parameter> GetEffectiveParameterNameAndTypes()
         {
