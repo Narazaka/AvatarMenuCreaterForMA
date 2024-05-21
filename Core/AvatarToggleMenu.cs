@@ -181,7 +181,10 @@ namespace net.narazaka.avatarmenucreator
         protected override void OnHeaderGUI(IList<string> children)
         {
             ToggleIcon = TextureField(T.アイコン, ToggleIcon);
+            var labelFontStyle = EditorStyles.label.fontStyle;
+            EditorStyles.label.fontStyle = FontStyle.Bold;
             ToggleDefaultValue = Toggle(T.パラメーター初期値, ToggleDefaultValue);
+            EditorStyles.label.fontStyle = labelFontStyle;
             ShowSaved();
             ShowDetailMenu();
             UseAdvanced = EditorGUILayout.Toggle(T.高度な設定, UseAdvanced);

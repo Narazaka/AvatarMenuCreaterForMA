@@ -140,7 +140,10 @@ namespace net.narazaka.avatarmenucreator
         protected override void OnHeaderGUI(IList<string> children)
         {
             ChooseParentIcon = TextureField(T.親メニューアイコン, ChooseParentIcon);
+            var labelFontStyle = EditorStyles.label.fontStyle;
+            EditorStyles.label.fontStyle = FontStyle.Bold;
             ChooseDefaultValue = IntField(T.パラメーター初期値, ChooseDefaultValue);
+            EditorStyles.label.fontStyle = labelFontStyle;
             ShowSaved();
             ShowDetailMenu();
 

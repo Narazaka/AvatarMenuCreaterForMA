@@ -110,7 +110,10 @@ namespace net.narazaka.avatarmenucreator
         protected override void OnHeaderGUI(IList<string> children)
         {
             RadialIcon = TextureField(T.アイコン, RadialIcon);
+            var labelFontStyle = EditorStyles.label.fontStyle;
+            EditorStyles.label.fontStyle = FontStyle.Bold;
             RadialDefaultValue = FloatField(T.パラメーター初期値, RadialDefaultValue);
+            EditorStyles.label.fontStyle = labelFontStyle;
             ShowSaved();
             ShowDetailMenu();
             if (RadialDefaultValue < 0) RadialDefaultValue = 0;
