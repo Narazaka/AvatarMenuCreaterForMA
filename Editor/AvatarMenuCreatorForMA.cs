@@ -112,7 +112,7 @@ namespace net.narazaka.avatarmenucreator.editor
                 return;
             }
 
-            var newMenuType = (MenuType)EnumPopupUtility.EnumPopup(MenuType);
+            var newMenuType = (MenuType)ToolbarUtility.Toolbar(MenuType);
             if (newMenuType != MenuType)
             {
                 UndoUtility.RecordObject(this, "MenuType");
