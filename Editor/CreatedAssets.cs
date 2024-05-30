@@ -61,24 +61,27 @@ namespace net.narazaka.avatarmenucreator.editor
         void StoreToPrefab(GameObject prefab, bool isMenuInstaller)
         {
             var menuInstaller = prefab.GetComponent<ModularAvatarMenuInstaller>();
-            if (menuInstaller == null && isMenuInstaller)
+            if (menuInstaller == null && isMenuInstaller && menu != null)
             {
                 menuInstaller = prefab.AddComponent<ModularAvatarMenuInstaller>();
             }
             if (menuInstaller == null || !isMenuInstaller)
             {
 #if !NET_NARAZAKA_VRCHAT_AvatarMenuCreator_HAS_NO_MENU_MA
-                var menuItem = prefab.GetOrAddComponent<ModularAvatarMenuItem>();
-                menuItem.Control = (parentMenu == null ? menu : parentMenu).controls[0].DeepCopy();
-                if (parentMenu != null)
+                if (menu != null)
                 {
-                    menuItem.MenuSource = SubmenuSource.Children;
-                    foreach (var control in menu.controls)
+                    var menuItem = prefab.GetOrAddComponent<ModularAvatarMenuItem>();
+                    menuItem.Control = (parentMenu == null ? menu : parentMenu).controls[0].DeepCopy();
+                    if (parentMenu != null)
                     {
-                        var menuGo = new GameObject(control.name);
-                        menuGo.transform.SetParent(prefab.transform);
-                        var subMenuItem = menuGo.AddComponent<ModularAvatarMenuItem>();
-                        subMenuItem.Control = control.DeepCopy();
+                        menuItem.MenuSource = SubmenuSource.Children;
+                        foreach (var control in menu.controls)
+                        {
+                            var menuGo = new GameObject(control.name);
+                            menuGo.transform.SetParent(prefab.transform);
+                            var subMenuItem = menuGo.AddComponent<ModularAvatarMenuItem>();
+                            subMenuItem.Control = control.DeepCopy();
+                        }
                     }
                 }
 #endif
@@ -104,7 +107,7 @@ namespace net.narazaka.avatarmenucreator.editor
             AssetDatabase.LoadAllAssetsAtPath(prefabPath).Where(a => !(a is GameObject)).ToList().ForEach(AssetDatabase.RemoveObjectFromAsset);
             if (includeAssetType == IncludeAssetType.Include)
             {
-                AssetDatabase.AddObjectToAsset(menu, prefabPath);
+                if (menu != null) AssetDatabase.AddObjectToAsset(menu, prefabPath);
                 if (parentMenu != null) AssetDatabase.AddObjectToAsset(parentMenu, prefabPath);
                 foreach (var clip in clips)
                 {
@@ -115,7 +118,7 @@ namespace net.narazaka.avatarmenucreator.editor
             }
             else if (includeAssetType == IncludeAssetType.AnimatorAndInclude)
             {
-                AssetDatabase.AddObjectToAsset(menu, prefabPath);
+                if (menu != null) AssetDatabase.AddObjectToAsset(menu, prefabPath);
                 if (parentMenu != null) AssetDatabase.AddObjectToAsset(parentMenu, prefabPath);
 
                 SaveAnimator(controller, controllerPath);
@@ -127,7 +130,7 @@ namespace net.narazaka.avatarmenucreator.editor
             else
             {
                 var basePathDir = System.IO.Path.GetDirectoryName(basePath);
-                AssetDatabase.CreateAsset(menu, $"{basePathDir}/{menu.name}.asset");
+                if (menu != null) AssetDatabase.CreateAsset(menu, $"{basePathDir}/{menu.name}.asset");
                 if (parentMenu != null) AssetDatabase.CreateAsset(parentMenu, $"{basePathDir}/{parentMenu.name}.asset");
                 foreach (var clip in clips)
                 {

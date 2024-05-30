@@ -161,6 +161,9 @@ namespace net.narazaka.avatarmenucreator
         [English("Parameter Default")]
         public static string パラメーター初期値 => L;
 
+        [English("Do not create Menu")]
+        public static string メニューを作らない => L;
+
         [English("Advanced")]
         public static string 高度な設定 => L;
 

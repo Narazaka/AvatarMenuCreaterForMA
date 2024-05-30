@@ -151,7 +151,7 @@ namespace net.narazaka.avatarmenucreator.editor
             };
             menu.name = baseName;
             // prefab
-            return new CreatedAssets(baseName, controller, emptyClip == null ? new AnimationClip[] { clip } : new AnimationClip[] { clip, emptyClip }, menu, null, new ParameterConfig[]
+            return new CreatedAssets(baseName, controller, emptyClip == null ? new AnimationClip[] { clip } : new AnimationClip[] { clip, emptyClip }, AvatarMenu.WithoutMenu ? null : menu, null, new ParameterConfig[]
             {
                 new ParameterConfig
                 {

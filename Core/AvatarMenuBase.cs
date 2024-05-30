@@ -24,6 +24,8 @@ namespace net.narazaka.avatarmenucreator
         public string ParameterName;
         [SerializeField]
         public bool InternalParameter = false;
+        [SerializeField]
+        public bool WithoutMenu = false;
 
 #if UNITY_EDITOR
         [NonSerialized]
@@ -130,6 +132,7 @@ namespace net.narazaka.avatarmenucreator
                 T.パラメーター内部値;
 #endif
             InternalParameter = Toggle(internalParameterLabel, InternalParameter);
+            WithoutMenu = Toggle(T.メニューを作らない, WithoutMenu);
         }
 
         protected void ShowDetailMenuMulti(SerializedProperty serializedProperty)
@@ -142,6 +145,8 @@ namespace net.narazaka.avatarmenucreator
                 T.パラメーター内部値;
 #endif
             EditorGUILayout.PropertyField(serializedProperty.FindPropertyRelative(nameof(InternalParameter)), new GUIContent(internalParameterLabel));
+
+            EditorGUILayout.PropertyField(serializedProperty.FindPropertyRelative(nameof(WithoutMenu)), new GUIContent(T.メニューを作らない));
         }
 
         protected GameObject GetGameObject(string child)

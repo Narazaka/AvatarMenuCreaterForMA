@@ -259,7 +259,7 @@ namespace net.narazaka.avatarmenucreator.editor
                 },
             };
             menu.name = baseName;
-            return new CreatedAssets(baseName, controller, AvatarMenu.TransitionSeconds > 0 ? new AnimationClip[] { active, inactive, activate, inactivate } : new AnimationClip[] { active, inactive }, menu, null, new ParameterConfig[]
+            return new CreatedAssets(baseName, controller, AvatarMenu.TransitionSeconds > 0 ? new AnimationClip[] { active, inactive, activate, inactivate } : new AnimationClip[] { active, inactive }, AvatarMenu.WithoutMenu ? null : menu, null, new ParameterConfig[]
             {
                 new ParameterConfig
                 {
