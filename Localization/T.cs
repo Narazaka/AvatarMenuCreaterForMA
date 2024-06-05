@@ -56,6 +56,9 @@ namespace net.narazaka.avatarmenucreator
         [English("It is located under the submenu of MA Menu Item.\nIt can be installed without the MA Menu Installer.")]
         public static string MA_Menu_Itemのサブメニュー配下にありますゝ_n_MA_Menu_Installerがなくてもインストールできますゝ => L;
 
+        [English("It is located under the MA Menu Group.\nIt can be installed without the MA Menu Installer.")]
+        public static string MA_Menu_Groupの配下にありますゝ_n_MA_Menu_Installerがなくてもインストールできますゝ => L;
+
         [English("Remove MA Menu Installer")]
         public static string MA_Menu_Installerを削除 => L;
 

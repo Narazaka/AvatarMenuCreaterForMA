@@ -91,12 +91,20 @@ namespace net.narazaka.avatarmenucreator.components.editor
                 if (baseObject != null)
                 {
                     var parentMenuItem = Creator.transform.parent.GetComponent<ModularAvatarMenuItem>();
+                    var parentMenuGroup = Creator.transform.parent.GetComponent<ModularAvatarMenuGroup>();
                     var parentChooseMenu = Creator.transform.parent.GetComponent<AvatarChooseMenuCreator>();
-                    if (parentChooseMenu != null || (parentMenuItem != null && parentMenuItem.Control.type == VRC.SDK3.Avatars.ScriptableObjects.VRCExpressionsMenu.Control.ControlType.SubMenu && parentMenuItem.MenuSource == SubmenuSource.Children))
+                    if (parentChooseMenu != null || parentMenuGroup != null || (parentMenuItem != null && parentMenuItem.Control.type == VRC.SDK3.Avatars.ScriptableObjects.VRCExpressionsMenu.Control.ControlType.SubMenu && parentMenuItem.MenuSource == SubmenuSource.Children))
                     {
                         if (maMenuInstaller != null)
                         {
-                            EditorGUILayout.HelpBox(T.MA_Menu_Itemのサブメニュー配下にありますゝ_n_MA_Menu_Installerがなくてもインストールできますゝ, MessageType.Info);
+                            if (parentMenuGroup != null)
+                            {
+                                EditorGUILayout.HelpBox(T.MA_Menu_Groupの配下にありますゝ_n_MA_Menu_Installerがなくてもインストールできますゝ, MessageType.Info);
+                            }
+                            else
+                            {
+                                EditorGUILayout.HelpBox(T.MA_Menu_Itemのサブメニュー配下にありますゝ_n_MA_Menu_Installerがなくてもインストールできますゝ, MessageType.Info);
+                            }
                             if (GUILayout.Button(T.MA_Menu_Installerを削除) && EditorUtility.DisplayDialog(T.本当に削除しますか_Q_, T.MA_Menu_Installerを削除します, "OK", "Cancel"))
                             {
                                 Undo.DestroyObjectImmediate(maMenuInstaller);
