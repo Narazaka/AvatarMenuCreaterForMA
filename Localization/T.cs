@@ -65,8 +65,8 @@ namespace net.narazaka.avatarmenucreator
         [English("Remove MA Menu Installer")]
         public static string MA_Menu_Installerを削除します => L;
 
-        [English("It is not under the submenu of MA Menu Item.\nMA Menu Installer is required.")]
-        public static string MA_Menu_Itemのサブメニュー配下にありませんゝ_n_MA_Menu_Installerが必要ですゝ => L;
+        [English("It is not under the submenu of MA Menu Item.\nMA Menu Installer is required for menu generation.\n(It will work without menu generation if you change the parameters by other means.)")]
+        public static string MA_Menu_Itemのサブメニュー配下にありませんゝ_n_メニューの生成にはMA_Menu_Installerが必要ですゝ_n__start_メニュー生成無しでも他の手段でパラメーターを変更すれば動作します_end_ => L;
 
         [English("Add MA Menu Installer")]
         public static string MA_Menu_Installerを追加 => L;

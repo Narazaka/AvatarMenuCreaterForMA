@@ -115,7 +115,7 @@ namespace net.narazaka.avatarmenucreator.components.editor
                     {
                         if (maMenuInstaller == null)
                         {
-                            EditorGUILayout.HelpBox(T.MA_Menu_Itemのサブメニュー配下にありませんゝ_n_MA_Menu_Installerが必要ですゝ, MessageType.Warning);
+                            EditorGUILayout.HelpBox(T.MA_Menu_Itemのサブメニュー配下にありませんゝ_n_メニューの生成にはMA_Menu_Installerが必要ですゝ_n__start_メニュー生成無しでも他の手段でパラメーターを変更すれば動作します_end_, MessageType.Warning);
                             if (GUILayout.Button(T.MA_Menu_Installerを追加))
                             {
                                 var installer = Creator.gameObject.AddComponent<ModularAvatarMenuInstaller>();
