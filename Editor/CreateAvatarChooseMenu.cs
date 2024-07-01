@@ -184,9 +184,10 @@ namespace net.narazaka.avatarmenucreator.editor
         {
             for (var i = 0; i < AvatarMenu.ChooseCount; ++i)
             {
-                choices[i].SetCurve(path, typeof(Transform), property + ".x", new AnimationCurve(new Keyframe(0, value[i].x)));
-                choices[i].SetCurve(path, typeof(Transform), property + ".y", new AnimationCurve(new Keyframe(0, value[i].y)));
-                choices[i].SetCurve(path, typeof(Transform), property + ".z", new AnimationCurve(new Keyframe(0, value[i].z)));
+                var v = value.ContainsKey(i) ? value[i] : Vector3.zero;
+                choices[i].SetCurve(path, typeof(Transform), property + ".x", new AnimationCurve(new Keyframe(0, v.x)));
+                choices[i].SetCurve(path, typeof(Transform), property + ".y", new AnimationCurve(new Keyframe(0, v.y)));
+                choices[i].SetCurve(path, typeof(Transform), property + ".z", new AnimationCurve(new Keyframe(0, v.z)));
             }
         }
     }
