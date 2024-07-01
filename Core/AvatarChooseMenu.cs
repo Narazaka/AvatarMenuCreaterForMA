@@ -149,6 +149,9 @@ namespace net.narazaka.avatarmenucreator
             serializedObject.ApplyModifiedProperties();
         }
 
+        bool ChoiceFoldout = true;
+        Vector2 ScrollPositionChoises;
+
         protected override void OnHeaderGUI(IList<string> children)
         {
             ChooseParentIcon = TextureField(T.親メニューアイコン, ChooseParentIcon);
@@ -165,12 +168,39 @@ namespace net.narazaka.avatarmenucreator
 
             EditorGUILayout.Space();
 
-            ChooseCount = IntField(T.選択肢の数, ChooseCount);
+            EditorGUILayout.BeginHorizontal();
+            var rect = EditorGUILayout.GetControlRect(false, GUILayout.Width(EditorGUIUtility.labelWidth));
+            ChoiceFoldout = EditorGUI.Foldout(rect, ChoiceFoldout, T.選択肢の数);
+            ChooseCount = IntField(ChooseCount);
+            EditorGUILayout.EndHorizontal();
 
             if (ChooseCount < 1) ChooseCount = 1;
             if (ChooseDefaultValue < 0) ChooseDefaultValue = 0;
             if (ChooseDefaultValue >= ChooseCount) ChooseDefaultValue = ChooseCount - 1;
 
+            if (ChoiceFoldout)
+            {
+                if (ChooseCount > 10)
+                {
+                    using (var scrollView = new EditorGUILayout.ScrollViewScope(ScrollPositionChoises, GUILayout.Height(220)))
+                    {
+                        ScrollPositionChoises = scrollView.scrollPosition;
+                        HeaderChoises();
+                    }
+                }
+                else
+                {
+                    HeaderChoises();
+                }
+            }
+            
+            HeaderBulkChoises(children);
+
+            HorizontalLine();
+        }
+
+        void HeaderChoises()
+        {
             EditorGUI.indentLevel++;
             EditorGUIUtility.labelWidth = 65;
             for (var i = 0; i < ChooseCount; ++i)
@@ -190,13 +220,15 @@ namespace net.narazaka.avatarmenucreator
             }
             EditorGUIUtility.labelWidth = 0;
             EditorGUI.indentLevel--;
+        }
 
-            var allMaterials = children.ToDictionary(child => child, child => GetMaterialSlots(child));
-
+        void HeaderBulkChoises(IList<string> children)
+        {
             if (BulkSet)
             {
                 if (FoldoutHeader("", T.一括設定, true))
                 {
+                    var allMaterials = children.ToDictionary(child => child, child => GetMaterialSlots(child));
                     ShowChooseBulkMaterialControl(allMaterials);
                 }
             }

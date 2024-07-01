@@ -299,6 +299,19 @@ namespace net.narazaka.avatarmenucreator
             }
         }
 
+        protected int IntField(int value)
+        {
+            using (var check = new EditorGUI.ChangeCheckScope())
+            {
+                var newValue = EditorGUILayout.IntField(value);
+                if (check.changed)
+                {
+                    WillChange();
+                }
+                return newValue;
+            }
+        }
+
         protected float FloatField(string label, float value)
         {
             using (var check = new EditorGUI.ChangeCheckScope())
@@ -349,6 +362,19 @@ namespace net.narazaka.avatarmenucreator
                 }
                 return newValue;
             }
+        }
+
+        protected void HorizontalLine()
+        {
+            var c = GUI.color;
+            GUI.color = Color.gray;
+            GUILayout.Box(GUIContent.none, new GUIStyle
+            {
+                normal = { background = EditorGUIUtility.whiteTexture },
+                margin = new RectOffset(10, 10, 10, 10),
+                fixedHeight = 1
+            });
+            GUI.color = c;
         }
 #endif
     }
