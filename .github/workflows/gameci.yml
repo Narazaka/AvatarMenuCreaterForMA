@@ -97,8 +97,8 @@ jobs:
             vrcsdk-version: 3.5.2
 
           - unity: 2019.4.31f1
-            ma: 1.9.12
+            ma: 1.9.13
             vrcsdk-version: 3.4.2
           - unity: 2022.3.6f1
-            ma: 1.9.12
+            ma: 1.9.13
             vrcsdk-version: 3.5.2
