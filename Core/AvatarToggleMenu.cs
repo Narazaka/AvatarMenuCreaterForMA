@@ -115,6 +115,7 @@ namespace net.narazaka.avatarmenucreator
             {
                 WillChange();
                 ToggleObjects.ReplaceKey(oldChild, newChild);
+                ToggleObjectUsings.ReplaceKey(oldChild, newChild);
                 ToggleMaterials.ReplacePrimaryKey(oldChild, newChild);
                 ToggleBlendShapes.ReplacePrimaryKey(oldChild, newChild);
                 ToggleShaderParameters.ReplacePrimaryKey(oldChild, newChild);
@@ -130,6 +131,10 @@ namespace net.narazaka.avatarmenucreator
             foreach (var key in ToggleObjects.Keys.Where(k => !filter.Contains(k)).ToList())
             {
                 ToggleObjects.Remove(key);
+            }
+            foreach (var key in ToggleObjectUsings.Keys.Where(k => !filter.Contains(k)).ToList())
+            {
+                ToggleObjectUsings.Remove(key);
             }
             foreach (var key in ToggleMaterials.Keys.Where(k => !filter.Contains(k.Item1)).ToList())
             {
@@ -160,6 +165,7 @@ namespace net.narazaka.avatarmenucreator
         {
             WillChange();
             ToggleObjects.Remove(child);
+            ToggleObjectUsings.Remove(child);
             foreach (var key in ToggleMaterials.Keys.Where(k => k.Item1 == child).ToList())
             {
                 ToggleMaterials.Remove(key);
