@@ -39,6 +39,11 @@ namespace net.narazaka.avatarmenucreator.editor.util
             return (basePath, baseName);
         }
 
+        public static Component[] GetAllComponents(this GameObject gameObject)
+        {
+            return gameObject.GetComponents<Component>();
+        }
+
         public static Material[] GetMaterialSlots(this GameObject gameObject)
         {
             var renderer = gameObject.GetComponent<Renderer>();
@@ -74,6 +79,12 @@ namespace net.narazaka.avatarmenucreator.editor.util
 
         public static IEnumerable<NameWithDescription> ToNames(this IEnumerable<string> names) =>
             names.Select(name => new NameWithDescription { Name = name });
+
+        public class NameAndDescription : INameAndDescription
+        {
+            public string Name { get; set; }
+            public string Description { get; set; }
+        }
 
         public static IEnumerable<string> ToStrings(this IEnumerable<INameAndDescription> names) =>
             names.Select(name => name.Name);

@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 using UnityEngine;
+using VRC.Core;
+
 #if UNITY_EDITOR
 using UnityEditor;
 using net.narazaka.avatarmenucreator.editor.util;
@@ -18,6 +20,10 @@ namespace net.narazaka.avatarmenucreator
         public ToggleTypeDictionary ToggleObjects = new ToggleTypeDictionary();
         [SerializeField]
         public ToggleUsingDictionary ToggleObjectUsings = new ToggleUsingDictionary();
+        [SerializeField]
+        public NestedToggleTypeDictionary ToggleComponents = new NestedToggleTypeDictionary();
+        [SerializeField]
+        public NestedToggleUsingDictionary ToggleComponentUsings = new NestedToggleUsingDictionary();
         [SerializeField]
         public ToggleMaterialDictionary ToggleMaterials = new ToggleMaterialDictionary();
         [SerializeField]
@@ -73,6 +79,7 @@ namespace net.narazaka.avatarmenucreator
                             _UseAdvanced = value;
                             WillChange();
                             ToggleObjectUsings.Clear();
+                            ToggleComponentUsings.Clear();
                             foreach (var key in ToggleMaterials.Keys.ToList())
                             {
                                 ToggleMaterials[key] = ToggleMaterials[key].ResetAdvanced();
@@ -106,16 +113,18 @@ namespace net.narazaka.avatarmenucreator
                 }
             }
         }
-        bool HasAdvanced => ToggleObjectUsings.Count > 0 || ToggleMaterials.Any(t => t.Value.HasAdvanced) || ToggleBlendShapes.Any(t => t.Value.HasAdvanced) || ToggleShaderParameters.Any(t => t.Value.HasAdvanced) || Positions.Any(t => t.Value.HasAdvanced) || Rotations.Any(t => t.Value.HasAdvanced) || Scales.Any(t => t.Value.HasAdvanced);
+        bool HasAdvanced => ToggleObjectUsings.Count > 0 || ToggleComponentUsings.Count > 0 || ToggleMaterials.Any(t => t.Value.HasAdvanced) || ToggleBlendShapes.Any(t => t.Value.HasAdvanced) || ToggleShaderParameters.Any(t => t.Value.HasAdvanced) || Positions.Any(t => t.Value.HasAdvanced) || Rotations.Any(t => t.Value.HasAdvanced) || Scales.Any(t => t.Value.HasAdvanced);
 
-        public override IEnumerable<string> GetStoredChildren() => ToggleObjects.Keys.Concat(ToggleMaterials.Keys.Select(k => k.Item1)).Concat(ToggleBlendShapes.Keys.Select(k => k.Item1)).Concat(ToggleShaderParameters.Keys.Select(k => k.Item1)).Concat(Positions.Keys).Concat(Rotations.Keys).Concat(Scales.Keys).Distinct();
+        public override IEnumerable<string> GetStoredChildren() => ToggleObjects.Keys.Concat(ToggleComponents.Keys.Select(k => k.Item1)).Concat(ToggleMaterials.Keys.Select(k => k.Item1)).Concat(ToggleBlendShapes.Keys.Select(k => k.Item1)).Concat(ToggleShaderParameters.Keys.Select(k => k.Item1)).Concat(Positions.Keys).Concat(Rotations.Keys).Concat(Scales.Keys).Distinct();
         public override void ReplaceStoredChild(string oldChild, string newChild)
         {
-            if (ToggleObjects.ContainsKey(oldChild) || ToggleMaterials.ContainsPrimaryKey(oldChild) || ToggleBlendShapes.ContainsPrimaryKey(oldChild) || ToggleShaderParameters.ContainsPrimaryKey(oldChild) || Positions.ContainsKey(oldChild) || Rotations.ContainsKey(oldChild) || Scales.ContainsKey(oldChild))
+            if (ToggleObjects.ContainsKey(oldChild) || ToggleComponents.ContainsPrimaryKey(oldChild) || ToggleMaterials.ContainsPrimaryKey(oldChild) || ToggleBlendShapes.ContainsPrimaryKey(oldChild) || ToggleShaderParameters.ContainsPrimaryKey(oldChild) || Positions.ContainsKey(oldChild) || Rotations.ContainsKey(oldChild) || Scales.ContainsKey(oldChild))
             {
                 WillChange();
                 ToggleObjects.ReplaceKey(oldChild, newChild);
                 ToggleObjectUsings.ReplaceKey(oldChild, newChild);
+                ToggleComponents.ReplacePrimaryKey(oldChild, newChild);
+                ToggleComponentUsings.ReplacePrimaryKey(oldChild, newChild);
                 ToggleMaterials.ReplacePrimaryKey(oldChild, newChild);
                 ToggleBlendShapes.ReplacePrimaryKey(oldChild, newChild);
                 ToggleShaderParameters.ReplacePrimaryKey(oldChild, newChild);
@@ -135,6 +144,14 @@ namespace net.narazaka.avatarmenucreator
             foreach (var key in ToggleObjectUsings.Keys.Where(k => !filter.Contains(k)).ToList())
             {
                 ToggleObjectUsings.Remove(key);
+            }
+            foreach (var key in ToggleComponents.Keys.Where(k => !filter.Contains(k.Item1)).ToList())
+            {
+                ToggleComponents.Remove(key);
+            }
+            foreach (var key in ToggleComponentUsings.Keys.Where(k => !filter.Contains(k.Item1)).ToList())
+            {
+                ToggleComponentUsings.Remove(key);
             }
             foreach (var key in ToggleMaterials.Keys.Where(k => !filter.Contains(k.Item1)).ToList())
             {
@@ -166,6 +183,14 @@ namespace net.narazaka.avatarmenucreator
             WillChange();
             ToggleObjects.Remove(child);
             ToggleObjectUsings.Remove(child);
+            foreach (var key in ToggleComponents.Keys.Where(k => k.Item1 == child).ToList())
+            {
+                ToggleComponents.Remove(key);
+            }
+            foreach (var key in ToggleComponentUsings.Keys.Where(k => k.Item1 == child).ToList())
+            {
+                ToggleComponentUsings.Remove(key);
+            }
             foreach (var key in ToggleMaterials.Keys.Where(k => k.Item1 == child).ToList())
             {
                 ToggleMaterials.Remove(key);
@@ -240,6 +265,7 @@ namespace net.narazaka.avatarmenucreator
                 var gameObjectRef = GetGameObject(child);
                 var names = gameObjectRef == null ? ToggleBlendShapes.Names(child).ToList() : Util.GetBlendShapeNames(gameObjectRef);
                 var parameters = gameObjectRef == null ? ToggleShaderParameters.Names(child).ToFakeShaderParameters().ToList() : ShaderParametersCache.GetFilteredShaderParameters(gameObjectRef);
+                var components = gameObjectRef == null ? ToggleComponents.Names(child).Select(typeName => TypeUtil.GetType(typeName)).ToList() : gameObjectRef.GetAllComponents().Select(t => TypeUtil.GetType(t)).ToList();
 
                 var materials = allMaterials[child];
                 if (materials.Length > 0 &&
@@ -302,6 +328,20 @@ namespace net.narazaka.avatarmenucreator
                     if (Positions.ContainsKey(child)) ShowTransformComponentControl(children, child, Positions, "Position");
                     if (Rotations.ContainsKey(child)) ShowTransformComponentControl(children, child, Rotations, "Rotation");
                     if (Scales.ContainsKey(child)) ShowTransformComponentControl(children, child, Scales, "Scale");
+                    EditorGUI.indentLevel--;
+                }
+                if (FoldoutHeaderWithAddItemButton(
+                    child,
+                    "Components",
+                    ToggleComponents.HasChild(child),
+                    () => components.Select(c => new NameAndDescriptionItemContainer(new Util.NameAndDescription { Name = TypeUtil.GetTypeName(c), Description = c.Name }) as ListTreeViewItemContainer<string>).ToList(),
+                    () => ToggleComponents.Names(child).ToImmutableHashSet(),
+                    typeName => AddToggleComponent(children, child, typeName),
+                    typeName => RemoveToggleComponent(children, child, typeName)
+                    ))
+                {
+                    EditorGUI.indentLevel++;
+                    ShowToggleComponentControl(children, child, components);
                     EditorGUI.indentLevel--;
                 }
                 EditorGUI.indentLevel--;
