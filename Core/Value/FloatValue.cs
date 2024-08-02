@@ -8,6 +8,6 @@ namespace net.narazaka.avatarmenucreator.value
     {
         public FloatValue(float value) : base(new List<float> { value }) { }
 
-        public static implicit operator float(FloatValue value) => value.Count > 0 ? value[0] : 0;
+        public static implicit operator float(FloatValue value) => value != null && value.Count > 0 ? value[0] : 0;
     }
 }

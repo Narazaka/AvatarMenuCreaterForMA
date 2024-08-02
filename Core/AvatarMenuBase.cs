@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 #if UNITY_EDITOR
 using UnityEditor;
-using net.narazaka.avatarmenucreator.editor.util;
+using net.narazaka.avatarmenucreator.util;
 #endif
 
 namespace net.narazaka.avatarmenucreator

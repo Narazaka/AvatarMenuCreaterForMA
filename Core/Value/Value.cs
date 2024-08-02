@@ -19,10 +19,12 @@ namespace net.narazaka.avatarmenucreator.value
         public static implicit operator Value(Vector3 value) => new Vector3Value(value);
         public static implicit operator Value(ToggleType value) => new ToggleTypeValue(value);
 
+        public Value() : base(new float[0]) { }
         public Value(IEnumerable<float> values) : base(values) { }
 
         public bool Equals(Value other)
         {
+            Debug.Log("Equals");
             if (other == null) return false;
             if (Count != other.Count) return false;
 
@@ -42,6 +44,18 @@ namespace net.narazaka.avatarmenucreator.value
             if (Count == 1) return this[0].GetHashCode();
             if (Count == 3) return HashCode.Combine(this[0], this[1], this[2]);
             return 0;
+        }
+
+        public static bool operator ==(Value left, Value right)
+        {
+            if (ReferenceEquals(left, right)) return true;
+            if (ReferenceEquals(left, null)) return false;
+            return left.Equals(right);
+        }
+
+        public static bool operator !=(Value left, Value right)
+        {
+            return !(left == right);
         }
     }
 }

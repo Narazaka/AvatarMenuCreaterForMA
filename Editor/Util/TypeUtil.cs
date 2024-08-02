@@ -1,9 +1,10 @@
 using System;
 using System.Linq;
 using System.Collections.Generic;
+using System.Reflection;
 using UnityEngine;
 
-namespace net.narazaka.avatarmenucreator.editor.util
+namespace net.narazaka.avatarmenucreator.util
 {
     public static class TypeUtil
     {
@@ -23,7 +24,6 @@ namespace net.narazaka.avatarmenucreator.editor.util
                 return type;
             }
 
-            /*
             foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
             {
                 type = assembly.GetType(typeName);
@@ -33,7 +33,6 @@ namespace net.narazaka.avatarmenucreator.editor.util
                     return type;
                 }
             }
-            */
 
             return null;
         }
@@ -65,13 +64,13 @@ namespace net.narazaka.avatarmenucreator.editor.util
             {
                 return hasEnabled;
             }
-            var field = type.GetField("enabled", System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance);
-            var property = type.GetProperty("enabled", System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance);
-            if (field == null && property == null)
+            var field = type.GetField(nameof(Behaviour.enabled), BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
+            var property = type.GetProperty(nameof(Behaviour.enabled), BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
+            if (field != null || property != null)
             {
-                return HasEnabledCache[type] = false;
+                return HasEnabledCache[type] = true;
             }
-            var methods = type.GetMethods(System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Public);
+            var methods = type.GetMethods(BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public);
             return HasEnabledCache[type] = methods.Any(m => HasEnabledMethodNames.Contains(m.Name));
         }
 

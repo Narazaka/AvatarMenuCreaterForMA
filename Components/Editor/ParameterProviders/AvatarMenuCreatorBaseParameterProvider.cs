@@ -1,7 +1,7 @@
 using nadena.dev.ndmf;
 using net.narazaka.avatarmenucreator.components;
 using net.narazaka.avatarmenucreator.components.editor;
-using net.narazaka.avatarmenucreator.editor.util;
+using net.narazaka.avatarmenucreator.util;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;

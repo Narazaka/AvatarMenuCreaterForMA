@@ -182,6 +182,9 @@ namespace net.narazaka.avatarmenucreator
         [English("ON=hide")]
         public static string ON_eq_非表示 => L;
 
+        [English("ON=")]
+        public static string ON_eq_ => L;
+
         [English("ctrl both")]
         public static string 両方制御 => L;
 

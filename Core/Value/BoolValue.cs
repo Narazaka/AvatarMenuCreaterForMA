@@ -7,6 +7,6 @@ namespace net.narazaka.avatarmenucreator.value
     public sealed class BoolValue : Value
     {
         public BoolValue(bool value) : base(new List<float> { value ? 1 : 0 }) { }
-        public static implicit operator bool(BoolValue value) => value.Count > 0 ? value[0] != 0 : false;
+        public static implicit operator bool(BoolValue value) => value != null && value.Count > 0 ? value[0] != 0 : false;
     }
 }

@@ -2,7 +2,7 @@
 using nadena.dev.modular_avatar.core;
 using net.narazaka.avatarmenucreator.components;
 #endif
-using net.narazaka.avatarmenucreator.editor.util;
+using net.narazaka.avatarmenucreator.util;
 using System.Collections.Generic;
 using UnityEngine;
 
