@@ -64,11 +64,14 @@ namespace net.narazaka.avatarmenucreator.util
             {
                 return hasEnabled;
             }
-            var field = type.GetField(nameof(Behaviour.enabled), BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
-            var property = type.GetProperty(nameof(Behaviour.enabled), BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
-            if (field != null || property != null)
+            if (!type.IsSubclassOf(typeof(Behaviour)))
             {
-                return HasEnabledCache[type] = true;
+                var field = type.GetField(nameof(Behaviour.enabled), BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
+                var property = type.GetProperty(nameof(Behaviour.enabled), BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
+                if (field != null || property != null)
+                {
+                    return HasEnabledCache[type] = true;
+                }
             }
             var methods = type.GetMethods(BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public);
             return HasEnabledCache[type] = methods.Any(m => HasEnabledMethodNames.Contains(m.Name));
