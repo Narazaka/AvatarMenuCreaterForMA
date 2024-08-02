@@ -24,14 +24,15 @@ namespace net.narazaka.avatarmenucreator.util
 
         public Type Type { get; private set; }
         public MemberInfo Member { get; private set; }
-        [SerializeField] public readonly string TypeName;
-        [SerializeField] public readonly string MemberName;
+        [SerializeField] public string TypeName;
+        [SerializeField] public string MemberName;
         public Type MemberType
         {
             get => Member.MemberType == MemberTypes.Field ? ((FieldInfo)Member).FieldType : ((PropertyInfo)Member).PropertyType;
         }
         public string Name { get => $"{TypeName}\t{MemberName}"; }
         public string Description { get => $"{Type.Name}.{MemberName}"; }
+        public TypeMember() { } // for serialization
 
         public TypeMember(string typeName, string memberName) : this(TypeMemberUtil.GetMember(TypeUtil.GetType(typeName), memberName)) { }
         public TypeMember(Type type, string memberName) : this(TypeMemberUtil.GetMember(type, memberName)) { }
