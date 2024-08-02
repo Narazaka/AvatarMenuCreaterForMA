@@ -5,7 +5,7 @@ using System.Collections.Generic;
 namespace net.narazaka.avatarmenucreator.value
 {
     [Serializable]
-    public class Value : List<float>, IEquatable<Value>
+    public class Value : IEquatable<Value>
     {
         public static explicit operator bool(Value value) => value.AsBool();
         public static explicit operator float(Value value) => value.AsFloat();
@@ -19,17 +19,20 @@ namespace net.narazaka.avatarmenucreator.value
         public static implicit operator Value(Vector3 value) => new Vector3Value(value);
         public static implicit operator Value(ToggleType value) => new ToggleTypeValue(value);
 
-        public Value() : base(new float[0]) { }
-        public Value(IEnumerable<float> values) : base(values) { }
+        [SerializeField]
+        protected float[] value;
+
+        public Value() { value = new float[0]; }
+        public Value(float[] value) { this.value = value; }
 
         public bool Equals(Value other)
         {
             if (other == null) return false;
-            if (Count != other.Count) return false;
+            if (value.Length != other.value.Length) return false;
 
-            for (int i = 0; i < Count; i++)
+            for (int i = 0; i < value.Length; i++)
             {
-                if (this[i] != other[i]) return false;
+                if (this.value[i] != other.value[i]) return false;
             }
             return true;
         }
@@ -40,8 +43,8 @@ namespace net.narazaka.avatarmenucreator.value
         }
 
         public override int GetHashCode() {
-            if (Count == 1) return this[0].GetHashCode();
-            if (Count == 3) return HashCode.Combine(this[0], this[1], this[2]);
+            if (value.Length == 1) return value[0].GetHashCode();
+            if (value.Length == 3) return HashCode.Combine(value[0], value[1], value[2]);
             return 0;
         }
 
