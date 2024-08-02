@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 using net.narazaka.avatarmenucreator.value;
 
@@ -9,12 +10,10 @@ using UnityEditor;
 namespace net.narazaka.avatarmenucreator
 {
     [Serializable]
-    public class ToggleValue : IEquatable<ToggleValue>
+    public struct ToggleValue : IEquatable<ToggleValue>
     {
-        public Value Inactive { get => InactiveValue; set => InactiveValue = value; }
-        public Value Active { get => ActiveValue; set => ActiveValue = value; }
-        public Value InactiveValue;
-        public Value ActiveValue;
+        public Value Inactive;
+        public Value Active;
         public float TransitionOffsetPercent;
         public float TransitionDurationPercent;
         [SerializeField]
@@ -44,15 +43,16 @@ namespace net.narazaka.avatarmenucreator
             return Inactive == other.Inactive && Active == other.Active && TransitionOffsetPercent == other.TransitionOffsetPercent && TransitionDurationPercent == other.TransitionDurationPercent && UseInactive == other.UseInactive && UseActive == other.UseActive;
         }
 
-        public string ChangedProp(ToggleValue other)
+        public IEnumerable<string> ChangedProps(ToggleValue other)
         {
-            if (Inactive != other.Inactive) return nameof(Inactive);
-            if (Active != other.Active) return nameof(Active);
-            if (TransitionOffsetPercent != other.TransitionOffsetPercent) return nameof(TransitionOffsetPercent);
-            if (TransitionDurationPercent != other.TransitionDurationPercent) return nameof(TransitionDurationPercent);
-            if (UseInactive != other.UseInactive) return nameof(UseInactive);
-            if (UseActive != other.UseActive) return nameof(UseActive);
-            return "";
+            var changed = new List<string>();
+            if (Inactive != other.Inactive) changed.Add(nameof(Inactive));
+            if (Active != other.Active) changed.Add(nameof(Active));
+            if (TransitionOffsetPercent != other.TransitionOffsetPercent) changed.Add(nameof(TransitionOffsetPercent));
+            if (TransitionDurationPercent != other.TransitionDurationPercent) changed.Add(nameof(TransitionDurationPercent));
+            if (UseInactive != other.UseInactive) changed.Add(nameof(UseInactive));
+            if (UseActive != other.UseActive) changed.Add(nameof(UseActive));
+            return changed;
         }
 
         public object GetProp(string name)
@@ -61,9 +61,9 @@ namespace net.narazaka.avatarmenucreator
             if (name == nameof(Active)) return Active;
             if (name == nameof(TransitionOffsetPercent)) return TransitionOffsetPercent;
             if (name == nameof(TransitionDurationPercent)) return TransitionDurationPercent;
-            if (name == nameof(UseInactive)) return UseInactive ? 1 : 0;
-            if (name == nameof(UseActive)) return UseActive ? 1 : 0;
-            return 0;
+            if (name == nameof(UseInactive)) return UseInactive;
+            if (name == nameof(UseActive)) return UseActive;
+            return null;
         }
 
         public ToggleValue SetProp(string name, object value)
@@ -75,6 +75,15 @@ namespace net.narazaka.avatarmenucreator
             if (name == nameof(UseInactive)) UseInactive = (bool)value;
             if (name == nameof(UseActive)) UseActive = (bool)value;
             return this;
+        }
+
+        public void AdjustTransitionValues()
+        {
+            if (TransitionOffsetPercent < 0) TransitionOffsetPercent = 0;
+            if (TransitionOffsetPercent > 100) TransitionOffsetPercent = 100;
+            if (TransitionDurationPercent < 0) TransitionDurationPercent = 0;
+            if (TransitionDurationPercent > 100) TransitionDurationPercent = 100;
+            if (TransitionOffsetPercent + TransitionDurationPercent > 100) TransitionDurationPercent = 100 - TransitionOffsetPercent;
         }
 
         public float TransitionOffsetRate { get => TransitionOffsetPercent / 100f; }

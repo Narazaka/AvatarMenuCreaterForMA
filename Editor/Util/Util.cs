@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using VRC.SDK3.Avatars.ScriptableObjects;
 
-namespace net.narazaka.avatarmenucreator.editor.util
+namespace net.narazaka.avatarmenucreator.util
 {
     public static class Util
     {
@@ -65,12 +65,6 @@ namespace net.narazaka.avatarmenucreator.editor.util
             return shapekeyNames;
         }
 
-        public interface INameAndDescription
-        {
-            string Name { get; }
-            string Description { get; }
-        }
-
         public class NameWithDescription : INameAndDescription
         {
             public string Name { get; set; }
@@ -79,12 +73,6 @@ namespace net.narazaka.avatarmenucreator.editor.util
 
         public static IEnumerable<NameWithDescription> ToNames(this IEnumerable<string> names) =>
             names.Select(name => new NameWithDescription { Name = name });
-
-        public class NameAndDescription : INameAndDescription
-        {
-            public string Name { get; set; }
-            public string Description { get; set; }
-        }
 
         public static IEnumerable<string> ToStrings(this IEnumerable<INameAndDescription> names) =>
             names.Select(name => name.Name);

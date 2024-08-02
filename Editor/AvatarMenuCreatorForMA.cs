@@ -1,7 +1,7 @@
 using UnityEngine;
 using UnityEditor;
 using VRC.SDK3.Avatars.Components;
-using net.narazaka.avatarmenucreator.editor.util;
+using net.narazaka.avatarmenucreator.util;
 #if NET_NARAZAKA_VRCHAT_AvatarMenuCreator_HAS_NDMF
 using net.narazaka.avatarmenucreator.components;
 #endif
