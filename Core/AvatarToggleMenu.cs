@@ -198,7 +198,7 @@ namespace net.narazaka.avatarmenucreator
             Scales.Remove(child);
         }
         // TODO: ToggleValues
-        protected override bool IsSuitableForTransition() => ToggleBlendShapes.Count > 0 || ToggleShaderParameters.Count > 0 || ToggleValues.NamePairs().Select(pair => new TypeMember(pair.Item1, pair.Item2).MemberType != typeof(bool)).Count() > 0 || Positions.Count > 0 || Rotations.Count > 0 || Scales.Count > 0;
+        protected override bool IsSuitableForTransition() => ToggleBlendShapes.Count > 0 || ToggleShaderParameters.Count > 0 || ToggleValues.Names().Where(t => t.MemberType != typeof(bool)).Count() > 0 || Positions.Count > 0 || Rotations.Count > 0 || Scales.Count > 0;
 
         protected override void OnMultiGUI(SerializedProperty serializedProperty)
         {
@@ -256,7 +256,7 @@ namespace net.narazaka.avatarmenucreator
                 var gameObjectRef = GetGameObject(child);
                 var names = gameObjectRef == null ? ToggleBlendShapes.Names(child).ToList() : Util.GetBlendShapeNames(gameObjectRef);
                 var parameters = gameObjectRef == null ? ToggleShaderParameters.Names(child).ToFakeShaderParameters().ToList() : ShaderParametersCache.GetFilteredShaderParameters(gameObjectRef);
-                var components = gameObjectRef == null ? ToggleValues.Names(child).Select(n => TypeUtil.GetType(n)).ToList() : gameObjectRef.GetAllComponents().Select(c => TypeUtil.GetType(c)).ToList();
+                var components = gameObjectRef == null ? ToggleValues.Names(child).Select(n => n.Type).ToList() : gameObjectRef.GetAllComponents().Select(c => TypeUtil.GetType(c)).ToList();
                 var properties = components.SelectMany(c => c.GetAvailableMembers()).ToList();
 
                 var materials = allMaterials[child];
@@ -311,7 +311,7 @@ namespace net.narazaka.avatarmenucreator
                     "Components",
                     ToggleValues.HasChild(child),
                     () => properties.Select(c => new NameAndDescriptionItemContainer(c) as ListTreeViewItemContainer<string>).ToList(),
-                    () => ToggleValues.NamePairs(child).Select(pair => $"{pair.Item1}\t{pair.Item2}").ToImmutableHashSet(),
+                    () => ToggleValues.Names(child).Select(n => n.Name).ToImmutableHashSet(),
                     name => AddToggleValue(children, child, TypeMember.FromName(name)),
                     name => RemoveToggleValue(children, child, TypeMember.FromName(name))
                     ))
@@ -818,7 +818,7 @@ namespace net.narazaka.avatarmenucreator
         {
             foreach (var member in members)
             {
-                var key = (child, member.TypeName, member.MemberName);
+                var key = (child, member);
                 if (ToggleValues.TryGetValue(key, out var value))
                 {
                     if (EditorGUILayout.ToggleLeft(member.Description, true))
@@ -900,14 +900,14 @@ namespace net.narazaka.avatarmenucreator
             }
         }
 
-        void BulkSetToggleValue(TypeMember member, ToggleValue toggleValue, IEnumerable<string> changedProps)
+        void BulkSetToggleValue(TypeMember toggleTypeMember, ToggleValue toggleValue, IEnumerable<string> changedProps)
         {
-            var matches = new List<(string, string, string)>();
-            foreach (var (child, typeName, memberName) in ToggleValues.Keys)
+            var matches = new List<(string, TypeMember)>();
+            foreach (var (child, typeMember) in ToggleValues.Keys)
             {
-                if (typeName == member.TypeName && memberName == member.MemberName)
+                if (typeMember == toggleTypeMember)
                 {
-                    matches.Add((child, typeName, memberName));
+                    matches.Add((child, typeMember));
                 }
             }
             foreach (var key in matches)
@@ -951,7 +951,7 @@ namespace net.narazaka.avatarmenucreator
 
         void AddToggleValueSingle(string child, TypeMember member)
         {
-            var key = (child, member.TypeName, member.MemberName);
+            var key = (child, member);
             if (ToggleValues.ContainsKey(key)) return;
             WillChange();
             ToggleValues[key] = member.MemberType == typeof(bool) ? new ToggleValue { Active = true, TransitionDurationPercent = 100 } : new ToggleValue { TransitionDurationPercent = 100 };
@@ -989,7 +989,7 @@ namespace net.narazaka.avatarmenucreator
 
         void RemoveToggleValueSingle(string child, TypeMember member)
         {
-            var key = (child, member.TypeName, member.MemberName);
+            var key = (child, member);
             if (!ToggleValues.ContainsKey(key)) return;
             WillChange();
             ToggleValues.Remove(key);
