@@ -24,7 +24,6 @@ namespace net.narazaka.avatarmenucreator.value
 
         public bool Equals(Value other)
         {
-            Debug.Log("Equals");
             if (other == null) return false;
             if (Count != other.Count) return false;
 
