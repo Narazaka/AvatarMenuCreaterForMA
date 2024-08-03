@@ -1,10 +1,8 @@
-﻿using net.narazaka.avatarmenucreator.value;
-
-namespace net.narazaka.avatarmenucreator.valuecurve
+﻿namespace net.narazaka.avatarmenucreator.valuecurve
 {
-    public class DiscreteValueCurve : ValueCurve
+    public abstract class DiscreteToggleCurve : ToggleCurve
     {
-        public DiscreteValueCurve(Value inactive, Value active, float transitionOffsetPercent) : base(inactive, active, transitionOffsetPercent) { }
+        public DiscreteToggleCurve(float transitionOffsetPercent) : base(transitionOffsetPercent) { }
 
         protected float ActivateChangeRate { get => TransitionOffsetRate; }
         protected float InactivateChangeRate { get => 1f - TransitionOffsetRate; }

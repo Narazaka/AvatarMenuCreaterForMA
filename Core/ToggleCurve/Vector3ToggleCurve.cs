@@ -1,17 +1,18 @@
 ﻿#if UNITY_EDITOR
 using UnityEngine;
-using net.narazaka.avatarmenucreator.value;
 using net.narazaka.avatarmenucreator.animationcurve;
 
 namespace net.narazaka.avatarmenucreator.valuecurve
 {
-    public class Vector3ValueCurve : ContinuousValueCurve
+    public class Vector3ToggleCurve : ContinuousToggleCurve, INamedAnimationToggleCurve
     {
-        public string Prefix { get; }
-        protected Vector3 ActiveValue { get => Active.AsVector3(); }
-        protected Vector3 InactiveValue { get => Inactive.AsVector3(); }
-        public Vector3ValueCurve(Vector3Value inactive, Vector3Value active, float transitionOffsetPercent, float transitionDurationPercent, string prefix) : base(inactive, active, transitionOffsetPercent, transitionDurationPercent)
+        string Prefix { get; }
+        Vector3 ActiveValue { get; }
+        Vector3 InactiveValue { get; }
+        public Vector3ToggleCurve(string prefix, Vector3 inactive, Vector3 active, float transitionOffsetPercent, float transitionDurationPercent) : base(transitionOffsetPercent, transitionDurationPercent)
         {
+            ActiveValue = active;
+            InactiveValue = inactive;
             Prefix = prefix;
         }
 
