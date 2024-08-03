@@ -22,15 +22,23 @@ namespace net.narazaka.avatarmenucreator.util
             return new TypeMember(type, split[1]);
         }
 
+        /// <summary>member class</summary>
         public Type Type { get; private set; }
+        /// <summary>MemberInfo</summary>
         public MemberInfo Member { get; private set; }
+        /// <summary>member class FullName</summary>
         [SerializeField] public string TypeName;
+        /// <summary>member Name</summary>
         [SerializeField] public string MemberName;
+        public string AnimationMemberName => MemberName == "enabled" ? "m_Enabled" : MemberName;
+        /// <summary>type of the member (bool|int|float|Vector3 etc.)</summary>
         public Type MemberType
         {
             get => Member.MemberType == MemberTypes.Field ? ((FieldInfo)Member).FieldType : ((PropertyInfo)Member).PropertyType;
         }
+        /// <summary>INameAndDescription.Name</summary>
         public string Name { get => $"{TypeName}\t{MemberName}"; }
+        /// <summary>INameAndDescription.Description</summary>
         public string Description { get => $"{Type.Name}.{MemberName}"; }
         public TypeMember() { } // for serialization
 

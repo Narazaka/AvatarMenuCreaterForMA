@@ -2,10 +2,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 using net.narazaka.avatarmenucreator.value;
-
-#if UNITY_EDITOR
-using UnityEditor;
-#endif
+using net.narazaka.avatarmenucreator.valuecurve;
 
 namespace net.narazaka.avatarmenucreator
 {
@@ -86,40 +83,20 @@ namespace net.narazaka.avatarmenucreator
             if (TransitionOffsetPercent + TransitionDurationPercent > 100) TransitionDurationPercent = 100 - TransitionOffsetPercent;
         }
 
-        public float TransitionOffsetRate { get => TransitionOffsetPercent / 100f; }
-        public float TransitionDurationRate { get => TransitionDurationPercent / 100f; }
-        public float ActivateStartRate { get => TransitionOffsetRate; }
-        public float ActivateEndRate { get => TransitionOffsetRate + TransitionDurationRate; }
-        public float InactivateStartRate { get => 1f - ActivateEndRate; }
-        public float InactivateEndRate { get => 1f - ActivateStartRate; }
-        public bool NeedActivateEndKey { get => 1f - ActivateEndRate >= 1f / 60; }
-        public bool NeedInactivateEndKey { get => 1f - InactivateEndRate >= 1f / 60; }
-
 #if UNITY_EDITOR
-        /*
-        public AnimationCurve ActiveCurve() => new AnimationCurve(new Keyframe(0 / 60.0f, Active));
-        public AnimationCurve InactiveCurve() => new AnimationCurve(new Keyframe(0 / 60.0f, Inactive));
-        public AnimationCurve ActivateCurve(float transitionSeconds)
+        public IAnimationValueCurve AnimationValueCurve(Type type)
         {
-            var curve = new AnimationCurve(new Keyframe(transitionSeconds * ActivateStartRate, Inactive), new Keyframe(transitionSeconds * ActivateEndRate, Active));
-            if (NeedActivateEndKey) curve.AddKey(transitionSeconds, Active);
-            AnimationUtility.SetKeyLeftTangentMode(curve, 0, AnimationUtility.TangentMode.Constant);
-            AnimationUtility.SetKeyRightTangentMode(curve, 0, AnimationUtility.TangentMode.Linear);
-            AnimationUtility.SetKeyLeftTangentMode(curve, 1, AnimationUtility.TangentMode.Linear);
-            AnimationUtility.SetKeyRightTangentMode(curve, 1, AnimationUtility.TangentMode.Constant);
-            return curve;
+
+            if (type == typeof(float)) return FloatValueCurve();
+            if (type == typeof(int)) return IntValueCurve();
+            if (type == typeof(bool)) return BoolValueCurve();
+            return null;
         }
-        public AnimationCurve InactivateCurve(float transitionSeconds)
-        {
-            var curve = new AnimationCurve(new Keyframe(transitionSeconds * InactivateStartRate, Active), new Keyframe(transitionSeconds * InactivateEndRate, Inactive));
-            if (NeedInactivateEndKey) curve.AddKey(transitionSeconds, Inactive);
-            AnimationUtility.SetKeyLeftTangentMode(curve, 0, AnimationUtility.TangentMode.Constant);
-            AnimationUtility.SetKeyRightTangentMode(curve, 0, AnimationUtility.TangentMode.Linear);
-            AnimationUtility.SetKeyLeftTangentMode(curve, 1, AnimationUtility.TangentMode.Linear);
-            AnimationUtility.SetKeyRightTangentMode(curve, 1, AnimationUtility.TangentMode.Constant);
-            return curve;
-        }
-        */
+        public IAnimationValueCurve AnimationValueCurve<T>() => AnimationValueCurve(typeof(T));
+        public FloatValueCurve FloatValueCurve() => new FloatValueCurve(Inactive.AsFloat(), Active.AsFloat(), TransitionOffsetPercent, TransitionDurationPercent);
+        public IntValueCurve IntValueCurve() => new IntValueCurve(Inactive.AsInt(), Active.AsInt(), TransitionOffsetPercent);
+        public BoolValueCurve BoolValueCurve() => new BoolValueCurve(Inactive.AsBool(), Active.AsBool(), TransitionOffsetPercent);
+        public Vector3ValueCurve Vector3ValueCurve(string prefix) => new Vector3ValueCurve(Inactive.AsVector3(), Active.AsVector3(), TransitionOffsetPercent, TransitionDurationPercent, prefix);
 #endif
     }
 }
