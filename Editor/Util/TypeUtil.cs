@@ -73,8 +73,22 @@ namespace net.narazaka.avatarmenucreator.util
                     return HasEnabledCache[type] = true;
                 }
             }
-            var methods = type.GetMethods(BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public);
-            return HasEnabledCache[type] = methods.Any(m => HasEnabledMethodNames.Contains(m.Name));
+            var baseType = type;
+            // private methodは継承されないのでbaseTypeで探す
+            while (baseType != null)
+            {
+                if (baseType == typeof(Component))
+                {
+                    break;
+                }
+                var methods = baseType.GetMethods(BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public);
+                if (methods.Any(m => HasEnabledMethodNames.Contains(m.Name)))
+                {
+                    return HasEnabledCache[type] = true;
+                }
+                baseType = baseType.BaseType;
+            }
+            return HasEnabledCache[type] = false;
         }
 
         public static IEnumerable<Type> HasEnabled(this IEnumerable<Type> types)
