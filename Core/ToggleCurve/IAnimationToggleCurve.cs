@@ -1,9 +1,8 @@
-using UnityEditor;
 using UnityEngine;
 
 namespace net.narazaka.avatarmenucreator.valuecurve
 {
-    public interface IAnimationValueCurve
+    public interface IAnimationToggleCurve
     {
         AnimationCurve ActiveCurve();
         AnimationCurve InactiveCurve();

@@ -1,11 +1,9 @@
-﻿using net.narazaka.avatarmenucreator.value;
-
-namespace net.narazaka.avatarmenucreator.valuecurve
+﻿namespace net.narazaka.avatarmenucreator.valuecurve
 {
-    public class ContinuousValueCurve : ValueCurve
+    public abstract class ContinuousToggleCurve : ToggleCurve
     {
         public readonly float TransitionDurationPercent;
-        public ContinuousValueCurve(Value inactive, Value active, float transitionOffsetPercent, float transitionDurationPercent) : base(inactive, active, transitionOffsetPercent)
+        public ContinuousToggleCurve(float transitionOffsetPercent, float transitionDurationPercent) : base(transitionOffsetPercent)
         {
             TransitionDurationPercent = transitionDurationPercent;
         }

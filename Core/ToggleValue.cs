@@ -93,10 +93,10 @@ namespace net.narazaka.avatarmenucreator
             return null;
         }
         public IAnimationValueCurve AnimationValueCurve<T>() => AnimationValueCurve(typeof(T));
-        public FloatValueCurve FloatValueCurve() => new FloatValueCurve(Inactive.AsFloat(), Active.AsFloat(), TransitionOffsetPercent, TransitionDurationPercent);
-        public IntValueCurve IntValueCurve() => new IntValueCurve(Inactive.AsInt(), Active.AsInt(), TransitionOffsetPercent);
-        public BoolValueCurve BoolValueCurve() => new BoolValueCurve(Inactive.AsBool(), Active.AsBool(), TransitionOffsetPercent);
-        public Vector3ValueCurve Vector3ValueCurve(string prefix) => new Vector3ValueCurve(Inactive.AsVector3(), Active.AsVector3(), TransitionOffsetPercent, TransitionDurationPercent, prefix);
+        public FloatValueCurve FloatValueCurve() => new FloatValueCurve((float)Inactive, (float)Active, TransitionOffsetPercent, TransitionDurationPercent);
+        public IntValueCurve IntValueCurve() => new IntValueCurve((int)Inactive, (int)Active, TransitionOffsetPercent);
+        public BoolValueCurve BoolValueCurve() => new BoolValueCurve((bool)Inactive, (bool)Active, TransitionOffsetPercent);
+        public Vector3ValueCurve Vector3ValueCurve(string prefix) => new Vector3ValueCurve(prefix, (Vector3)Inactive, (Vector3)Active, TransitionOffsetPercent, TransitionDurationPercent);
 #endif
     }
 }

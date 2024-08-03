@@ -1,15 +1,18 @@
 ﻿#if UNITY_EDITOR
 using UnityEngine;
-using net.narazaka.avatarmenucreator.value;
 using UnityEditor;
 
 namespace net.narazaka.avatarmenucreator.valuecurve
 {
-    public abstract class ContinuousOneValueCurve : ContinuousValueCurve, IAnimationValueCurve
+    public abstract class ContinuousSingleToggleCurve : ContinuousToggleCurve, IAnimationToggleCurve
     {
-        protected abstract float ActiveValue { get; }
-        protected abstract float InactiveValue { get; }
-        public ContinuousOneValueCurve(Value inactive, Value active, float transitionOffsetPercent, float transitionDurationPercent) : base(inactive, active, transitionOffsetPercent, transitionDurationPercent) { }
+        float ActiveValue { get; }
+        float InactiveValue { get; }
+        public ContinuousSingleToggleCurve(float inactive, float active, float transitionOffsetPercent, float transitionDurationPercent) : base(transitionOffsetPercent, transitionDurationPercent)
+        {
+            ActiveValue = active;
+            InactiveValue = inactive;
+        }
 
         public AnimationCurve ActiveCurve() => new AnimationCurve(new Keyframe(0, ActiveValue));
         public AnimationCurve InactiveCurve() => new AnimationCurve(new Keyframe(0, InactiveValue));
