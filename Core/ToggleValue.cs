@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using net.narazaka.avatarmenucreator.value;
 using net.narazaka.avatarmenucreator.valuecurve;
+using VRC.Dynamics;
 
 namespace net.narazaka.avatarmenucreator
 {
@@ -84,19 +85,26 @@ namespace net.narazaka.avatarmenucreator
         }
 
 #if UNITY_EDITOR
-        public IAnimationValueCurve AnimationValueCurve(Type type)
+        public IAnimationToggleCurve AnimationToggleCurve(Type type)
         {
 
-            if (type == typeof(float)) return FloatValueCurve();
-            if (type == typeof(int)) return IntValueCurve();
-            if (type == typeof(bool)) return BoolValueCurve();
+            if (type == typeof(float)) return FloatToggleCurve();
+            if (type == typeof(int) || type.IsSubclassOf(typeof(Enum))) return IntToggleCurve();
+            if (type == typeof(bool)) return BoolToggleCurve();
             return null;
         }
-        public IAnimationValueCurve AnimationValueCurve<T>() => AnimationValueCurve(typeof(T));
-        public FloatValueCurve FloatValueCurve() => new FloatValueCurve((float)Inactive, (float)Active, TransitionOffsetPercent, TransitionDurationPercent);
-        public IntValueCurve IntValueCurve() => new IntValueCurve((int)Inactive, (int)Active, TransitionOffsetPercent);
-        public BoolValueCurve BoolValueCurve() => new BoolValueCurve((bool)Inactive, (bool)Active, TransitionOffsetPercent);
-        public Vector3ValueCurve Vector3ValueCurve(string prefix) => new Vector3ValueCurve(prefix, (Vector3)Inactive, (Vector3)Active, TransitionOffsetPercent, TransitionDurationPercent);
+        public IAnimationToggleCurve AnimationToggleCurve<T>() => AnimationToggleCurve(typeof(T));
+        public FloatToggleCurve FloatToggleCurve() => new FloatToggleCurve((float)Inactive, (float)Active, TransitionOffsetPercent, TransitionDurationPercent);
+        public IntToggleCurve IntToggleCurve() => new IntToggleCurve((int)Inactive, (int)Active, TransitionOffsetPercent);
+        public BoolToggleCurve BoolToggleCurve() => new BoolToggleCurve((bool)Inactive, (bool)Active, TransitionOffsetPercent);
+        public INamedAnimationToggleCurve ComplexAnimationToggleCurve(Type type, string prefix)
+        {
+            if (type == typeof(Vector3)) return Vector3ToggleCurve(prefix);
+            if (type == typeof(VRCPhysBoneBase.PermissionFilter)) return PermissionFilterToggleCurve(prefix);
+            return null;
+        }
+        public Vector3ToggleCurve Vector3ToggleCurve(string prefix) => new Vector3ToggleCurve(prefix, (Vector3)Inactive, (Vector3)Active, TransitionOffsetPercent, TransitionDurationPercent);
+        public PermissionFilterToggleCurve PermissionFilterToggleCurve(string prefix) => new PermissionFilterToggleCurve(prefix, (VRCPhysBoneBase.PermissionFilter)Inactive, (VRCPhysBoneBase.PermissionFilter)Active, TransitionOffsetPercent);
 #endif
     }
 }

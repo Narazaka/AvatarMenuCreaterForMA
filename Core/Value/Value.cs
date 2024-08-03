@@ -1,6 +1,7 @@
 using System;
 using UnityEngine;
 using System.Collections.Generic;
+using VRC.Dynamics;
 
 namespace net.narazaka.avatarmenucreator.value
 {
@@ -11,13 +12,13 @@ namespace net.narazaka.avatarmenucreator.value
         public static explicit operator float(Value value) => value.AsFloat();
         public static explicit operator int(Value value) => value.AsInt();
         public static explicit operator Vector3(Value value) => value.AsVector3();
-        public static explicit operator ToggleType(Value value) => value.AsToggleTypeValue();
+        public static explicit operator VRCPhysBoneBase.PermissionFilter(Value value) => value.AsPermissionFilterValue();
 
         public static implicit operator Value(bool value) => new BoolValue(value);
         public static implicit operator Value(float value) => new FloatValue(value);
         public static implicit operator Value(int value) => new IntValue(value);
         public static implicit operator Value(Vector3 value) => new Vector3Value(value);
-        public static implicit operator Value(ToggleType value) => new ToggleTypeValue(value);
+        public static implicit operator Value(VRCPhysBoneBase.PermissionFilter value) => new PermissionFilterValue(value);
 
         [SerializeField]
         protected float[] value;
@@ -44,6 +45,7 @@ namespace net.narazaka.avatarmenucreator.value
 
         public override int GetHashCode() {
             if (value.Length == 1) return value[0].GetHashCode();
+            if (value.Length == 2) return HashCode.Combine(value[0], value[1]);
             if (value.Length == 3) return HashCode.Combine(value[0], value[1], value[2]);
             return 0;
         }

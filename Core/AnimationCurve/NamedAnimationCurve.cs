@@ -29,6 +29,17 @@ namespace net.narazaka.avatarmenucreator.animationcurve
             }
             return curves;
         }
+        public static NamedAnimationCurve[] SetTangentModesConstant(NamedAnimationCurve[] curves)
+        {
+            foreach (var c in curves)
+            {
+                AnimationUtility.SetKeyLeftTangentMode(c.curve, 0, AnimationUtility.TangentMode.Constant);
+                AnimationUtility.SetKeyRightTangentMode(c.curve, 0, AnimationUtility.TangentMode.Constant);
+                AnimationUtility.SetKeyLeftTangentMode(c.curve, 1, AnimationUtility.TangentMode.Constant);
+                AnimationUtility.SetKeyRightTangentMode(c.curve, 1, AnimationUtility.TangentMode.Constant);
+            }
+            return curves;
+        }
 #endif
     }
 }

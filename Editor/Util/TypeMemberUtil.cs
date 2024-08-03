@@ -17,6 +17,12 @@ namespace net.narazaka.avatarmenucreator.util
                     typeof(VRCPhysBone).GetField(nameof(VRCPhysBone.stiffness)),
                     typeof(VRCPhysBone).GetField(nameof(VRCPhysBone.gravity)),
                     typeof(VRCPhysBone).GetField(nameof(VRCPhysBone.gravityFalloff)),
+                    typeof(VRCPhysBone).GetField(nameof(VRCPhysBone.allowGrabbing)),
+                    typeof(VRCPhysBone).GetField(nameof(VRCPhysBone.allowPosing)),
+                    typeof(VRCPhysBone).GetField(nameof(VRCPhysBone.allowCollision)),
+                    typeof(VRCPhysBone).GetField(nameof(VRCPhysBone.grabFilter)),
+                    typeof(VRCPhysBone).GetField(nameof(VRCPhysBone.poseFilter)),
+                    typeof(VRCPhysBone).GetField(nameof(VRCPhysBone.collisionFilter)),
                 }
             },
         };
