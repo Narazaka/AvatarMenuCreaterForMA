@@ -88,26 +88,26 @@ namespace net.narazaka.avatarmenucreator.editor
                 if (!matchGameObjects.Contains(child)) continue;
                 var value = AvatarMenu.ToggleValues[(child, member)];
                 var curvePath = child;
-                if (member.MemberType == typeof(Vector3))
+                if (member.MemberTypeIsPrimitive)
                 {
-                    var curve = value.Vector3ValueCurve(member.AnimationMemberName);
-                    if (value.UseActive) foreach (var c in curve.ActiveCurve()) active.SetCurve(curvePath, member.Type, c.propertyName, c.curve);
-                    if (value.UseInactive) foreach (var c in curve.InactiveCurve()) inactive.SetCurve(curvePath, member.Type, c.propertyName, c.curve);
-                    if (AvatarMenu.TransitionSeconds > 0)
-                    {
-                        foreach (var c in curve.ActivateCurve(AvatarMenu.TransitionSeconds)) activate.SetCurve(curvePath, member.Type, c.propertyName, c.curve);
-                        foreach (var c in curve.InactivateCurve(AvatarMenu.TransitionSeconds)) inactivate.SetCurve(curvePath, member.Type, c.propertyName, c.curve);
-                    }
-                }
-                else
-                {
-                    var curve = value.AnimationValueCurve(member.MemberType);
+                    var curve = value.AnimationToggleCurve(member.MemberType);
                     if (value.UseActive) active.SetCurve(curvePath, member.Type, member.AnimationMemberName, curve.ActiveCurve());
                     if (value.UseInactive) inactive.SetCurve(curvePath, member.Type, member.AnimationMemberName, curve.InactiveCurve());
                     if (AvatarMenu.TransitionSeconds > 0)
                     {
                         activate.SetCurve(curvePath, member.Type, member.AnimationMemberName, curve.ActivateCurve(AvatarMenu.TransitionSeconds));
                         inactivate.SetCurve(curvePath, member.Type, member.AnimationMemberName, curve.InactivateCurve(AvatarMenu.TransitionSeconds));
+                    }
+                }
+                else
+                {
+                    var curve = value.ComplexAnimationToggleCurve(member.MemberType, member.AnimationMemberName);
+                    if (value.UseActive) foreach (var c in curve.ActiveCurve()) active.SetCurve(curvePath, member.Type, c.propertyName, c.curve);
+                    if (value.UseInactive) foreach (var c in curve.InactiveCurve()) inactive.SetCurve(curvePath, member.Type, c.propertyName, c.curve);
+                    if (AvatarMenu.TransitionSeconds > 0)
+                    {
+                        foreach (var c in curve.ActivateCurve(AvatarMenu.TransitionSeconds)) activate.SetCurve(curvePath, member.Type, c.propertyName, c.curve);
+                        foreach (var c in curve.InactivateCurve(AvatarMenu.TransitionSeconds)) inactivate.SetCurve(curvePath, member.Type, c.propertyName, c.curve);
                     }
                 }
             }

@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 using UnityEngine;
+using VRC.Dynamics;
+
 #if UNITY_EDITOR
 using UnityEditor;
 using net.narazaka.avatarmenucreator.util;
@@ -824,10 +826,10 @@ namespace net.narazaka.avatarmenucreator
                     if (EditorGUILayout.ToggleLeft(member.Description, true))
                     {
                         var newValue = new ToggleValue { TransitionDurationPercent = 100 };
+                        EditorGUI.indentLevel++;
+                        EditorGUIUtility.labelWidth = 70;
                         using (new EditorGUILayout.HorizontalScope())
                         {
-                            EditorGUI.indentLevel++;
-                            EditorGUIUtility.labelWidth = 70;
                             if (member.MemberType == typeof(float))
                             {
                                 newValue.Inactive = EditorGUILayout.FloatField("OFF", (float)value.Inactive, GUILayout.Width(100));
@@ -840,16 +842,41 @@ namespace net.narazaka.avatarmenucreator
                             }
                             else if (member.MemberType == typeof(bool))
                             {
-
-                                EditorGUIUtility.labelWidth = 80;
+                                EditorGUIUtility.labelWidth = 75;
                                 var activeOn = EditorGUILayout.Toggle(T.ON_eq_, (bool)value.Active == true);
                                 newValue.Active = activeOn;
                                 newValue.Inactive = !activeOn;
                                 EditorGUIUtility.labelWidth = 0;
                             }
-                            EditorGUIUtility.labelWidth = 0;
-                            EditorGUI.indentLevel--;
+                            else if (member.MemberType.IsSubclassOf(typeof(Enum)))
+                            {
+                                var names = member.MemberType.GetEnumNamesCached();
+                                var values = member.MemberType.GetEnumValuesCached();
+                                newValue.Inactive = EditorGUILayout.IntPopup("OFF", (int)value.Inactive, names, values);
+                                newValue.Active = EditorGUILayout.IntPopup("ON", (int)value.Active, names, values);
+                            }
                         }
+                        if (member.MemberType == typeof(VRCPhysBoneBase.PermissionFilter))
+                        {
+                            EditorGUIUtility.labelWidth = 90;
+                            var inactive = (VRCPhysBoneBase.PermissionFilter)value.Inactive;
+                            var active = (VRCPhysBoneBase.PermissionFilter)value.Active;
+                            bool inactiveAllowSelf, activeAllowSelf, inactiveAllowOthers, activeAllowOthers;
+                            using (new EditorGUILayout.HorizontalScope())
+                            {
+                                inactiveAllowSelf = EditorGUILayout.ToggleLeft("OFF allowSelf", inactive.allowSelf);
+                                activeAllowSelf = EditorGUILayout.ToggleLeft("ON allowSelf", active.allowSelf);
+                            }
+                            using (new EditorGUILayout.HorizontalScope())
+                            {
+                                inactiveAllowOthers = EditorGUILayout.ToggleLeft("OFF allowOthers", inactive.allowOthers);
+                                activeAllowOthers = EditorGUILayout.ToggleLeft("ON allowOthers", active.allowOthers);
+                            }
+                            newValue.Inactive = new VRCPhysBoneBase.PermissionFilter { allowSelf = inactiveAllowSelf, allowOthers = inactiveAllowOthers };
+                            newValue.Active = new VRCPhysBoneBase.PermissionFilter { allowSelf = activeAllowSelf, allowOthers = activeAllowOthers };
+                        }
+                        EditorGUIUtility.labelWidth = 0;
+                        EditorGUI.indentLevel--;
                         if (TransitionSeconds > 0)
                         {
                             using (new EditorGUILayout.HorizontalScope())

@@ -36,6 +36,7 @@ namespace net.narazaka.avatarmenucreator.util
         {
             get => Member.MemberType == MemberTypes.Field ? ((FieldInfo)Member).FieldType : ((PropertyInfo)Member).PropertyType;
         }
+        public bool MemberTypeIsPrimitive => MemberType.IsPrimitive || MemberType.IsSubclassOf(typeof(Enum));
         /// <summary>INameAndDescription.Name</summary>
         public string Name { get => $"{TypeName}\t{MemberName}"; }
         /// <summary>INameAndDescription.Description</summary>
