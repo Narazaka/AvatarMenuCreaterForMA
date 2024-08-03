@@ -1,5 +1,6 @@
 using System;
 using UnityEngine;
+using net.narazaka.avatarmenucreator.animationcurve;
 
 #if UNITY_EDITOR
 using UnityEditor;
@@ -90,13 +91,13 @@ namespace net.narazaka.avatarmenucreator
         {
             var curve = new Vector3AnimationCurve(new Vector3Keyframe(transitionSeconds * ActivateStartRate, Inactive), new Vector3Keyframe(transitionSeconds * ActivateEndRate, Active));
             if (NeedActivateEndKey) curve.AddKey(transitionSeconds, Active);
-            return Vector3AnimationCurve.SetTangentModes(curve.GetCurves(prefix));
+            return NamedAnimationCurve.SetTangentModes(curve.GetCurves(prefix));
         }
         public NamedAnimationCurve[] InactivateCurve(string prefix, float transitionSeconds)
         {
             var curve = new Vector3AnimationCurve(new Vector3Keyframe(transitionSeconds * InactivateStartRate, Active), new Vector3Keyframe(transitionSeconds * InactivateEndRate, Inactive));
             if (NeedInactivateEndKey) curve.AddKey(transitionSeconds, Inactive);
-            return Vector3AnimationCurve.SetTangentModes(curve.GetCurves(prefix));
+            return NamedAnimationCurve.SetTangentModes(curve.GetCurves(prefix));
         }
 #endif
     }
