@@ -79,7 +79,11 @@ namespace net.narazaka.avatarmenucreator.util
 
         public override int GetHashCode()
         {
+#if NET_UNITY_4_8 || UNITY_2021_2_OR_NEWER
             return HashCode.Combine(Type, Member);
+#else
+            return (Type.GetHashCode() * 397) ^ Member.GetHashCode();
+#endif
         }
 
         public static bool operator ==(TypeMember left, TypeMember right)
