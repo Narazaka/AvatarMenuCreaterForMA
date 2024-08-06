@@ -875,6 +875,16 @@ namespace net.narazaka.avatarmenucreator
                             newValue.Inactive = new VRCPhysBoneBase.PermissionFilter { allowSelf = inactiveAllowSelf, allowOthers = inactiveAllowOthers };
                             newValue.Active = new VRCPhysBoneBase.PermissionFilter { allowSelf = activeAllowSelf, allowOthers = activeAllowOthers };
                         }
+                        else if (member.MemberType == typeof(Vector3))
+                        {
+                            var widemode = EditorGUIUtility.wideMode;
+                            EditorGUIUtility.wideMode = true;
+                            EditorGUIUtility.labelWidth = 70;
+                            newValue.Inactive = EditorGUILayout.Vector3Field("OFF", (Vector3)value.Inactive);
+                            newValue.Active = EditorGUILayout.Vector3Field("ON", (Vector3)value.Active);
+                            EditorGUIUtility.labelWidth = 0;
+                            EditorGUIUtility.wideMode = widemode;
+                        }
                         EditorGUIUtility.labelWidth = 0;
                         EditorGUI.indentLevel--;
                         if (TransitionSeconds > 0)
