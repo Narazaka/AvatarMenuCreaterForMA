@@ -309,7 +309,7 @@ namespace net.narazaka.avatarmenucreator
                         ))
                 {
                     EditorGUI.indentLevel++;
-                    ShowChooseBlendShapeControl(children, child, ChooseBlendShapes, names.ToNames());
+                    ShowChooseBlendShapeControl(true, children, child, ChooseBlendShapes, names.ToNames());
                     EditorGUI.indentLevel--;
                 }
                 if (parameters.Count > 0 &&
@@ -324,7 +324,7 @@ namespace net.narazaka.avatarmenucreator
                         ))
                 {
                     EditorGUI.indentLevel++;
-                    ShowChooseBlendShapeControl(children, child, ChooseShaderParameters, parameters, minValue: null, maxValue: null);
+                    ShowChooseBlendShapeControl(false, children, child, ChooseShaderParameters, parameters, minValue: null, maxValue: null);
                     EditorGUI.indentLevel--;
                 }
                 if (FoldoutHeaderWithAddItemButton(
@@ -432,7 +432,10 @@ namespace net.narazaka.avatarmenucreator
                         for (var j = 0; j < ChooseCount; ++j)
                         {
                             var value = values.ContainsKey(j) ? values[j] : null;
+                            EditorGUILayout.BeginHorizontal();
                             var newValue = EditorGUILayout.ObjectField(ChooseName(j), value, typeof(Material), false) as Material;
+                            MaterialPickerButton(child, i, ref newValue);
+                            EditorGUILayout.EndHorizontal();
                             if (value != newValue)
                             {
                                 WillChange();
@@ -576,6 +579,7 @@ namespace net.narazaka.avatarmenucreator
         }
 
         void ShowChooseBlendShapeControl(
+            bool isBlendShape,
             IList<string> children,
             string child,
             ChooseBlendShapeDictionary choices,
@@ -596,7 +600,10 @@ namespace net.narazaka.avatarmenucreator
                         for (var i = 0; i < ChooseCount; ++i)
                         {
                             var value = values.ContainsKey(i) ? values[i] : 0;
+                            EditorGUILayout.BeginHorizontal();
                             var newValue = EditorGUILayout.FloatField(ChooseName(i), value);
+                            BlendShapeLikePickerButton(isBlendShape, child, name.Name, ref newValue);
+                            EditorGUILayout.EndHorizontal();
 
                             if (value != newValue)
                             {
@@ -695,7 +702,10 @@ namespace net.narazaka.avatarmenucreator
                     for (var i = 0; i < ChooseCount; ++i)
                     {
                         var value = values.ContainsKey(i) ? values[i] : Vector3.zero;
+                        EditorGUILayout.BeginHorizontal();
                         var newValue = EditorGUILayout.Vector3Field(ChooseName(i), value);
+                        TransformPickerButton(child, title, ref newValue);
+                        EditorGUILayout.EndHorizontal();
 
                         if (value != newValue)
                         {
@@ -770,7 +780,7 @@ namespace net.narazaka.avatarmenucreator
         }
 
         // with prefab shim
-        Material[] GetMaterialSlots(string child) => GetGameObject(child)?.GetMaterialSlots() ?? ChooseMaterials.MaterialSlots(child);
+        protected override Material[] GetMaterialSlots(string child) => GetGameObject(child)?.GetMaterialSlots() ?? ChooseMaterials.MaterialSlots(child);
 #endif
     }
 }

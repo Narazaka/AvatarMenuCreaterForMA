@@ -364,6 +364,79 @@ namespace net.narazaka.avatarmenucreator
             }
         }
 
+        // for MaterialPickerButton
+        protected virtual Material[] GetMaterialSlots(string child) { throw new NotImplementedException(); }
+
+        protected bool PickerButton()
+        {
+            return GUILayout.Button(EditorGUIUtility.IconContent("Grid.PickingTool"), GUILayout.Width(20));
+        }
+
+        protected void MaterialPickerButton(string child, int index, ref Material value)
+        {
+            var go = GetGameObject(child);
+            if (go == null || !PickerButton()) return;
+            value = GetMaterialSlots(child)[index];
+        }
+
+        protected void BlendShapeLikePickerButton(bool isBlendShape, string child, string name, ref float value)
+        {
+            if (isBlendShape)
+            {
+                BlendShapePickerButton(child, name, ref value);
+            }
+            else
+            {
+                ShaderParameterPickerButton(child, name, ref value);
+            }
+        }
+
+        void BlendShapePickerButton(string child, string name, ref float value)
+        {
+            var go = GetGameObject(child);
+            if (go == null || !PickerButton()) return;
+            var mesh = go.GetComponent<SkinnedMeshRenderer>();
+            value = mesh.GetBlendShapeWeight(mesh.sharedMesh.GetBlendShapeIndex(name));
+        }
+
+        void ShaderParameterPickerButton(string child, string name, ref float value)
+        {
+            var go = GetGameObject(child);
+            if (go == null || !PickerButton()) return;
+            var mesh = go.GetComponent<Renderer>();
+            foreach (var mat in mesh.sharedMaterials)
+            {
+                if (mat.shader.FindPropertyIndex(name) != -1)
+                {
+                    value = mat.GetFloat(name);
+                    return;
+                }
+            }
+        }
+
+        protected void TransformPickerButton(string child, string transformComponentName, ref Vector3 value)
+        {
+            var go = GetGameObject(child);
+            if (go == null || !PickerButton()) return;
+            var component = go.GetComponent<Transform>();
+            var memberInfo = TypeMemberUtil.GetMember(typeof(Transform), TransformPropertyName(transformComponentName));
+            if (memberInfo is System.Reflection.PropertyInfo propertyInfo)
+            {
+                value = (Vector3)propertyInfo.GetValue(component);
+            }
+        }
+
+        string TransformPropertyName(string transformComponentName)
+        {
+            switch (transformComponentName)
+            {
+                case "Position": return "localPosition";
+                case "Rotation": return "localEulerAngles";
+                case "Scale": return "localScale";
+                default: throw new ArgumentException();
+            }
+        }
+
         protected void HorizontalLine()
         {
             var c = GUI.color;

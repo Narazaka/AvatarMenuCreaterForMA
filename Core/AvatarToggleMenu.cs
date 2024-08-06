@@ -270,7 +270,7 @@ namespace net.narazaka.avatarmenucreator
                         ))
                 {
                     EditorGUI.indentLevel++;
-                    ShowToggleBlendShapeControl(children, child, ToggleBlendShapes, names.ToNames());
+                    ShowToggleBlendShapeControl(true, children, child, ToggleBlendShapes, names.ToNames());
                     EditorGUI.indentLevel--;
                 }
                 if (parameters.Count > 0 &&
@@ -285,7 +285,7 @@ namespace net.narazaka.avatarmenucreator
                         ))
                 {
                     EditorGUI.indentLevel++;
-                    ShowToggleBlendShapeControl(children, child, ToggleShaderParameters, parameters, minValue: null, maxValue: null);
+                    ShowToggleBlendShapeControl(false, children, child, ToggleShaderParameters, parameters, minValue: null, maxValue: null);
                     EditorGUI.indentLevel--;
                 }
                 if (FoldoutHeaderWithAddItemButton(
@@ -413,7 +413,9 @@ namespace net.narazaka.avatarmenucreator
                         {
                             EditorGUIUtility.labelWidth = 70;
                             newValue.Inactive = EditorGUILayout.ObjectField("OFF", value.Inactive, typeof(Material), false) as Material;
+                            MaterialPickerButton(child, i, ref newValue.Inactive);
                             newValue.Active = EditorGUILayout.ObjectField("ON", value.Active, typeof(Material), false) as Material;
+                            MaterialPickerButton(child, i, ref newValue.Active);
                             EditorGUIUtility.labelWidth = 0;
                         }
                         if (TransitionSeconds > 0)
@@ -621,6 +623,7 @@ namespace net.narazaka.avatarmenucreator
         }
 
         void ShowToggleBlendShapeControl(
+            bool isBlendShape,
             IList<string> children,
             string child,
             ToggleBlendShapeDictionary toggles,
@@ -642,8 +645,10 @@ namespace net.narazaka.avatarmenucreator
                         {
                             EditorGUI.indentLevel++;
                             EditorGUIUtility.labelWidth = 70;
-                            newValue.Inactive = EditorGUILayout.FloatField("OFF", value.Inactive, GUILayout.Width(100));
-                            newValue.Active = EditorGUILayout.FloatField("ON", value.Active, GUILayout.Width(100));
+                            newValue.Inactive = EditorGUILayout.FloatField("OFF", value.Inactive, GUILayout.Width(110));
+                            BlendShapeLikePickerButton(isBlendShape, child, name.Name, ref newValue.Inactive);
+                            newValue.Active = EditorGUILayout.FloatField("ON", value.Active, GUILayout.Width(110));
+                            BlendShapeLikePickerButton(isBlendShape, child, name.Name, ref newValue.Active);
                             EditorGUIUtility.labelWidth = 0;
                             EditorGUI.indentLevel--;
                         }
@@ -784,8 +789,16 @@ namespace net.narazaka.avatarmenucreator
                     var widemode = EditorGUIUtility.wideMode;
                     EditorGUIUtility.wideMode = true;
                     EditorGUIUtility.labelWidth = 70;
-                    newValue.Inactive = EditorGUILayout.Vector3Field("OFF", value.Inactive);
-                    newValue.Active = EditorGUILayout.Vector3Field("ON", value.Active);
+                    using (new EditorGUILayout.HorizontalScope())
+                    {
+                        newValue.Inactive = EditorGUILayout.Vector3Field("OFF", value.Inactive);
+                        TransformPickerButton(child, title, ref newValue.Inactive);
+                    }
+                    using (new EditorGUILayout.HorizontalScope())
+                    {
+                        newValue.Active = EditorGUILayout.Vector3Field("ON", value.Active);
+                        TransformPickerButton(child, title, ref newValue.Active);
+                    }
                     EditorGUIUtility.labelWidth = 0;
                     EditorGUIUtility.wideMode = widemode;
                     EditorGUI.indentLevel--;
@@ -890,7 +903,7 @@ namespace net.narazaka.avatarmenucreator
         }
 
         // with prefab shim
-        Material[] GetMaterialSlots(string child) => GetGameObject(child)?.GetMaterialSlots() ?? ToggleMaterials.MaterialSlots(child);
+        protected override Material[] GetMaterialSlots(string child) => GetGameObject(child)?.GetMaterialSlots() ?? ToggleMaterials.MaterialSlots(child);
 #endif
     }
 }

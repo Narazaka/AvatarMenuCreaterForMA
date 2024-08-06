@@ -228,7 +228,7 @@ namespace net.narazaka.avatarmenucreator
                         ))
                 {
                     EditorGUI.indentLevel++;
-                    ShowRadialBlendShapeControl(children, child, RadialBlendShapes, names.ToNames());
+                    ShowRadialBlendShapeControl(true, children, child, RadialBlendShapes, names.ToNames());
                     EditorGUI.indentLevel--;
                 }
                 if (parameters.Count > 0 &&
@@ -243,7 +243,7 @@ namespace net.narazaka.avatarmenucreator
                         ))
                 {
                     EditorGUI.indentLevel++;
-                    ShowRadialBlendShapeControl(children, child, RadialShaderParameters, parameters, minValue: null, maxValue: null);
+                    ShowRadialBlendShapeControl(false, children, child, RadialShaderParameters, parameters, minValue: null, maxValue: null);
                     EditorGUI.indentLevel--;
                 }
                 if (FoldoutHeaderWithAddItemButton(
@@ -267,6 +267,7 @@ namespace net.narazaka.avatarmenucreator
         }
 
         void ShowRadialBlendShapeControl(
+            bool isBlendShape,
             IList<string> children,
             string child,
             RadialBlendShapeDictionary radials,
@@ -289,7 +290,9 @@ namespace net.narazaka.avatarmenucreator
                             EditorGUI.indentLevel++;
                             EditorGUIUtility.labelWidth = 75;
                             newValue.Start = EditorGUILayout.FloatField(T.始, value.Start, GUILayout.Width(105));
+                            BlendShapeLikePickerButton(isBlendShape, child, name.Name, ref newValue.Start);
                             newValue.End = EditorGUILayout.FloatField(T.終, value.End, GUILayout.Width(105));
+                            BlendShapeLikePickerButton(isBlendShape, child, name.Name, ref newValue.End);
                             EditorGUIUtility.labelWidth = 70;
                             using (new EditorGUI.DisabledGroupScope(true))
                             {
@@ -420,8 +423,16 @@ namespace net.narazaka.avatarmenucreator
                         var widemode = EditorGUIUtility.wideMode;
                         EditorGUIUtility.wideMode = true;
                         EditorGUIUtility.labelWidth = 75;
-                        newValue.Start = EditorGUILayout.Vector3Field(T.始, value.Start);
-                        newValue.End = EditorGUILayout.Vector3Field(T.終, value.End);
+                        using (new EditorGUILayout.HorizontalScope())
+                        {
+                            newValue.Start = EditorGUILayout.Vector3Field(T.始, value.Start);
+                            TransformPickerButton(child, title, ref newValue.Start);
+                        }
+                        using (new EditorGUILayout.HorizontalScope())
+                        {
+                            newValue.End = EditorGUILayout.Vector3Field(T.終, value.End);
+                            TransformPickerButton(child, title, ref newValue.End);
+                        }
                         EditorGUIUtility.labelWidth = 70;
                         using (new EditorGUI.DisabledGroupScope(true))
                         {
