@@ -726,6 +726,7 @@ namespace net.narazaka.avatarmenucreator
             IEnumerable<TypeMember> members
             )
         {
+            ShowPhysBoneAutoResetMenu(child, ChooseValues.Names(child).ToArray());
             foreach (var member in members)
             {
                 var key = (child, member);

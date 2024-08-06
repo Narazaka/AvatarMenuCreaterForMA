@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using UnityEngine;
+using net.narazaka.avatarmenucreator.collections.instance;
+
 #if UNITY_EDITOR
 using UnityEditor;
 using net.narazaka.avatarmenucreator.util;
@@ -24,6 +26,8 @@ namespace net.narazaka.avatarmenucreator
         public string ParameterName;
         [SerializeField]
         public bool InternalParameter = false;
+        [SerializeField]
+        public StringHashSet PhysBoneAutoResetDisabled = new StringHashSet();
 
 #if UNITY_EDITOR
         [NonSerialized]
@@ -142,6 +146,41 @@ namespace net.narazaka.avatarmenucreator
                 T.パラメーター内部値;
 #endif
             EditorGUILayout.PropertyField(serializedProperty.FindPropertyRelative(nameof(InternalParameter)), new GUIContent(internalParameterLabel));
+        }
+
+        protected void ShowPhysBoneAutoResetMenu(string child, TypeMember[] childMembers)
+        {
+            var needResetPhysBoneField = VRCPhysBoneUtil.IsNeedResetPhysBoneField(childMembers);
+            if (needResetPhysBoneField)
+            {
+                var hasPhysBoneField = VRCPhysBoneUtil.HasPhysBoneEnabled(childMembers);
+                var physBoneAutoResetEnabled = !PhysBoneAutoResetDisabled.Contains(child);
+                if (hasPhysBoneField)
+                {
+                    EditorGUILayout.HelpBox(T.PhysBone自動リセットを有効にするには_PhysBone_dot_enabled_設定を削除して下さいゝ, MessageType.Info);
+                }
+                else
+                {
+                    EditorGUI.BeginChangeCheck();
+                    physBoneAutoResetEnabled = EditorGUILayout.Toggle(T.PhysBone自動リセット, physBoneAutoResetEnabled);
+                    if (EditorGUI.EndChangeCheck())
+                    {
+                        WillChange();
+                        if (physBoneAutoResetEnabled)
+                        {
+                            PhysBoneAutoResetDisabled.Remove(child);
+                        }
+                        else
+                        {
+                            PhysBoneAutoResetDisabled.Add(child);
+                        }
+                    }
+                }
+                if (hasPhysBoneField || !physBoneAutoResetEnabled)
+                {
+                    EditorGUILayout.HelpBox(T.PhysBoneをリセットしないと反映されない値が設定されていますゝPhysBone自動リセットを有効にするとリセット_start_OFF_sl_ON_end_処理を挿入しますゝ, MessageType.Warning);
+                }
+            }
         }
 
         protected GameObject GetGameObject(string child)

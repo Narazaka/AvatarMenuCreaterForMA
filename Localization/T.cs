@@ -274,5 +274,14 @@ namespace net.narazaka.avatarmenucreator
 
         [English("There is nothing to control.")]
         public static string BlendShape_sl_Shader_Parameterなし => L;
+
+        [English("PhysBone auto-reset")]
+        public static string PhysBone自動リセット => L;
+
+        [English("Values are set that are not reflected unless PhysBone is reset; if PhysBone auto-reset is enabled, the reset (OFF/ON) process is inserted.")]
+        public static string PhysBoneをリセットしないと反映されない値が設定されていますゝPhysBone自動リセットを有効にするとリセット_start_OFF_sl_ON_end_処理を挿入しますゝ => L;
+
+        [English("To enable PhysBone auto-reset, delete the PhysBone.enabled setting.")]
+        public static string PhysBone自動リセットを有効にするには_PhysBone_dot_enabled_設定を削除して下さいゝ => L;
     }
 }

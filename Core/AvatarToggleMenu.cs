@@ -818,6 +818,7 @@ namespace net.narazaka.avatarmenucreator
             IEnumerable<TypeMember> members
             )
         {
+            ShowPhysBoneAutoResetMenu(child, ToggleValues.Names(child).ToArray());
             foreach (var member in members)
             {
                 var key = (child, member);
@@ -846,6 +847,10 @@ namespace net.narazaka.avatarmenucreator
                             }
                             else if (member.MemberType == typeof(bool))
                             {
+                                if (member.Member == VRCPhysBoneUtil.PhysBoneEnabled)
+                                {
+
+                                }
                                 EditorGUIUtility.labelWidth = 75;
                                 var activeOn = EditorGUILayout.Toggle(T.ON_eq_, (bool)value.Active == true);
                                 newValue.Active = activeOn;
