@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 #if UNITY_EDITOR
@@ -369,7 +369,7 @@ namespace net.narazaka.avatarmenucreator
 
         protected bool PickerButton()
         {
-            return GUILayout.Button(EditorGUIUtility.IconContent("Grid.PickingTool"), GUILayout.Width(20));
+            return GUILayout.Button(EditorGUIUtility.IconContent("Grid.PickingTool"), GUILayout.Width(20), GUILayout.Height(18));
         }
 
         protected void MaterialPickerButton(string child, int index, ref Material value)

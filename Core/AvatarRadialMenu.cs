@@ -301,7 +301,7 @@ namespace net.narazaka.avatarmenucreator
                                     RadialDefaultValue * 100 < value.StartOffsetPercent ? value.Start :
                                     RadialDefaultValue * 100 > value.EndOffsetPercent ? value.End :
                                     (value.Start * (value.EndOffsetPercent - RadialDefaultValue * 100) + value.End * (RadialDefaultValue * 100 - value.StartOffsetPercent)) / (value.EndOffsetPercent - value.StartOffsetPercent),
-                                    GUILayout.Width(100)
+                                    GUILayout.Width(105)
                                     );
                             }
                             EditorGUIUtility.labelWidth = 0;
