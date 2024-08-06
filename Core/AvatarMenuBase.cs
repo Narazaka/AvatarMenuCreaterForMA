@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using UnityEngine;
 #if UNITY_EDITOR
@@ -435,6 +435,13 @@ namespace net.narazaka.avatarmenucreator
                 case "Scale": return "localScale";
                 default: throw new ArgumentException();
             }
+        }
+
+        protected void ValuePickerButton(string child, TypeMember member, Action<SerializedProperty> setValue)
+        {
+            var go = GetGameObject(child);
+            if (go == null || !PickerButton()) return;
+            setValue(new SerializedObject(go.GetComponent(member.Type)).FindProperty(member.AnimationMemberName));
         }
 
         protected void HorizontalLine()

@@ -3,6 +3,7 @@ using System.Linq;
 using System.Collections.Generic;
 using System.Reflection;
 using VRC.SDK3.Dynamics.PhysBone.Components;
+using UnityEngine;
 using UnityEngine.Animations;
 
 namespace net.narazaka.avatarmenucreator.util
@@ -97,6 +98,10 @@ namespace net.narazaka.avatarmenucreator.util
 
             return AvailableMembersCache[type] = new TypeMember[0];
         }
+
+        public static bool IsSuitableForTransition(this Type type) => type == typeof(float) || type == typeof(Vector3);
+
+        public static IEnumerable<TypeMember> OnlySuitableForTransition(this IEnumerable<TypeMember> typeMembers) => typeMembers.Where(tm => tm.MemberType.IsSuitableForTransition());
 
         static Dictionary<(Type, string), MemberInfo> MemberInfoCache = new Dictionary<(Type, string), MemberInfo>();
 

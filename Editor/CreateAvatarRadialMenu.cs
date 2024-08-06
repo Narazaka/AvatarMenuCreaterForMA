@@ -32,6 +32,23 @@ namespace net.narazaka.avatarmenucreator.editor
                 var value = AvatarMenu.RadialShaderParameters[(child, name)];
                 clip.SetCurve(child, typeof(Renderer), $"material.{name}", FullAnimationCurve(new Keyframe(value.StartOffsetPercent, value.Start), new Keyframe(value.EndOffsetPercent, value.End)));
             }
+            foreach (var (child, member) in AvatarMenu.RadialValues.Keys)
+            {
+                if (!matchGameObjects.Contains(child)) continue;
+                var value = AvatarMenu.RadialValues[(child, member)];
+                if (member.MemberType == typeof(float))
+                {
+                    clip.SetCurve(child, member.Type, member.AnimationMemberName, FullAnimationCurve(new Keyframe(value.StartOffsetPercent, (float)value.Start), new Keyframe(value.EndOffsetPercent, (float)value.End)));
+                }
+                else if (member.MemberType == typeof(Vector3))
+                {
+                    var start = (Vector3)value.Start;
+                    var end = (Vector3)value.End;
+                    clip.SetCurve(child, member.Type, $"{member.AnimationMemberName}.x", FullAnimationCurve(new Keyframe(value.StartOffsetPercent, start.x), new Keyframe(value.EndOffsetPercent, end.x)));
+                    clip.SetCurve(child, member.Type, $"{member.AnimationMemberName}.y", FullAnimationCurve(new Keyframe(value.StartOffsetPercent, start.y), new Keyframe(value.EndOffsetPercent, end.y)));
+                    clip.SetCurve(child, member.Type, $"{member.AnimationMemberName}.z", FullAnimationCurve(new Keyframe(value.StartOffsetPercent, start.z), new Keyframe(value.EndOffsetPercent, end.z)));
+                }
+            }
             foreach (var child in AvatarMenu.Positions.Keys)
             {
                 if (!matchGameObjects.Contains(child)) continue;

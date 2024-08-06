@@ -200,7 +200,7 @@ namespace net.narazaka.avatarmenucreator
             Scales.Remove(child);
         }
         // TODO: ToggleValues
-        protected override bool IsSuitableForTransition() => ToggleBlendShapes.Count > 0 || ToggleShaderParameters.Count > 0 || ToggleValues.Names().Where(t => t.MemberType != typeof(bool)).Count() > 0 || Positions.Count > 0 || Rotations.Count > 0 || Scales.Count > 0;
+        protected override bool IsSuitableForTransition() => ToggleBlendShapes.Count > 0 || ToggleShaderParameters.Count > 0 || ToggleValues.Names().Where(t => t.MemberType.IsSuitableForTransition()).Count() > 0 || Positions.Count > 0 || Rotations.Count > 0 || Scales.Count > 0;
 
         protected override void OnMultiGUI(SerializedProperty serializedProperty)
         {
@@ -259,7 +259,7 @@ namespace net.narazaka.avatarmenucreator
                 var names = gameObjectRef == null ? ToggleBlendShapes.Names(child).ToList() : Util.GetBlendShapeNames(gameObjectRef);
                 var parameters = gameObjectRef == null ? ToggleShaderParameters.Names(child).ToFakeShaderParameters().ToList() : ShaderParametersCache.GetFilteredShaderParameters(gameObjectRef);
                 var components = gameObjectRef == null ? ToggleValues.Names(child).Select(n => n.Type).ToList() : gameObjectRef.GetAllComponents().Select(c => TypeUtil.GetType(c)).FilterByVRCWhitelist().ToList();
-                var properties = components.SelectMany(c => c.GetAvailableMembers()).ToList();
+                var members = components.SelectMany(c => c.GetAvailableMembers()).ToList();
 
                 var materials = allMaterials[child];
                 if (materials.Length > 0 &&
@@ -308,18 +308,18 @@ namespace net.narazaka.avatarmenucreator
                     ShowToggleBlendShapeControl(false, children, child, ToggleShaderParameters, parameters, minValue: null, maxValue: null);
                     EditorGUI.indentLevel--;
                 }
-                if (properties.Count > 0 && FoldoutHeaderWithAddItemButton(
+                if (members.Count > 0 && FoldoutHeaderWithAddItemButton(
                     child,
                     "Components",
                     ToggleValues.HasChild(child),
-                    () => properties.Select(c => new NameAndDescriptionItemContainer(c) as ListTreeViewItemContainer<string>).ToList(),
+                    () => members.Select(c => new NameAndDescriptionItemContainer(c) as ListTreeViewItemContainer<string>).ToList(),
                     () => ToggleValues.Names(child).Select(n => n.Name).ToImmutableHashSet(),
                     name => AddToggleValue(children, child, TypeMember.FromName(name)),
                     name => RemoveToggleValue(children, child, TypeMember.FromName(name))
                     ))
                 {
                     EditorGUI.indentLevel++;
-                    ShowToggleValueControl(children, child, properties);
+                    ShowToggleValueControl(children, child, members);
                     EditorGUI.indentLevel--;
                 }
                 if (FoldoutHeaderWithAddItemButton(
@@ -832,13 +832,17 @@ namespace net.narazaka.avatarmenucreator
                         {
                             if (member.MemberType == typeof(float))
                             {
-                                newValue.Inactive = EditorGUILayout.FloatField("OFF", (float)value.Inactive, GUILayout.Width(100));
-                                newValue.Active = EditorGUILayout.FloatField("ON", (float)value.Active, GUILayout.Width(100));
+                                newValue.Inactive = EditorGUILayout.FloatField("OFF", (float)value.Inactive, GUILayout.Width(110));
+                                ValuePickerButton(child, member, p => newValue.Inactive = p.floatValue);
+                                newValue.Active = EditorGUILayout.FloatField("ON", (float)value.Active, GUILayout.Width(110));
+                                ValuePickerButton(child, member, p => newValue.Active = p.floatValue);
                             }
                             else if (member.MemberType == typeof(int))
                             {
                                 newValue.Inactive = EditorGUILayout.IntField("OFF", (int)value.Inactive, GUILayout.Width(100));
+                                ValuePickerButton(child, member, p => newValue.Inactive = p.intValue);
                                 newValue.Active = EditorGUILayout.IntField("ON", (int)value.Active, GUILayout.Width(100));
+                                ValuePickerButton(child, member, p => newValue.Active = p.intValue);
                             }
                             else if (member.MemberType == typeof(bool))
                             {
@@ -850,10 +854,12 @@ namespace net.narazaka.avatarmenucreator
                             }
                             else if (member.MemberType.IsSubclassOf(typeof(Enum)))
                             {
-                                var names = member.MemberType.GetEnumNamesCached();
-                                var values = member.MemberType.GetEnumValuesCached();
-                                newValue.Inactive = EditorGUILayout.IntPopup("OFF", (int)value.Inactive, names, values);
-                                newValue.Active = EditorGUILayout.IntPopup("ON", (int)value.Active, names, values);
+                                var enumNames = member.MemberType.GetEnumNamesCached();
+                                var enumValues = member.MemberType.GetEnumValuesCached();
+                                newValue.Inactive = EditorGUILayout.IntPopup("OFF", (int)value.Inactive, enumNames, enumValues);
+                                ValuePickerButton(child, member, p => newValue.Inactive = enumValues[p.enumValueIndex]);
+                                newValue.Active = EditorGUILayout.IntPopup("ON", (int)value.Active, enumNames, enumValues);
+                                ValuePickerButton(child, member, p => newValue.Active = enumValues[p.enumValueIndex]);
                             }
                         }
                         if (member.MemberType == typeof(VRCPhysBoneBase.PermissionFilter))
@@ -880,8 +886,16 @@ namespace net.narazaka.avatarmenucreator
                             var widemode = EditorGUIUtility.wideMode;
                             EditorGUIUtility.wideMode = true;
                             EditorGUIUtility.labelWidth = 70;
-                            newValue.Inactive = EditorGUILayout.Vector3Field("OFF", (Vector3)value.Inactive);
-                            newValue.Active = EditorGUILayout.Vector3Field("ON", (Vector3)value.Active);
+                            using (new EditorGUILayout.HorizontalScope())
+                            {
+                                newValue.Inactive = EditorGUILayout.Vector3Field("OFF", (Vector3)value.Inactive);
+                                ValuePickerButton(child, member, p => newValue.Inactive = p.vector3Value);
+                            }
+                            using (new EditorGUILayout.HorizontalScope())
+                            {
+                                newValue.Active = EditorGUILayout.Vector3Field("ON", (Vector3)value.Active);
+                                ValuePickerButton(child, member, p => newValue.Active = p.vector3Value);
+                            }
                             EditorGUIUtility.labelWidth = 0;
                             EditorGUIUtility.wideMode = widemode;
                         }
@@ -894,7 +908,7 @@ namespace net.narazaka.avatarmenucreator
                                 EditorGUI.indentLevel++;
                                 EditorGUIUtility.labelWidth = 110;
                                 newValue.TransitionOffsetPercent = EditorGUILayout.FloatField(T.変化待機_per_, value.TransitionOffsetPercent, GUILayout.Width(140));
-                                if (member.MemberType != typeof(bool))
+                                if (member.MemberType.IsSuitableForTransition())
                                 {
                                     newValue.TransitionDurationPercent = EditorGUILayout.FloatField(T.変化時間_per_, value.TransitionDurationPercent, GUILayout.Width(140));
                                 }

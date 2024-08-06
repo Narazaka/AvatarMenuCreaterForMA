@@ -1,10 +1,12 @@
 using nadena.dev.modular_avatar.core;
 using net.narazaka.avatarmenucreator.collections.instance;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEditor;
 using UnityEditor.Animations;
 using UnityEngine;
+using VRC.Dynamics;
 using VRC.SDK3.Avatars.Components;
 using VRC.SDK3.Avatars.ScriptableObjects;
 
@@ -61,6 +63,38 @@ namespace net.narazaka.avatarmenucreator.editor
                 for (var i = 0; i < AvatarMenu.ChooseCount; ++i)
                 {
                     choices[i].SetCurve(curvePath, typeof(Renderer), curveName, new AnimationCurve(new Keyframe(0, value.ContainsKey(i) ? value[i] : 0)));
+                }
+            }
+            foreach (var (child, member) in AvatarMenu.ChooseValues.Keys)
+            {
+                if (!matchGameObjects.Contains(child)) continue;
+                var value = AvatarMenu.ChooseValues[(child, member)];
+                var curvePath = child;
+                if (member.MemberTypeIsPrimitive)
+                {
+                    for (var i = 0; i < AvatarMenu.ChooseCount; ++i)
+                    {
+                        choices[i].SetCurve(curvePath, member.Type, member.AnimationMemberName, new AnimationCurve(new Keyframe(0, value.ContainsKey(i) ? (float)value[i].As(member.MemberType) : 0)));
+                    }
+                }
+                else if (member.MemberType == typeof(Vector3))
+                {
+                    for (var i = 0; i < AvatarMenu.ChooseCount; ++i)
+                    {
+                        var v = value.ContainsKey(i) ? (Vector3)value[i] : Vector3.zero;
+                        choices[i].SetCurve(curvePath, member.Type, member.AnimationMemberName + ".x", new AnimationCurve(new Keyframe(0, v.x)));
+                        choices[i].SetCurve(curvePath, member.Type, member.AnimationMemberName + ".y", new AnimationCurve(new Keyframe(0, v.y)));
+                        choices[i].SetCurve(curvePath, member.Type, member.AnimationMemberName + ".z", new AnimationCurve(new Keyframe(0, v.z)));
+                    }
+                }
+                else if (member.MemberType == typeof(VRCPhysBoneBase.PermissionFilter))
+                {
+                    for (var i = 0; i < AvatarMenu.ChooseCount; ++i)
+                    {
+                        var v = value.ContainsKey(i) ? (VRCPhysBoneBase.PermissionFilter)value[i] : new VRCPhysBoneBase.PermissionFilter();
+                        choices[i].SetCurve(curvePath, member.Type, member.AnimationMemberName + ".allowSelf", new AnimationCurve(new Keyframe(0, v.allowSelf ? 1 : 0)));
+                        choices[i].SetCurve(curvePath, member.Type, member.AnimationMemberName + ".allowOthers", new AnimationCurve(new Keyframe(0, v.allowOthers ? 1 : 0)));
+                    }
                 }
             }
             foreach (var child in AvatarMenu.Positions.Keys)

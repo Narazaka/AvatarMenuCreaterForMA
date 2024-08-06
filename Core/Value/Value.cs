@@ -26,6 +26,16 @@ namespace net.narazaka.avatarmenucreator.value
         public Value() { value = new float[0]; }
         public Value(float[] value) { this.value = value; }
 
+        public object As(Type type)
+        {
+            if (type == typeof(bool)) return (bool)this;
+            if (type == typeof(float)) return (float)this;
+            if (type == typeof(int)) return (int)this;
+            if (type == typeof(Vector3)) return (Vector3)this;
+            if (type == typeof(VRCPhysBoneBase.PermissionFilter)) return (VRCPhysBoneBase.PermissionFilter)this;
+            return null;
+        }
+
         public bool Equals(Value other)
         {
             if (other == null) return false;

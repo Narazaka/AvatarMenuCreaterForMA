@@ -3,11 +3,14 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 using UnityEngine;
+using VRC.Dynamics;
+
 #if UNITY_EDITOR
 using UnityEditor;
 using net.narazaka.avatarmenucreator.util;
 #endif
 using net.narazaka.avatarmenucreator.collections.instance;
+using net.narazaka.avatarmenucreator.value;
 
 namespace net.narazaka.avatarmenucreator
 {
@@ -22,6 +25,8 @@ namespace net.narazaka.avatarmenucreator
         public ChooseBlendShapeDictionary ChooseBlendShapes = new ChooseBlendShapeDictionary();
         [SerializeField]
         public ChooseBlendShapeDictionary ChooseShaderParameters = new ChooseBlendShapeDictionary();
+        [SerializeField]
+        public ChooseValueDictionary ChooseValues = new ChooseValueDictionary();
         [SerializeField]
         public ChooseVector3Dictionary Positions = new ChooseVector3Dictionary();
         [SerializeField]
@@ -65,16 +70,17 @@ namespace net.narazaka.avatarmenucreator
             return null;
         }
 
-        public override IEnumerable<string> GetStoredChildren() => ChooseObjects.Keys.Concat(ChooseMaterials.Keys.Select(key => key.Item1)).Concat(ChooseBlendShapes.Keys.Select(key => key.Item1)).Concat(ChooseShaderParameters.Keys.Select(key => key.Item1)).Concat(Positions.Keys).Concat(Rotations.Keys).Concat(Scales.Keys).Distinct();
+        public override IEnumerable<string> GetStoredChildren() => ChooseObjects.Keys.Concat(ChooseMaterials.Keys.Select(key => key.Item1)).Concat(ChooseBlendShapes.Keys.Select(key => key.Item1)).Concat(ChooseShaderParameters.Keys.Select(key => key.Item1)).Concat(ChooseValues.Keys.Select(key => key.Item1)).Concat(Positions.Keys).Concat(Rotations.Keys).Concat(Scales.Keys).Distinct();
 
         public override void ReplaceStoredChild(string oldChild, string newChild)
         {
-            if (ChooseObjects.ContainsKey(oldChild) || ChooseMaterials.ContainsPrimaryKey(oldChild) || ChooseBlendShapes.ContainsPrimaryKey(oldChild) || ChooseShaderParameters.ContainsPrimaryKey(oldChild) || Positions.ContainsKey(oldChild) || Rotations.ContainsKey(oldChild) || Scales.ContainsKey(oldChild))
+            if (ChooseObjects.ContainsKey(oldChild) || ChooseMaterials.ContainsPrimaryKey(oldChild) || ChooseBlendShapes.ContainsPrimaryKey(oldChild) || ChooseShaderParameters.ContainsPrimaryKey(oldChild) || ChooseValues.ContainsPrimaryKey(oldChild) || Positions.ContainsKey(oldChild) || Rotations.ContainsKey(oldChild) || Scales.ContainsKey(oldChild))
             {
                 ChooseObjects.ReplaceKey(oldChild, newChild);
                 ChooseMaterials.ReplacePrimaryKey(oldChild, newChild);
                 ChooseBlendShapes.ReplacePrimaryKey(oldChild, newChild);
                 ChooseShaderParameters.ReplacePrimaryKey(oldChild, newChild);
+                ChooseValues.ReplacePrimaryKey(oldChild, newChild);
                 Positions.ReplaceKey(oldChild, newChild);
                 Rotations.ReplaceKey(oldChild, newChild);
                 Scales.ReplaceKey(oldChild, newChild);
@@ -99,6 +105,10 @@ namespace net.narazaka.avatarmenucreator
             foreach (var key in ChooseShaderParameters.Keys.Where(key => !filter.Contains(key.Item1)).ToList())
             {
                 ChooseShaderParameters.Remove(key);
+            }
+            foreach (var key in ChooseValues.Keys.Where(key => !filter.Contains(key.Item1)).ToList())
+            {
+                ChooseValues.Remove(key);
             }
             foreach (var child in Positions.Keys.Where(child => !filter.Contains(child)).ToList())
             {
@@ -130,12 +140,16 @@ namespace net.narazaka.avatarmenucreator
             {
                 ChooseShaderParameters.Remove(key);
             }
+            foreach (var key in ChooseValues.Keys.Where(key => key.Item1 == child).ToList())
+            {
+                ChooseValues.Remove(key);
+            }
             Positions.Remove(child);
             Rotations.Remove(child);
             Scales.Remove(child);
         }
 
-        protected override bool IsSuitableForTransition() => ChooseBlendShapes.Count > 0 || ChooseShaderParameters.Count > 0 || Positions.Count > 0 || Rotations.Count > 0 || Scales.Count > 0;
+        protected override bool IsSuitableForTransition() => ChooseBlendShapes.Count > 0 || ChooseShaderParameters.Count > 0 || ChooseValues.Names().Where(t => t.MemberType.IsSuitableForTransition()).Count() > 0 || Positions.Count > 0 || Rotations.Count > 0 || Scales.Count > 0;
 
         protected override void OnMultiGUI(SerializedProperty serializedProperty)
         {
@@ -297,6 +311,8 @@ namespace net.narazaka.avatarmenucreator
                 var gameObjectRef = GetGameObject(child);
                 var names = gameObjectRef == null ? ChooseBlendShapes.Names(child).ToList() : Util.GetBlendShapeNames(gameObjectRef);
                 var parameters = gameObjectRef == null ? ChooseShaderParameters.Names(child).ToFakeShaderParameters().ToList() : ShaderParametersCache.GetFilteredShaderParameters(gameObjectRef);
+                var components = gameObjectRef == null ? ChooseValues.Names(child).Select(n => n.Type).ToList() : gameObjectRef.GetAllComponents().Select(c => TypeUtil.GetType(c)).FilterByVRCWhitelist().ToList();
+                var members = components.SelectMany(c => c.GetAvailableMembers()).ToList();
                 if (names.Count > 0 &&
                     FoldoutHeaderWithAddItemButton(
                         child,
@@ -325,6 +341,20 @@ namespace net.narazaka.avatarmenucreator
                 {
                     EditorGUI.indentLevel++;
                     ShowChooseBlendShapeControl(false, children, child, ChooseShaderParameters, parameters, minValue: null, maxValue: null);
+                    EditorGUI.indentLevel--;
+                }
+                if (members.Count > 0 && FoldoutHeaderWithAddItemButton(
+                    child,
+                    "Components",
+                    ChooseValues.HasChild(child),
+                    () => members.Select(c => new NameAndDescriptionItemContainer(c) as ListTreeViewItemContainer<string>).ToList(),
+                    () => ChooseValues.Names(child).Select(n => n.Name).ToImmutableHashSet(),
+                    name => AddChooseValue(children, child, TypeMember.FromName(name)),
+                    name => RemoveChooseValue(children, child, TypeMember.FromName(name))
+                    ))
+                {
+                    EditorGUI.indentLevel++;
+                    ShowChooseValueControl(children, child, members);
                     EditorGUI.indentLevel--;
                 }
                 if (FoldoutHeaderWithAddItemButton(
@@ -688,6 +718,146 @@ namespace net.narazaka.avatarmenucreator
             if (!choices.ContainsKey(key)) return;
             WillChange();
             choices.Remove(key);
+        }
+
+        void ShowChooseValueControl(
+            IList<string> children,
+            string child,
+            IEnumerable<TypeMember> members
+            )
+        {
+            foreach (var member in members)
+            {
+                var key = (child, member);
+                if (ChooseValues.TryGetValue(key, out var values))
+                {
+                    if (EditorGUILayout.ToggleLeft(member.Description, true))
+                    {
+                        EditorGUI.indentLevel++;
+                        for (var i = 0; i < ChooseCount; ++i)
+                        {
+                            var value = values.ContainsKey(i) ? values[i] : 0;
+                            Value newValue = null;
+                            EditorGUILayout.BeginHorizontal();
+                            if (member.MemberType == typeof(float))
+                            {
+                                newValue = EditorGUILayout.FloatField(ChooseName(i), (float)value);
+                                ValuePickerButton(child, member, p => newValue = p.floatValue);
+                            }
+                            else if (member.MemberType == typeof(int))
+                            {
+                                newValue = EditorGUILayout.IntField(ChooseName(i), (int)value);
+                                ValuePickerButton(child, member, p => newValue = p.intValue);
+                            }
+                            else if (member.MemberType == typeof(bool))
+                            {
+                                newValue = EditorGUILayout.Toggle(ChooseName(i), (bool)value);
+                                ValuePickerButton(child, member, p => newValue = p.boolValue);
+                            }
+                            else if (member.MemberType.IsSubclassOf(typeof(Enum)))
+                            {
+                                var enumNames = member.MemberType.GetEnumNamesCached();
+                                var enumValues = member.MemberType.GetEnumValuesCached();
+                                newValue = EditorGUILayout.IntPopup(ChooseName(i), (int)value, enumNames, enumValues);
+                                ValuePickerButton(child, member, p => newValue = enumValues[p.enumValueIndex]);
+                            }
+                            else if (member.MemberType == typeof(VRCPhysBoneBase.PermissionFilter))
+                            {
+                                EditorGUILayout.LabelField(ChooseName(i), GUILayout.Width(EditorGUIUtility.labelWidth));
+                                EditorGUIUtility.labelWidth = 85;
+                                var filter = (VRCPhysBoneBase.PermissionFilter)value;
+                                newValue = new VRCPhysBoneBase.PermissionFilter
+                                {
+                                    allowSelf = EditorGUILayout.ToggleLeft($"allowSelf", filter.allowSelf, GUILayout.Width(115)),
+                                    allowOthers = EditorGUILayout.ToggleLeft("allowOthers", filter.allowOthers, GUILayout.Width(130)),
+                                };
+                                EditorGUIUtility.labelWidth = 0;
+                            }
+                            else if (member.MemberType == typeof(Vector3))
+                            {
+                                var widemode = EditorGUIUtility.wideMode;
+                                EditorGUIUtility.wideMode = true;
+                                newValue = EditorGUILayout.Vector3Field(ChooseName(i), (Vector3)value);
+                                ValuePickerButton(child, member, p => newValue = p.vector3Value);
+                                EditorGUIUtility.wideMode = widemode;
+                            }
+                            EditorGUILayout.EndHorizontal();
+
+                            if (value != newValue)
+                            {
+                                WillChange();
+                                values[i] = newValue;
+                                if (BulkSet)
+                                {
+                                    BulkSetChooseValue(member, i, newValue);
+                                }
+                            }
+                        }
+                        EditorGUI.indentLevel--;
+                    }
+                    else
+                    {
+                        RemoveChooseValue(children, child, member);
+                    }
+                }
+            }
+        }
+
+        void BulkSetChooseValue(TypeMember sourceMember, int choiseIndex, Value choiceValue)
+        {
+            foreach (var (child, member) in ChooseValues.Keys.ToArray())
+            {
+                if (member == sourceMember)
+                {
+                    ChooseValues[(child, member)][choiseIndex] = choiceValue;
+                }
+            }
+        }
+
+        void AddChooseValue(IList<string> children, string child, TypeMember member)
+        {
+            if (BulkSet)
+            {
+                foreach (var c in children)
+                {
+                    AddChooseValueSingle(c, member);
+                }
+            }
+            else
+            {
+                AddChooseValueSingle(child, member);
+            }
+        }
+
+        void AddChooseValueSingle(string child, TypeMember member)
+        {
+            var key = (child, member);
+            if (ChooseValues.ContainsKey(key)) return;
+            WillChange();
+            ChooseValues[key] = new IntValueDictionary();
+        }
+
+        void RemoveChooseValue(IList<string> children, string child, TypeMember member)
+        {
+            if (BulkSet)
+            {
+                foreach (var c in children)
+                {
+                    RemoveChooseValueSingle(c, member);
+                }
+            }
+            else
+            {
+                RemoveChooseValueSingle(child, member);
+            }
+        }
+
+        void RemoveChooseValueSingle(string child, TypeMember member)
+        {
+            var key = (child, member);
+            if (!ChooseValues.ContainsKey(key)) return;
+            WillChange();
+            ChooseValues.Remove(key);
         }
 
         void ShowTransformComponentControl(IList<string> children, string child, ChooseVector3Dictionary choices, string title)
