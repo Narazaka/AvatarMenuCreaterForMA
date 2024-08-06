@@ -1,6 +1,9 @@
 {
     "name": "AvatarMenuCreatorForMA.Editor.Util",
-    "references": [],
+    "rootNamespace": "",
+    "references": [
+        "VRC.SDKBase"
+    ],
     "includePlatforms": [],
     "excludePlatforms": [],
     "allowUnsafeCode": false,
