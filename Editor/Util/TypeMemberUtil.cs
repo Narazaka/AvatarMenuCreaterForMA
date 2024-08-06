@@ -21,8 +21,8 @@ namespace net.narazaka.avatarmenucreator.util
         }
         static MemberInfoContainer[] ConstraintCommonMembers(Type type) => new MemberInfoContainer[]
         {
-            new (type.GetProperty(nameof(IConstraint.constraintActive))) { Field = "m_Active" },
-            new (type.GetProperty(nameof(IConstraint.weight))) { Field = "m_Weight" },
+            new MemberInfoContainer(type.GetProperty(nameof(IConstraint.constraintActive))) { Field = "m_Active" },
+            new MemberInfoContainer(type.GetProperty(nameof(IConstraint.weight))) { Field = "m_Weight" },
         };
         static Dictionary<Type, MemberInfoContainer[]> AvailableMembers = new Dictionary<Type, MemberInfoContainer[]>
         {
@@ -30,28 +30,28 @@ namespace net.narazaka.avatarmenucreator.util
                 typeof(VRCPhysBone), new MemberInfoContainer[]
                 {
                     //new (typeof(VRCPhysBone).GetField(nameof(VRCPhysBone.integrationType))),
-                    new (typeof(VRCPhysBone).GetField(nameof(VRCPhysBone.pull))),
-                    new (typeof(VRCPhysBone).GetField(nameof(VRCPhysBone.spring))) { Label ="Spring / Momentum" },
-                    new (typeof(VRCPhysBone).GetField(nameof(VRCPhysBone.stiffness))),
-                    new (typeof(VRCPhysBone).GetField(nameof(VRCPhysBone.gravity))),
-                    new (typeof(VRCPhysBone).GetField(nameof(VRCPhysBone.gravityFalloff))),
+                    new MemberInfoContainer(typeof(VRCPhysBone).GetField(nameof(VRCPhysBone.pull))),
+                    new MemberInfoContainer(typeof(VRCPhysBone).GetField(nameof(VRCPhysBone.spring))) { Label ="Spring / Momentum" },
+                    new MemberInfoContainer(typeof(VRCPhysBone).GetField(nameof(VRCPhysBone.stiffness))),
+                    new MemberInfoContainer(typeof(VRCPhysBone).GetField(nameof(VRCPhysBone.gravity))),
+                    new MemberInfoContainer(typeof(VRCPhysBone).GetField(nameof(VRCPhysBone.gravityFalloff))),
                     //new (typeof(VRCPhysBone).GetField(nameof(VRCPhysBone.immobileType))),
-                    new (typeof(VRCPhysBone).GetField(nameof(VRCPhysBone.immobile))),
+                    new MemberInfoContainer(typeof(VRCPhysBone).GetField(nameof(VRCPhysBone.immobile))),
                     // new (typeof(VRCPhysBone).GetField(nameof(VRCPhysBone.limitType))),
-                    new (typeof(VRCPhysBone).GetField(nameof(VRCPhysBone.maxAngleX))) { Label = "Max Angle / Max Pitch" },
-                    new (typeof(VRCPhysBone).GetField(nameof(VRCPhysBone.maxAngleZ))) { Label = "Max Yaw" },
-                    new (typeof(VRCPhysBone).GetField(nameof(VRCPhysBone.limitRotation))) { Label ="Rotation (Pitch / Roll / Yaw)" },
-                    new (typeof(VRCPhysBone).GetField(nameof(VRCPhysBone.radius))),
+                    new MemberInfoContainer(typeof(VRCPhysBone).GetField(nameof(VRCPhysBone.maxAngleX))) { Label = "Max Angle / Max Pitch" },
+                    new MemberInfoContainer(typeof(VRCPhysBone).GetField(nameof(VRCPhysBone.maxAngleZ))) { Label = "Max Yaw" },
+                    new MemberInfoContainer(typeof(VRCPhysBone).GetField(nameof(VRCPhysBone.limitRotation))) { Label ="Rotation (Pitch / Roll / Yaw)" },
+                    new MemberInfoContainer(typeof(VRCPhysBone).GetField(nameof(VRCPhysBone.radius))),
                     //new (typeof(VRCPhysBone).GetField(nameof(VRCPhysBone.allowCollision))),
-                    new (typeof(VRCPhysBone).GetField(nameof(VRCPhysBone.collisionFilter))),
-                    new (typeof(VRCPhysBone).GetField(nameof(VRCPhysBone.maxStretch))),
-                    new (typeof(VRCPhysBone).GetField(nameof(VRCPhysBone.stretchMotion))),
-                    new (typeof(VRCPhysBone).GetField(nameof(VRCPhysBone.maxSquish))),
+                    new MemberInfoContainer(typeof(VRCPhysBone).GetField(nameof(VRCPhysBone.collisionFilter))),
+                    new MemberInfoContainer(typeof(VRCPhysBone).GetField(nameof(VRCPhysBone.maxStretch))),
+                    new MemberInfoContainer(typeof(VRCPhysBone).GetField(nameof(VRCPhysBone.stretchMotion))),
+                    new MemberInfoContainer(typeof(VRCPhysBone).GetField(nameof(VRCPhysBone.maxSquish))),
                     //new (typeof(VRCPhysBone).GetField(nameof(VRCPhysBone.allowGrabbing))),
-                    new (typeof(VRCPhysBone).GetField(nameof(VRCPhysBone.grabFilter))),
+                    new MemberInfoContainer(typeof(VRCPhysBone).GetField(nameof(VRCPhysBone.grabFilter))),
                     //new (typeof(VRCPhysBone).GetField(nameof(VRCPhysBone.allowPosing))),
-                    new (typeof(VRCPhysBone).GetField(nameof(VRCPhysBone.poseFilter))),
-                    new (typeof(VRCPhysBone).GetField(nameof(VRCPhysBone.snapToHand))),
+                    new MemberInfoContainer(typeof(VRCPhysBone).GetField(nameof(VRCPhysBone.poseFilter))),
+                    new MemberInfoContainer(typeof(VRCPhysBone).GetField(nameof(VRCPhysBone.snapToHand))),
                 }
             },
             { typeof(AimConstraint), ConstraintCommonMembers(typeof(AimConstraint)) },
