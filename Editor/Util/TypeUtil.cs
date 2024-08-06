@@ -64,7 +64,7 @@ namespace net.narazaka.avatarmenucreator.util
             {
                 return hasEnabled;
             }
-            if (!type.IsSubclassOf(typeof(Behaviour)))
+            if (!type.IsSubclassOf(typeof(MonoBehaviour)))
             {
                 var field = type.GetField(nameof(Behaviour.enabled), BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
                 var property = type.GetProperty(nameof(Behaviour.enabled), BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
