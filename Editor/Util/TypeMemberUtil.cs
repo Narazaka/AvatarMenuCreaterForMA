@@ -45,8 +45,10 @@ namespace net.narazaka.avatarmenucreator.util
                     //new (typeof(VRCPhysBone).GetField(nameof(VRCPhysBone.allowCollision))),
                     new MemberInfoContainer(typeof(VRCPhysBone).GetField(nameof(VRCPhysBone.collisionFilter))),
                     new MemberInfoContainer(typeof(VRCPhysBone).GetField(nameof(VRCPhysBone.maxStretch))),
+#if !PHYSBONE_ONLY_1_0
                     new MemberInfoContainer(typeof(VRCPhysBone).GetField(nameof(VRCPhysBone.stretchMotion))),
                     new MemberInfoContainer(typeof(VRCPhysBone).GetField(nameof(VRCPhysBone.maxSquish))),
+#endif
                     //new (typeof(VRCPhysBone).GetField(nameof(VRCPhysBone.allowGrabbing))),
                     new MemberInfoContainer(typeof(VRCPhysBone).GetField(nameof(VRCPhysBone.grabFilter))),
                     //new (typeof(VRCPhysBone).GetField(nameof(VRCPhysBone.allowPosing))),

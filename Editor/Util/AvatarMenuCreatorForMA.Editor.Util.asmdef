@@ -11,6 +11,12 @@
     "precompiledReferences": [],
     "autoReferenced": false,
     "defineConstraints": [],
-    "versionDefines": [],
+    "versionDefines": [
+        {
+            "name": "com.vrchat.base",
+            "expression": "[3,3.2)",
+            "define": "PHYSBONE_ONLY_1_0"
+        }
+    ],
     "noEngineReferences": false
 }
