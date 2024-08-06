@@ -157,7 +157,6 @@ namespace net.narazaka.avatarmenucreator
             serializedObject.Update();
             EditorGUILayout.PropertyField(serializedProperty.FindPropertyRelative(nameof(ChooseParentIcon)), new GUIContent(T.親メニューアイコン));
             EditorGUILayout.PropertyField(serializedProperty.FindPropertyRelative(nameof(ChooseDefaultValue)), new GUIContent(T.パラメーター初期値));
-            ShowSavedMulti(serializedProperty);
             ShowDetailMenuMulti(serializedProperty);
             ShowTransitionSecondsMulti(serializedProperty);
             serializedObject.ApplyModifiedProperties();
@@ -173,7 +172,6 @@ namespace net.narazaka.avatarmenucreator
             EditorStyles.label.fontStyle = FontStyle.Bold;
             ChooseDefaultValue = IntField(T.パラメーター初期値, ChooseDefaultValue);
             EditorStyles.label.fontStyle = labelFontStyle;
-            ShowSaved();
             ShowDetailMenu();
 
             EditorGUILayout.Space();

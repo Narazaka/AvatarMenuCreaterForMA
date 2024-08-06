@@ -208,7 +208,6 @@ namespace net.narazaka.avatarmenucreator
             serializedObject.Update();
             EditorGUILayout.PropertyField(serializedProperty.FindPropertyRelative(nameof(ToggleIcon)), new GUIContent(T.アイコン));
             EditorGUILayout.PropertyField(serializedProperty.FindPropertyRelative(nameof(ToggleDefaultValue)), new GUIContent(T.パラメーター初期値));
-            ShowSavedMulti(serializedProperty);
             ShowDetailMenuMulti(serializedProperty);
             ShowTransitionSecondsMulti(serializedProperty);
             serializedObject.ApplyModifiedProperties();
@@ -221,7 +220,6 @@ namespace net.narazaka.avatarmenucreator
             EditorStyles.label.fontStyle = FontStyle.Bold;
             ToggleDefaultValue = Toggle(T.パラメーター初期値, ToggleDefaultValue);
             EditorStyles.label.fontStyle = labelFontStyle;
-            ShowSaved();
             ShowDetailMenu();
             UseAdvanced = EditorGUILayout.Toggle(T.高度な設定, UseAdvanced);
             if (UseAdvanced)

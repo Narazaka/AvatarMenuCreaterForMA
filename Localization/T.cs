@@ -149,6 +149,9 @@ namespace net.narazaka.avatarmenucreator
         [English("Changes over a specified time.")]
         public static string 指定時間かけて変化します => L;
 
+        [English("Options")]
+        public static string オプション => L;
+
         [English("Saved Parameter")]
         public static string パラメーター保存 => L;
 

@@ -125,7 +125,6 @@ namespace net.narazaka.avatarmenucreator
             serializedObject.FindProperty(nameof(AvatarRadialMenu));
             EditorGUILayout.PropertyField(serializedProperty.FindPropertyRelative(nameof(RadialIcon)), new GUIContent(T.アイコン));
             EditorGUILayout.PropertyField(serializedProperty.FindPropertyRelative(nameof(RadialDefaultValue)), new GUIContent(T.パラメーター初期値));
-            ShowSavedMulti(serializedProperty);
             ShowDetailMenuMulti(serializedProperty);
             serializedObject.ApplyModifiedProperties();
         }
@@ -137,7 +136,6 @@ namespace net.narazaka.avatarmenucreator
             EditorStyles.label.fontStyle = FontStyle.Bold;
             RadialDefaultValue = FloatField(T.パラメーター初期値, RadialDefaultValue);
             EditorStyles.label.fontStyle = labelFontStyle;
-            ShowSaved();
             ShowDetailMenu();
             if (RadialDefaultValue < 0) RadialDefaultValue = 0;
             if (RadialDefaultValue > 1) RadialDefaultValue = 1;

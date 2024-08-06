@@ -48,6 +48,38 @@ namespace net.narazaka.avatarmenucreator
         [NonSerialized]
         public bool ShowMultiSelectInfo;
 
+        bool? _FoldoutDetails;
+        bool FoldoutDetails
+        {
+
+            get
+            {
+                if (_FoldoutDetails == null)
+                {
+                    _FoldoutDetails = !Saved || InternalParameter || !string.IsNullOrEmpty(ParameterName);
+                }
+                return (bool)_FoldoutDetails;
+            }
+            set => _FoldoutDetails = value;
+        }
+
+        bool? _FoldoutDetailsMulti;
+        bool GetFoldoutDetailsMulti(SerializedProperty serializedProperty)
+        {
+            if (_FoldoutDetailsMulti == null)
+            {
+                var saved = serializedProperty.FindPropertyRelative(nameof(Saved));
+                var internalParameter = serializedProperty.FindPropertyRelative(nameof(InternalParameter));
+                _FoldoutDetailsMulti = saved.hasMultipleDifferentValues || internalParameter.hasMultipleDifferentValues || !saved.boolValue || internalParameter.boolValue;
+            }
+            return (bool)_FoldoutDetailsMulti;
+        }
+        bool SetFoldoutDetailsMulti(bool value)
+        {
+            _FoldoutDetailsMulti = value;
+            return value;
+        }
+
         HashSet<string> FoldoutGameObjects = new HashSet<string>();
         Dictionary<string, HashSet<string>> FoldoutGroups = new Dictionary<string, HashSet<string>>();
         Vector2 ScrollPosition;
@@ -120,18 +152,12 @@ namespace net.narazaka.avatarmenucreator
             if (transitionSeconds.floatValue < 0) transitionSeconds.floatValue = 0;
         }
 
-        protected void ShowSaved()
-        {
-            Saved = Toggle(T.パラメーター保存, Saved);
-        }
-
-        protected void ShowSavedMulti(SerializedProperty serializedProperty)
-        {
-            EditorGUILayout.PropertyField(serializedProperty.FindPropertyRelative(nameof(Saved)), new GUIContent(T.パラメーター保存));
-        }
-
         protected void ShowDetailMenu()
         {
+            FoldoutDetails = EditorGUILayout.Foldout(FoldoutDetails, T.オプション);
+            if (!FoldoutDetails) return;
+            EditorGUI.indentLevel++;
+            Saved = Toggle(T.パラメーター保存, Saved);
             ParameterName = TextField(T.パラメーター名_start_オプショナル_end_, ParameterName);
             var internalParameterLabel =
 #if UNITY_2022_1_OR_NEWER && !NET_NARAZAKA_VRCHAT_AvatarMenuCreator_HAS_MA_BEFORE_1_8
@@ -140,10 +166,17 @@ namespace net.narazaka.avatarmenucreator
                 T.パラメーター内部値;
 #endif
             InternalParameter = Toggle(internalParameterLabel, InternalParameter);
+            EditorGUI.indentLevel--;
         }
 
         protected void ShowDetailMenuMulti(SerializedProperty serializedProperty)
         {
+            EditorGUI.indentLevel++;
+            var foldout = SetFoldoutDetailsMulti(EditorGUILayout.Foldout(GetFoldoutDetailsMulti(serializedProperty), T.オプション));
+            EditorGUI.indentLevel--;
+            if (!foldout) return;
+            EditorGUI.indentLevel++;
+            EditorGUILayout.PropertyField(serializedProperty.FindPropertyRelative(nameof(Saved)), new GUIContent(T.パラメーター保存));
             // EditorGUILayout.PropertyField(serializedProperty.FindPropertyRelative(nameof(ParameterName)), new GUIContent(T.パラメーター名_start_オプショナル_end_));
             var internalParameterLabel =
 #if UNITY_2022_1_OR_NEWER && !NET_NARAZAKA_VRCHAT_AvatarMenuCreator_HAS_MA_BEFORE_1_8
@@ -152,6 +185,7 @@ namespace net.narazaka.avatarmenucreator
                 T.パラメーター内部値;
 #endif
             EditorGUILayout.PropertyField(serializedProperty.FindPropertyRelative(nameof(InternalParameter)), new GUIContent(internalParameterLabel));
+            EditorGUI.indentLevel--;
         }
 
         protected void ShowPhysBoneAutoResetMenu(string child, TypeMember[] childMembers)
