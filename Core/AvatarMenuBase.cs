@@ -56,7 +56,7 @@ namespace net.narazaka.avatarmenucreator
             {
                 if (_FoldoutDetails == null)
                 {
-                    _FoldoutDetails = !Saved || InternalParameter || !string.IsNullOrEmpty(ParameterName);
+                    _FoldoutDetails = InternalParameter || !string.IsNullOrEmpty(ParameterName);
                 }
                 return (bool)_FoldoutDetails;
             }
@@ -68,9 +68,8 @@ namespace net.narazaka.avatarmenucreator
         {
             if (_FoldoutDetailsMulti == null)
             {
-                var saved = serializedProperty.FindPropertyRelative(nameof(Saved));
                 var internalParameter = serializedProperty.FindPropertyRelative(nameof(InternalParameter));
-                _FoldoutDetailsMulti = saved.hasMultipleDifferentValues || internalParameter.hasMultipleDifferentValues || !saved.boolValue || internalParameter.boolValue;
+                _FoldoutDetailsMulti = internalParameter.hasMultipleDifferentValues || internalParameter.boolValue;
             }
             return (bool)_FoldoutDetailsMulti;
         }
@@ -154,10 +153,10 @@ namespace net.narazaka.avatarmenucreator
 
         protected void ShowDetailMenu()
         {
+            Saved = Toggle(T.パラメーター保存, Saved);
             FoldoutDetails = EditorGUILayout.Foldout(FoldoutDetails, T.オプション);
             if (!FoldoutDetails) return;
             EditorGUI.indentLevel++;
-            Saved = Toggle(T.パラメーター保存, Saved);
             ParameterName = TextField(T.パラメーター名_start_オプショナル_end_, ParameterName);
             var internalParameterLabel =
 #if UNITY_2022_1_OR_NEWER && !NET_NARAZAKA_VRCHAT_AvatarMenuCreator_HAS_MA_BEFORE_1_8
@@ -171,12 +170,12 @@ namespace net.narazaka.avatarmenucreator
 
         protected void ShowDetailMenuMulti(SerializedProperty serializedProperty)
         {
+            EditorGUILayout.PropertyField(serializedProperty.FindPropertyRelative(nameof(Saved)), new GUIContent(T.パラメーター保存));
             EditorGUI.indentLevel++;
             var foldout = SetFoldoutDetailsMulti(EditorGUILayout.Foldout(GetFoldoutDetailsMulti(serializedProperty), T.オプション));
             EditorGUI.indentLevel--;
             if (!foldout) return;
             EditorGUI.indentLevel++;
-            EditorGUILayout.PropertyField(serializedProperty.FindPropertyRelative(nameof(Saved)), new GUIContent(T.パラメーター保存));
             // EditorGUILayout.PropertyField(serializedProperty.FindPropertyRelative(nameof(ParameterName)), new GUIContent(T.パラメーター名_start_オプショナル_end_));
             var internalParameterLabel =
 #if UNITY_2022_1_OR_NEWER && !NET_NARAZAKA_VRCHAT_AvatarMenuCreator_HAS_MA_BEFORE_1_8
