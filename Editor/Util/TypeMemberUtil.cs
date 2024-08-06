@@ -22,7 +22,7 @@ namespace net.narazaka.avatarmenucreator.util
         }
         static MemberInfoContainer[] ConstraintCommonMembers(Type type) => new MemberInfoContainer[]
         {
-            new MemberInfoContainer(type.GetProperty(nameof(IConstraint.constraintActive))) { Field = "m_Active" },
+            new MemberInfoContainer(type.GetProperty(nameof(IConstraint.constraintActive))) { Field = "m_Active", Label = "Is Active" },
             new MemberInfoContainer(type.GetProperty(nameof(IConstraint.weight))) { Field = "m_Weight" },
         };
         static Dictionary<Type, MemberInfoContainer[]> AvailableMembers = new Dictionary<Type, MemberInfoContainer[]>
