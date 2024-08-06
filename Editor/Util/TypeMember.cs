@@ -30,7 +30,7 @@ namespace net.narazaka.avatarmenucreator.util
         [SerializeField] public string TypeName;
         /// <summary>member Name</summary>
         [SerializeField] public string MemberName;
-        public string AnimationMemberName => MemberName == "enabled" ? "m_Enabled" : MemberName;
+        public string AnimationMemberName => TypeMemberUtil.GetMemberField(Member);
         /// <summary>type of the member (bool|int|float|Vector3 etc.)</summary>
         public Type MemberType
         {
@@ -40,7 +40,23 @@ namespace net.narazaka.avatarmenucreator.util
         /// <summary>INameAndDescription.Name</summary>
         public string Name { get => $"{TypeName}\t{MemberName}"; }
         /// <summary>INameAndDescription.Description</summary>
-        public string Description { get => $"{Type.Name}.{MemberName}"; }
+        public string Description
+        {
+            get
+            {
+                if (DescriptionCache != null) return DescriptionCache;
+                if (MemberName == "enabled")
+                {
+                    return DescriptionCache = $"{Type.Name}.enabled";
+                }
+                var label = TypeMemberUtil.GetMemberLabel(Member);
+#if UNITY_EDITOR
+                label = UnityEditor.ObjectNames.NicifyVariableName(label);
+#endif
+                return DescriptionCache = $"{Type.Name}.{label}";
+            }
+        }
+        string DescriptionCache = null;
         public TypeMember() { } // for serialization
 
         public TypeMember(string typeName, string memberName) : this(TypeMemberUtil.GetMember(TypeUtil.GetType(typeName), memberName)) { }
