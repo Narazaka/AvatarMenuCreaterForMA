@@ -67,7 +67,7 @@ namespace net.narazaka.avatarmenucreator.util
 
         static Dictionary<Type, TypeMember[]> AvailableMembersCache = new Dictionary<Type, TypeMember[]>();
 
-        public static IEnumerable<TypeMember> GetAvailableMembers(this Type type)
+        public static TypeMember[] GetAvailableMembers(this Type type)
         {
             if (AvailableMembersCache.TryGetValue(type, out var availableMembers))
             {
@@ -99,9 +99,34 @@ namespace net.narazaka.avatarmenucreator.util
             return AvailableMembersCache[type] = new TypeMember[0];
         }
 
-        public static bool IsSuitableForTransition(this Type type) => type == typeof(float) || type == typeof(Vector3);
+        public static List<TypeMember> GetAvailableMembers(this IEnumerable<Type> types)
+        {
+            var list = new List<TypeMember>();
+            foreach (var type in types)
+            {
+                list.AddRange(type.GetAvailableMembers());
+            }
+            return list;
+        }
 
-        public static IEnumerable<TypeMember> OnlySuitableForTransition(this IEnumerable<TypeMember> typeMembers) => typeMembers.Where(tm => tm.MemberType.IsSuitableForTransition());
+        public static List<TypeMember> GetAvailableMembersOnlySuitableForTransition(this IEnumerable<Type> types)
+        {
+            var list = new List<TypeMember>();
+            foreach (var type in types)
+            {
+                var members = type.GetAvailableMembers();
+                for (var i = 0; i < members.Length; ++i)
+                {
+                    if (members[i].MemberType.IsSuitableForTransition())
+                    {
+                        list.Add(members[i]);
+                    }
+                }
+            }
+            return list;
+        }
+
+        public static bool IsSuitableForTransition(this Type type) => type == typeof(float) || type == typeof(Vector3);
 
         static Dictionary<(Type, string), MemberInfo> MemberInfoCache = new Dictionary<(Type, string), MemberInfo>();
 
