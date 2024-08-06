@@ -23,6 +23,9 @@ namespace net.narazaka.avatarmenucreator
         [English("Select the target object")]
         public static string 対象のオブジェクトを選択して下さい => L;
 
+        [English("Hint: Multiple objects can be selected and set together.")]
+        public static string ヒント_colon__複数のオブジェクトを選択して一緒に設定出来ます => L;
+
         [English("Save format")]
         public static string 保存形式 => L;
 

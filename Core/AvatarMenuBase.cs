@@ -45,6 +45,8 @@ namespace net.narazaka.avatarmenucreator
 
         [NonSerialized]
         public UnityEngine.Object UndoObject;
+        [NonSerialized]
+        public bool ShowMultiSelectInfo;
 
         HashSet<string> FoldoutGameObjects = new HashSet<string>();
         Dictionary<string, HashSet<string>> FoldoutGroups = new Dictionary<string, HashSet<string>>();
@@ -70,6 +72,10 @@ namespace net.narazaka.avatarmenucreator
             {
                 ScrollPosition = scrollView.scrollPosition;
                 OnMainGUI(children);
+                if (ShowMultiSelectInfo && children.Count == 1)
+                {
+                    EditorGUILayout.HelpBox(T.ヒント_colon__複数のオブジェクトを選択して一緒に設定出来ます, MessageType.Info);
+                }
             }
         }
 

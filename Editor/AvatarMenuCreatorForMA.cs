@@ -50,6 +50,9 @@ namespace net.narazaka.avatarmenucreator.editor
             AvatarToggleMenu.UndoObject = this;
             AvatarChooseMenu.UndoObject = this;
             AvatarRadialMenu.UndoObject = this;
+            AvatarToggleMenu.ShowMultiSelectInfo = true;
+            AvatarChooseMenu.ShowMultiSelectInfo = true;
+            AvatarRadialMenu.ShowMultiSelectInfo = true;
         }
 
         void Update()
@@ -100,7 +103,7 @@ namespace net.narazaka.avatarmenucreator.editor
             if (VRCAvatarDescriptor == null)
             {
                 VRCAvatarDescriptor = null;
-                EditorGUILayout.LabelField(T.対象のアバターを選択して下さい);
+                EditorGUILayout.HelpBox(T.対象のアバターを選択して下さい, MessageType.Warning);
                 return;
             }
 
@@ -108,7 +111,7 @@ namespace net.narazaka.avatarmenucreator.editor
 
             if (children.Length == 0 || (children.Length == 1 && selectedGameObjects[0] == VRCAvatarDescriptor.gameObject))
             {
-                EditorGUILayout.LabelField(T.対象のオブジェクトを選択して下さい);
+                EditorGUILayout.HelpBox(T.対象のオブジェクトを選択して下さい, MessageType.Warning);
                 return;
             }
 
