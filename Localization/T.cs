@@ -155,8 +155,8 @@ namespace net.narazaka.avatarmenucreator
         [English("Saved Parameter")]
         public static string パラメーター保存 => L;
 
-        [English("Parameter name (optional)")]
-        public static string パラメーター名_start_オプショナル_end_ => L;
+        [English("Parameter name")]
+        public static string パラメーター名 => L;
 
         [English("Parameter Auto Rename")]
         public static string パラメーター自動リネーム => L;

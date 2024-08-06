@@ -157,7 +157,7 @@ namespace net.narazaka.avatarmenucreator
             FoldoutDetails = EditorGUILayout.Foldout(FoldoutDetails, T.オプション);
             if (!FoldoutDetails) return;
             EditorGUI.indentLevel++;
-            ParameterName = TextField(T.パラメーター名_start_オプショナル_end_, ParameterName);
+            ParameterName = TextField(T.パラメーター名, ParameterName);
             var internalParameterLabel =
 #if UNITY_2022_1_OR_NEWER && !NET_NARAZAKA_VRCHAT_AvatarMenuCreator_HAS_MA_BEFORE_1_8
                 T.パラメーター自動リネーム;
