@@ -115,11 +115,11 @@ namespace net.narazaka.avatarmenucreator.util
             foreach (var type in types)
             {
                 var members = type.GetAvailableMembers();
-                for (var i = 0; i < members.Length; ++i)
+                foreach (var member in members)
                 {
-                    if (members[i].MemberType.IsSuitableForTransition())
+                    if (member.MemberType.IsSuitableForTransition())
                     {
-                        list.Add(members[i]);
+                        list.Add(member);
                     }
                 }
             }
