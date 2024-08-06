@@ -419,7 +419,7 @@ namespace net.narazaka.avatarmenucreator
             var go = GetGameObject(child);
             if (go == null || !PickerButton()) return;
             var component = go.GetComponent<Transform>();
-            var memberInfo = TypeMemberUtil.GetMember(typeof(Transform), TransformPropertyName(transformComponentName));
+            var memberInfo = typeof(Transform).GetProperty(TransformPropertyName(transformComponentName), System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance);
             if (memberInfo is System.Reflection.PropertyInfo propertyInfo)
             {
                 value = (Vector3)propertyInfo.GetValue(component);
