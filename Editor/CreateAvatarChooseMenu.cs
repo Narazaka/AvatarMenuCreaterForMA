@@ -7,8 +7,8 @@ using UnityEditor;
 using UnityEditor.Animations;
 using UnityEngine;
 using VRC.Dynamics;
-using VRC.SDK3.Avatars.Components;
 using VRC.SDK3.Avatars.ScriptableObjects;
+using VRC.SDK3.Dynamics.PhysBone.Components;
 
 namespace net.narazaka.avatarmenucreator.editor
 {
@@ -162,6 +162,105 @@ namespace net.narazaka.avatarmenucreator.editor
                         threshold = i,
                     },
                 };
+            }
+            var physBoneAutoResetEffectiveObjects = AvatarMenu.GetPhysBoneAutoResetEffectiveObjects(matchGameObjects, AvatarMenu.ChooseValues.Keys).ToArray();
+            if (physBoneAutoResetEffectiveObjects.Length > 0)
+            {
+                controller.AddLayer(new AnimatorControllerLayer
+                {
+                    name = baseName + "_PB_auto_reset",
+                    defaultWeight = 1,
+                    stateMachine = new AnimatorStateMachine
+                    {
+                        name = baseName + "_PB_auto_reset",
+                        hideFlags = HideFlags.HideInHierarchy,
+                    },
+                });
+                var pbLayer = controller.layers[1];
+
+                pbLayer.stateMachine.name = baseName;
+                pbLayer.stateMachine.entryPosition = new Vector3(-600, 0);
+                pbLayer.stateMachine.anyStatePosition = new Vector3(-900, 0);
+                pbLayer.stateMachine.exitPosition = new Vector3(1700, 0);
+
+                var emptyClip = util.Util.GenerateEmptyAnimationClip(baseName);
+                var waitClip = util.Util.GenerateEmptyAnimationClip(baseName + "_wait", AvatarMenu.TransitionSeconds == 0 ? 1 / 60f : AvatarMenu.TransitionSeconds);
+                var pbDisableClip = new AnimationClip { name = $"{baseName}_PB_disable" };
+                var pbEnableClip = new AnimationClip { name = $"{baseName}_PB_enable" };
+                var disableCurve = new AnimationCurve(new Keyframe(0, 0), new Keyframe(1 / 60f, 0));
+                var enableCurve = new AnimationCurve(new Keyframe(0, 1), new Keyframe(1 / 60f, 1));
+                foreach (var child in physBoneAutoResetEffectiveObjects)
+                {
+                    var curvePath = child;
+                    pbDisableClip.SetCurve(curvePath, typeof(VRCPhysBone), "m_Enabled", disableCurve);
+                    pbEnableClip.SetCurve(curvePath, typeof(VRCPhysBone), "m_Enabled", enableCurve);
+                }
+                var initialState = pbLayer.stateMachine.AddState($"{baseName}_idle", new Vector3(-300, 0));
+                initialState.motion = emptyClip;
+                initialState.writeDefaultValues = false;
+                pbLayer.stateMachine.defaultState = initialState;
+                var waitState = pbLayer.stateMachine.AddState($"{baseName}_wait", new Vector3(800, 0));
+                waitState.motion = waitClip;
+                waitState.writeDefaultValues = false;
+                var disableState = pbLayer.stateMachine.AddState($"{baseName}_disable", new Vector3(1100, 0));
+                disableState.motion = pbDisableClip;
+                disableState.writeDefaultValues = false;
+                var enableState = pbLayer.stateMachine.AddState($"{baseName}_enable", new Vector3(1400, 0));
+                enableState.motion = pbEnableClip;
+                enableState.writeDefaultValues = false;
+                var eachStates = Enumerable.Range(0, AvatarMenu.ChooseCount).Select((i) =>
+                {
+                    var state = pbLayer.stateMachine.AddState($"{baseName}_{i}", new Vector3(300, 50 * i));
+                    state.motion = emptyClip;
+                    state.writeDefaultValues = false;
+                    return state;
+                }).ToList();
+                var toDisable = waitState.AddTransition(disableState);
+                toDisable.exitTime = 1;
+                toDisable.duration = 0;
+                toDisable.hasExitTime = true;
+                var toEnable = disableState.AddTransition(enableState);
+                toEnable.exitTime = 1;
+                toEnable.duration = 0;
+                toEnable.hasExitTime = true;
+                var toExit = enableState.AddExitTransition();
+                toExit.exitTime = 1;
+                toExit.duration = 0;
+                toExit.hasExitTime = true;
+                for (var i = 0; i < AvatarMenu.ChooseCount; ++i)
+                {
+                    var eachState = eachStates[i];
+                    var initialToEach = initialState.AddTransition(eachState);
+                    initialToEach.exitTime = 0;
+                    initialToEach.duration = 0;
+                    initialToEach.hasExitTime = false;
+                    initialToEach.conditions = new AnimatorCondition[]
+                    {
+                        new AnimatorCondition
+                        {
+                            mode = AnimatorConditionMode.Equals,
+                            parameter = parameterName,
+                            threshold = i,
+                        },
+                    };
+                    var eachToWait = eachState.AddTransition(waitState);
+                    eachToWait.exitTime = 0;
+                    eachToWait.duration = 0;
+                    eachToWait.hasExitTime = false;
+                    eachToWait.conditions = new AnimatorCondition[]
+                    {
+                        new AnimatorCondition
+                        {
+                            mode = AnimatorConditionMode.NotEqual,
+                            parameter = parameterName,
+                            threshold = i,
+                        },
+                    };
+                }
+                choices.Add(emptyClip);
+                choices.Add(waitClip);
+                choices.Add(pbDisableClip);
+                choices.Add(pbEnableClip);
             }
             // menu
             var menu = new VRCExpressionsMenu

@@ -1,10 +1,11 @@
 using nadena.dev.modular_avatar.core;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEditor;
 using UnityEditor.Animations;
 using UnityEngine;
-using VRC.SDK3.Avatars.Components;
 using VRC.SDK3.Avatars.ScriptableObjects;
+using VRC.SDK3.Dynamics.PhysBone.Components;
 
 namespace net.narazaka.avatarmenucreator.editor
 {
@@ -82,8 +83,7 @@ namespace net.narazaka.avatarmenucreator.editor
             AnimationClip emptyClip = null;
             if (AvatarMenu.RadialInactiveRange && !(float.IsNaN(AvatarMenu.RadialInactiveRangeMin) && float.IsNaN(AvatarMenu.RadialInactiveRangeMax)))
             {
-                emptyClip = new AnimationClip();
-                emptyClip.name = $"{baseName}_empty";
+                emptyClip = util.Util.GenerateEmptyAnimationClip(baseName);
                 var inactiveState = layer.stateMachine.AddState($"{baseName}_inactive", new Vector3(300, 100));
                 inactiveState.motion = emptyClip;
                 inactiveState.writeDefaultValues = false;
@@ -146,6 +146,90 @@ namespace net.narazaka.avatarmenucreator.editor
                     };
                 }
             }
+            var physBoneAutoResetEffectiveObjects = AvatarMenu.GetPhysBoneAutoResetEffectiveObjects(matchGameObjects, AvatarMenu.RadialValues.Keys).ToArray();
+            var changingParameterName = parameterName + "_changing";
+            AnimationClip pbDisableClip = null;
+            AnimationClip pbEnableClip = null;
+            if (physBoneAutoResetEffectiveObjects.Length > 0)
+            {
+                controller.AddParameter(new AnimatorControllerParameter { name = changingParameterName, type = AnimatorControllerParameterType.Bool, defaultBool = false });
+                controller.AddLayer(new AnimatorControllerLayer
+                {
+                    name = baseName + "_PB_auto_reset",
+                    defaultWeight = 1,
+                    stateMachine = new AnimatorStateMachine
+                    {
+                        name = baseName + "_PB_auto_reset",
+                        hideFlags = HideFlags.HideInHierarchy,
+                    },
+                });
+                var pbLayer = controller.layers[1];
+
+                pbLayer.stateMachine.name = baseName;
+                pbLayer.stateMachine.entryPosition = new Vector3(-600, 0);
+                pbLayer.stateMachine.anyStatePosition = new Vector3(1500, 0);
+
+                if (emptyClip == null) emptyClip = util.Util.GenerateEmptyAnimationClip(baseName);
+                pbDisableClip = new AnimationClip { name = $"{baseName}_PB_disable" };
+                pbEnableClip = new AnimationClip { name = $"{baseName}_PB_enable" };
+                var disableCurve = new AnimationCurve(new Keyframe(0, 0), new Keyframe(1 / 60f, 0));
+                var enableCurve = new AnimationCurve(new Keyframe(0, 1), new Keyframe(1 / 60f, 1));
+                foreach (var child in physBoneAutoResetEffectiveObjects)
+                {
+                    var curvePath = child;
+                    pbDisableClip.SetCurve(curvePath, typeof(VRCPhysBone), "m_Enabled", disableCurve);
+                    pbEnableClip.SetCurve(curvePath, typeof(VRCPhysBone), "m_Enabled", enableCurve);
+                }
+
+                var initialState = pbLayer.stateMachine.AddState($"{baseName}_idle", new Vector3(-300, 0));
+                initialState.motion = emptyClip;
+                initialState.writeDefaultValues = false;
+                pbLayer.stateMachine.defaultState = initialState;
+                var changingState = pbLayer.stateMachine.AddState($"{baseName}_changing", new Vector3(300, 0));
+                changingState.motion = emptyClip;
+                changingState.writeDefaultValues = false;
+                var disableState = pbLayer.stateMachine.AddState($"{baseName}_disable", new Vector3(300, 300));
+                disableState.motion = pbDisableClip;
+                disableState.writeDefaultValues = false;
+                var enableState = pbLayer.stateMachine.AddState($"{baseName}_enable", new Vector3(-300, 300));
+                enableState.motion = pbEnableClip;
+                enableState.writeDefaultValues = false;
+
+                var toChanging = initialState.AddTransition(changingState);
+                toChanging.exitTime = 0;
+                toChanging.duration = 0;
+                toChanging.hasExitTime = false;
+                toChanging.conditions = new AnimatorCondition[]
+                {
+                    new AnimatorCondition
+                    {
+                        mode = AnimatorConditionMode.If,
+                        parameter = changingParameterName,
+                        threshold = 1,
+                    },
+                };
+                var toDisable = changingState.AddTransition(disableState);
+                toDisable.exitTime = 0;
+                toDisable.duration = 0;
+                toDisable.hasExitTime = false;
+                toDisable.conditions = new AnimatorCondition[]
+                {
+                    new AnimatorCondition
+                    {
+                        mode = AnimatorConditionMode.IfNot,
+                        parameter = changingParameterName,
+                        threshold = 1,
+                    },
+                };
+                var toEnable = disableState.AddTransition(enableState);
+                toEnable.exitTime = 1;
+                toEnable.duration = 0;
+                toEnable.hasExitTime = true;
+                var toIdle = enableState.AddTransition(initialState);
+                toIdle.exitTime = 1;
+                toIdle.duration = 0;
+                toIdle.hasExitTime = true;
+            }
             // menu
             var menu = new VRCExpressionsMenu
             {
@@ -166,19 +250,37 @@ namespace net.narazaka.avatarmenucreator.editor
                     },
                 },
             };
-            menu.name = baseName;
-            // prefab
-            return new CreatedAssets(baseName, controller, emptyClip == null ? new AnimationClip[] { clip } : new AnimationClip[] { clip, emptyClip }, menu, null, new ParameterConfig[]
+            if (physBoneAutoResetEffectiveObjects.Length > 0)
             {
-                new ParameterConfig
+                menu.controls[0].parameter = new VRCExpressionsMenu.Control.Parameter
                 {
-                    nameOrPrefix = parameterName,
-                    defaultValue = AvatarMenu.RadialDefaultValue,
-                    syncType = ParameterSyncType.Float,
-                    saved = AvatarMenu.Saved,
-                    internalParameter = AvatarMenu.InternalParameter,
-                },
-            });
+                    name = changingParameterName,
+                };
+            }
+            menu.name = baseName;
+            var parameterConfig = new ParameterConfig
+            {
+                nameOrPrefix = parameterName,
+                defaultValue = AvatarMenu.RadialDefaultValue,
+                syncType = ParameterSyncType.Float,
+                saved = AvatarMenu.Saved,
+                internalParameter = AvatarMenu.InternalParameter,
+            };
+            var subParameterConfig = new ParameterConfig
+            {
+                nameOrPrefix = changingParameterName,
+                defaultValue = 0,
+                syncType = ParameterSyncType.Bool,
+                saved = false,
+                internalParameter = AvatarMenu.InternalParameter,
+            };
+            var parameterConfigs =(physBoneAutoResetEffectiveObjects.Length > 0 ? new ParameterConfig[] { parameterConfig, subParameterConfig } : new ParameterConfig[] { parameterConfig });
+            var clips = new List<AnimationClip> { clip };
+            if (emptyClip != null) clips.Add(emptyClip);
+            if (pbDisableClip != null) clips.Add(pbDisableClip);
+            if (pbEnableClip != null) clips.Add(pbEnableClip);
+            // prefab
+            return new CreatedAssets(baseName, controller, clips.ToArray(), menu, null, parameterConfigs);
         }
 
         AnimationCurve FullAnimationCurve(Keyframe start, Keyframe end)

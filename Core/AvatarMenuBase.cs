@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Collections.Generic;
 using UnityEngine;
 using net.narazaka.avatarmenucreator.collections.instance;
@@ -27,7 +28,11 @@ namespace net.narazaka.avatarmenucreator
         [SerializeField]
         public bool InternalParameter = false;
         [SerializeField]
-        public StringHashSet PhysBoneAutoResetDisabled = new StringHashSet();
+        public StringHashSet PhysBoneAutoResetDisabledObjects = new StringHashSet();
+
+        protected bool PhysBoneAutoResetEnabled(string child) => !PhysBoneAutoResetDisabledObjects.Contains(child);
+        protected void EnablePhysBoneAutoReset(string child) => PhysBoneAutoResetDisabledObjects.Remove(child);
+        protected void DisablePhysBoneAutoReset(string child) => PhysBoneAutoResetDisabledObjects.Add(child);
 
 #if UNITY_EDITOR
         [NonSerialized]
@@ -193,7 +198,7 @@ namespace net.narazaka.avatarmenucreator
             if (needResetPhysBoneField)
             {
                 var hasPhysBoneField = VRCPhysBoneUtil.HasPhysBoneEnabled(childMembers);
-                var physBoneAutoResetEnabled = !PhysBoneAutoResetDisabled.Contains(child);
+                var physBoneAutoResetEnabled = PhysBoneAutoResetEnabled(child);
                 if (hasPhysBoneField)
                 {
                     EditorGUILayout.HelpBox(T.PhysBone自動リセットを有効にするには_PhysBone_dot_enabled_設定を削除して下さいゝ, MessageType.Info);
@@ -207,11 +212,11 @@ namespace net.narazaka.avatarmenucreator
                         WillChange();
                         if (physBoneAutoResetEnabled)
                         {
-                            PhysBoneAutoResetDisabled.Remove(child);
+                            EnablePhysBoneAutoReset(child);
                         }
                         else
                         {
-                            PhysBoneAutoResetDisabled.Add(child);
+                            DisablePhysBoneAutoReset(child);
                         }
                     }
                 }
@@ -221,6 +226,13 @@ namespace net.narazaka.avatarmenucreator
                 }
             }
         }
+
+        public IEnumerable<string> GetPhysBoneAutoResetEffectiveObjects(IEnumerable<string> children, IEnumerable<(string, TypeMember)> valueKeys) =>
+            valueKeys.Where(k => children.Contains(k.Item1)).GroupBy(k => k.Item1).Where(g =>
+            {
+                var tms = g.Select(k => k.Item2).ToArray();
+                return PhysBoneAutoResetEnabled(g.Key) && !VRCPhysBoneUtil.HasPhysBoneEnabled(tms) && VRCPhysBoneUtil.IsNeedResetPhysBoneField(tms);
+            }).Select(g => g.Key);
 
         protected GameObject GetGameObject(string child)
         {

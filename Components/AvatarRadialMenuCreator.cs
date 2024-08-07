@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using VRC.SDK3.Avatars.ScriptableObjects;
 
@@ -15,17 +16,34 @@ namespace net.narazaka.avatarmenucreator.components
 
         public override IEnumerable<VRCExpressionParameters.Parameter> GetEffectiveParameterNameAndTypes()
         {
-            return new VRCExpressionParameters.Parameter[]
+            var parameterConfig = new VRCExpressionParameters.Parameter
             {
-                new VRCExpressionParameters.Parameter
-                {
-                    name = ParameterName,
-                    valueType = VRCExpressionParameters.ValueType.Float,
-                    defaultValue = AvatarRadialMenu.RadialDefaultValue,
-                    saved = AvatarMenu.Saved,
-                    networkSynced = true,
-                },
+                name = ParameterName,
+                valueType = VRCExpressionParameters.ValueType.Float,
+                defaultValue = AvatarRadialMenu.RadialDefaultValue,
+                saved = AvatarMenu.Saved,
+                networkSynced = true,
             };
+            var subParameterConfig = new VRCExpressionParameters.Parameter
+            {
+                name = ParameterName + "_changing",
+                valueType = VRCExpressionParameters.ValueType.Bool,
+                defaultValue = 0,
+                saved = false,
+                networkSynced = true,
+            };
+            if (AvatarRadialMenu.GetPhysBoneAutoResetEffectiveObjects(AvatarRadialMenu.GetStoredChildren(), AvatarRadialMenu.RadialValues.Keys).Any())
+            {
+                return new VRCExpressionParameters.Parameter[]
+                {
+                    parameterConfig,
+                    subParameterConfig,
+                };
+            }
+            else
+            {
+                return new VRCExpressionParameters.Parameter[] { parameterConfig };
+            }
         }
     }
 }

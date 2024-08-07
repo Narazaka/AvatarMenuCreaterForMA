@@ -1,9 +1,12 @@
 {
     "name": "AvatarMenuCreatorForMA.Components",
+    "rootNamespace": "",
     "references": [
         "AvatarMenuCreatorForMA.Core",
         "nadena.dev.modular-avatar.core",
         "AvatarParametersDriver.Runtime",
+        "AvatarMenuCreatorForMA.Collections",
+        "AvatarMenuCreatorForMA.Editor.Util",
         "Narazaka.VRChat.AvatarParametersUtil"
     ],
     "includePlatforms": [],

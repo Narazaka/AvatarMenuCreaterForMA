@@ -260,5 +260,12 @@ namespace net.narazaka.avatarmenucreator.util
                     throw new System.ArgumentOutOfRangeException(nameof(valueType));
             }
         }
+
+        public static AnimationClip GenerateEmptyAnimationClip(string baseName, float duration = 1 / 60f)
+        {
+            var clip = new AnimationClip { name = $"{baseName}_empty" };
+            clip.SetCurve("__AvatarMenuCreatorForMA_Empty_Animation__", typeof(Transform), "localPosition.x", AnimationCurve.Constant(0, duration, 0));
+            return clip;
+        }
     }
 }
