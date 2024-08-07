@@ -103,7 +103,7 @@ namespace net.narazaka.avatarmenucreator.editor
             if (VRCAvatarDescriptor == null)
             {
                 VRCAvatarDescriptor = null;
-                EditorGUILayout.HelpBox(T.対象のアバターを選択して下さい, MessageType.Warning);
+                EditorGUILayout.HelpBox(T.対象のアバターを選択して下さい, MessageType.Info);
                 return;
             }
 
@@ -111,7 +111,7 @@ namespace net.narazaka.avatarmenucreator.editor
 
             if (children.Length == 0 || (children.Length == 1 && selectedGameObjects[0] == VRCAvatarDescriptor.gameObject))
             {
-                EditorGUILayout.HelpBox(T.対象のオブジェクトを選択して下さい, MessageType.Warning);
+                EditorGUILayout.HelpBox(T.対象のオブジェクトを選択して下さい, MessageType.Info);
                 return;
             }
 
