@@ -18,7 +18,6 @@ namespace net.narazaka.avatarmenucreator.components
         public abstract AvatarMenuBase AvatarMenu { get; }
 #if UNITY_EDITOR
         public abstract UnityEditor.SerializedProperty AvatarMenuProperty(UnityEditor.SerializedObject serializedObject);
-#endif
 
         public bool IsEffective => GetComponent<ModularAvatarMergeAnimator>() == null && GetComponent<ModularAvatarParameters>() == null;
 
@@ -37,5 +36,6 @@ namespace net.narazaka.avatarmenucreator.components
         public abstract IEnumerable<VRCExpressionParameters.Parameter> GetEffectiveParameterNameAndTypes();
 
         public string ParameterName => string.IsNullOrEmpty(AvatarMenu.ParameterName) ? name : AvatarMenu.ParameterName;
+#endif
     }
 }

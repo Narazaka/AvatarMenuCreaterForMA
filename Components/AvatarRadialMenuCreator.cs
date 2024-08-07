@@ -12,7 +12,6 @@ namespace net.narazaka.avatarmenucreator.components
         public override AvatarMenuBase AvatarMenu => AvatarRadialMenu;
 #if UNITY_EDITOR
         public override UnityEditor.SerializedProperty AvatarMenuProperty(UnityEditor.SerializedObject serializedObject) => serializedObject.FindProperty(nameof(AvatarRadialMenu));
-#endif
 
         public override IEnumerable<VRCExpressionParameters.Parameter> GetEffectiveParameterNameAndTypes()
         {
@@ -45,5 +44,6 @@ namespace net.narazaka.avatarmenucreator.components
                 return new VRCExpressionParameters.Parameter[] { parameterConfig };
             }
         }
+#endif
     }
 }

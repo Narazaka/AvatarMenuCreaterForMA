@@ -11,7 +11,6 @@ namespace net.narazaka.avatarmenucreator.components
         public override AvatarMenuBase AvatarMenu => AvatarToggleMenu;
 #if UNITY_EDITOR
         public override UnityEditor.SerializedProperty AvatarMenuProperty(UnityEditor.SerializedObject serializedObject) => serializedObject.FindProperty(nameof(AvatarToggleMenu));
-#endif
 
         public override IEnumerable<VRCExpressionParameters.Parameter> GetEffectiveParameterNameAndTypes()
         {
@@ -27,5 +26,6 @@ namespace net.narazaka.avatarmenucreator.components
                 },
             };
         }
+#endif
     }
 }
