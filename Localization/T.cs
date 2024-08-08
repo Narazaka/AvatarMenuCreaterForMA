@@ -23,6 +23,9 @@ namespace net.narazaka.avatarmenucreator
         [English("Select the target object")]
         public static string 対象のオブジェクトを選択して下さい => L;
 
+        [English("Hint: Multiple objects can be selected and set together.")]
+        public static string ヒント_colon__複数のオブジェクトを選択して一緒に設定出来ます => L;
+
         [English("Save format")]
         public static string 保存形式 => L;
 
@@ -146,11 +149,17 @@ namespace net.narazaka.avatarmenucreator
         [English("Changes over a specified time.")]
         public static string 指定時間かけて変化します => L;
 
+        [English("Options")]
+        public static string オプション => L;
+
         [English("Saved Parameter")]
         public static string パラメーター保存 => L;
 
-        [English("Parameter name (optional)")]
-        public static string パラメーター名_start_オプショナル_end_ => L;
+        [English("Synced Parameter")]
+        public static string パラメーター同期 => L;
+
+        [English("Parameter name")]
+        public static string パラメーター名 => L;
 
         [English("Parameter Auto Rename")]
         public static string パラメーター自動リネーム => L;
@@ -181,6 +190,9 @@ namespace net.narazaka.avatarmenucreator
 
         [English("ON=hide")]
         public static string ON_eq_非表示 => L;
+
+        [English("ON=")]
+        public static string ON_eq_ => L;
 
         [English("ctrl both")]
         public static string 両方制御 => L;
@@ -271,5 +283,14 @@ namespace net.narazaka.avatarmenucreator
 
         [English("There is nothing to control.")]
         public static string BlendShape_sl_Shader_Parameterなし => L;
+
+        [English("PhysBone auto-reset")]
+        public static string PhysBone自動リセット => L;
+
+        [English("Values are set that are not reflected unless PhysBone is reset; if PhysBone auto-reset is enabled, the reset (OFF/ON) process is inserted.")]
+        public static string PhysBoneをリセットしないと反映されない値が設定されていますゝPhysBone自動リセットを有効にするとリセット_start_OFF_sl_ON_end_処理を挿入しますゝ => L;
+
+        [English("To enable PhysBone auto-reset, delete the PhysBone.enabled setting.")]
+        public static string PhysBone自動リセットを有効にするには_PhysBone_dot_enabled_設定を削除して下さいゝ => L;
     }
 }

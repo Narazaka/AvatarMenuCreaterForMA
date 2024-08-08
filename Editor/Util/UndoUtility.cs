@@ -1,7 +1,8 @@
+#if UNITY_EDITOR
 using UnityEditor;
 using UnityObject = UnityEngine.Object;
 
-namespace net.narazaka.avatarmenucreator.editor.util
+namespace net.narazaka.avatarmenucreator.util
 {
     public static class UndoUtility
     {
@@ -29,3 +30,4 @@ namespace net.narazaka.avatarmenucreator.editor.util
         }
     }
 }
+#endif

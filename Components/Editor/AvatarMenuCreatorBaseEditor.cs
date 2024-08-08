@@ -3,7 +3,7 @@ using UnityEngine;
 using UnityEditor;
 using System.Linq;
 using VRC.SDK3.Avatars.Components;
-using net.narazaka.avatarmenucreator.editor.util;
+using net.narazaka.avatarmenucreator.util;
 using nadena.dev.modular_avatar.core;
 using net.narazaka.avatarmenucreator.editor;
 using System;

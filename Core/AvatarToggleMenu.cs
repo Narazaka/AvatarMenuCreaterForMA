@@ -3,9 +3,11 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 using UnityEngine;
+using VRC.Dynamics;
+
 #if UNITY_EDITOR
 using UnityEditor;
-using net.narazaka.avatarmenucreator.editor.util;
+using net.narazaka.avatarmenucreator.util;
 #endif
 using net.narazaka.avatarmenucreator.collections.instance;
 
@@ -24,6 +26,8 @@ namespace net.narazaka.avatarmenucreator
         public ToggleBlendShapeDictionary ToggleBlendShapes = new ToggleBlendShapeDictionary();
         [SerializeField]
         public ToggleBlendShapeDictionary ToggleShaderParameters = new ToggleBlendShapeDictionary();
+        [SerializeField]
+        public ToggleValueDictionary ToggleValues = new ToggleValueDictionary();
         [SerializeField]
         public ToggleVector3Dictionary Positions = new ToggleVector3Dictionary();
         [SerializeField]
@@ -85,6 +89,10 @@ namespace net.narazaka.avatarmenucreator
                             {
                                 ToggleShaderParameters[key] = ToggleShaderParameters[key].ResetAdvanced();
                             }
+                            foreach (var key in ToggleValues.Keys.ToList())
+                            {
+                                ToggleValues[key] = ToggleValues[key].ResetAdvanced();
+                            }
                             foreach (var key in Positions.Keys.ToList())
                             {
                                 Positions[key] = Positions[key].ResetAdvanced();
@@ -106,12 +114,12 @@ namespace net.narazaka.avatarmenucreator
                 }
             }
         }
-        bool HasAdvanced => ToggleObjectUsings.Count > 0 || ToggleMaterials.Any(t => t.Value.HasAdvanced) || ToggleBlendShapes.Any(t => t.Value.HasAdvanced) || ToggleShaderParameters.Any(t => t.Value.HasAdvanced) || Positions.Any(t => t.Value.HasAdvanced) || Rotations.Any(t => t.Value.HasAdvanced) || Scales.Any(t => t.Value.HasAdvanced);
+        bool HasAdvanced => ToggleObjectUsings.Count > 0 || ToggleMaterials.Any(t => t.Value.HasAdvanced) || ToggleBlendShapes.Any(t => t.Value.HasAdvanced) || ToggleShaderParameters.Any(t => t.Value.HasAdvanced) || ToggleValues.Any(t => t.Value.HasAdvanced) || Positions.Any(t => t.Value.HasAdvanced) || Rotations.Any(t => t.Value.HasAdvanced) || Scales.Any(t => t.Value.HasAdvanced);
 
-        public override IEnumerable<string> GetStoredChildren() => ToggleObjects.Keys.Concat(ToggleMaterials.Keys.Select(k => k.Item1)).Concat(ToggleBlendShapes.Keys.Select(k => k.Item1)).Concat(ToggleShaderParameters.Keys.Select(k => k.Item1)).Concat(Positions.Keys).Concat(Rotations.Keys).Concat(Scales.Keys).Distinct();
+        public override IEnumerable<string> GetStoredChildren() => ToggleObjects.Keys.Concat(ToggleMaterials.Keys.Select(k => k.Item1)).Concat(ToggleBlendShapes.Keys.Select(k => k.Item1)).Concat(ToggleShaderParameters.Keys.Select(k => k.Item1)).Concat(ToggleValues.Keys.Select(k => k.Item1)).Concat(Positions.Keys).Concat(Rotations.Keys).Concat(Scales.Keys).Distinct();
         public override void ReplaceStoredChild(string oldChild, string newChild)
         {
-            if (ToggleObjects.ContainsKey(oldChild) || ToggleMaterials.ContainsPrimaryKey(oldChild) || ToggleBlendShapes.ContainsPrimaryKey(oldChild) || ToggleShaderParameters.ContainsPrimaryKey(oldChild) || Positions.ContainsKey(oldChild) || Rotations.ContainsKey(oldChild) || Scales.ContainsKey(oldChild))
+            if (ToggleObjects.ContainsKey(oldChild) || ToggleMaterials.ContainsPrimaryKey(oldChild) || ToggleBlendShapes.ContainsPrimaryKey(oldChild) || ToggleShaderParameters.ContainsPrimaryKey(oldChild) || ToggleValues.ContainsPrimaryKey(oldChild) || Positions.ContainsKey(oldChild) || Rotations.ContainsKey(oldChild) || Scales.ContainsKey(oldChild))
             {
                 WillChange();
                 ToggleObjects.ReplaceKey(oldChild, newChild);
@@ -119,6 +127,7 @@ namespace net.narazaka.avatarmenucreator
                 ToggleMaterials.ReplacePrimaryKey(oldChild, newChild);
                 ToggleBlendShapes.ReplacePrimaryKey(oldChild, newChild);
                 ToggleShaderParameters.ReplacePrimaryKey(oldChild, newChild);
+                ToggleValues.ReplacePrimaryKey(oldChild, newChild);
                 Positions.ReplaceKey(oldChild, newChild);
                 Rotations.ReplaceKey(oldChild, newChild);
                 Scales.ReplaceKey(oldChild, newChild);
@@ -147,6 +156,10 @@ namespace net.narazaka.avatarmenucreator
             foreach (var key in ToggleShaderParameters.Keys.Where(k => !filter.Contains(k.Item1)).ToList())
             {
                 ToggleShaderParameters.Remove(key);
+            }
+            foreach (var key in ToggleValues.Keys.Where(k => !filter.Contains(k.Item1)).ToList())
+            {
+                ToggleValues.Remove(key);
             }
             foreach (var key in Positions.Keys.Where(k => !filter.Contains(k)).ToList())
             {
@@ -178,11 +191,16 @@ namespace net.narazaka.avatarmenucreator
             {
                 ToggleShaderParameters.Remove(key);
             }
+            foreach (var key in ToggleValues.Keys.Where(k => k.Item1 == child).ToList())
+            {
+                ToggleValues.Remove(key);
+            }
             Positions.Remove(child);
             Rotations.Remove(child);
             Scales.Remove(child);
         }
-        protected override bool IsSuitableForTransition() => ToggleBlendShapes.Count > 0 || ToggleShaderParameters.Count > 0 || Positions.Count > 0 || Rotations.Count > 0 || Scales.Count > 0;
+        // TODO: ToggleValues
+        protected override bool IsSuitableForTransition() => ToggleBlendShapes.Count > 0 || ToggleShaderParameters.Count > 0 || ToggleValues.Names().Where(t => t.MemberType.IsSuitableForTransition()).Count() > 0 || Positions.Count > 0 || Rotations.Count > 0 || Scales.Count > 0;
 
         protected override void OnMultiGUI(SerializedProperty serializedProperty)
         {
@@ -190,7 +208,6 @@ namespace net.narazaka.avatarmenucreator
             serializedObject.Update();
             EditorGUILayout.PropertyField(serializedProperty.FindPropertyRelative(nameof(ToggleIcon)), new GUIContent(T.アイコン));
             EditorGUILayout.PropertyField(serializedProperty.FindPropertyRelative(nameof(ToggleDefaultValue)), new GUIContent(T.パラメーター初期値));
-            ShowSavedMulti(serializedProperty);
             ShowDetailMenuMulti(serializedProperty);
             ShowTransitionSecondsMulti(serializedProperty);
             serializedObject.ApplyModifiedProperties();
@@ -203,7 +220,6 @@ namespace net.narazaka.avatarmenucreator
             EditorStyles.label.fontStyle = FontStyle.Bold;
             ToggleDefaultValue = Toggle(T.パラメーター初期値, ToggleDefaultValue);
             EditorStyles.label.fontStyle = labelFontStyle;
-            ShowSaved();
             ShowDetailMenu();
             UseAdvanced = EditorGUILayout.Toggle(T.高度な設定, UseAdvanced);
             if (UseAdvanced)
@@ -240,6 +256,8 @@ namespace net.narazaka.avatarmenucreator
                 var gameObjectRef = GetGameObject(child);
                 var names = gameObjectRef == null ? ToggleBlendShapes.Names(child).ToList() : Util.GetBlendShapeNames(gameObjectRef);
                 var parameters = gameObjectRef == null ? ToggleShaderParameters.Names(child).ToFakeShaderParameters().ToList() : ShaderParametersCache.GetFilteredShaderParameters(gameObjectRef);
+                var components = gameObjectRef == null ? ToggleValues.Names(child).Select(n => n.Type) : gameObjectRef.GetAllComponents().Select(c => TypeUtil.GetType(c)).FilterByVRCWhitelist();
+                var members = components.GetAvailableMembers();
 
                 var materials = allMaterials[child];
                 if (materials.Length > 0 &&
@@ -286,6 +304,20 @@ namespace net.narazaka.avatarmenucreator
                 {
                     EditorGUI.indentLevel++;
                     ShowToggleBlendShapeControl(false, children, child, ToggleShaderParameters, parameters, minValue: null, maxValue: null);
+                    EditorGUI.indentLevel--;
+                }
+                if (members.Count > 0 && FoldoutHeaderWithAddItemButton(
+                    child,
+                    "Components",
+                    ToggleValues.HasChild(child),
+                    () => members.Select(c => new NameAndDescriptionItemContainer(c) as ListTreeViewItemContainer<string>).ToList(),
+                    () => ToggleValues.Names(child).Select(n => n.Name).ToImmutableHashSet(),
+                    name => AddToggleValue(children, child, TypeMember.FromName(name)),
+                    name => RemoveToggleValue(children, child, TypeMember.FromName(name))
+                    ))
+                {
+                    EditorGUI.indentLevel++;
+                    ShowToggleValueControl(children, child, members);
                     EditorGUI.indentLevel--;
                 }
                 if (FoldoutHeaderWithAddItemButton(
@@ -627,7 +659,7 @@ namespace net.narazaka.avatarmenucreator
             IList<string> children,
             string child,
             ToggleBlendShapeDictionary toggles,
-            IEnumerable<Util.INameAndDescription> names,
+            IEnumerable<INameAndDescription> names,
             float? minValue = 0,
             float? maxValue = 100
             )
@@ -776,6 +808,245 @@ namespace net.narazaka.avatarmenucreator
             if (!toggles.ContainsKey(key)) return;
             WillChange();
             toggles.Remove(key);
+        }
+
+        void ShowToggleValueControl(
+            IList<string> children,
+            string child,
+            IEnumerable<TypeMember> members
+            )
+        {
+            ShowPhysBoneAutoResetMenu(child, ToggleValues.Names(child).ToArray());
+            foreach (var member in members)
+            {
+                var key = (child, member);
+                if (ToggleValues.TryGetValue(key, out var value))
+                {
+                    if (EditorGUILayout.ToggleLeft(member.Description, true))
+                    {
+                        var newValue = new ToggleValue { TransitionDurationPercent = 100 };
+                        EditorGUI.indentLevel++;
+                        EditorGUIUtility.labelWidth = 70;
+                        using (new EditorGUILayout.HorizontalScope())
+                        {
+                            if (member.MemberType == typeof(float))
+                            {
+                                newValue.Inactive = EditorGUILayout.FloatField("OFF", (float)value.Inactive, GUILayout.Width(110));
+                                ValuePickerButton(child, member, p => newValue.Inactive = p.floatValue);
+                                newValue.Active = EditorGUILayout.FloatField("ON", (float)value.Active, GUILayout.Width(110));
+                                ValuePickerButton(child, member, p => newValue.Active = p.floatValue);
+                            }
+                            else if (member.MemberType == typeof(int))
+                            {
+                                newValue.Inactive = EditorGUILayout.IntField("OFF", (int)value.Inactive, GUILayout.Width(100));
+                                ValuePickerButton(child, member, p => newValue.Inactive = p.intValue);
+                                newValue.Active = EditorGUILayout.IntField("ON", (int)value.Active, GUILayout.Width(100));
+                                ValuePickerButton(child, member, p => newValue.Active = p.intValue);
+                            }
+                            else if (member.MemberType == typeof(bool))
+                            {
+                                if (member.Member == VRCPhysBoneUtil.PhysBoneEnabled)
+                                {
+
+                                }
+                                EditorGUIUtility.labelWidth = 75;
+                                var activeOn = EditorGUILayout.Toggle(T.ON_eq_, (bool)value.Active == true);
+                                newValue.Active = activeOn;
+                                newValue.Inactive = !activeOn;
+                                EditorGUIUtility.labelWidth = 0;
+                            }
+                            else if (member.MemberType.IsSubclassOf(typeof(Enum)))
+                            {
+                                var enumNames = member.MemberType.GetEnumNamesCached();
+                                var enumValues = member.MemberType.GetEnumValuesCached();
+                                newValue.Inactive = EditorGUILayout.IntPopup("OFF", (int)value.Inactive, enumNames, enumValues);
+                                ValuePickerButton(child, member, p => newValue.Inactive = enumValues[p.enumValueIndex]);
+                                newValue.Active = EditorGUILayout.IntPopup("ON", (int)value.Active, enumNames, enumValues);
+                                ValuePickerButton(child, member, p => newValue.Active = enumValues[p.enumValueIndex]);
+                            }
+                        }
+                        if (member.MemberType == typeof(VRCPhysBoneBase.PermissionFilter))
+                        {
+                            EditorGUIUtility.labelWidth = 90;
+                            var inactive = (VRCPhysBoneBase.PermissionFilter)value.Inactive;
+                            var active = (VRCPhysBoneBase.PermissionFilter)value.Active;
+                            bool inactiveAllowSelf, activeAllowSelf, inactiveAllowOthers, activeAllowOthers;
+                            using (new EditorGUILayout.HorizontalScope())
+                            {
+                                inactiveAllowSelf = EditorGUILayout.ToggleLeft("OFF allowSelf", inactive.allowSelf);
+                                activeAllowSelf = EditorGUILayout.ToggleLeft("ON allowSelf", active.allowSelf);
+                            }
+                            using (new EditorGUILayout.HorizontalScope())
+                            {
+                                inactiveAllowOthers = EditorGUILayout.ToggleLeft("OFF allowOthers", inactive.allowOthers);
+                                activeAllowOthers = EditorGUILayout.ToggleLeft("ON allowOthers", active.allowOthers);
+                            }
+                            newValue.Inactive = new VRCPhysBoneBase.PermissionFilter { allowSelf = inactiveAllowSelf, allowOthers = inactiveAllowOthers };
+                            newValue.Active = new VRCPhysBoneBase.PermissionFilter { allowSelf = activeAllowSelf, allowOthers = activeAllowOthers };
+                        }
+                        else if (member.MemberType == typeof(Vector3))
+                        {
+                            var widemode = EditorGUIUtility.wideMode;
+                            EditorGUIUtility.wideMode = true;
+                            EditorGUIUtility.labelWidth = 70;
+                            using (new EditorGUILayout.HorizontalScope())
+                            {
+                                newValue.Inactive = EditorGUILayout.Vector3Field("OFF", (Vector3)value.Inactive);
+                                ValuePickerButton(child, member, p => newValue.Inactive = p.vector3Value);
+                            }
+                            using (new EditorGUILayout.HorizontalScope())
+                            {
+                                newValue.Active = EditorGUILayout.Vector3Field("ON", (Vector3)value.Active);
+                                ValuePickerButton(child, member, p => newValue.Active = p.vector3Value);
+                            }
+                            EditorGUIUtility.labelWidth = 0;
+                            EditorGUIUtility.wideMode = widemode;
+                        }
+                        EditorGUIUtility.labelWidth = 0;
+                        EditorGUI.indentLevel--;
+                        if (TransitionSeconds > 0)
+                        {
+                            using (new EditorGUILayout.HorizontalScope())
+                            {
+                                EditorGUI.indentLevel++;
+                                EditorGUIUtility.labelWidth = 110;
+                                newValue.TransitionOffsetPercent = EditorGUILayout.FloatField(T.変化待機_per_, value.TransitionOffsetPercent, GUILayout.Width(140));
+                                if (member.MemberType.IsSuitableForTransition())
+                                {
+                                    newValue.TransitionDurationPercent = EditorGUILayout.FloatField(T.変化時間_per_, value.TransitionDurationPercent, GUILayout.Width(140));
+                                }
+                                EditorGUIUtility.labelWidth = 0;
+                                EditorGUI.indentLevel--;
+                            }
+                            // 過去互換性
+                            if (newValue.TransitionDurationPercent <= 0)
+                            {
+                                EditorGUILayout.HelpBox(T.変化時間_per_は0より大きく設定して下さい, MessageType.Error);
+                            }
+                        }
+                        if (UseAdvanced)
+                        {
+                            using (new EditorGUILayout.HorizontalScope())
+                            {
+                                EditorGUI.indentLevel++;
+                                newValue.UseActive = EditorGUILayout.Toggle(T.ONを制御, value.UseActive);
+                                newValue.UseInactive = EditorGUILayout.Toggle(T.OFFを制御, value.UseInactive);
+                                EditorGUI.indentLevel--;
+                            }
+                        }
+                        if (!value.Equals(newValue))
+                        {
+                            WillChange();
+                            newValue.AdjustTransitionValues();
+
+                            ToggleValues[key] = newValue;
+                            if (BulkSet)
+                            {
+                                BulkSetToggleValue(member, newValue, value.ChangedProps(newValue));
+                            }
+                        }
+                    }
+                    else
+                    {
+                        RemoveToggleValue(children, child, member);
+                    }
+                }
+            }
+        }
+
+        void BulkSetToggleValue(TypeMember toggleTypeMember, ToggleValue toggleValue, IEnumerable<string> changedProps)
+        {
+            var matches = new List<(string, TypeMember)>();
+            foreach (var (child, typeMember) in ToggleValues.Keys)
+            {
+                if (typeMember == toggleTypeMember)
+                {
+                    matches.Add((child, typeMember));
+                }
+            }
+            foreach (var key in matches)
+            {
+                foreach (var changedProp in changedProps)
+                {
+                    ToggleValues[key] = ToggleValues[key].SetProp(changedProp, toggleValue.GetProp(changedProp));
+                }
+            }
+        }
+
+        void BulkAddToggleValue(IList<string> children, string child, TypeMember member)
+        {
+            if (BulkSet)
+            {
+                foreach (var c in children)
+                {
+                    AddToggleValueSingle(c, member);
+                }
+            }
+            else
+            {
+                AddToggleValueSingle(child, member);
+            }
+        }
+
+        void AddToggleValue(IList<string> children, string child, TypeMember member)
+        {
+            if (BulkSet)
+            {
+                foreach (var c in children)
+                {
+                    AddToggleValueSingle(c, member);
+                }
+            }
+            else
+            {
+                AddToggleValueSingle(child, member);
+            }
+        }
+
+        void AddToggleValueSingle(string child, TypeMember member)
+        {
+            var key = (child, member);
+            if (ToggleValues.ContainsKey(key)) return;
+            WillChange();
+            ToggleValues[key] = member.MemberType == typeof(bool) ? new ToggleValue { Active = true, TransitionDurationPercent = 100 } : new ToggleValue { TransitionDurationPercent = 100 };
+        }
+
+        void BulkRemoveToggleValue(IList<string> children, string child, TypeMember member)
+        {
+            if (BulkSet)
+            {
+                foreach (var c in children)
+                {
+                    RemoveToggleValueSingle(c, member);
+                }
+            }
+            else
+            {
+                RemoveToggleValueSingle(child, member);
+            }
+        }
+
+        void RemoveToggleValue(IList<string> children, string child, TypeMember member)
+        {
+            if (BulkSet)
+            {
+                foreach (var c in children)
+                {
+                    RemoveToggleValueSingle(c, member);
+                }
+            }
+            else
+            {
+                RemoveToggleValueSingle(child, member);
+            }
+        }
+
+        void RemoveToggleValueSingle(string child, TypeMember member)
+        {
+            var key = (child, member);
+            if (!ToggleValues.ContainsKey(key)) return;
+            WillChange();
+            ToggleValues.Remove(key);
         }
 
         void ShowTransformComponentControl(IList<string> children, string child, ToggleVector3Dictionary values, string title)

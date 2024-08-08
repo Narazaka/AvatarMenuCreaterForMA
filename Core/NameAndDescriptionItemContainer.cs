@@ -1,15 +1,15 @@
 #if UNITY_EDITOR
 using UnityEngine;
 using UnityEditor;
-using net.narazaka.avatarmenucreator.editor.util;
+using net.narazaka.avatarmenucreator.util;
 
 namespace net.narazaka.avatarmenucreator
 {
     class NameAndDescriptionItemContainer : ListTreeViewItemContainer<string>
     {
-        public Util.INameAndDescription nameAndDescription;
+        public INameAndDescription nameAndDescription;
 
-        public NameAndDescriptionItemContainer(Util.INameAndDescription nameAndDescription) : base(nameAndDescription.Name)
+        public NameAndDescriptionItemContainer(INameAndDescription nameAndDescription) : base(nameAndDescription.Name)
         {
             this.nameAndDescription = nameAndDescription;
         }

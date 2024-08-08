@@ -1,8 +1,9 @@
+#if UNITY_EDITOR
 using UnityEditor;
 using UnityEngine;
 using UnityObject = UnityEngine.Object;
 
-namespace net.narazaka.avatarmenucreator.editor.util
+namespace net.narazaka.avatarmenucreator.util
 {
     // cf. https://gist.github.com/lazlo-bonin/a85586dd37fdf7cf4971d93fa5d2f6f7
     public static class UnityObjectUtility
@@ -40,3 +41,4 @@ namespace net.narazaka.avatarmenucreator.editor.util
         }
     }
 }
+#endif

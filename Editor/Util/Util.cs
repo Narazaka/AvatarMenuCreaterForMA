@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using VRC.SDK3.Avatars.ScriptableObjects;
 
-namespace net.narazaka.avatarmenucreator.editor.util
+namespace net.narazaka.avatarmenucreator.util
 {
     public static class Util
     {
@@ -39,6 +39,11 @@ namespace net.narazaka.avatarmenucreator.editor.util
             return (basePath, baseName);
         }
 
+        public static Component[] GetAllComponents(this GameObject gameObject)
+        {
+            return gameObject.GetComponents<Component>();
+        }
+
         public static Material[] GetMaterialSlots(this GameObject gameObject)
         {
             var renderer = gameObject.GetComponent<Renderer>();
@@ -58,12 +63,6 @@ namespace net.narazaka.avatarmenucreator.editor.util
                 shapekeyNames.Add(name);
             }
             return shapekeyNames;
-        }
-
-        public interface INameAndDescription
-        {
-            string Name { get; }
-            string Description { get; }
         }
 
         public class NameWithDescription : INameAndDescription
@@ -260,6 +259,13 @@ namespace net.narazaka.avatarmenucreator.editor.util
                 default:
                     throw new System.ArgumentOutOfRangeException(nameof(valueType));
             }
+        }
+
+        public static AnimationClip GenerateEmptyAnimationClip(string baseName, float duration = 1 / 60f)
+        {
+            var clip = new AnimationClip { name = $"{baseName}_empty" };
+            clip.SetCurve("__AvatarMenuCreatorForMA_Empty_Animation__", typeof(Transform), "localPosition.x", AnimationCurve.Constant(0, duration, 0));
+            return clip;
         }
     }
 }

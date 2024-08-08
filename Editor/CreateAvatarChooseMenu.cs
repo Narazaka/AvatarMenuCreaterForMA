@@ -1,12 +1,14 @@
 using nadena.dev.modular_avatar.core;
 using net.narazaka.avatarmenucreator.collections.instance;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEditor;
 using UnityEditor.Animations;
 using UnityEngine;
-using VRC.SDK3.Avatars.Components;
+using VRC.Dynamics;
 using VRC.SDK3.Avatars.ScriptableObjects;
+using VRC.SDK3.Dynamics.PhysBone.Components;
 
 namespace net.narazaka.avatarmenucreator.editor
 {
@@ -61,6 +63,38 @@ namespace net.narazaka.avatarmenucreator.editor
                 for (var i = 0; i < AvatarMenu.ChooseCount; ++i)
                 {
                     choices[i].SetCurve(curvePath, typeof(Renderer), curveName, new AnimationCurve(new Keyframe(0, value.ContainsKey(i) ? value[i] : 0)));
+                }
+            }
+            foreach (var (child, member) in AvatarMenu.ChooseValues.Keys)
+            {
+                if (!matchGameObjects.Contains(child)) continue;
+                var value = AvatarMenu.ChooseValues[(child, member)];
+                var curvePath = child;
+                if (member.MemberTypeIsPrimitive)
+                {
+                    for (var i = 0; i < AvatarMenu.ChooseCount; ++i)
+                    {
+                        choices[i].SetCurve(curvePath, member.Type, member.AnimationMemberName, new AnimationCurve(new Keyframe(0, value.ContainsKey(i) ? (float)value[i].As(member.MemberType) : 0)));
+                    }
+                }
+                else if (member.MemberType == typeof(Vector3))
+                {
+                    for (var i = 0; i < AvatarMenu.ChooseCount; ++i)
+                    {
+                        var v = value.ContainsKey(i) ? (Vector3)value[i] : Vector3.zero;
+                        choices[i].SetCurve(curvePath, member.Type, member.AnimationMemberName + ".x", new AnimationCurve(new Keyframe(0, v.x)));
+                        choices[i].SetCurve(curvePath, member.Type, member.AnimationMemberName + ".y", new AnimationCurve(new Keyframe(0, v.y)));
+                        choices[i].SetCurve(curvePath, member.Type, member.AnimationMemberName + ".z", new AnimationCurve(new Keyframe(0, v.z)));
+                    }
+                }
+                else if (member.MemberType == typeof(VRCPhysBoneBase.PermissionFilter))
+                {
+                    for (var i = 0; i < AvatarMenu.ChooseCount; ++i)
+                    {
+                        var v = value.ContainsKey(i) ? (VRCPhysBoneBase.PermissionFilter)value[i] : new VRCPhysBoneBase.PermissionFilter();
+                        choices[i].SetCurve(curvePath, member.Type, member.AnimationMemberName + ".allowSelf", new AnimationCurve(new Keyframe(0, v.allowSelf ? 1 : 0)));
+                        choices[i].SetCurve(curvePath, member.Type, member.AnimationMemberName + ".allowOthers", new AnimationCurve(new Keyframe(0, v.allowOthers ? 1 : 0)));
+                    }
                 }
             }
             foreach (var child in AvatarMenu.Positions.Keys)
@@ -129,6 +163,105 @@ namespace net.narazaka.avatarmenucreator.editor
                     },
                 };
             }
+            var physBoneAutoResetEffectiveObjects = AvatarMenu.GetPhysBoneAutoResetEffectiveObjects(matchGameObjects, AvatarMenu.ChooseValues.Keys).ToArray();
+            if (physBoneAutoResetEffectiveObjects.Length > 0)
+            {
+                controller.AddLayer(new AnimatorControllerLayer
+                {
+                    name = baseName + "_PB_auto_reset",
+                    defaultWeight = 1,
+                    stateMachine = new AnimatorStateMachine
+                    {
+                        name = baseName + "_PB_auto_reset",
+                        hideFlags = HideFlags.HideInHierarchy,
+                    },
+                });
+                var pbLayer = controller.layers[1];
+
+                pbLayer.stateMachine.name = baseName;
+                pbLayer.stateMachine.entryPosition = new Vector3(-600, 0);
+                pbLayer.stateMachine.anyStatePosition = new Vector3(-900, 0);
+                pbLayer.stateMachine.exitPosition = new Vector3(1700, 0);
+
+                var emptyClip = util.Util.GenerateEmptyAnimationClip(baseName);
+                var waitClip = util.Util.GenerateEmptyAnimationClip(baseName + "_wait", AvatarMenu.TransitionSeconds == 0 ? 1 / 60f : AvatarMenu.TransitionSeconds);
+                var pbDisableClip = new AnimationClip { name = $"{baseName}_PB_disable" };
+                var pbEnableClip = new AnimationClip { name = $"{baseName}_PB_enable" };
+                var disableCurve = new AnimationCurve(new Keyframe(0, 0), new Keyframe(1 / 60f, 0));
+                var enableCurve = new AnimationCurve(new Keyframe(0, 1), new Keyframe(1 / 60f, 1));
+                foreach (var child in physBoneAutoResetEffectiveObjects)
+                {
+                    var curvePath = child;
+                    pbDisableClip.SetCurve(curvePath, typeof(VRCPhysBone), "m_Enabled", disableCurve);
+                    pbEnableClip.SetCurve(curvePath, typeof(VRCPhysBone), "m_Enabled", enableCurve);
+                }
+                var initialState = pbLayer.stateMachine.AddState($"{baseName}_idle", new Vector3(-300, 0));
+                initialState.motion = emptyClip;
+                initialState.writeDefaultValues = false;
+                pbLayer.stateMachine.defaultState = initialState;
+                var waitState = pbLayer.stateMachine.AddState($"{baseName}_wait", new Vector3(800, 0));
+                waitState.motion = waitClip;
+                waitState.writeDefaultValues = false;
+                var disableState = pbLayer.stateMachine.AddState($"{baseName}_disable", new Vector3(1100, 0));
+                disableState.motion = pbDisableClip;
+                disableState.writeDefaultValues = false;
+                var enableState = pbLayer.stateMachine.AddState($"{baseName}_enable", new Vector3(1400, 0));
+                enableState.motion = pbEnableClip;
+                enableState.writeDefaultValues = false;
+                var eachStates = Enumerable.Range(0, AvatarMenu.ChooseCount).Select((i) =>
+                {
+                    var state = pbLayer.stateMachine.AddState($"{baseName}_{i}", new Vector3(300, 50 * i));
+                    state.motion = emptyClip;
+                    state.writeDefaultValues = false;
+                    return state;
+                }).ToList();
+                var toDisable = waitState.AddTransition(disableState);
+                toDisable.exitTime = 1;
+                toDisable.duration = 0;
+                toDisable.hasExitTime = true;
+                var toEnable = disableState.AddTransition(enableState);
+                toEnable.exitTime = 1;
+                toEnable.duration = 0;
+                toEnable.hasExitTime = true;
+                var toExit = enableState.AddExitTransition();
+                toExit.exitTime = 1;
+                toExit.duration = 0;
+                toExit.hasExitTime = true;
+                for (var i = 0; i < AvatarMenu.ChooseCount; ++i)
+                {
+                    var eachState = eachStates[i];
+                    var initialToEach = initialState.AddTransition(eachState);
+                    initialToEach.exitTime = 0;
+                    initialToEach.duration = 0;
+                    initialToEach.hasExitTime = false;
+                    initialToEach.conditions = new AnimatorCondition[]
+                    {
+                        new AnimatorCondition
+                        {
+                            mode = AnimatorConditionMode.Equals,
+                            parameter = parameterName,
+                            threshold = i,
+                        },
+                    };
+                    var eachToWait = eachState.AddTransition(waitState);
+                    eachToWait.exitTime = 0;
+                    eachToWait.duration = 0;
+                    eachToWait.hasExitTime = false;
+                    eachToWait.conditions = new AnimatorCondition[]
+                    {
+                        new AnimatorCondition
+                        {
+                            mode = AnimatorConditionMode.NotEqual,
+                            parameter = parameterName,
+                            threshold = i,
+                        },
+                    };
+                }
+                choices.Add(emptyClip);
+                choices.Add(waitClip);
+                choices.Add(pbDisableClip);
+                choices.Add(pbEnableClip);
+            }
             // menu
             var menu = new VRCExpressionsMenu
             {
@@ -175,6 +308,9 @@ namespace net.narazaka.avatarmenucreator.editor
                     defaultValue = AvatarMenu.ChooseDefaultValue,
                     syncType = ParameterSyncType.Int,
                     saved = AvatarMenu.Saved,
+#if !NET_NARAZAKA_VRCHAT_AvatarMenuCreator_HAS_NO_MENU_MA
+                    localOnly = !AvatarMenu.Synced,
+#endif
                     internalParameter = AvatarMenu.InternalParameter,
                 },
             });

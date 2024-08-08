@@ -7,7 +7,7 @@ using UnityEngine;
 using VRC.SDK3.Avatars.ScriptableObjects;
 using nadena.dev.modular_avatar.core;
 using VRC.SDK3.Avatars.Components;
-using net.narazaka.avatarmenucreator.editor.util;
+using net.narazaka.avatarmenucreator.util;
 
 namespace net.narazaka.avatarmenucreator.editor
 {
