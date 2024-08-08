@@ -1,4 +1,4 @@
-#if NET_NARAZAKA_VRCHAT_AvatarMenuCreator_HAS_NDMF
+#if NET_NARAZAKA_VRCHAT_AvatarMenuCreator_HAS_NDMF && !NET_NARAZAKA_VRCHAT_AvatarMenuCreator_HAS_NO_MENU_MA
 using nadena.dev.modular_avatar.core;
 using net.narazaka.avatarmenucreator.components;
 #endif
@@ -27,7 +27,7 @@ namespace net.narazaka.avatarmenucreator.editor
 
         public abstract CreatedAssets CreateAssets(string baseName, IEnumerable<string> children = null);
 
-#if NET_NARAZAKA_VRCHAT_AvatarMenuCreator_HAS_NDMF
+#if NET_NARAZAKA_VRCHAT_AvatarMenuCreator_HAS_NDMF && !NET_NARAZAKA_VRCHAT_AvatarMenuCreator_HAS_NO_MENU_MA
         public static AvatarMenuCreatorBase GetOrAddMenuCreatorComponent(GameObject obj, AvatarMenuBase avatarMenu)
         {
             var creator = GetOrAddMenuCreatorComponentOnly(obj, avatarMenu);

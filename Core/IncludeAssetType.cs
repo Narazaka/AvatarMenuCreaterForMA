@@ -13,7 +13,7 @@ namespace net.narazaka.avatarmenucreator
         [Japanese("全てprefabに含める")]
         [English("one prefab")]
         Include,
-#if NET_NARAZAKA_VRCHAT_AvatarMenuCreator_HAS_NDMF
+#if NET_NARAZAKA_VRCHAT_AvatarMenuCreator_HAS_NDMF && !NET_NARAZAKA_VRCHAT_AvatarMenuCreator_HAS_NO_MENU_MA
         [Japanese("コンポーネントとして保持")]
         [English("as component")]
         Component,

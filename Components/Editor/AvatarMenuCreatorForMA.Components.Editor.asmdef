@@ -19,13 +19,19 @@
     "precompiledReferences": [],
     "autoReferenced": false,
     "defineConstraints": [
-        "NET_NARAZAKA_VRCHAT_AvatarMenuCreator_HAS_NDMF"
+        "NET_NARAZAKA_VRCHAT_AvatarMenuCreator_HAS_NDMF",
+        "HAS_MENU_MA"
     ],
     "versionDefines": [
         {
             "name": "nadena.dev.ndmf",
             "expression": "[1.0.0,2)",
             "define": "NET_NARAZAKA_VRCHAT_AvatarMenuCreator_HAS_NDMF"
+        },
+        {
+            "name": "nadena.dev.modular-avatar",
+            "expression": "[1.5.0,2)",
+            "define": "HAS_MENU_MA"
         }
     ],
     "noEngineReferences": false
