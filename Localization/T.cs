@@ -155,6 +155,9 @@ namespace net.narazaka.avatarmenucreator
         [English("Saved Parameter")]
         public static string パラメーター保存 => L;
 
+        [English("Synced Parameter")]
+        public static string パラメーター同期 => L;
+
         [English("Parameter name")]
         public static string パラメーター名 => L;
 

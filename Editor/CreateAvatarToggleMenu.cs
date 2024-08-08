@@ -463,6 +463,7 @@ namespace net.narazaka.avatarmenucreator.editor
                     defaultValue = AvatarMenu.ToggleDefaultValue ? 1 : 0,
                     syncType = ParameterSyncType.Bool,
                     saved = AvatarMenu.Saved,
+                    localOnly = !AvatarMenu.Synced,
                     internalParameter = AvatarMenu.InternalParameter,
                 },
             });

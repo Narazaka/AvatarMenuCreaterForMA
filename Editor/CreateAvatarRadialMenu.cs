@@ -264,6 +264,7 @@ namespace net.narazaka.avatarmenucreator.editor
                 defaultValue = AvatarMenu.RadialDefaultValue,
                 syncType = ParameterSyncType.Float,
                 saved = AvatarMenu.Saved,
+                localOnly = !AvatarMenu.Synced,
                 internalParameter = AvatarMenu.InternalParameter,
             };
             var subParameterConfig = new ParameterConfig
@@ -272,6 +273,7 @@ namespace net.narazaka.avatarmenucreator.editor
                 defaultValue = 0,
                 syncType = ParameterSyncType.Bool,
                 saved = false,
+                localOnly = !AvatarMenu.Synced,
                 internalParameter = AvatarMenu.InternalParameter,
             };
             var parameterConfigs =(physBoneAutoResetEffectiveObjects.Length > 0 ? new ParameterConfig[] { parameterConfig, subParameterConfig } : new ParameterConfig[] { parameterConfig });

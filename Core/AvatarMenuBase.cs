@@ -24,6 +24,8 @@ namespace net.narazaka.avatarmenucreator
         [SerializeField]
         public bool Saved = true;
         [SerializeField]
+        public bool Synced = true;
+        [SerializeField]
         public string ParameterName;
         [SerializeField]
         public bool InternalParameter = false;
@@ -61,7 +63,7 @@ namespace net.narazaka.avatarmenucreator
             {
                 if (_FoldoutDetails == null)
                 {
-                    _FoldoutDetails = InternalParameter || !string.IsNullOrEmpty(ParameterName);
+                    _FoldoutDetails = !Synced || InternalParameter || !string.IsNullOrEmpty(ParameterName);
                 }
                 return (bool)_FoldoutDetails;
             }
@@ -73,8 +75,9 @@ namespace net.narazaka.avatarmenucreator
         {
             if (_FoldoutDetailsMulti == null)
             {
+                var synced = serializedProperty.FindPropertyRelative(nameof(Synced));
                 var internalParameter = serializedProperty.FindPropertyRelative(nameof(InternalParameter));
-                _FoldoutDetailsMulti = internalParameter.hasMultipleDifferentValues || internalParameter.boolValue;
+                _FoldoutDetailsMulti = synced.hasMultipleDifferentValues || !synced.boolValue || internalParameter.hasMultipleDifferentValues || internalParameter.boolValue;
             }
             return (bool)_FoldoutDetailsMulti;
         }
@@ -162,6 +165,7 @@ namespace net.narazaka.avatarmenucreator
             FoldoutDetails = EditorGUILayout.Foldout(FoldoutDetails, T.オプション);
             if (!FoldoutDetails) return;
             EditorGUI.indentLevel++;
+            Synced = Toggle(T.パラメーター同期, Synced);
             ParameterName = TextField(T.パラメーター名, ParameterName);
             var internalParameterLabel =
 #if UNITY_2022_1_OR_NEWER && !NET_NARAZAKA_VRCHAT_AvatarMenuCreator_HAS_MA_BEFORE_1_8
@@ -181,6 +185,7 @@ namespace net.narazaka.avatarmenucreator
             EditorGUI.indentLevel--;
             if (!foldout) return;
             EditorGUI.indentLevel++;
+            EditorGUILayout.PropertyField(serializedProperty.FindPropertyRelative(nameof(Synced)), new GUIContent(T.パラメーター同期));
             // EditorGUILayout.PropertyField(serializedProperty.FindPropertyRelative(nameof(ParameterName)), new GUIContent(T.パラメーター名_start_オプショナル_end_));
             var internalParameterLabel =
 #if UNITY_2022_1_OR_NEWER && !NET_NARAZAKA_VRCHAT_AvatarMenuCreator_HAS_MA_BEFORE_1_8
