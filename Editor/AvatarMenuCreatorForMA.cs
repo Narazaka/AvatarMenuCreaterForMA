@@ -44,6 +44,19 @@ namespace net.narazaka.avatarmenucreator.editor
         {
             GetWindow<AvatarMenuCreatorForMA>("AvatarMenuCreator for Modular Avatar");
         }
+        
+        [MenuItem("GameObject/AvatarMenuCreator for Modular Avatar", validate = true)]
+        static bool CreateWindowfromGameObjectValidation()
+        {
+            return Selection.activeGameObject != null && Selection.activeGameObject.GetComponent<VRCAvatarDescriptor>() != null;
+        }
+
+        [MenuItem("GameObject/AvatarMenuCreator for Modular Avatar")]
+        static void CreateWindowfromGameObject()
+        {
+            var window = GetWindow<AvatarMenuCreatorForMA>("AvatarMenuCreator for Modular Avatar");
+            window.VRCAvatarDescriptor = Selection.activeGameObject.GetComponent<VRCAvatarDescriptor>();
+        }
 
         void OnEnable()
         {
