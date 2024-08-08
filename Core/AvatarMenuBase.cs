@@ -165,7 +165,9 @@ namespace net.narazaka.avatarmenucreator
             FoldoutDetails = EditorGUILayout.Foldout(FoldoutDetails, T.オプション);
             if (!FoldoutDetails) return;
             EditorGUI.indentLevel++;
+#if !NET_NARAZAKA_VRCHAT_AvatarMenuCreator_HAS_NO_MENU_MA
             Synced = Toggle(T.パラメーター同期, Synced);
+#endif
             ParameterName = TextField(T.パラメーター名, ParameterName);
             var internalParameterLabel =
 #if UNITY_2022_1_OR_NEWER && !NET_NARAZAKA_VRCHAT_AvatarMenuCreator_HAS_MA_BEFORE_1_8
@@ -185,7 +187,9 @@ namespace net.narazaka.avatarmenucreator
             EditorGUI.indentLevel--;
             if (!foldout) return;
             EditorGUI.indentLevel++;
+#if !NET_NARAZAKA_VRCHAT_AvatarMenuCreator_HAS_NO_MENU_MA
             EditorGUILayout.PropertyField(serializedProperty.FindPropertyRelative(nameof(Synced)), new GUIContent(T.パラメーター同期));
+#endif
             // EditorGUILayout.PropertyField(serializedProperty.FindPropertyRelative(nameof(ParameterName)), new GUIContent(T.パラメーター名_start_オプショナル_end_));
             var internalParameterLabel =
 #if UNITY_2022_1_OR_NEWER && !NET_NARAZAKA_VRCHAT_AvatarMenuCreator_HAS_MA_BEFORE_1_8

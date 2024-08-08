@@ -264,7 +264,9 @@ namespace net.narazaka.avatarmenucreator.editor
                 defaultValue = AvatarMenu.RadialDefaultValue,
                 syncType = ParameterSyncType.Float,
                 saved = AvatarMenu.Saved,
+#if !NET_NARAZAKA_VRCHAT_AvatarMenuCreator_HAS_NO_MENU_MA
                 localOnly = !AvatarMenu.Synced,
+#endif
                 internalParameter = AvatarMenu.InternalParameter,
             };
             var subParameterConfig = new ParameterConfig
@@ -273,7 +275,9 @@ namespace net.narazaka.avatarmenucreator.editor
                 defaultValue = 0,
                 syncType = ParameterSyncType.Bool,
                 saved = false,
+#if !NET_NARAZAKA_VRCHAT_AvatarMenuCreator_HAS_NO_MENU_MA
                 localOnly = !AvatarMenu.Synced,
+#endif
                 internalParameter = AvatarMenu.InternalParameter,
             };
             var parameterConfigs =(physBoneAutoResetEffectiveObjects.Length > 0 ? new ParameterConfig[] { parameterConfig, subParameterConfig } : new ParameterConfig[] { parameterConfig });
