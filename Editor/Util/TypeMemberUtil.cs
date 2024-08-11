@@ -44,16 +44,16 @@ namespace net.narazaka.avatarmenucreator.util
                     new MemberInfoContainer(typeof(VRCPhysBone).GetField(nameof(VRCPhysBone.limitRotation))) { Label ="Rotation (Pitch / Roll / Yaw)" },
                     new MemberInfoContainer(typeof(VRCPhysBone).GetField(nameof(VRCPhysBone.radius))),
                     //new (typeof(VRCPhysBone).GetField(nameof(VRCPhysBone.allowCollision))),
-                    new MemberInfoContainer(typeof(VRCPhysBone).GetField(nameof(VRCPhysBone.collisionFilter))),
+                    new MemberInfoContainer(typeof(VRCPhysBone).GetField(nameof(VRCPhysBone.collisionFilter))) { Label = "Allow Collision (Other)" },
                     new MemberInfoContainer(typeof(VRCPhysBone).GetField(nameof(VRCPhysBone.maxStretch))),
 #if !PHYSBONE_ONLY_1_0
                     new MemberInfoContainer(typeof(VRCPhysBone).GetField(nameof(VRCPhysBone.stretchMotion))),
                     new MemberInfoContainer(typeof(VRCPhysBone).GetField(nameof(VRCPhysBone.maxSquish))),
 #endif
                     //new (typeof(VRCPhysBone).GetField(nameof(VRCPhysBone.allowGrabbing))),
-                    new MemberInfoContainer(typeof(VRCPhysBone).GetField(nameof(VRCPhysBone.grabFilter))),
+                    new MemberInfoContainer(typeof(VRCPhysBone).GetField(nameof(VRCPhysBone.grabFilter))) { Label = "Allow Grabbing (Other)" },
                     //new (typeof(VRCPhysBone).GetField(nameof(VRCPhysBone.allowPosing))),
-                    new MemberInfoContainer(typeof(VRCPhysBone).GetField(nameof(VRCPhysBone.poseFilter))),
+                    new MemberInfoContainer(typeof(VRCPhysBone).GetField(nameof(VRCPhysBone.poseFilter))) { Label = "Allow Posing (Other)" },
                     new MemberInfoContainer(typeof(VRCPhysBone).GetField(nameof(VRCPhysBone.snapToHand))),
                 }
             },
