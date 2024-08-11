@@ -1,9 +1,12 @@
 {
     "name": "AvatarMenuCreatorForMA.Components",
+    "rootNamespace": "",
     "references": [
         "AvatarMenuCreatorForMA.Core",
         "nadena.dev.modular-avatar.core",
         "AvatarParametersDriver.Runtime",
+        "AvatarMenuCreatorForMA.Collections",
+        "AvatarMenuCreatorForMA.Editor.Util",
         "Narazaka.VRChat.AvatarParametersUtil"
     ],
     "includePlatforms": [],
@@ -13,7 +16,8 @@
     "precompiledReferences": [],
     "autoReferenced": true,
     "defineConstraints": [
-        "NET_NARAZAKA_VRCHAT_AvatarMenuCreator_HAS_NDMF"
+        "NET_NARAZAKA_VRCHAT_AvatarMenuCreator_HAS_NDMF",
+        "HAS_MENU_MA"
     ],
     "versionDefines": [
         {
@@ -30,6 +34,11 @@
             "name": "net.narazaka.vrchat.avatar-parameters-util",
             "expression": "[1.0.0,2)",
             "define": "NET_NARAZAKA_VRCHAT_AvatarMenuCreator_HAS_AvatarParametersUtil"
+        },
+        {
+            "name": "nadena.dev.modular-avatar",
+            "expression": "[1.5.0,2)",
+            "define": "HAS_MENU_MA"
         }
     ],
     "noEngineReferences": false

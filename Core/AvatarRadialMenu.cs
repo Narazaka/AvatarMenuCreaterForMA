@@ -5,7 +5,7 @@ using System.Linq;
 using UnityEngine;
 #if UNITY_EDITOR
 using UnityEditor;
-using net.narazaka.avatarmenucreator.editor.util;
+using net.narazaka.avatarmenucreator.util;
 #endif
 using net.narazaka.avatarmenucreator.collections.instance;
 
@@ -18,6 +18,8 @@ namespace net.narazaka.avatarmenucreator
         public RadialBlendShapeDictionary RadialBlendShapes = new RadialBlendShapeDictionary();
         [SerializeField]
         public RadialBlendShapeDictionary RadialShaderParameters = new RadialBlendShapeDictionary();
+        [SerializeField]
+        public RadialValueDictionary RadialValues = new RadialValueDictionary();
         [SerializeField]
         public RadialVector3Dictionary Positions = new RadialVector3Dictionary();
         [SerializeField]
@@ -49,14 +51,15 @@ namespace net.narazaka.avatarmenucreator
             }
         }
 
-        public override IEnumerable<string> GetStoredChildren() => RadialBlendShapes.Keys.Select(key => key.Item1).Concat(RadialShaderParameters.Keys.Select(key => key.Item1)).Concat(Positions.Keys).Concat(Rotations.Keys).Concat(Scales.Keys).Distinct();
+        public override IEnumerable<string> GetStoredChildren() => RadialBlendShapes.Keys.Select(key => key.Item1).Concat(RadialShaderParameters.Keys.Select(key => key.Item1)).Concat(RadialValues.Keys.Select(key => key.Item1)).Concat(Positions.Keys).Concat(Rotations.Keys).Concat(Scales.Keys).Distinct();
         public override void ReplaceStoredChild(string oldChild, string newChild)
         {
-            if (RadialBlendShapes.ContainsPrimaryKey(oldChild) || RadialShaderParameters.ContainsPrimaryKey(oldChild) || Positions.ContainsKey(oldChild) || Rotations.ContainsKey(oldChild) || Scales.ContainsKey(oldChild))
+            if (RadialBlendShapes.ContainsPrimaryKey(oldChild) || RadialShaderParameters.ContainsPrimaryKey(oldChild) || RadialValues.ContainsPrimaryKey(oldChild) || Positions.ContainsKey(oldChild) || Rotations.ContainsKey(oldChild) || Scales.ContainsKey(oldChild))
             {
                 WillChange();
                 RadialBlendShapes.ReplacePrimaryKey(oldChild, newChild);
                 RadialShaderParameters.ReplacePrimaryKey(oldChild, newChild);
+                RadialValues.ReplacePrimaryKey(oldChild, newChild);
                 Positions.ReplaceKey(oldChild, newChild);
                 Rotations.ReplaceKey(oldChild, newChild);
                 Scales.ReplaceKey(oldChild, newChild);
@@ -73,6 +76,10 @@ namespace net.narazaka.avatarmenucreator
             foreach (var key in RadialShaderParameters.Keys.Where(k => !filter.Contains(k.Item1)).ToList())
             {
                 RadialShaderParameters.Remove(key);
+            }
+            foreach (var key in RadialValues.Keys.Where(k => !filter.Contains(k.Item1)).ToList())
+            {
+                RadialValues.Remove(key);
             }
             foreach (var key in Positions.Keys.Where(k => !filter.Contains(k)).ToList())
             {
@@ -98,6 +105,10 @@ namespace net.narazaka.avatarmenucreator
             {
                 RadialShaderParameters.Remove(key);
             }
+            foreach (var key in RadialValues.Keys.Where(k => k.Item1 == child).ToList())
+            {
+                RadialValues.Remove(key);
+            }
             Positions.Remove(child);
             Rotations.Remove(child);
             Scales.Remove(child);
@@ -114,7 +125,6 @@ namespace net.narazaka.avatarmenucreator
             serializedObject.FindProperty(nameof(AvatarRadialMenu));
             EditorGUILayout.PropertyField(serializedProperty.FindPropertyRelative(nameof(RadialIcon)), new GUIContent(T.アイコン));
             EditorGUILayout.PropertyField(serializedProperty.FindPropertyRelative(nameof(RadialDefaultValue)), new GUIContent(T.パラメーター初期値));
-            ShowSavedMulti(serializedProperty);
             ShowDetailMenuMulti(serializedProperty);
             serializedObject.ApplyModifiedProperties();
         }
@@ -126,7 +136,6 @@ namespace net.narazaka.avatarmenucreator
             EditorStyles.label.fontStyle = FontStyle.Bold;
             RadialDefaultValue = FloatField(T.パラメーター初期値, RadialDefaultValue);
             EditorStyles.label.fontStyle = labelFontStyle;
-            ShowSaved();
             ShowDetailMenu();
             if (RadialDefaultValue < 0) RadialDefaultValue = 0;
             if (RadialDefaultValue > 1) RadialDefaultValue = 1;
@@ -213,6 +222,8 @@ namespace net.narazaka.avatarmenucreator
                 var gameObjectRef = GetGameObject(child);
                 var names = gameObjectRef == null ? RadialBlendShapes.Names(child).ToList() : Util.GetBlendShapeNames(gameObjectRef);
                 var parameters = gameObjectRef == null ? RadialShaderParameters.Names(child).ToFakeShaderParameters().ToList() : ShaderParametersCache.GetFilteredShaderParameters(gameObjectRef);
+                var components = gameObjectRef == null ? RadialValues.Names(child).Select(n => n.Type) : gameObjectRef.GetAllComponents().Select(c => TypeUtil.GetType(c)).FilterByVRCWhitelist();
+                var members = components.GetAvailableMembersOnlySuitableForTransition();
                 var path = child;
                 GameObjectHeader(child);
                 EditorGUI.indentLevel++;
@@ -246,6 +257,21 @@ namespace net.narazaka.avatarmenucreator
                     ShowRadialBlendShapeControl(false, children, child, RadialShaderParameters, parameters, minValue: null, maxValue: null);
                     EditorGUI.indentLevel--;
                 }
+                if (members.Count > 0 &&
+                    FoldoutHeaderWithAddItemButton(
+                        child,
+                        "Components",
+                        RadialValues.HasChild(child),
+                        () => members.Select(m => new NameAndDescriptionItemContainer(m) as ListTreeViewItemContainer<string>).ToList(),
+                        () => RadialValues.Names(child).Select(n => n.Name).ToImmutableHashSet(),
+                        name => AddRadialValue(children, child, TypeMember.FromName(name)),
+                        name => RemoveRadialValue(children, child, TypeMember.FromName(name))
+                        ))
+                {
+                    EditorGUI.indentLevel++;
+                    ShowRadialValueControl(children, child, members);
+                    EditorGUI.indentLevel--;
+                }
                 if (FoldoutHeaderWithAddItemButton(
                     child,
                     "Transform",
@@ -271,7 +297,7 @@ namespace net.narazaka.avatarmenucreator
             IList<string> children,
             string child,
             RadialBlendShapeDictionary radials,
-            IEnumerable<Util.INameAndDescription> names,
+            IEnumerable<INameAndDescription> names,
             float? minValue = 0,
             float? maxValue = 100
             )
@@ -409,6 +435,168 @@ namespace net.narazaka.avatarmenucreator
             if (!radials.ContainsKey(key)) return;
             WillChange();
             radials.Remove(key);
+        }
+
+        void ShowRadialValueControl(
+            IList<string> children,
+            string child,
+            IEnumerable<TypeMember> members
+            )
+        {
+            ShowPhysBoneAutoResetMenu(child, RadialValues.Names(child).ToArray());
+            foreach (var member in members)
+            {
+                var key = (child, member);
+                if (RadialValues.TryGetValue(key, out var value))
+                {
+                    if (EditorGUILayout.ToggleLeft(member.Description, true))
+                    {
+                        var newValue = new RadialValue();
+                        if (member.MemberType == typeof(float))
+                        {
+                            using (new EditorGUILayout.HorizontalScope())
+                            {
+                                EditorGUI.indentLevel++;
+                                EditorGUIUtility.labelWidth = 75;
+                                newValue.Start = EditorGUILayout.FloatField(T.始, (float)value.Start, GUILayout.Width(105));
+                                ValuePickerButton(child, member, p => newValue.Start = p.floatValue);
+                                newValue.End = EditorGUILayout.FloatField(T.終, (float)value.End, GUILayout.Width(105));
+                                ValuePickerButton(child, member, p => newValue.End = p.floatValue);
+                                EditorGUIUtility.labelWidth = 70;
+                                using (new EditorGUI.DisabledGroupScope(true))
+                                {
+                                    EditorGUILayout.FloatField(
+                                        T.初期,
+                                        RadialDefaultValue * 100 < value.StartOffsetPercent ? (float)value.Start :
+                                        RadialDefaultValue * 100 > value.EndOffsetPercent ? (float)value.End :
+                                        (((float)value.Start) * (value.EndOffsetPercent - RadialDefaultValue * 100) + ((float)value.End) * (RadialDefaultValue * 100 - value.StartOffsetPercent)) / (value.EndOffsetPercent - value.StartOffsetPercent),
+                                        GUILayout.Width(105)
+                                        );
+                                }
+                                EditorGUIUtility.labelWidth = 0;
+                                EditorGUI.indentLevel--;
+                            }
+                        }
+                        else if (member.MemberType == typeof(Vector3))
+                        {
+                            EditorGUI.indentLevel++;
+                            var widemode = EditorGUIUtility.wideMode;
+                            EditorGUIUtility.wideMode = true;
+                            EditorGUIUtility.labelWidth = 75;
+                            using (new EditorGUILayout.HorizontalScope())
+                            {
+                                newValue.Start = EditorGUILayout.Vector3Field(T.始, (Vector3)value.Start);
+                                ValuePickerButton(child, member, p => newValue.Start = p.vector3Value);
+                            }
+                            using (new EditorGUILayout.HorizontalScope())
+                            {
+                                newValue.End = EditorGUILayout.Vector3Field(T.終, (Vector3)value.End);
+                                ValuePickerButton(child, member, p => newValue.End = p.vector3Value);
+                            }
+                            EditorGUIUtility.labelWidth = 70;
+                            using (new EditorGUI.DisabledGroupScope(true))
+                            {
+                                EditorGUILayout.Vector3Field(
+                                    T.初期,
+                                    RadialDefaultValue * 100 < value.StartOffsetPercent ? (Vector3)value.Start :
+                                    RadialDefaultValue * 100 > value.EndOffsetPercent ? (Vector3)value.End :
+                                    (((Vector3)value.Start) * (value.EndOffsetPercent - RadialDefaultValue * 100) + ((Vector3)value.End) * (RadialDefaultValue * 100 - value.StartOffsetPercent)) / (value.EndOffsetPercent - value.StartOffsetPercent)
+                                    );
+                            }
+                            EditorGUIUtility.wideMode = widemode;
+                            EditorGUIUtility.labelWidth = 0;
+                            EditorGUI.indentLevel--;
+                        }
+                        using (new EditorGUILayout.HorizontalScope())
+                        {
+                            EditorGUI.indentLevel++;
+                            EditorGUIUtility.labelWidth = 120;
+                            newValue.StartOffsetPercent = EditorGUILayout.FloatField(T.始offset_per_, value.StartOffsetPercent, GUILayout.Width(150));
+                            newValue.EndOffsetPercent = EditorGUILayout.FloatField(T.終offset_per_, value.EndOffsetPercent, GUILayout.Width(150));
+                            EditorGUIUtility.labelWidth = 0;
+                            EditorGUI.indentLevel--;
+                        }
+                        if (!value.Equals(newValue))
+                        {
+                            WillChange();
+                            if (newValue.StartOffsetPercent < 0) newValue.StartOffsetPercent = 0;
+                            if (newValue.EndOffsetPercent < 0) newValue.EndOffsetPercent = 0;
+                            if (newValue.StartOffsetPercent > 100) newValue.StartOffsetPercent = 100;
+                            if (newValue.EndOffsetPercent > 100) newValue.EndOffsetPercent = 100;
+
+                            RadialValues[key] = newValue;
+                            if (BulkSet)
+                            {
+                                BulkSetRadialValue(member, newValue, value.ChangedProps(newValue));
+                            }
+                        }
+                    }
+                    else
+                    {
+                        RemoveRadialValue(children, child, member);
+                    }
+                }
+            }
+        }
+
+        void BulkSetRadialValue(TypeMember member, RadialValue value, IEnumerable<string> changedProps)
+        {
+            foreach (var key in RadialValues.Keys.ToArray())
+            {
+                if (key.Item2 == member)
+                {
+                    foreach (var changedProp in changedProps)
+                    {
+                        RadialValues[key] = RadialValues[key].SetProp(changedProp, value.GetProp(changedProp));
+                    }
+                }
+            }
+        }
+
+        void AddRadialValue(IList<string> children, string child, TypeMember member)
+        {
+            if (BulkSet)
+            {
+                foreach (var c in children)
+                {
+                    AddRadialValueSingle(c, member);
+                }
+            }
+            else
+            {
+                AddRadialValueSingle(child, member);
+            }
+        }
+
+        void AddRadialValueSingle(string child, TypeMember member)
+        {
+            var key = (child, member);
+            if (RadialValues.ContainsKey(key)) return;
+            WillChange();
+            RadialValues[key] = new RadialValue();
+        }
+
+        void RemoveRadialValue(IList<string> children, string child, TypeMember member)
+        {
+            if (BulkSet)
+            {
+                foreach (var c in children)
+                {
+                    RemoveRadialValueSingle(c, member);
+                }
+            }
+            else
+            {
+                RemoveRadialValueSingle(child, member);
+            }
+        }
+
+        void RemoveRadialValueSingle(string child, TypeMember member)
+        {
+            var key = (child, member);
+            if (!RadialValues.ContainsKey(key)) return;
+            WillChange();
+            RadialValues.Remove(key);
         }
 
         void ShowTransformComponentControl(IList<string> children, string child, RadialVector3Dictionary values, string title)

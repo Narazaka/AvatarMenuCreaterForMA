@@ -1,10 +1,11 @@
 using nadena.dev.modular_avatar.core;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEditor;
 using UnityEditor.Animations;
 using UnityEngine;
-using VRC.SDK3.Avatars.Components;
 using VRC.SDK3.Avatars.ScriptableObjects;
+using VRC.SDK3.Dynamics.PhysBone.Components;
 
 namespace net.narazaka.avatarmenucreator.editor
 {
@@ -26,6 +27,7 @@ namespace net.narazaka.avatarmenucreator.editor
             inactive.name = $"{baseName}_inactive";
             var inactivate = new AnimationClip();
             inactivate.name = $"{baseName}_inactivate";
+            var transitionSeconds = AvatarMenu.TransitionSeconds;
             foreach (var child in AvatarMenu.ToggleObjects.Keys)
             {
                 if (!matchGameObjects.Contains(child)) continue;
@@ -34,10 +36,10 @@ namespace net.narazaka.avatarmenucreator.editor
                 var curvePath = child;
                 if (use != ToggleUsing.OFF) active.SetCurve(curvePath, typeof(GameObject), "m_IsActive", new AnimationCurve(new Keyframe(0 / 60.0f, activeValue ? 1 : 0)));
                 if (use != ToggleUsing.ON) inactive.SetCurve(curvePath, typeof(GameObject), "m_IsActive", new AnimationCurve(new Keyframe(0 / 60.0f, activeValue ? 0 : 1)));
-                if (AvatarMenu.TransitionSeconds > 0)
+                if (transitionSeconds > 0)
                 {
-                    activate.SetCurve(curvePath, typeof(GameObject), "m_IsActive", new AnimationCurve(new Keyframe(0 / 60.0f, 1), new Keyframe(AvatarMenu.TransitionSeconds, activeValue ? 1 : 0)));
-                    inactivate.SetCurve(curvePath, typeof(GameObject), "m_IsActive", new AnimationCurve(new Keyframe(0 / 60.0f, 1), new Keyframe(AvatarMenu.TransitionSeconds, activeValue ? 0 : 1)));
+                    activate.SetCurve(curvePath, typeof(GameObject), "m_IsActive", new AnimationCurve(new Keyframe(0 / 60.0f, 1), new Keyframe(transitionSeconds, activeValue ? 1 : 0)));
+                    inactivate.SetCurve(curvePath, typeof(GameObject), "m_IsActive", new AnimationCurve(new Keyframe(0 / 60.0f, 1), new Keyframe(transitionSeconds, activeValue ? 0 : 1)));
                 }
             }
             foreach (var (child, index) in AvatarMenu.ToggleMaterials.Keys)
@@ -49,10 +51,10 @@ namespace net.narazaka.avatarmenucreator.editor
                 var binding = EditorCurveBinding.PPtrCurve(curvePath, typeof(Renderer), curveName);
                 if (value.UseActive) AnimationUtility.SetObjectReferenceCurve(active, binding, value.ActiveCurve());
                 if (value.UseInactive) AnimationUtility.SetObjectReferenceCurve(inactive, binding, value.InactiveCurve());
-                if (AvatarMenu.TransitionSeconds > 0)
+                if (transitionSeconds > 0)
                 {
-                    AnimationUtility.SetObjectReferenceCurve(activate, binding, value.ActivateCurve(AvatarMenu.TransitionSeconds));
-                    AnimationUtility.SetObjectReferenceCurve(inactivate, binding, value.InactivateCurve(AvatarMenu.TransitionSeconds));
+                    AnimationUtility.SetObjectReferenceCurve(activate, binding, value.ActivateCurve(transitionSeconds));
+                    AnimationUtility.SetObjectReferenceCurve(inactivate, binding, value.InactivateCurve(transitionSeconds));
                 }
             }
             foreach (var (child, name) in AvatarMenu.ToggleBlendShapes.Keys)
@@ -63,10 +65,10 @@ namespace net.narazaka.avatarmenucreator.editor
                 var curveName = $"blendShape.{name}";
                 if (value.UseActive) active.SetCurve(curvePath, typeof(SkinnedMeshRenderer), curveName, value.ActiveCurve());
                 if (value.UseInactive) inactive.SetCurve(curvePath, typeof(SkinnedMeshRenderer), curveName, value.InactiveCurve());
-                if (AvatarMenu.TransitionSeconds > 0)
+                if (transitionSeconds > 0)
                 {
-                    activate.SetCurve(curvePath, typeof(SkinnedMeshRenderer), curveName, value.ActivateCurve(AvatarMenu.TransitionSeconds));
-                    inactivate.SetCurve(curvePath, typeof(SkinnedMeshRenderer), curveName, value.InactivateCurve(AvatarMenu.TransitionSeconds));
+                    activate.SetCurve(curvePath, typeof(SkinnedMeshRenderer), curveName, value.ActivateCurve(transitionSeconds));
+                    inactivate.SetCurve(curvePath, typeof(SkinnedMeshRenderer), curveName, value.InactivateCurve(transitionSeconds));
                 }
             }
             foreach (var (child, name) in AvatarMenu.ToggleShaderParameters.Keys)
@@ -77,10 +79,38 @@ namespace net.narazaka.avatarmenucreator.editor
                 var curveName = $"material.{name}";
                 if (value.UseActive) active.SetCurve(curvePath, typeof(Renderer), curveName, value.ActiveCurve());
                 if (value.UseInactive) inactive.SetCurve(curvePath, typeof(Renderer), curveName, value.InactiveCurve());
-                if (AvatarMenu.TransitionSeconds > 0)
+                if (transitionSeconds > 0)
                 {
-                    activate.SetCurve(curvePath, typeof(Renderer), curveName, value.ActivateCurve(AvatarMenu.TransitionSeconds));
-                    inactivate.SetCurve(curvePath, typeof(Renderer), curveName, value.InactivateCurve(AvatarMenu.TransitionSeconds));
+                    activate.SetCurve(curvePath, typeof(Renderer), curveName, value.ActivateCurve(transitionSeconds));
+                    inactivate.SetCurve(curvePath, typeof(Renderer), curveName, value.InactivateCurve(transitionSeconds));
+                }
+            }
+            foreach (var (child, member) in AvatarMenu.ToggleValues.Keys)
+            {
+                if (!matchGameObjects.Contains(child)) continue;
+                var value = AvatarMenu.ToggleValues[(child, member)];
+                var curvePath = child;
+                if (member.MemberTypeIsPrimitive)
+                {
+                    var curve = value.AnimationToggleCurve(member.MemberType);
+                    if (value.UseActive) active.SetCurve(curvePath, member.Type, member.AnimationMemberName, curve.ActiveCurve());
+                    if (value.UseInactive) inactive.SetCurve(curvePath, member.Type, member.AnimationMemberName, curve.InactiveCurve());
+                    if (transitionSeconds > 0)
+                    {
+                        activate.SetCurve(curvePath, member.Type, member.AnimationMemberName, curve.ActivateCurve(transitionSeconds));
+                        inactivate.SetCurve(curvePath, member.Type, member.AnimationMemberName, curve.InactivateCurve(transitionSeconds));
+                    }
+                }
+                else
+                {
+                    var curve = value.ComplexAnimationToggleCurve(member.MemberType, member.AnimationMemberName);
+                    if (value.UseActive) foreach (var c in curve.ActiveCurve()) active.SetCurve(curvePath, member.Type, c.propertyName, c.curve);
+                    if (value.UseInactive) foreach (var c in curve.InactiveCurve()) inactive.SetCurve(curvePath, member.Type, c.propertyName, c.curve);
+                    if (transitionSeconds > 0)
+                    {
+                        foreach (var c in curve.ActivateCurve(transitionSeconds)) activate.SetCurve(curvePath, member.Type, c.propertyName, c.curve);
+                        foreach (var c in curve.InactivateCurve(transitionSeconds)) inactivate.SetCurve(curvePath, member.Type, c.propertyName, c.curve);
+                    }
                 }
             }
             foreach (var child in AvatarMenu.Positions.Keys)
@@ -90,10 +120,10 @@ namespace net.narazaka.avatarmenucreator.editor
                 var curvePath = child;
                 if (value.UseActive) foreach (var c in value.ActiveCurve("localPosition")) active.SetCurve(curvePath, typeof(Transform), c.propertyName, c.curve);
                 if (value.UseInactive) foreach (var c in value.InactiveCurve("localPosition")) inactive.SetCurve(curvePath, typeof(Transform), c.propertyName, c.curve);
-                if (AvatarMenu.TransitionSeconds > 0)
+                if (transitionSeconds > 0)
                 {
-                    foreach (var c in value.ActivateCurve("localPosition", AvatarMenu.TransitionSeconds)) activate.SetCurve(curvePath, typeof(Transform), c.propertyName, c.curve);
-                    foreach (var c in value.InactivateCurve("localPosition", AvatarMenu.TransitionSeconds)) inactivate.SetCurve(curvePath, typeof(Transform), c.propertyName, c.curve);
+                    foreach (var c in value.ActivateCurve("localPosition", transitionSeconds)) activate.SetCurve(curvePath, typeof(Transform), c.propertyName, c.curve);
+                    foreach (var c in value.InactivateCurve("localPosition", transitionSeconds)) inactivate.SetCurve(curvePath, typeof(Transform), c.propertyName, c.curve);
                 }
             }
             foreach (var child in AvatarMenu.Rotations.Keys)
@@ -103,10 +133,10 @@ namespace net.narazaka.avatarmenucreator.editor
                 var curvePath = child;
                 if (value.UseActive) foreach (var c in value.ActiveCurve("localEulerAnglesRaw")) active.SetCurve(curvePath, typeof(Transform), c.propertyName, c.curve);
                 if (value.UseInactive) foreach (var c in value.InactiveCurve("localEulerAnglesRaw")) inactive.SetCurve(curvePath, typeof(Transform), c.propertyName, c.curve);
-                if (AvatarMenu.TransitionSeconds > 0)
+                if (transitionSeconds > 0)
                 {
-                    foreach (var c in value.ActivateCurve("localEulerAnglesRaw", AvatarMenu.TransitionSeconds)) activate.SetCurve(curvePath, typeof(Transform), c.propertyName, c.curve);
-                    foreach (var c in value.InactivateCurve("localEulerAnglesRaw", AvatarMenu.TransitionSeconds)) inactivate.SetCurve(curvePath, typeof(Transform), c.propertyName, c.curve);
+                    foreach (var c in value.ActivateCurve("localEulerAnglesRaw", transitionSeconds)) activate.SetCurve(curvePath, typeof(Transform), c.propertyName, c.curve);
+                    foreach (var c in value.InactivateCurve("localEulerAnglesRaw", transitionSeconds)) inactivate.SetCurve(curvePath, typeof(Transform), c.propertyName, c.curve);
                 }
             }
             foreach (var child in AvatarMenu.Scales.Keys)
@@ -116,10 +146,10 @@ namespace net.narazaka.avatarmenucreator.editor
                 var curvePath = child;
                 if (value.UseActive) foreach (var c in value.ActiveCurve("localScale")) active.SetCurve(curvePath, typeof(Transform), c.propertyName, c.curve);
                 if (value.UseInactive) foreach (var c in value.InactiveCurve("localScale")) inactive.SetCurve(curvePath, typeof(Transform), c.propertyName, c.curve);
-                if (AvatarMenu.TransitionSeconds > 0)
+                if (transitionSeconds > 0)
                 {
-                    foreach (var c in value.ActivateCurve("localScale", AvatarMenu.TransitionSeconds)) activate.SetCurve(curvePath, typeof(Transform), c.propertyName, c.curve);
-                    foreach (var c in value.InactivateCurve("localScale", AvatarMenu.TransitionSeconds)) inactivate.SetCurve(curvePath, typeof(Transform), c.propertyName, c.curve);    
+                    foreach (var c in value.ActivateCurve("localScale", transitionSeconds)) activate.SetCurve(curvePath, typeof(Transform), c.propertyName, c.curve);
+                    foreach (var c in value.InactivateCurve("localScale", transitionSeconds)) inactivate.SetCurve(curvePath, typeof(Transform), c.propertyName, c.curve);    
                 }
             }
             // controller
@@ -167,7 +197,7 @@ namespace net.narazaka.avatarmenucreator.editor
                     threshold = 1,
                 },
             };
-            if (AvatarMenu.TransitionSeconds > 0)
+            if (transitionSeconds > 0)
             {
                 var inactivateState = layer.stateMachine.AddState($"{baseName}_inactivate", new Vector3(500, 0));
                 inactivateState.motion = inactivate;
@@ -239,6 +269,168 @@ namespace net.narazaka.avatarmenucreator.editor
                     },
                 };
             }
+            var physBoneAutoResetEffectiveObjects = AvatarMenu.GetPhysBoneAutoResetEffectiveObjects(matchGameObjects, AvatarMenu.ToggleValues.Keys).ToArray();
+            AnimationClip emptyClip = null;
+            AnimationClip waitClip = null;
+            AnimationClip pbDisableClip = null;
+            AnimationClip pbEnableClip = null;
+            if (physBoneAutoResetEffectiveObjects.Length > 0)
+            {
+                controller.AddLayer(new AnimatorControllerLayer
+                {
+                    name = baseName + "_PB_auto_reset",
+                    defaultWeight = 1,
+                    stateMachine = new AnimatorStateMachine
+                    {
+                        name = baseName + "_PB_auto_reset",
+                        hideFlags = HideFlags.HideInHierarchy,
+                    },
+                });
+                var pbLayer = controller.layers[1];
+
+                emptyClip = util.Util.GenerateEmptyAnimationClip(baseName);
+                if (transitionSeconds > 0) waitClip = util.Util.GenerateEmptyAnimationClip(baseName + "_wait", transitionSeconds);
+                pbDisableClip = new AnimationClip { name = $"{baseName}_PB_disable" };
+                pbEnableClip = new AnimationClip { name = $"{baseName}_PB_enable" };
+                var disableCurve = new AnimationCurve(new Keyframe(0, 0), new Keyframe(1 / 60f, 0));
+                var enableCurve = new AnimationCurve(new Keyframe(0, 1), new Keyframe(1 / 60f, 1));
+                foreach (var child in physBoneAutoResetEffectiveObjects)
+                {
+                    var curvePath = child;
+                    pbDisableClip.SetCurve(curvePath, typeof(VRCPhysBone), "m_Enabled", disableCurve);
+                    pbEnableClip.SetCurve(curvePath, typeof(VRCPhysBone), "m_Enabled", enableCurve);
+                }
+
+                pbLayer.stateMachine.entryPosition = new Vector3(-600, 0);
+                pbLayer.stateMachine.anyStatePosition = new Vector3(900, 0);
+                var pbIdleState = pbLayer.stateMachine.AddState($"{baseName}_idle", new Vector3(300, 0));
+                pbIdleState.motion = emptyClip;
+                pbIdleState.writeDefaultValues = false;
+                pbLayer.stateMachine.defaultState = pbIdleState;
+                var pbInactiveState = pbLayer.stateMachine.AddState($"{baseName}_inactive", new Vector3(300, 100));
+                pbInactiveState.motion = emptyClip;
+                pbInactiveState.writeDefaultValues = false;
+                var pbActiveState = pbLayer.stateMachine.AddState($"{baseName}_active", new Vector3(300, -100));
+                pbActiveState.motion = emptyClip;
+                pbActiveState.writeDefaultValues = false;
+                AnimatorState pbInactivateWaitState = null;
+                if (transitionSeconds > 0)
+                {
+                    pbInactivateWaitState = pbLayer.stateMachine.AddState($"{baseName}_inactivate_wait", new Vector3(600, 300));
+                    pbInactivateWaitState.motion = waitClip;
+                    pbInactivateWaitState.writeDefaultValues = false;
+                }
+                var pbInactivateDisableState = pbLayer.stateMachine.AddState($"{baseName}_inactivate_disable", new Vector3(600, 100));
+                pbInactivateDisableState.motion = pbDisableClip;
+                pbInactivateDisableState.writeDefaultValues = false;
+                var pbInactivateEnableState = pbLayer.stateMachine.AddState($"{baseName}_inactivate_enable", new Vector3(600, -100));
+                pbInactivateEnableState.motion = pbEnableClip;
+                pbInactivateEnableState.writeDefaultValues = false;
+                AnimatorState pbActivateWaitState = null;
+                if (transitionSeconds > 0)
+                {
+                    pbActivateWaitState = pbLayer.stateMachine.AddState($"{baseName}_activate_wait", new Vector3(0, -300));
+                    pbActivateWaitState.motion = waitClip;
+                    pbActivateWaitState.writeDefaultValues = false;
+                }
+                var pbActivateDisableState = pbLayer.stateMachine.AddState($"{baseName}_activate_disable", new Vector3(0, -100));
+                pbActivateDisableState.motion = pbDisableClip;
+                pbActivateDisableState.writeDefaultValues = false;
+                var pbActivateEnableState = pbLayer.stateMachine.AddState($"{baseName}_activate_enable", new Vector3(0, 100));
+                pbActivateEnableState.motion = pbEnableClip;
+                pbActivateEnableState.writeDefaultValues = false;
+
+                var pbIdleToActive = pbIdleState.AddTransition(pbActiveState);
+                pbIdleToActive.exitTime = 0;
+                pbIdleToActive.duration = 0;
+                pbIdleToActive.hasExitTime = false;
+                pbIdleToActive.conditions = new AnimatorCondition[]
+                {
+                    new AnimatorCondition
+                    {
+                        mode = AnimatorConditionMode.If,
+                        parameter = parameterName,
+                        threshold = 1,
+                    },
+                };
+                var pbIdleToInactive = pbIdleState.AddTransition(pbInactiveState);
+                pbIdleToInactive.exitTime = 0;
+                pbIdleToInactive.duration = 0;
+                pbIdleToInactive.hasExitTime = false;
+                pbIdleToInactive.conditions = new AnimatorCondition[]
+                {
+                    new AnimatorCondition
+                    {
+                        mode = AnimatorConditionMode.IfNot,
+                        parameter = parameterName,
+                        threshold = 1,
+                    },
+                };
+                var pbInactivate = pbInactiveState.AddTransition(transitionSeconds > 0 ? pbInactivateWaitState : pbInactivateDisableState);
+                pbInactivate.exitTime = 0;
+                pbInactivate.duration = 0;
+                pbInactivate.hasExitTime = false;
+                pbInactivate.conditions = new AnimatorCondition[]
+                {
+                    new AnimatorCondition
+                    {
+                        mode = AnimatorConditionMode.If,
+                        parameter = parameterName,
+                        threshold = 1,
+                    },
+                };
+                if (transitionSeconds > 0)
+                {
+                    var pbInactivateToDisable = pbInactivateWaitState.AddTransition(pbInactivateDisableState);
+                    pbInactivateToDisable.exitTime = 1;
+                    pbInactivateToDisable.duration = 0;
+                    pbInactivateToDisable.hasExitTime = true;
+                }
+                var pbInactivateToEnable = pbInactivateDisableState.AddTransition(pbInactivateEnableState);
+                pbInactivateToEnable.exitTime = 1;
+                pbInactivateToEnable.duration = 0;
+                pbInactivateToEnable.hasExitTime = true;
+                var pbToActive = pbInactivateEnableState.AddTransition(pbActiveState);
+                pbToActive.exitTime = 1;
+                pbToActive.duration = 0;
+                pbToActive.hasExitTime = true;
+                var pbActivate = pbActiveState.AddTransition(transitionSeconds > 0 ? pbActivateWaitState : pbActivateDisableState);
+                pbActivate.exitTime = 0;
+                pbActivate.duration = 0;
+                pbActivate.hasExitTime = false;
+                pbActivate.conditions = new AnimatorCondition[]
+                {
+                    new AnimatorCondition
+                    {
+                        mode = AnimatorConditionMode.IfNot,
+                        parameter = parameterName,
+                        threshold = 1,
+                    },
+                };
+                if (transitionSeconds > 0)
+                {
+                    var pbActivateToDisable = pbActivateWaitState.AddTransition(pbActivateDisableState);
+                    pbActivateToDisable.exitTime = 1;
+                    pbActivateToDisable.duration = 0;
+                    pbActivateToDisable.hasExitTime = true;
+                }
+                var pbActivateToEnable = pbActivateDisableState.AddTransition(pbActivateEnableState);
+                pbActivateToEnable.exitTime = 1;
+                pbActivateToEnable.duration = 0;
+                pbActivateToEnable.hasExitTime = true;
+                var pbToInactive = pbActivateEnableState.AddTransition(pbInactiveState);
+                pbToInactive.exitTime = 1;
+                pbToInactive.duration = 0;
+                pbToInactive.hasExitTime = true;
+            }
+            foreach (var child in physBoneAutoResetEffectiveObjects)
+            {
+                var curvePath = child;
+                var curve = new AnimationCurve(new Keyframe(transitionSeconds - 2 / 60f, 0), new Keyframe(transitionSeconds - 1 / 60f, 1), new Keyframe(transitionSeconds, 1));
+                if (transitionSeconds >= 3 / 60f) curve.AddKey(transitionSeconds - 3 / 60f, 1);
+                activate.SetCurve(curvePath, typeof(VRCPhysBone), "m_Enabled", curve);
+                inactivate.SetCurve(curvePath, typeof(VRCPhysBone), "m_Enabled", curve);
+            }
             // menu
             var menu = new VRCExpressionsMenu
             {
@@ -259,7 +451,11 @@ namespace net.narazaka.avatarmenucreator.editor
                 },
             };
             menu.name = baseName;
-            return new CreatedAssets(baseName, controller, AvatarMenu.TransitionSeconds > 0 ? new AnimationClip[] { active, inactive, activate, inactivate } : new AnimationClip[] { active, inactive }, menu, null, new ParameterConfig[]
+            var clips = new List<AnimationClip> { active, inactive };
+            if (transitionSeconds > 0) clips.AddRange(new AnimationClip[] { activate, inactivate });
+            if (physBoneAutoResetEffectiveObjects.Length > 0) clips.AddRange(new AnimationClip[] { emptyClip, pbDisableClip, pbEnableClip });
+            if (physBoneAutoResetEffectiveObjects.Length > 0 && transitionSeconds > 0) clips.Add(waitClip);
+            return new CreatedAssets(baseName, controller, clips.ToArray(), menu, null, new ParameterConfig[]
             {
                 new ParameterConfig
                 {
@@ -267,6 +463,9 @@ namespace net.narazaka.avatarmenucreator.editor
                     defaultValue = AvatarMenu.ToggleDefaultValue ? 1 : 0,
                     syncType = ParameterSyncType.Bool,
                     saved = AvatarMenu.Saved,
+#if !NET_NARAZAKA_VRCHAT_AvatarMenuCreator_HAS_NO_MENU_MA
+                    localOnly = !AvatarMenu.Synced,
+#endif
                     internalParameter = AvatarMenu.InternalParameter,
                 },
             });

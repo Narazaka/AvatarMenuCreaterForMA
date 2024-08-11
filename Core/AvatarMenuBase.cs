@@ -1,9 +1,12 @@
-using System;
+﻿using System;
+using System.Linq;
 using System.Collections.Generic;
 using UnityEngine;
+using net.narazaka.avatarmenucreator.collections.instance;
+
 #if UNITY_EDITOR
 using UnityEditor;
-using net.narazaka.avatarmenucreator.editor.util;
+using net.narazaka.avatarmenucreator.util;
 #endif
 
 namespace net.narazaka.avatarmenucreator
@@ -21,9 +24,17 @@ namespace net.narazaka.avatarmenucreator
         [SerializeField]
         public bool Saved = true;
         [SerializeField]
+        public bool Synced = true;
+        [SerializeField]
         public string ParameterName;
         [SerializeField]
         public bool InternalParameter = false;
+        [SerializeField]
+        public StringHashSet PhysBoneAutoResetDisabledObjects = new StringHashSet();
+
+        protected bool PhysBoneAutoResetEnabled(string child) => !PhysBoneAutoResetDisabledObjects.Contains(child);
+        protected void EnablePhysBoneAutoReset(string child) => PhysBoneAutoResetDisabledObjects.Remove(child);
+        protected void DisablePhysBoneAutoReset(string child) => PhysBoneAutoResetDisabledObjects.Add(child);
 
 #if UNITY_EDITOR
         [NonSerialized]
@@ -41,6 +52,40 @@ namespace net.narazaka.avatarmenucreator
 
         [NonSerialized]
         public UnityEngine.Object UndoObject;
+        [NonSerialized]
+        public bool ShowMultiSelectInfo;
+
+        bool? _FoldoutDetails;
+        bool FoldoutDetails
+        {
+
+            get
+            {
+                if (_FoldoutDetails == null)
+                {
+                    _FoldoutDetails = !Synced || InternalParameter || !string.IsNullOrEmpty(ParameterName);
+                }
+                return (bool)_FoldoutDetails;
+            }
+            set => _FoldoutDetails = value;
+        }
+
+        bool? _FoldoutDetailsMulti;
+        bool GetFoldoutDetailsMulti(SerializedProperty serializedProperty)
+        {
+            if (_FoldoutDetailsMulti == null)
+            {
+                var synced = serializedProperty.FindPropertyRelative(nameof(Synced));
+                var internalParameter = serializedProperty.FindPropertyRelative(nameof(InternalParameter));
+                _FoldoutDetailsMulti = synced.hasMultipleDifferentValues || !synced.boolValue || internalParameter.hasMultipleDifferentValues || internalParameter.boolValue;
+            }
+            return (bool)_FoldoutDetailsMulti;
+        }
+        bool SetFoldoutDetailsMulti(bool value)
+        {
+            _FoldoutDetailsMulti = value;
+            return value;
+        }
 
         HashSet<string> FoldoutGameObjects = new HashSet<string>();
         Dictionary<string, HashSet<string>> FoldoutGroups = new Dictionary<string, HashSet<string>>();
@@ -66,6 +111,10 @@ namespace net.narazaka.avatarmenucreator
             {
                 ScrollPosition = scrollView.scrollPosition;
                 OnMainGUI(children);
+                if (ShowMultiSelectInfo && children.Count == 1)
+                {
+                    EditorGUILayout.HelpBox(T.ヒント_colon__複数のオブジェクトを選択して一緒に設定出来ます, MessageType.Info);
+                }
             }
         }
 
@@ -110,19 +159,16 @@ namespace net.narazaka.avatarmenucreator
             if (transitionSeconds.floatValue < 0) transitionSeconds.floatValue = 0;
         }
 
-        protected void ShowSaved()
-        {
-            Saved = Toggle(T.パラメーター保存, Saved);
-        }
-
-        protected void ShowSavedMulti(SerializedProperty serializedProperty)
-        {
-            EditorGUILayout.PropertyField(serializedProperty.FindPropertyRelative(nameof(Saved)), new GUIContent(T.パラメーター保存));
-        }
-
         protected void ShowDetailMenu()
         {
-            ParameterName = TextField(T.パラメーター名_start_オプショナル_end_, ParameterName);
+            Saved = Toggle(T.パラメーター保存, Saved);
+            FoldoutDetails = EditorGUILayout.Foldout(FoldoutDetails, T.オプション);
+            if (!FoldoutDetails) return;
+            EditorGUI.indentLevel++;
+#if !NET_NARAZAKA_VRCHAT_AvatarMenuCreator_HAS_NO_MENU_MA
+            Synced = Toggle(T.パラメーター同期, Synced);
+#endif
+            ParameterName = TextField(T.パラメーター名, ParameterName);
             var internalParameterLabel =
 #if UNITY_2022_1_OR_NEWER && !NET_NARAZAKA_VRCHAT_AvatarMenuCreator_HAS_MA_BEFORE_1_8
                 T.パラメーター自動リネーム;
@@ -130,10 +176,20 @@ namespace net.narazaka.avatarmenucreator
                 T.パラメーター内部値;
 #endif
             InternalParameter = Toggle(internalParameterLabel, InternalParameter);
+            EditorGUI.indentLevel--;
         }
 
         protected void ShowDetailMenuMulti(SerializedProperty serializedProperty)
         {
+            EditorGUILayout.PropertyField(serializedProperty.FindPropertyRelative(nameof(Saved)), new GUIContent(T.パラメーター保存));
+            EditorGUI.indentLevel++;
+            var foldout = SetFoldoutDetailsMulti(EditorGUILayout.Foldout(GetFoldoutDetailsMulti(serializedProperty), T.オプション));
+            EditorGUI.indentLevel--;
+            if (!foldout) return;
+            EditorGUI.indentLevel++;
+#if !NET_NARAZAKA_VRCHAT_AvatarMenuCreator_HAS_NO_MENU_MA
+            EditorGUILayout.PropertyField(serializedProperty.FindPropertyRelative(nameof(Synced)), new GUIContent(T.パラメーター同期));
+#endif
             // EditorGUILayout.PropertyField(serializedProperty.FindPropertyRelative(nameof(ParameterName)), new GUIContent(T.パラメーター名_start_オプショナル_end_));
             var internalParameterLabel =
 #if UNITY_2022_1_OR_NEWER && !NET_NARAZAKA_VRCHAT_AvatarMenuCreator_HAS_MA_BEFORE_1_8
@@ -142,7 +198,50 @@ namespace net.narazaka.avatarmenucreator
                 T.パラメーター内部値;
 #endif
             EditorGUILayout.PropertyField(serializedProperty.FindPropertyRelative(nameof(InternalParameter)), new GUIContent(internalParameterLabel));
+            EditorGUI.indentLevel--;
         }
+
+        protected void ShowPhysBoneAutoResetMenu(string child, TypeMember[] childMembers)
+        {
+            var needResetPhysBoneField = VRCPhysBoneUtil.IsNeedResetPhysBoneField(childMembers);
+            if (needResetPhysBoneField)
+            {
+                var hasPhysBoneField = VRCPhysBoneUtil.HasPhysBoneEnabled(childMembers);
+                var physBoneAutoResetEnabled = PhysBoneAutoResetEnabled(child);
+                if (hasPhysBoneField)
+                {
+                    EditorGUILayout.HelpBox(T.PhysBone自動リセットを有効にするには_PhysBone_dot_enabled_設定を削除して下さいゝ, MessageType.Info);
+                }
+                else
+                {
+                    EditorGUI.BeginChangeCheck();
+                    physBoneAutoResetEnabled = EditorGUILayout.Toggle(T.PhysBone自動リセット, physBoneAutoResetEnabled);
+                    if (EditorGUI.EndChangeCheck())
+                    {
+                        WillChange();
+                        if (physBoneAutoResetEnabled)
+                        {
+                            EnablePhysBoneAutoReset(child);
+                        }
+                        else
+                        {
+                            DisablePhysBoneAutoReset(child);
+                        }
+                    }
+                }
+                if (hasPhysBoneField || !physBoneAutoResetEnabled)
+                {
+                    EditorGUILayout.HelpBox(T.PhysBoneをリセットしないと反映されない値が設定されていますゝPhysBone自動リセットを有効にするとリセット_start_OFF_sl_ON_end_処理を挿入しますゝ, MessageType.Warning);
+                }
+            }
+        }
+
+        public IEnumerable<string> GetPhysBoneAutoResetEffectiveObjects(IEnumerable<string> children, IEnumerable<(string, TypeMember)> valueKeys) =>
+            valueKeys.Where(k => children.Contains(k.Item1)).GroupBy(k => k.Item1).Where(g =>
+            {
+                var tms = g.Select(k => k.Item2).ToArray();
+                return PhysBoneAutoResetEnabled(g.Key) && !VRCPhysBoneUtil.HasPhysBoneEnabled(tms) && VRCPhysBoneUtil.IsNeedResetPhysBoneField(tms);
+            }).Select(g => g.Key);
 
         protected GameObject GetGameObject(string child)
         {
@@ -435,6 +534,13 @@ namespace net.narazaka.avatarmenucreator
                 case "Scale": return "localScale";
                 default: throw new ArgumentException();
             }
+        }
+
+        protected void ValuePickerButton(string child, TypeMember member, Action<SerializedProperty> setValue)
+        {
+            var go = GetGameObject(child);
+            if (go == null || !PickerButton()) return;
+            setValue(new SerializedObject(go.GetComponent(member.Type)).FindProperty(member.AnimationMemberName));
         }
 
         protected void HorizontalLine()

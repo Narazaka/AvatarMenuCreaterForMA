@@ -1,10 +1,7 @@
 using UnityEngine;
 using UnityEditor;
 using VRC.SDK3.Avatars.Components;
-using net.narazaka.avatarmenucreator.editor.util;
-#if NET_NARAZAKA_VRCHAT_AvatarMenuCreator_HAS_NDMF
-using net.narazaka.avatarmenucreator.components;
-#endif
+using net.narazaka.avatarmenucreator.util;
 
 namespace net.narazaka.avatarmenucreator.editor
 {
@@ -16,7 +13,7 @@ namespace net.narazaka.avatarmenucreator.editor
         MenuType MenuType = MenuType.Toggle;
         [SerializeField]
         IncludeAssetType IncludeAssetType =
-#if NET_NARAZAKA_VRCHAT_AvatarMenuCreator_HAS_NDMF
+#if NET_NARAZAKA_VRCHAT_AvatarMenuCreator_HAS_NDMF && !NET_NARAZAKA_VRCHAT_AvatarMenuCreator_HAS_NO_MENU_MA
             IncludeAssetType.Component;
 #else
             IncludeAssetType.AnimatorAndInclude;
@@ -50,6 +47,9 @@ namespace net.narazaka.avatarmenucreator.editor
             AvatarToggleMenu.UndoObject = this;
             AvatarChooseMenu.UndoObject = this;
             AvatarRadialMenu.UndoObject = this;
+            AvatarToggleMenu.ShowMultiSelectInfo = true;
+            AvatarChooseMenu.ShowMultiSelectInfo = true;
+            AvatarRadialMenu.ShowMultiSelectInfo = true;
         }
 
         void Update()
@@ -100,7 +100,7 @@ namespace net.narazaka.avatarmenucreator.editor
             if (VRCAvatarDescriptor == null)
             {
                 VRCAvatarDescriptor = null;
-                EditorGUILayout.LabelField(T.対象のアバターを選択して下さい);
+                EditorGUILayout.HelpBox(T.対象のアバターを選択して下さい, MessageType.Info);
                 return;
             }
 
@@ -108,7 +108,7 @@ namespace net.narazaka.avatarmenucreator.editor
 
             if (children.Length == 0 || (children.Length == 1 && selectedGameObjects[0] == VRCAvatarDescriptor.gameObject))
             {
-                EditorGUILayout.LabelField(T.対象のオブジェクトを選択して下さい);
+                EditorGUILayout.HelpBox(T.対象のオブジェクトを選択して下さい, MessageType.Info);
                 return;
             }
 
@@ -147,7 +147,7 @@ namespace net.narazaka.avatarmenucreator.editor
                 IncludeAssetType = newIncludeAssetType;
             }
             var isComponent =
-#if NET_NARAZAKA_VRCHAT_AvatarMenuCreator_HAS_NDMF
+#if NET_NARAZAKA_VRCHAT_AvatarMenuCreator_HAS_NDMF && !NET_NARAZAKA_VRCHAT_AvatarMenuCreator_HAS_NO_MENU_MA
                 IncludeAssetType == IncludeAssetType.Component;
 #else
                 false;
@@ -182,7 +182,7 @@ namespace net.narazaka.avatarmenucreator.editor
 
                     if (isComponent)
                     {
-#if NET_NARAZAKA_VRCHAT_AvatarMenuCreator_HAS_NDMF
+#if NET_NARAZAKA_VRCHAT_AvatarMenuCreator_HAS_NDMF && !NET_NARAZAKA_VRCHAT_AvatarMenuCreator_HAS_NO_MENU_MA
                         if (MakeMultipleObjectsEffective)
                         {
                             foreach (var child in children)
@@ -199,7 +199,7 @@ namespace net.narazaka.avatarmenucreator.editor
                     else
                     {
                         System.Action<GameObject> modifyPrefab =
-#if NET_NARAZAKA_VRCHAT_AvatarMenuCreator_HAS_NDMF
+#if NET_NARAZAKA_VRCHAT_AvatarMenuCreator_HAS_NDMF && !NET_NARAZAKA_VRCHAT_AvatarMenuCreator_HAS_NO_MENU_MA
                             (GameObject prefab) =>
                             {
                                 var creator = CreateAvatarMenuBase.GetOrAddMenuCreatorComponent(prefab, avatarMenu);
@@ -221,7 +221,7 @@ namespace net.narazaka.avatarmenucreator.editor
 
         public bool MakeMultipleObjectsEffective => MakeMultipleObjects && MenuType != MenuType.Choose;
 
-#if NET_NARAZAKA_VRCHAT_AvatarMenuCreator_HAS_NDMF
+#if NET_NARAZAKA_VRCHAT_AvatarMenuCreator_HAS_NDMF && !NET_NARAZAKA_VRCHAT_AvatarMenuCreator_HAS_NO_MENU_MA
         public void SaveAsComponent(AvatarMenuBase avatarMenu, string baseName, string[] children)
         {
             var obj = new GameObject(baseName);
