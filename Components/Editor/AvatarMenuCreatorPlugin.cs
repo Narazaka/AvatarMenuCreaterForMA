@@ -16,7 +16,7 @@ namespace net.narazaka.avatarmenucreator.components.editor
         {
             InPhase(BuildPhase.Generating).BeforePlugin("nadena.dev.modular-avatar").Run("AvatarMenuCreatorForMA", ctx =>
             {
-                var creators = ctx.AvatarRootTransform.GetComponentsInChildren<AvatarMenuCreatorBase>();
+                var creators = ctx.AvatarRootTransform.GetComponentsInChildren<AvatarMenuCreatorBase>(true);
                 foreach (var creator in creators)
                 {
                     if (!creator.IsEffective) continue;
