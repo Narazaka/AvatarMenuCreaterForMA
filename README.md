@@ -43,6 +43,8 @@ NDMF（Modular Avatar 1.8.0以降）のコンポーネントによる非破壊�
 
 ## 更新履歴
 
+- 1.21.1
+  - 初期inactiveなメニューが処理されない不具合を修正
 - 1.21.0
   - アイコンが付きました<img src="Icons/AvatarMenuCreatorToggleIcon.png" width="18" height="18"><img src="Icons/AvatarMenuCreatorChooseIcon.png" width="18" height="18"><img src="Icons/AvatarMenuCreatorRadialIcon.png" width="18" height="18">
 - 1.20.0
