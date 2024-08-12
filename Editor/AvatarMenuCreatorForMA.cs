@@ -125,11 +125,14 @@ namespace net.narazaka.avatarmenucreator.editor
                 return;
             }
 
-            var newMenuType = (MenuType)ToolbarUtility.Toolbar(MenuType);
-            if (newMenuType != MenuType)
+            using (new EditorGUIUtility.IconSizeScope(new Vector2(16, 16)))
             {
-                UndoUtility.RecordObject(this, "MenuType");
-                MenuType = newMenuType;
+                var newMenuType = (MenuType)ToolbarUtility.Toolbar(MenuType);
+                if (newMenuType != MenuType)
+                {
+                    UndoUtility.RecordObject(this, "MenuType");
+                    MenuType = newMenuType;
+                }
             }
 
             ShowBulkSet();

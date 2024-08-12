@@ -5,7 +5,7 @@ namespace net.narazaka.avatarmenucreator
 {
     public class Localization
     {
-        static Lang Lang
+        public static Lang Lang
         {
             get {
                 switch (LanguageName)
