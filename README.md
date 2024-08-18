@@ -43,6 +43,8 @@ NDMF（Modular Avatar 1.8.0以降）のコンポーネントによる非破壊�
 
 ## 更新履歴
 
+- 1.21.2
+  - ChooseメニューでComponentsのbool値(enabledなど)を設定した場合にエラーになる問題を修正
 - 1.21.1
   - 初期inactiveなメニューが処理されない不具合を修正
 - 1.21.0
