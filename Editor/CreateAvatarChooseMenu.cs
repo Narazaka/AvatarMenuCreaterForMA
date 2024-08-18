@@ -74,7 +74,7 @@ namespace net.narazaka.avatarmenucreator.editor
                 {
                     for (var i = 0; i < AvatarMenu.ChooseCount; ++i)
                     {
-                        choices[i].SetCurve(curvePath, member.Type, member.AnimationMemberName, new AnimationCurve(new Keyframe(0, value.ContainsKey(i) ? (float)value[i].As(member.MemberType) : 0)));
+                        choices[i].SetCurve(curvePath, member.Type, member.AnimationMemberName, new AnimationCurve(new Keyframe(0, value.ContainsKey(i) ? Convert.ToSingle(value[i].As(member.MemberType)) : 0)));
                     }
                 }
                 else if (member.MemberType == typeof(Vector3))
