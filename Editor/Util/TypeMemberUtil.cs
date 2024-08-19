@@ -5,6 +5,10 @@ using System.Reflection;
 using VRC.SDK3.Dynamics.PhysBone.Components;
 using UnityEngine;
 using UnityEngine.Animations;
+#if HAS_VRC_CONSTRAINT
+using VRC.SDK3.Dynamics.Constraint.Components;
+#endif
+using VRC.Dynamics;
 
 namespace net.narazaka.avatarmenucreator.util
 {
@@ -25,6 +29,16 @@ namespace net.narazaka.avatarmenucreator.util
             new MemberInfoContainer(type.GetProperty(nameof(IConstraint.constraintActive))) { Field = "m_Active", Label = "Is Active" },
             new MemberInfoContainer(type.GetProperty(nameof(IConstraint.weight))) { Field = "m_Weight" },
         };
+#if HAS_VRC_CONSTRAINT
+        static MemberInfoContainer[] VRCConstraintCommonMembers(Type type) => new MemberInfoContainer[]
+        {
+            new MemberInfoContainer(type.GetField(nameof(VRCConstraintBase.IsActive))),
+            new MemberInfoContainer(type.GetField(nameof(VRCConstraintBase.GlobalWeight))) { Label = "Weight" },
+            new MemberInfoContainer(type.GetField(nameof(VRCConstraintBase.SolveInLocalSpace))),
+            new MemberInfoContainer(type.GetField(nameof(VRCConstraintBase.FreezeToWorld))),
+            new MemberInfoContainer(type.GetField(nameof(VRCConstraintBase.RebakeOffsetsWhenUnfrozen))),
+        };
+#endif
         static Dictionary<Type, MemberInfoContainer[]> AvailableMembers = new Dictionary<Type, MemberInfoContainer[]>
         {
             {
@@ -63,6 +77,14 @@ namespace net.narazaka.avatarmenucreator.util
             { typeof(PositionConstraint), ConstraintCommonMembers(typeof(PositionConstraint)) },
             { typeof(RotationConstraint), ConstraintCommonMembers(typeof(RotationConstraint)) },
             { typeof(ScaleConstraint), ConstraintCommonMembers(typeof(ScaleConstraint)) },
+#if HAS_VRC_CONSTRAINT
+            { typeof(VRCAimConstraint), VRCConstraintCommonMembers(typeof(VRCAimConstraint)) },
+            { typeof(VRCLookAtConstraint), VRCConstraintCommonMembers(typeof(VRCLookAtConstraint)) },
+            { typeof(VRCParentConstraint), VRCConstraintCommonMembers(typeof(VRCParentConstraint)) },
+            { typeof(VRCPositionConstraint), VRCConstraintCommonMembers(typeof(VRCPositionConstraint)) },
+            { typeof(VRCRotationConstraint), VRCConstraintCommonMembers(typeof(VRCRotationConstraint)) },
+            { typeof(VRCScaleConstraint), VRCConstraintCommonMembers(typeof(VRCScaleConstraint)) },
+#endif
         };
 
         static Dictionary<Type, TypeMember[]> AvailableMembersCache = new Dictionary<Type, TypeMember[]>();

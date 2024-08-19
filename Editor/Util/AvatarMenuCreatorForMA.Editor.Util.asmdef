@@ -16,6 +16,11 @@
             "name": "com.vrchat.base",
             "expression": "[3,3.2)",
             "define": "PHYSBONE_ONLY_1_0"
+        },
+        {
+            "name": "com.vrchat.base",
+            "expression": "[3.7.0,4)",
+            "define": "HAS_VRC_CONSTRAINT"
         }
     ],
     "noEngineReferences": false
