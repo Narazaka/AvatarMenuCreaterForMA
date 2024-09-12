@@ -248,6 +248,42 @@ namespace net.narazaka.avatarmenucreator
         [English("Number of options")]
         public static string 選択肢の数 => L;
 
+        [English("Drag & Drop icons")]
+        public static string アイコンをドラッグ__and__ドロップ => L;
+
+        [English("Drag & Drop materials")]
+        public static string マテリアルをドラッグ__and__ドロップ => L;
+
+        [English("Rename tool")]
+        public static string 選択肢名を変更 => L;
+
+        [English("Name by icons")]
+        public static string アイコンから命名 => L;
+
+        [English("Name by materials")]
+        public static string マテリアルから命名 => L;
+
+        [English("Replace")]
+        public static string 一括置換 => L;
+
+        [English("Error")]
+        public static string エラー => L;
+
+        [English("Invalid regexp!")]
+        public static string 正規表現が正しくありません => L;
+
+        [English("Search string")]
+        public static string 検索文字列 => L;
+
+        [English("Replace string")]
+        public static string 置換後文字列 => L;
+
+        [English("Ignore case")]
+        public static string 大文字小文字を区別しない => L;
+
+        [English("Use regexp")]
+        public static string 正規表現を使う => L;
+
         [English("Control this")]
         public static string 制御 => L;
 

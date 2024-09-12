@@ -8,6 +8,7 @@ using VRC.Dynamics;
 #if UNITY_EDITOR
 using UnityEditor;
 using net.narazaka.avatarmenucreator.util;
+using System.Text.RegularExpressions;
 #endif
 using net.narazaka.avatarmenucreator.collections.instance;
 using net.narazaka.avatarmenucreator.value;
@@ -163,6 +164,12 @@ namespace net.narazaka.avatarmenucreator
         }
 
         bool ChoiceFoldout = true;
+        bool ChooseNameFoldout = false;
+        (string, int) ChooseNameMaterialSlot;
+        bool ChooseNameRenameUseRegexp = false;
+        bool ChooseNameRenameIgnoreCase = false;
+        string ChooseNameRenameSearch = "";
+        string ChooseNameRenameResult = "";
         Vector2 ScrollPositionChoises;
 
         protected override void OnHeaderGUI(IList<string> children)
@@ -192,6 +199,92 @@ namespace net.narazaka.avatarmenucreator
 
             if (ChoiceFoldout)
             {
+                EditorGUILayout.BeginHorizontal();
+                var dropRect = EditorGUILayout.GetControlRect(false, GUILayout.Height(EditorGUIUtility.singleLineHeight));
+                DropAreaGUI(dropRect, T.アイコンをドラッグ__and__ドロップ, (index, icon) => ChooseIcons[index] = icon as Texture2D);
+                if (GUILayout.Button(T.選択肢名を変更)) ChooseNameFoldout = !ChooseNameFoldout;
+                EditorGUILayout.EndHorizontal();
+
+                EditorGUI.indentLevel++;
+                if (ChooseNameFoldout)
+                {
+                    if (GUILayout.Button(T.アイコンから命名))
+                    {
+                        WillChange();
+                        for (var i = 0; i < ChooseCount; ++i)
+                        {
+                            var icon = ChooseIcon(i);
+                            if (icon != null)
+                            {
+                                ChooseNames[i] = icon.name;
+                            }
+                        }
+                    }
+                    if (ChooseMaterials.Count > 0)
+                    {
+                        if (GUILayout.Button(T.マテリアルから命名))
+                        {
+                            if (ChooseMaterials.TryGetValue(ChooseNameMaterialSlot, out var matDic))
+                            {
+                                WillChange();
+                                for (var i = 0; i < ChooseCount; ++i)
+                                {
+                                    if (matDic.TryGetValue(i, out var mat) && mat != null)
+                                    {
+                                        ChooseNames[i] = mat.name;
+                                    }
+                                }
+                            }
+                        }
+                        EditorGUI.indentLevel++;
+                        
+                        var slots = ChooseMaterials.Keys.ToArray();
+                        var slotNames = slots.Select(s => $"{s.Item1.Replace("/", " \u2215 ")}[{s.Item2}]").ToArray();
+                        var index = EditorGUILayout.Popup(Array.IndexOf(slots, ChooseNameMaterialSlot), slotNames);
+                        if (index >= 0)
+                        {
+                            ChooseNameMaterialSlot = slots[index];
+                        }
+                        EditorGUI.indentLevel--;
+                    }
+
+                    if (GUILayout.Button(T.一括置換))
+                    {
+                        WillChange();
+                        if (ChooseNameRenameUseRegexp)
+                        {
+                            Regex re;
+                            try
+                            {
+                                re = new Regex(ChooseNameRenameSearch, ChooseNameRenameIgnoreCase ? RegexOptions.IgnoreCase : RegexOptions.None);
+                                for (var i = 0; i < ChooseCount; ++i)
+                                {
+                                    var chooseName = ChooseName(i);
+                                    ChooseNames[i] = re.Replace(chooseName, ChooseNameRenameResult);
+                                }
+                            }
+                            catch (ArgumentException)
+                            {
+                                EditorUtility.DisplayDialog(T.エラー, T.正規表現が正しくありません, "OK");
+                            }
+                        }
+                        else
+                        {
+                            for (var i = 0; i < ChooseCount; ++i)
+                            {
+                                var chooseName = ChooseName(i);
+                                ChooseNames[i] = chooseName.Replace(ChooseNameRenameSearch, ChooseNameRenameResult, ChooseNameRenameIgnoreCase ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal);
+                            }
+                        }
+                    }
+                    EditorGUI.indentLevel++;
+                    ChooseNameRenameSearch = EditorGUILayout.TextField(T.検索文字列, ChooseNameRenameSearch);
+                    ChooseNameRenameResult = EditorGUILayout.TextField(T.置換後文字列, ChooseNameRenameResult);
+                    ChooseNameRenameIgnoreCase = EditorGUILayout.Toggle(T.大文字小文字を区別しない, ChooseNameRenameIgnoreCase);
+                    ChooseNameRenameUseRegexp = EditorGUILayout.Toggle(T.正規表現を使う, ChooseNameRenameUseRegexp);
+                    EditorGUI.indentLevel--;
+                }
+                EditorGUI.indentLevel--;
                 if (ChooseCount > 10)
                 {
                     using (var scrollView = new EditorGUILayout.ScrollViewScope(ScrollPositionChoises, GUILayout.Height(220)))
@@ -457,6 +550,15 @@ namespace net.narazaka.avatarmenucreator
                     if (ShowChooseMaterialToggle(i, materials[i], true))
                     {
                         EditorGUI.indentLevel++;
+                        var rect = EditorGUILayout.GetControlRect(false, 0, GUILayout.Height(EditorGUIUtility.singleLineHeight));
+                        DropAreaGUI(rect, T.マテリアルをドラッグ__and__ドロップ, (index, mat) =>
+                        {
+                            values[index] = mat as Material;
+                            if (BulkSet)
+                            {
+                                SetBulkChooseMaterial(materials[i], index, mat as Material);
+                            }
+                        });
                         for (var j = 0; j < ChooseCount; ++j)
                         {
                             var value = values.ContainsKey(j) ? values[j] : null;
@@ -587,6 +689,11 @@ namespace net.narazaka.avatarmenucreator
                     EditorGUILayout.ObjectField(sourceMaterial, typeof(Material), false);
                 }
                 EditorGUI.indentLevel++;
+                var rect = EditorGUILayout.GetControlRect(false, 0, GUILayout.Height(EditorGUIUtility.singleLineHeight));
+                DropAreaGUI(rect, T.マテリアルをドラッグ__and__ドロップ, (index, mat) =>
+                {
+                    SetBulkChooseMaterial(sourceMaterial, index, mat as Material);
+                });
                 for (var j = 0; j < ChooseCount; ++j)
                 {
                     var materials = chooseMaterialGroups[sourceMaterial].Select(key => ChooseMaterials.TryGetValue(key, out var ms) && ms.TryGetValue(j, out var m) ? m : null).Distinct().ToList();
@@ -946,6 +1053,42 @@ namespace net.narazaka.avatarmenucreator
             if (!values.ContainsKey(child)) return;
             WillChange();
             values.Remove(child);
+        }
+
+        UnityEngine.Object[] DropAreaGUI(Rect rect, string label)
+        {
+            var evt = Event.current;
+            GUI.Box(rect, label);
+
+            switch (evt.type)
+            {
+                case EventType.DragUpdated:
+                    if (!rect.Contains(evt.mousePosition))
+                        return null;
+                    DragAndDrop.visualMode = DragAndDropVisualMode.Copy;
+                    return null;
+                case EventType.DragPerform:
+                    if (!rect.Contains(evt.mousePosition))
+                        return null;
+                    DragAndDrop.AcceptDrag();
+                    return DragAndDrop.objectReferences;
+                default:
+                    return null;
+            }
+        }
+
+        void DropAreaGUI(Rect rect, string label, Action<int, UnityEngine.Object> onEachDrop)
+        {
+            var objects = DropAreaGUI(rect, label);
+            if (objects != null)
+            {
+                WillChange();
+                var len = Mathf.Min(objects.Length, ChooseCount);
+                for (var i = 0; i < len; ++i)
+                {
+                    onEachDrop(i, objects[i]);
+                }
+            }
         }
 
         // with prefab shim

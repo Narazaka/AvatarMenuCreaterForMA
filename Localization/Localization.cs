@@ -51,6 +51,7 @@ namespace net.narazaka.avatarmenucreator
                 .Replace("_sl_", "/")
                 .Replace("_start_", "（")
                 .Replace("_end_", "）")
+                .Replace("_and_", "&")
                 .Replace("_dot_", ".")
                 .Replace("_", " ")
                 .Replace("ヽ", "、")
