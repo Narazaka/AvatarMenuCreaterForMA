@@ -503,6 +503,22 @@ namespace net.narazaka.avatarmenucreator
             {
                 value.SwapKey(from, to);
             }
+            foreach (var value in ChooseValues.Values)
+            {
+                value.SwapKey(from, to);
+            }
+            foreach (var value in Positions.Values)
+            {
+                value.SwapKey(from, to);
+            }
+            foreach (var value in Rotations.Values)
+            {
+                value.SwapKey(from, to);
+            }
+            foreach (var value in Scales.Values)
+            {
+                value.SwapKey(from, to);
+            }
         }
 
         void ShowChooseObjectControl(string child, IntHashSet indexes)
