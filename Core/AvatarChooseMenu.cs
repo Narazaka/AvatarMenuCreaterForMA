@@ -251,30 +251,20 @@ namespace net.narazaka.avatarmenucreator
                     if (GUILayout.Button(T.一括置換))
                     {
                         WillChange();
-                        if (ChooseNameRenameUseRegexp)
+                        Regex re;
+                        try
                         {
-                            Regex re;
-                            try
-                            {
-                                re = new Regex(ChooseNameRenameSearch, ChooseNameRenameIgnoreCase ? RegexOptions.IgnoreCase : RegexOptions.None);
-                                for (var i = 0; i < ChooseCount; ++i)
-                                {
-                                    var chooseName = ChooseName(i);
-                                    ChooseNames[i] = re.Replace(chooseName, ChooseNameRenameResult);
-                                }
-                            }
-                            catch (ArgumentException)
-                            {
-                                EditorUtility.DisplayDialog(T.エラー, T.正規表現が正しくありません, "OK");
-                            }
-                        }
-                        else
-                        {
+                            var restr = ChooseNameRenameUseRegexp ? ChooseNameRenameSearch : Regex.Escape(ChooseNameRenameSearch);
+                            re = new Regex(restr, ChooseNameRenameIgnoreCase ? RegexOptions.IgnoreCase : RegexOptions.None);
                             for (var i = 0; i < ChooseCount; ++i)
                             {
                                 var chooseName = ChooseName(i);
-                                ChooseNames[i] = chooseName.Replace(ChooseNameRenameSearch, ChooseNameRenameResult, ChooseNameRenameIgnoreCase ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal);
+                                ChooseNames[i] = re.Replace(chooseName, ChooseNameRenameResult);
                             }
+                        }
+                        catch (ArgumentException)
+                        {
+                            EditorUtility.DisplayDialog(T.エラー, T.正規表現が正しくありません, "OK");
                         }
                     }
                     EditorGUI.indentLevel++;
