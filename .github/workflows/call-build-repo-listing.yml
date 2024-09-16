@@ -3,7 +3,7 @@ name: Call Build Repo Listing
 on:
   workflow_dispatch:
   workflow_run:
-    workflows: [Build Package Listing]
+    workflows: [GameCI]
     types:
       - completed
 

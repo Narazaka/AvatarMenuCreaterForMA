@@ -1,0 +1,81 @@
+---
+title: 基本の使い方
+sidebar:
+  order: 10
+---
+
+import { LinkCard } from '@astrojs/starlight/components';
+
+「ツールを開く」→「操作したいオブジェクトを選択」→「設定してメニューを生成」という手順で色々なメニューを作れます。
+
+### ①ツールを開く
+
+アバターを右クリックして「AvatarMenuCreator for Modular Avatar」を開きます。
+
+![](../../../assets/imgs/amc-from-avatar.png)
+
+またはメニューから「Tools」→「Modular Avatar」→「AvatarMenuCreator for Modular Avatar」を開いて、ヒエラルキー上のアバターをツールにセット！
+
+![](../../../assets/imgs/amc-tools.png)
+
+![](../../../assets/imgs/amc-avatar.png)
+
+### ②オブジェクトを選ぶ
+
+オブジェクトを選んでといわれるので
+
+![](../../../assets/imgs/amc-select-obj-please.png)
+
+アバター内にある操作したいオブジェクトを選びます。
+
+![](../../../assets/imgs/amc-select-obj.png)
+
+複数のオブジェクトを同時選択して一緒に設定することも可能です。
+
+![](../../../assets/imgs/amc-select-objs.png)
+
+複数のオブジェクトを編集する場合は、「同名パラメーターや同マテリアルスロットを一括設定」をオンにすると便利です。
+
+たとえば最初のオブジェクトで設定を変えるだけで、他のオブジェクトの設定も同時に変更されるようになります。
+
+![](../../../assets/imgs/amc-multi-edit.png)
+
+### ③モード選択
+
+好きなモードを選択します。
+
+![](../../../assets/imgs/amc-select-modes.png)
+
+それぞれのモードについての設定は以下のページから見られます。
+
+<LinkCard title="ON/OFF" href="/guides/toggle/" description="ON/OFFのToggleボタンを作るモードです" />
+<LinkCard title="選択式" href="/guides/choose/" description="複数の選択肢があるモードです" />
+<LinkCard title="無段階制御" href="/guides/radial/" description="BlendShape（シェイプキー）などを無段階に変更出来るモードです" />
+
+### ④設定する
+
+色々設定して……
+
+![](../../../assets/imgs/amc-basic-set.png)
+
+### ⑤Create!で作成
+
+![](../../../assets/imgs/amc-create.png)
+
+### メニューが出来ます
+
+アバター直下にメニューオブジェクトが出来ます。
+
+![](../../../assets/imgs/amc-menu-obj.png)
+
+アバター直下以外にも好きな所に入れて大丈夫です。
+
+![](../../../assets/imgs/amc-menu-obj-child.png)
+
+オブジェクトには設定が保存されます。（あとから追加や変更が可能）
+
+![](../../../assets/imgs/amc-toggle-inspector.png)
+
+Av3EmulatorやGesture Managerで再生して確認すると、メニューが出来ているはずです。
+
+![](../../../assets/imgs/gesture-manager.png)

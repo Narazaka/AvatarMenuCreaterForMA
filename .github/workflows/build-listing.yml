@@ -1,7 +1,10 @@
-name: Build Package Listing
+name: Build documentation
 
 on: 
   workflow_dispatch:
+  push:
+    branches:
+      - master
   release:
     types:
     - published
@@ -16,7 +19,39 @@ permissions:
   pages: write
   id-token: write
 
+concurrency:
+  group: "pages"
+  cancel-in-progress: true
+
 jobs:
-  
-  build-listing:
-    uses: Narazaka/vpm-repos/.github/workflows/build-package-listing.yml@main
+  build-package-listing:
+    name: build-package-listing
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3 # check out this repo
+
+      - name: Use Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - run: npm ci
+        working-directory: doc~/site
+      - run: npm run build
+        working-directory: doc~/site
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v3
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v1
+        with:
+          path: doc~/site/dist
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v2

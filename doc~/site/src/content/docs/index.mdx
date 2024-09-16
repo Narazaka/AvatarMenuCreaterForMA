@@ -1,0 +1,43 @@
+---
+title: Avatar Menu Creator for Modular Avatar
+description: VRChatアバターのメニューをModular Avatarで簡単に作れるツール
+template: splash
+hero:
+  tagline: VRChatアバターのメニューをModular Avatarで簡単に作れるツール
+  image:
+    file: ../../assets/AvatarMenuCreator.png
+  actions:
+    - text: インストール
+      link: /guides/install/
+      icon: right-arrow
+    - text: ドキュメント
+      link: /guides/basic/
+      icon: open-book
+    - text: 更新履歴
+      link: https://github.com/Narazaka/AvatarMenuCreaterForMA?tab=readme-ov-file#%E6%9B%B4%E6%96%B0%E5%B1%A5%E6%AD%B4
+      icon: external
+      variant: minimal
+---
+
+import { Card, CardGrid } from '@astrojs/starlight/components';
+import { Image } from 'astro:assets';
+import AvatarMenuCreatorToggleIcon from "../../assets/imgs/AvatarMenuCreatorToggleIcon.png";
+import AvatarMenuCreatorChooseIcon from "../../assets/imgs/AvatarMenuCreatorChooseIcon.png";
+import AvatarMenuCreatorRadialIcon from "../../assets/imgs/AvatarMenuCreatorRadialIcon.png";
+
+## シンプルな3つのモードで様々なユースケースをカバー
+
+<CardGrid>
+	<Card title="ON/OFF" href="/guides/toggle/" image="../../assets/imgs/AvatarMenuCreatorToggleIcon.png">
+		<Image src={AvatarMenuCreatorToggleIcon} alt="icon" width="50" />ON/OFFのToggleボタンを作るモードです
+	</Card>
+	<Card title="選択式" href="/guides/choose/">
+		<Image src={AvatarMenuCreatorChooseIcon} alt="icon" width="50" />複数の選択肢があるモードです
+	</Card>
+	<Card title="無段階制御" href="/guides/radial/">
+		<Image src={AvatarMenuCreatorRadialIcon} alt="icon" width="50" />BlendShape（シェイプキー）などを無段階に変更出来るモードです
+	</Card>
+</CardGrid>
+
+<hr/>
+<small>Zlib License (C) 2024 Narazaka</small>
