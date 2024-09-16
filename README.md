@@ -16,6 +16,12 @@ Modular Avatarでアバターのメニューを構成出来るようにする補
 
 NDMF（Modular Avatar 1.8.0以降）のコンポーネントによる非破壊操作に対応していますが、Modular Avatar 1.7.7以前のバージョンでも動作します（この場合プレハブ生成機能のみ）。
 
+## ドキュメント
+
+よくあるユースケースについての設定方法を含むドキュメントです
+
+**[ドキュメント](https://avatar-menu-creator-for-ma.vrchat.narazaka.net)**
+
 ## インストール
 
 ### VCCによる方法
