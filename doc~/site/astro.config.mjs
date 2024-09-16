@@ -22,6 +22,9 @@ export default defineConfig({
 			social: {
 				github: 'https://github.com/Narazaka/AvatarMenuCreaterForMA',
 			},
+			editLink: {
+				baseUrl: 'https://github.com/Narazaka/AvatarMenuCreaterForMA/edit/master/doc~/site',
+			},
 			sidebar: [
 				{
 					label: 'ガイド',
