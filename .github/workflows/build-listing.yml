@@ -40,7 +40,7 @@ jobs:
           cache: 'npm'
           cache-dependency-path: doc~/site/package-lock.json
 
-      - run: npm i
+      - run: npm ci
         working-directory: doc~/site
       - run: npm run build
         working-directory: doc~/site
