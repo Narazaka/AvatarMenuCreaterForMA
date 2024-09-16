@@ -1,36 +1,39 @@
 ---
-title: Welcome to Starlight
-description: Get started building your docs site with Starlight.
+title: Avatar Menu Creator for Modular Avatar
+description: VRChatアバターのメニューをModular Avatarで簡単に作れるツール
 template: splash
 hero:
-  tagline: Congrats on setting up a new Starlight project!
+  tagline: VRChatアバターのメニューをModular Avatarで簡単に作れるツール
   image:
-    file: ../../assets/houston.webp
+    file: ../../assets/AvatarMenuCreator.png
   actions:
-    - text: Example Guide
-      link: /guides/example/
+    - text: インストール
+      link: /guides/install/
       icon: right-arrow
-    - text: Read the Starlight docs
-      link: https://starlight.astro.build
-      icon: external
-      variant: minimal
+    - text: ドキュメント
+      link: /guides/basic/
+      icon: open-book
 ---
 
 import { Card, CardGrid } from '@astrojs/starlight/components';
+import { Image } from 'astro:assets';
+import AvatarMenuCreatorToggleIcon from "../../assets/imgs/AvatarMenuCreatorToggleIcon.png";
+import AvatarMenuCreatorChooseIcon from "../../assets/imgs/AvatarMenuCreatorChooseIcon.png";
+import AvatarMenuCreatorRadialIcon from "../../assets/imgs/AvatarMenuCreatorRadialIcon.png";
 
-## Next steps!
+## シンプルな3つのモードで様々なユースケースをカバー
 
-<CardGrid stagger>
-	<Card title="Update content" icon="pencil">
-		Edit `src/content/docs/index.mdx` to see this page change.
+<CardGrid>
+	<Card title="ON/OFF" href="/guides/toggle/" image="../../assets/imgs/AvatarMenuCreatorToggleIcon.png">
+		<Image src={AvatarMenuCreatorToggleIcon} alt="icon" width="50" />ON/OFFのToggleボタンを作るモードです
 	</Card>
-	<Card title="Add new content" icon="add-document">
-		Add Markdown or MDX files to `src/content/docs` to create new pages.
+	<Card title="選択式" href="/guides/choose/">
+		<Image src={AvatarMenuCreatorChooseIcon} alt="icon" width="50" />複数の選択肢があるモードです
 	</Card>
-	<Card title="Configure your site" icon="setting">
-		Edit your `sidebar` and other config in `astro.config.mjs`.
-	</Card>
-	<Card title="Read the docs" icon="open-book">
-		Learn more in [the Starlight Docs](https://starlight.astro.build/).
+	<Card title="無段階制御" href="/guides/radial/">
+		<Image src={AvatarMenuCreatorRadialIcon} alt="icon" width="50" />BlendShape（シェイプキー）などを無段階に変更出来るモードです
 	</Card>
 </CardGrid>
+
+<hr/>
+<small>Zlib License (C) 2024 Narazaka</small>

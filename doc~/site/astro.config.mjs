@@ -6,21 +6,27 @@ import starlight from '@astrojs/starlight';
 export default defineConfig({
 	integrations: [
 		starlight({
-			title: 'My Docs',
+			title: 'Avatar Menu Creator for MA',
+			logo: {
+				src: './public/favicon.svg',
+			},
+			locales: {
+				root: {
+					label: '日本語',
+					lang: 'ja',
+				}
+			},
 			social: {
-				github: 'https://github.com/withastro/starlight',
+				github: 'https://github.com/Narazaka/AvatarMenuCreaterForMA',
 			},
 			sidebar: [
 				{
-					label: 'Guides',
-					items: [
-						// Each item here is one entry in the navigation menu.
-						{ label: 'Example Guide', slug: 'guides/example' },
-					],
+					label: 'ガイド',
+					autogenerate: { directory: 'guides' },
 				},
 				{
-					label: 'Reference',
-					autogenerate: { directory: 'reference' },
+					label: '詳しい使い方',
+					autogenerate: { directory: 'usecases' },
 				},
 			],
 		}),
