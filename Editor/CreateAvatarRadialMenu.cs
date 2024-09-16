@@ -291,6 +291,12 @@ namespace net.narazaka.avatarmenucreator.editor
 
         AnimationCurve FullAnimationCurve(Keyframe start, Keyframe end)
         {
+            if (start.time > end.time)
+            {
+                var temp = start;
+                start = end;
+                end = temp;
+            }
             var curve = new AnimationCurve(start, end);
             if (end.time < 100)
             {
