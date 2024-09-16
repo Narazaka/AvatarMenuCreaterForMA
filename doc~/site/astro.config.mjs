@@ -10,6 +10,9 @@ export default defineConfig({
 			logo: {
 				src: './public/favicon.svg',
 			},
+			customCss: [
+				'./src/styles/custom.css',
+			],
 			locales: {
 				root: {
 					label: '日本語',
