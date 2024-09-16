@@ -18,7 +18,14 @@ namespace net.narazaka.avatarmenucreator.util
         {
             public MemberInfo MemberInfo;
             public string Label;
+            /// <summary>
+            /// animation field name (maybe not C# field name (C name?))
+            /// </summary>
             public string Field;
+            /// <summary>
+            /// path for nested field (must be C# field name)
+            /// </summary>
+            public string Path;
             public MemberInfoContainer(MemberInfo memberInfo)
             {
                 MemberInfo = memberInfo;
@@ -37,7 +44,9 @@ namespace net.narazaka.avatarmenucreator.util
             new MemberInfoContainer(type.GetField(nameof(VRCConstraintBase.SolveInLocalSpace))),
             new MemberInfoContainer(type.GetField(nameof(VRCConstraintBase.FreezeToWorld))),
             new MemberInfoContainer(type.GetField(nameof(VRCConstraintBase.RebakeOffsetsWhenUnfrozen))),
-        };
+        }.Concat(Enumerable.Range(0, VRCConstraintSourceKeyableList.MaxFlatLength).Select(index =>
+            new MemberInfoContainer(typeof(VRCConstraintSource).GetField(nameof(VRCConstraintSource.Weight))) { Path = $"Sources.source{index}.Weight", Label = $"Sources[{index}].Weight" }
+        )).ToArray();
 #endif
         static Dictionary<Type, MemberInfoContainer[]> AvailableMembers = new Dictionary<Type, MemberInfoContainer[]>
         {
@@ -108,7 +117,7 @@ namespace net.narazaka.avatarmenucreator.util
                 }
                 for (var i = 0; i < members.Length; ++i)
                 {
-                    array[i + offset] = new TypeMember(members[i].MemberInfo);
+                    array[i + offset] = members[i].Path == null ? new TypeMember(members[i].MemberInfo) : new TypeMember(type, members[i].Path, members[i].MemberInfo);
                 }
                 return AvailableMembersCache[type] = array;
             }
@@ -158,6 +167,16 @@ namespace net.narazaka.avatarmenucreator.util
             {
                 return memberInfo;
             }
+            if (memberName.Contains('.'))
+            {
+                var separaterIndex = memberName.IndexOf('.');
+                var firstMemberName = memberName.Substring(0, separaterIndex);
+                var firstMember = GetMember(type, firstMemberName);
+                if (firstMember == null) return null;
+                MemberInfoCache[(type, firstMemberName)] = firstMember;
+                var firstMemberType = firstMember.MemberType == MemberTypes.Field ? ((FieldInfo)firstMember).FieldType : ((PropertyInfo)firstMember).PropertyType;
+                return MemberInfoCache[(type, memberName)] = GetMember(firstMemberType, memberName.Substring(separaterIndex + 1));
+            }
             var field = type.GetField(memberName, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
             if (field != null) return MemberInfoCache[(type, memberName)] = field;
             var property = type.GetProperty(memberName, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
@@ -165,12 +184,37 @@ namespace net.narazaka.avatarmenucreator.util
             return null;
         }
 
-        public static string GetMemberField(MemberInfo memberInfo)
+        public static string GetMemberField(Type type, string memberName)
         {
-            if (memberInfo.Name == "enabled") return "m_Enabled";
-            return AvailableMembers.TryGetValue(memberInfo.ReflectedType, out var members) ? members.FirstOrDefault(m => m.MemberInfo == memberInfo)?.Field ?? memberInfo.Name : memberInfo.Name;
+            if (memberName == "enabled") return "m_Enabled";
+            if (AvailableMembers.TryGetValue(type, out var members))
+            {
+                var memberInfoContainer = members.FirstOrDefault(m => m.Path == memberName);
+                if (memberInfoContainer != null) return memberInfoContainer.Field ?? memberInfoContainer.Path;
+                var memberInfo = GetMember(type, memberName);
+                return members.FirstOrDefault(m => m.MemberInfo == memberInfo)?.Field ?? memberInfo.Name;
+            }
+            else
+            {
+                var memberInfo = GetMember(type, memberName);
+                return memberInfo.Name;
+            }
         }
 
-        public static string GetMemberLabel(MemberInfo memberInfo) => AvailableMembers.TryGetValue(memberInfo.ReflectedType, out var members) ? members.FirstOrDefault(m => m.MemberInfo == memberInfo)?.Label ?? memberInfo.Name : memberInfo.Name;
+        public static string GetMemberLabel(Type type, string memberName)
+        {
+            if (AvailableMembers.TryGetValue(type, out var members))
+            {
+                var memberInfoContainer = members.FirstOrDefault(m => m.Path == memberName);
+                if (memberInfoContainer != null) return memberInfoContainer.Label ?? memberInfoContainer.Path;
+                var memberInfo = GetMember(type, memberName);
+                return members.FirstOrDefault(m => m.MemberInfo == memberInfo)?.Label ?? memberInfo.Name;
+            }
+            else
+            {
+                var memberInfo = GetMember(type, memberName);
+                return memberInfo.Name;
+            }
+        }
     }
 }

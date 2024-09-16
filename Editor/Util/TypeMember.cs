@@ -30,7 +30,7 @@ namespace net.narazaka.avatarmenucreator.util
         [SerializeField] public string TypeName;
         /// <summary>member Name</summary>
         [SerializeField] public string MemberName;
-        public string AnimationMemberName => TypeMemberUtil.GetMemberField(Member);
+        public string AnimationMemberName => TypeMemberUtil.GetMemberField(Type, MemberName);
         /// <summary>type of the member (bool|int|float|Vector3 etc.)</summary>
         public Type MemberType
         {
@@ -49,7 +49,7 @@ namespace net.narazaka.avatarmenucreator.util
                 {
                     return DescriptionCache = $"{Type.Name}.enabled";
                 }
-                var label = TypeMemberUtil.GetMemberLabel(Member);
+                var label = TypeMemberUtil.GetMemberLabel(Type, MemberName);
 #if UNITY_EDITOR
                 label = UnityEditor.ObjectNames.NicifyVariableName(label);
 #endif
@@ -59,8 +59,22 @@ namespace net.narazaka.avatarmenucreator.util
         string DescriptionCache = null;
         public TypeMember() { } // for serialization
 
-        public TypeMember(string typeName, string memberName) : this(TypeMemberUtil.GetMember(TypeUtil.GetType(typeName), memberName)) { }
-        public TypeMember(Type type, string memberName) : this(TypeMemberUtil.GetMember(type, memberName)) { }
+        public TypeMember(string typeName, string memberName) : this(TypeUtil.GetType(typeName), memberName) { }
+        public TypeMember(Type type, string memberName)
+        {
+            Type = type;
+            Member = TypeMemberUtil.GetMember(type, memberName);
+            TypeName = TypeUtil.GetTypeName(Type);
+            MemberName = memberName;
+        }
+
+        public TypeMember(Type type, string memberName, MemberInfo memberInfo)
+        {
+            Type = type;
+            Member = memberInfo;
+            TypeName = TypeUtil.GetTypeName(Type);
+            MemberName = memberName;
+        }
 
         public TypeMember(MemberInfo memberInfo)
         {
@@ -85,7 +99,7 @@ namespace net.narazaka.avatarmenucreator.util
 
         public bool Equals(TypeMember other)
         {
-            return Type == other.Type && Member == other.Member;
+            return Type == other.Type && MemberName == other.MemberName;
         }
 
         public override bool Equals(object obj)
@@ -96,9 +110,9 @@ namespace net.narazaka.avatarmenucreator.util
         public override int GetHashCode()
         {
 #if NET_UNITY_4_8 || UNITY_2021_2_OR_NEWER
-            return HashCode.Combine(Type, Member);
+            return HashCode.Combine(Type, MemberName);
 #else
-            return (Type.GetHashCode() * 397) ^ Member.GetHashCode();
+            return (Type.GetHashCode() * 397) ^ MemberName.GetHashCode();
 #endif
         }
 
