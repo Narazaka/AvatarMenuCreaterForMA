@@ -34,6 +34,10 @@ export default defineConfig({
 					label: '詳しい使い方',
 					autogenerate: { directory: 'usecases' },
 				},
+				{
+					label: 'リファレンス',
+					autogenerate: { directory: 'references' },
+				},
 			],
 		}),
 	],
