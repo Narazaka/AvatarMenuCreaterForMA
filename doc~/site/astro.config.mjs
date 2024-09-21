@@ -12,6 +12,19 @@ export default defineConfig({
 			},
 			head: [
 				{
+					tag: "script",
+					attrs: {
+						async: true,
+						src: "https://www.googletagmanager.com/gtag/js?id=G-YKE861NPYC",
+					}
+				},
+				{
+					tag: "script",
+					attrs: {
+						src: "/ga.js",
+					}
+				},
+				{
 					tag: "meta",
 					attrs: {
 						property: "og:image",
