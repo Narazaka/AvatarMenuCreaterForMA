@@ -10,6 +10,15 @@ export default defineConfig({
 			logo: {
 				src: './public/favicon.svg',
 			},
+			head: [
+				{
+					tag: "meta",
+					attrs: {
+						property: "og:image",
+						content: "https://avatar-menu-creator-for-ma.vrchat.narazaka.net/AvatarMenuCreator.png",
+					}
+				}
+			],
 			customCss: [
 				'./src/styles/custom.css',
 			],
