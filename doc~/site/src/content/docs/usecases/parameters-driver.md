@@ -18,7 +18,7 @@ title: 干渉を防止したい・依存関係を作りたい
 
 これらの解消には、パラメーターの依存関係を定義するのが便利です。
 
-## 追加ツール: Avatar Parameters Driver / Avatar Parameters Exclusive Group
+## 追加ツール: 「Avatar Parameters Driver」 / 「Avatar Parameters Exclusive Group」
 
 このために条件に応じてパラメーター操作を設定出来るツール**Avatar Parameters Driver**及び**Avatar Parameters Exclusive Group**を使用します。
 
@@ -26,7 +26,7 @@ VCCからアバターに「Avatar Parameters Driver」及び「Avatar Parameters
 
 ![](../../../assets/imgs/vpm-apd.png)
 
-### Avatar Parameters Driverの設定
+### Avatar Parameters Driverの設定例
 
 #### 1. 空のオブジェクトを作る
 
@@ -49,7 +49,7 @@ VCCからアバターに「Avatar Parameters Driver」及び「Avatar Parameters
 
 同期メニューを動かす場合、「Local Only」はONにするのがおすすめです。
 
-### Avatar Parameters Exclusive Groupの設定
+### Avatar Parameters Exclusive Groupの設定例
 
 「オブジェクト同士を1つずつしかONにしない」等の簡単なケースについては、Avatar Parameters Exclusive Groupのほうがよりシンプルに設定出来ます。
 
