@@ -138,6 +138,8 @@ Avatar Menu Creatorはコンポーネントごとに設定通り素朴にアニ�
 
 メニューをビルド時に非破壊に生成するのではなく、エディタ上でAnimatorControllerやAnimationClipなどのアセットを生成してしまう機能です。
 
+操作方法などは[アニメーションを生成していじりたい](/usecases/create-asset)をご覧下さい。
+
 ### 保存形式
 
 #### 全て個別に保存
