@@ -23,7 +23,7 @@ Avatar Menu Creatorを開いてアバターを設定した状態で、服の全�
 
 ![](../../../assets/imgs/wf4.png)
 
-後で親メニューを作るので不要になるMA Menu Installerは付けない設定にします。
+不要なMA Menu Installerは付けない設定にします。（後で親メニューを作るので）
 
 ![](../../../assets/imgs/wf4_1.png)
 
