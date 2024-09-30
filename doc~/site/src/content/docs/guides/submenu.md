@@ -29,7 +29,7 @@ Modular Avatarの機能を使ってメニューをサブメニューにまとめ
 
 AvatarMenuCreatorでメニューオブジェクトに付いている`MA Menu Installer`を削除します。
 
-（削除して良いというヘルプと削除ボタンが出ているので押して下さい）
+（削除して良いというヘルプと削除ボタンが出ている場合）
 
 ![](../../../assets/imgs/menu-child-inspector.png)
 
