@@ -28,10 +28,10 @@ namespace net.narazaka.avatarmenucreator.editor
         public abstract CreatedAssets CreateAssets(string baseName, IEnumerable<string> children = null);
 
 #if NET_NARAZAKA_VRCHAT_AvatarMenuCreator_HAS_NDMF && !NET_NARAZAKA_VRCHAT_AvatarMenuCreator_HAS_NO_MENU_MA
-        public static AvatarMenuCreatorBase GetOrAddMenuCreatorComponent(GameObject obj, AvatarMenuBase avatarMenu)
+        public static AvatarMenuCreatorBase GetOrAddMenuCreatorComponent(GameObject obj, AvatarMenuBase avatarMenu, bool addMenuInstaller)
         {
             var creator = GetOrAddMenuCreatorComponentOnly(obj, avatarMenu);
-            creator.gameObject.GetOrAddComponent<ModularAvatarMenuInstaller>();
+            if (addMenuInstaller) creator.gameObject.GetOrAddComponent<ModularAvatarMenuInstaller>();
             return creator;
         }
 

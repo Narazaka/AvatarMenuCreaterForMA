@@ -30,6 +30,8 @@ namespace net.narazaka.avatarmenucreator.editor
         bool BulkSet;
 
         [SerializeField]
+        bool AddMenuInstaller = true;
+        [SerializeField]
         string BaseName;
         [SerializeField]
         bool MakeMultipleObjects;
@@ -170,6 +172,12 @@ namespace net.narazaka.avatarmenucreator.editor
 #endif
             if (isComponent)
             {
+                var newAddMenuInstaller = EditorGUILayout.ToggleLeft(T.MA_Menu_Installerを付ける, AddMenuInstaller);
+                if (newAddMenuInstaller != AddMenuInstaller)
+                {
+                    UndoUtility.RecordObject(this, nameof(AddMenuInstaller));
+                    AddMenuInstaller = newAddMenuInstaller;
+                }
                 if (MenuType != MenuType.Choose)
                 {
                     var newMakeMultipleObjects = EditorGUILayout.ToggleLeft(T.選択オブジェクト一つごとにメニューを作成, MakeMultipleObjects);
@@ -218,7 +226,7 @@ namespace net.narazaka.avatarmenucreator.editor
 #if NET_NARAZAKA_VRCHAT_AvatarMenuCreator_HAS_NDMF && !NET_NARAZAKA_VRCHAT_AvatarMenuCreator_HAS_NO_MENU_MA
                             (GameObject prefab) =>
                             {
-                                var creator = CreateAvatarMenuBase.GetOrAddMenuCreatorComponent(prefab, avatarMenu);
+                                var creator = CreateAvatarMenuBase.GetOrAddMenuCreatorComponent(prefab, avatarMenu, true);
                                 creator.AvatarMenu.FilterStoredTargets(children);
                             };
 #else
@@ -241,7 +249,7 @@ namespace net.narazaka.avatarmenucreator.editor
         public void SaveAsComponent(AvatarMenuBase avatarMenu, string baseName, string[] children)
         {
             var obj = new GameObject(baseName);
-            var creator = CreateAvatarMenuBase.GetOrAddMenuCreatorComponent(obj, avatarMenu);
+            var creator = CreateAvatarMenuBase.GetOrAddMenuCreatorComponent(obj, avatarMenu, AddMenuInstaller);
             creator.AvatarMenu.FilterStoredTargets(children);
             obj.transform.SetParent(VRCAvatarDescriptor.transform, false);
             Undo.RegisterCreatedObjectUndo(obj, "Create Component");

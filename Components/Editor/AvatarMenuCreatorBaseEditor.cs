@@ -157,7 +157,7 @@ namespace net.narazaka.avatarmenucreator.components.editor
                             }
                             var (basePath, baseName) = Util.GetBasePathAndNameFromPrefabPath(prefabPath);
                             var createAvatarMenu = CreateAvatarMenuBase.GetCreateAvatarMenu(Creator.AvatarMenu);
-                            createAvatarMenu.CreateAssets(baseName).SaveAssets(Creator.AvatarMenu.IncludeAssetType, basePath, (prefab) => CreateAvatarMenuBase.GetOrAddMenuCreatorComponent(prefab, Creator.AvatarMenu));
+                            createAvatarMenu.CreateAssets(baseName).SaveAssets(Creator.AvatarMenu.IncludeAssetType, basePath, (prefab) => CreateAvatarMenuBase.GetOrAddMenuCreatorComponent(prefab, Creator.AvatarMenu, true));
                         }
                         EditorGUI.EndDisabledGroup();
                         if (hasAssets)

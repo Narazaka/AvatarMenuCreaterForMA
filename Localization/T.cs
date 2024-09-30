@@ -32,6 +32,9 @@ namespace net.narazaka.avatarmenucreator
         [English("Create a menu for each selected object")]
         public static string 選択オブジェクト一つごとにメニューを作成 => L;
 
+        [English("Add MA Menu Installer")]
+        public static string MA_Menu_Installerを付ける => L;
+
         [English("Name")]
         public static string 名前 => L;
 
