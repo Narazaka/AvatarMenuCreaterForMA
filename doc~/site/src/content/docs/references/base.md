@@ -172,4 +172,4 @@ Prefabの1ファイルで全てが梱包されるのでポータブル性に優�
 
 上記の「アセット内容から設定を復元」と同じ機能ですが、Avatar Menu Creatorのコンポーネントが無い場合に適切なAvatar Menu Creatorコンポーネントを設定します。
 
-Avatar Menu Creatorの1.6.2以下で作られた古いprefabを新しいコンポーネント形式に移行するための機能です。
+Avatar Menu Creatorで作られたのにコンポーネントがついていないprefab（Avatar Menu Creatorの1.6.2以下で作られた古いprefab等）をコンポーネント形式に移行するための機能です。
