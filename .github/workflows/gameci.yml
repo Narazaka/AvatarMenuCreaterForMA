@@ -22,6 +22,8 @@ jobs:
     permissions:
       contents: write
     uses: Narazaka/vpm-repos/.github/workflows/release.yml@main
+    with:
+      ma: true
 
   test:
     uses: Narazaka/vpm-repos/.github/workflows/gameci.yml@main
