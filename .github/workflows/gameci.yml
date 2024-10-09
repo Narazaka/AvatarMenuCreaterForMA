@@ -8,6 +8,7 @@ on:
 jobs:
   call-build-listing:
     needs: release
+    if: ${{ startsWith(github.ref, 'refs/tags/v') }}
     uses: Narazaka/vpm-repos/.github/workflows/call-build-listing.yml@main
     secrets:
       DISPATCH_TOKEN: ${{ secrets.DISPATCH_TOKEN }}
