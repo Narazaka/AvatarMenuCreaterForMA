@@ -24,7 +24,7 @@ namespace net.narazaka.avatarmenucreator.editor
             return Menu.GetParameterNameAndTypes().Select(p =>
                 new ProvidedParameter(p.name, ParameterNamespace.Animator, Menu, AvatarMenuCreatorPlugin.Instance, p.valueType.ToAnimatorControllerParameterType())
                 {
-                    WantSynced = true,
+                    WantSynced = Menu.AvatarMenu.Synced,
                     IsHidden = Menu.AvatarMenu.InternalParameter,
                 }
                 );
