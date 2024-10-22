@@ -12,7 +12,7 @@ Avatar Radial Menu Creatorコンポーネント特有の設定です。
 
 パラメーターはFloat型で、8bitを消費します。
 
-ただし、[Physbone自動リセット](/usecases/components/#physbone自動リセット)が有効である場合、Bool型1ビットを追加で消費します。
+ただし、[Physbone自動リセット](/usecases/components/#physbone自動リセット)・[変更中リモートをロック](#変更中リモートをロック)・[リモートでのFloat暴発バグを防ぐ](#リモートでのfloat暴発バグを防ぐ)のいずれかが有効である場合、Bool型1ビットを追加で消費します。
 
 ## 項目の設定
 
@@ -24,6 +24,23 @@ Avatar Radial Menu Creatorコンポーネント特有の設定です。
 | 終offset% | 終点がパラメーター全体の何%地点に置かれるかを設定します。 |
 
 詳しくは[胸のサイズを変えたい 【無段階制御】/制御の設定](/guides/radial/#制御の設定)をご覧下さい。
+
+## 変更中リモートをロック
+
+RadialMenuを開いている間、リモートでは変更が反映されなくなります。
+
+このオプションが有効な場合、下記の「リモートでのFloat暴発バグを防ぐ」が自動的に満たされます。
+
+## リモートでのFloat暴発バグを防ぐ
+
+VRChatでRadialPuppetを開いた瞬間に、リモートでFloatパラメーターが一瞬1になるバグがあります。
+
+これははるか2021年から存在するバグで、未だに修正されていません。
+（[関連Canny: [BUG] Float on a radial open on wrong value remotely | Voters | VRChat](https://feedback.vrchat.com/avatar-30/p/bug-float-on-a-radial-open-on-wrong-value-remotely)）
+
+「リモートでのFloat暴発バグを防ぐ」はこの問題への応急的な対応として、RadialPuppetを開いてから0.3秒間値を固定する機能です。
+
+なおメニューを開いた状態でRadialPuppetを開いた時のバグはこのオプションで防止できますが、RadialPuppetを開いたままリングメニュー自体を閉じて、再度開いた時もこのバグが発生します。これはこの対処では防げません。
 
 ## 無効領域を設定
 
