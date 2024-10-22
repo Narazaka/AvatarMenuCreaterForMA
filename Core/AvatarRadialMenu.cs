@@ -37,6 +37,8 @@ namespace net.narazaka.avatarmenucreator
         [SerializeField]
         public Texture2D RadialIcon;
         [SerializeField]
+        public bool LockRemoteDuringChange;
+        [SerializeField]
         public bool PreventRemoteFloatBug = true;
 
 #if UNITY_EDITOR
@@ -145,11 +147,20 @@ namespace net.narazaka.avatarmenucreator
 
             EditorGUILayout.Space();
 
-            var newPreventRemoteFloatBug = EditorGUILayout.Toggle(T.リモートでのFloat暴発バグを防ぐ, PreventRemoteFloatBug);
-            if (newPreventRemoteFloatBug != PreventRemoteFloatBug)
+            var newLockRemoteDuringChange = EditorGUILayout.Toggle(T.変更中リモートをロック, LockRemoteDuringChange);
+            if (newLockRemoteDuringChange != LockRemoteDuringChange)
             {
                 WillChange();
-                PreventRemoteFloatBug = newPreventRemoteFloatBug;
+                LockRemoteDuringChange = newLockRemoteDuringChange;
+            }
+            if (!LockRemoteDuringChange)
+            {
+                var newPreventRemoteFloatBug = EditorGUILayout.Toggle(T.リモートでのFloat暴発バグを防ぐ, PreventRemoteFloatBug);
+                if (newPreventRemoteFloatBug != PreventRemoteFloatBug)
+                {
+                    WillChange();
+                    PreventRemoteFloatBug = newPreventRemoteFloatBug;
+                }
             }
 
             if (RadialInactiveRange)

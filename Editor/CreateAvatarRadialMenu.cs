@@ -149,7 +149,7 @@ namespace net.narazaka.avatarmenucreator.editor
             }
             var physBoneAutoResetEffectiveObjects = AvatarMenu.GetPhysBoneAutoResetEffectiveObjects(matchGameObjects, AvatarMenu.RadialValues.Keys).ToArray();
             var changingParameterName = parameterName + "_changing";
-            var needChangingParameter = physBoneAutoResetEffectiveObjects.Length > 0 || AvatarMenu.PreventRemoteFloatBug;
+            var needChangingParameter = physBoneAutoResetEffectiveObjects.Length > 0 || AvatarMenu.LockRemoteDuringChange || AvatarMenu.PreventRemoteFloatBug;
             if (needChangingParameter)
             {
                 controller.AddParameter(new AnimatorControllerParameter { name = changingParameterName, type = AnimatorControllerParameterType.Bool, defaultBool = false });
@@ -236,7 +236,7 @@ namespace net.narazaka.avatarmenucreator.editor
                 toIdle.hasExitTime = true;
             }
             var preventParameterName = parameterName + "_prevent";
-            if (AvatarMenu.PreventRemoteFloatBug)
+            if (AvatarMenu.LockRemoteDuringChange || AvatarMenu.PreventRemoteFloatBug)
             {
                 controller.AddParameter(new AnimatorControllerParameter { name = preventParameterName, type = AnimatorControllerParameterType.Float, defaultFloat = AvatarMenu.RadialDefaultValue });
                 state.behaviours = new StateMachineBehaviour[]
@@ -254,6 +254,43 @@ namespace net.narazaka.avatarmenucreator.editor
                         },
                     },
                 };
+            }
+            if (AvatarMenu.LockRemoteDuringChange)
+            {
+                var preventState = layer.stateMachine.AddState($"{baseName}_prevent", new Vector3(300, -100));
+                preventState.timeParameterActive = true;
+                preventState.timeParameter = preventParameterName;
+                preventState.motion = clip;
+                preventState.writeDefaultValues = false;
+                var toPrevent = state.AddTransition(preventState);
+                toPrevent.exitTime = 0;
+                toPrevent.duration = 0;
+                toPrevent.hasExitTime = false;
+                toPrevent.conditions = new AnimatorCondition[]
+                {
+                    new AnimatorCondition
+                    {
+                        mode = AnimatorConditionMode.If,
+                        parameter = changingParameterName,
+                        threshold = 1,
+                    },
+                };
+                var toActive = preventState.AddTransition(state);
+                toActive.exitTime = 0;
+                toActive.duration = 0;
+                toActive.hasExitTime = false;
+                toActive.conditions = new AnimatorCondition[]
+                {
+                    new AnimatorCondition
+                    {
+                        mode = AnimatorConditionMode.IfNot,
+                        parameter = changingParameterName,
+                        threshold = 1,
+                    },
+                };
+            }
+            else if (AvatarMenu.PreventRemoteFloatBug)
+            {
                 var preventState = layer.stateMachine.AddState($"{baseName}_prevent", new Vector3(300, -100));
                 preventState.timeParameterActive = true;
                 preventState.timeParameter = preventParameterName;

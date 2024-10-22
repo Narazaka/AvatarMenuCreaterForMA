@@ -293,6 +293,9 @@ namespace net.narazaka.avatarmenucreator
         [English("Multiple materials are selected")]
         public static string 複数のマテリアルが選択されています => L;
 
+        [English("Lock remote during change")]
+        public static string 変更中リモートをロック => L;
+
         [English("Prevent remote Float outburst bug")]
         public static string リモートでのFloat暴発バグを防ぐ => L;
 
