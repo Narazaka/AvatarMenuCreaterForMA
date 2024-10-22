@@ -4,6 +4,7 @@ using System.Linq;
 using UnityEditor;
 using UnityEditor.Animations;
 using UnityEngine;
+using VRC.SDK3.Avatars.Components;
 using VRC.SDK3.Avatars.ScriptableObjects;
 using VRC.SDK3.Dynamics.PhysBone.Components;
 
@@ -148,11 +149,14 @@ namespace net.narazaka.avatarmenucreator.editor
             }
             var physBoneAutoResetEffectiveObjects = AvatarMenu.GetPhysBoneAutoResetEffectiveObjects(matchGameObjects, AvatarMenu.RadialValues.Keys).ToArray();
             var changingParameterName = parameterName + "_changing";
+            if (physBoneAutoResetEffectiveObjects.Length > 0 || AvatarMenu.PreventRemoteFloatBug)
+            {
+                controller.AddParameter(new AnimatorControllerParameter { name = changingParameterName, type = AnimatorControllerParameterType.Bool, defaultBool = false });
+            }
             AnimationClip pbDisableClip = null;
             AnimationClip pbEnableClip = null;
             if (physBoneAutoResetEffectiveObjects.Length > 0)
             {
-                controller.AddParameter(new AnimatorControllerParameter { name = changingParameterName, type = AnimatorControllerParameterType.Bool, defaultBool = false });
                 controller.AddLayer(new AnimatorControllerLayer
                 {
                     name = baseName + "_PB_auto_reset",
@@ -230,6 +234,141 @@ namespace net.narazaka.avatarmenucreator.editor
                 toIdle.duration = 0;
                 toIdle.hasExitTime = true;
             }
+            var preventParameterName = parameterName + "_prevent";
+            if (AvatarMenu.PreventRemoteFloatBug)
+            {
+                controller.AddParameter(new AnimatorControllerParameter { name = preventParameterName, type = AnimatorControllerParameterType.Float, defaultFloat = AvatarMenu.RadialDefaultValue });
+                state.behaviours = new StateMachineBehaviour[]
+                {
+                    new VRCAvatarParameterDriver
+                    {
+                        parameters = new List<VRC.SDKBase.VRC_AvatarParameterDriver.Parameter>
+                        {
+                            new VRC.SDKBase.VRC_AvatarParameterDriver.Parameter
+                            {
+                                type = VRC.SDKBase.VRC_AvatarParameterDriver.ChangeType.Copy,
+                                source = parameterName,
+                                name = preventParameterName,
+                            }
+                        },
+                    },
+                };
+                var preventState = layer.stateMachine.AddState($"{baseName}_prevent", new Vector3(300, -100));
+                preventState.timeParameterActive = true;
+                preventState.timeParameter = preventParameterName;
+                preventState.motion = clip;
+                preventState.writeDefaultValues = false;
+                preventState.behaviours = new StateMachineBehaviour[]
+                {
+                    new VRCAvatarParameterDriver
+                    {
+                        parameters = new List<VRC.SDKBase.VRC_AvatarParameterDriver.Parameter>
+                        {
+                            new VRC.SDKBase.VRC_AvatarParameterDriver.Parameter
+                            {
+                                type = VRC.SDKBase.VRC_AvatarParameterDriver.ChangeType.Copy,
+                                source = parameterName,
+                                name = preventParameterName,
+                            }
+                        },
+                    },
+                };
+                var preventWaitState = layer.stateMachine.AddState($"{baseName}_prevent_wait", new Vector3(600, -100));
+                preventWaitState.timeParameterActive = true;
+                preventWaitState.timeParameter = preventParameterName;
+                preventWaitState.motion = clip;
+                preventWaitState.writeDefaultValues = false;
+                var preventedState = layer.stateMachine.AddState($"{baseName}_prevented", new Vector3(600, 0));
+                preventedState.timeParameterActive = true;
+                preventedState.timeParameter = parameterName;
+                preventedState.motion = clip;
+                preventedState.writeDefaultValues = false;
+                // if change start
+                var toPrevent = state.AddTransition(preventState);
+                toPrevent.exitTime = 0;
+                toPrevent.duration = 0;
+                toPrevent.hasExitTime = false;
+                toPrevent.conditions = new AnimatorCondition[]
+                {
+                    new AnimatorCondition
+                    {
+                        mode = AnimatorConditionMode.If,
+                        parameter = changingParameterName,
+                        threshold = 1,
+                    },
+                };
+                // if 0.3s after change start
+                var toPreventWait1 = preventState.AddTransition(preventWaitState);
+                toPreventWait1.exitTime = 0;
+                toPreventWait1.duration = 0.3f;
+                toPreventWait1.hasExitTime = false;
+                toPreventWait1.hasFixedDuration = true;
+                toPreventWait1.conditions = new AnimatorCondition[]
+                {
+                    new AnimatorCondition
+                    {
+                        mode = AnimatorConditionMode.If,
+                        parameter = changingParameterName,
+                        threshold = 1,
+                    },
+                };
+                var toPreventWait2 = preventState.AddTransition(preventWaitState);
+                toPreventWait2.exitTime = 0;
+                toPreventWait2.duration = 0.3f;
+                toPreventWait2.hasExitTime = false;
+                toPreventWait2.hasFixedDuration = true;
+                toPreventWait2.conditions = new AnimatorCondition[]
+                {
+                    new AnimatorCondition
+                    {
+                        mode = AnimatorConditionMode.IfNot,
+                        parameter = changingParameterName,
+                        threshold = 1,
+                    },
+                };
+                // 0.1s blending
+                var toPrevented1 = preventWaitState.AddTransition(preventedState);
+                toPrevented1.exitTime = 0;
+                toPrevented1.duration = 0.1f;
+                toPrevented1.hasExitTime = false;
+                toPrevented1.interruptionSource = TransitionInterruptionSource.Destination;
+                toPrevented1.conditions = new AnimatorCondition[]
+                {
+                    new AnimatorCondition
+                    {
+                        mode = AnimatorConditionMode.If,
+                        parameter = changingParameterName,
+                        threshold = 1,
+                    },
+                };
+                var toPrevented2 = preventWaitState.AddTransition(preventedState);
+                toPrevented2.exitTime = 0;
+                toPrevented2.duration = 0.1f;
+                toPrevented2.hasExitTime = false;
+                toPrevented2.interruptionSource = TransitionInterruptionSource.Destination;
+                toPrevented2.conditions = new AnimatorCondition[]
+                {
+                    new AnimatorCondition
+                    {
+                        mode = AnimatorConditionMode.IfNot,
+                        parameter = changingParameterName,
+                        threshold = 1,
+                    },
+                };
+                var toActive = preventedState.AddTransition(state);
+                toActive.exitTime = 0;
+                toActive.duration = 0;
+                toActive.hasExitTime = false;
+                toActive.conditions = new AnimatorCondition[]
+                {
+                    new AnimatorCondition
+                    {
+                        mode = AnimatorConditionMode.IfNot,
+                        parameter = changingParameterName,
+                        threshold = 1,
+                    },
+                };
+            }
             // menu
             var menu = new VRCExpressionsMenu
             {
@@ -250,7 +389,7 @@ namespace net.narazaka.avatarmenucreator.editor
                     },
                 },
             };
-            if (physBoneAutoResetEffectiveObjects.Length > 0)
+            if (physBoneAutoResetEffectiveObjects.Length > 0 || AvatarMenu.PreventRemoteFloatBug)
             {
                 menu.controls[0].parameter = new VRCExpressionsMenu.Control.Parameter
                 {

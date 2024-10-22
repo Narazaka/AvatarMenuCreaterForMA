@@ -293,6 +293,9 @@ namespace net.narazaka.avatarmenucreator
         [English("Multiple materials are selected")]
         public static string 複数のマテリアルが選択されています => L;
 
+        [English("Prevent remote Float outburst bug")]
+        public static string リモートでのFloat暴発バグを防ぐ => L;
+
         [English("Set Invalid Area")]
         public static string 無効領域を設定 => L;
 

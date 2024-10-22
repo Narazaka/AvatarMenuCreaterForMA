@@ -36,6 +36,8 @@ namespace net.narazaka.avatarmenucreator
         public float RadialInactiveRangeMax = float.NaN;
         [SerializeField]
         public Texture2D RadialIcon;
+        [SerializeField]
+        public bool PreventRemoteFloatBug = true;
 
 #if UNITY_EDITOR
 
@@ -126,6 +128,7 @@ namespace net.narazaka.avatarmenucreator
             EditorGUILayout.PropertyField(serializedProperty.FindPropertyRelative(nameof(RadialIcon)), new GUIContent(T.アイコン));
             EditorGUILayout.PropertyField(serializedProperty.FindPropertyRelative(nameof(RadialDefaultValue)), new GUIContent(T.パラメーター初期値));
             ShowDetailMenuMulti(serializedProperty);
+            EditorGUILayout.PropertyField(serializedProperty.FindPropertyRelative(nameof(PreventRemoteFloatBug)), new GUIContent(T.リモートでのFloat暴発バグを防ぐ));
             serializedObject.ApplyModifiedProperties();
         }
 
@@ -141,6 +144,13 @@ namespace net.narazaka.avatarmenucreator
             if (RadialDefaultValue > 1) RadialDefaultValue = 1;
 
             EditorGUILayout.Space();
+
+            var newPreventRemoteFloatBug = EditorGUILayout.Toggle(T.リモートでのFloat暴発バグを防ぐ, PreventRemoteFloatBug);
+            if (newPreventRemoteFloatBug != PreventRemoteFloatBug)
+            {
+                WillChange();
+                PreventRemoteFloatBug = newPreventRemoteFloatBug;
+            }
 
             if (RadialInactiveRange)
             {
