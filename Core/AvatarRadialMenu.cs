@@ -39,7 +39,13 @@ namespace net.narazaka.avatarmenucreator
         [SerializeField]
         public bool LockRemoteDuringChange;
         [SerializeField]
-        public bool PreventRemoteFloatBug = true;
+        public bool PreventRemoteFloatBug;
+
+        public override void Reset()
+        {
+            base.Reset();
+            PreventRemoteFloatBug = true;
+        }
 
 #if UNITY_EDITOR
 

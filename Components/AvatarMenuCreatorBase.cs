@@ -16,6 +16,11 @@ namespace net.narazaka.avatarmenucreator.components
 #endif
     {
         public abstract AvatarMenuBase AvatarMenu { get; }
+
+        void Reset()
+        {
+            AvatarMenu.Reset();
+        }
 #if UNITY_EDITOR
         public abstract UnityEditor.SerializedProperty AvatarMenuProperty(UnityEditor.SerializedObject serializedObject);
 

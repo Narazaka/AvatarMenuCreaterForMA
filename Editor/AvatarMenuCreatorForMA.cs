@@ -65,6 +65,9 @@ namespace net.narazaka.avatarmenucreator.editor
             AvatarToggleMenu.ShowMultiSelectInfo = true;
             AvatarChooseMenu.ShowMultiSelectInfo = true;
             AvatarRadialMenu.ShowMultiSelectInfo = true;
+            AvatarToggleMenu.Reset();
+            AvatarChooseMenu.Reset();
+            AvatarRadialMenu.Reset();
         }
 
         void Update()

@@ -36,6 +36,8 @@ namespace net.narazaka.avatarmenucreator
         protected void EnablePhysBoneAutoReset(string child) => PhysBoneAutoResetDisabledObjects.Remove(child);
         protected void DisablePhysBoneAutoReset(string child) => PhysBoneAutoResetDisabledObjects.Add(child);
 
+        public virtual void Reset() { }
+
 #if UNITY_EDITOR
         [NonSerialized]
         GameObject _BaseObject;
