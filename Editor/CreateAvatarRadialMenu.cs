@@ -257,6 +257,7 @@ namespace net.narazaka.avatarmenucreator.editor
             }
             if (AvatarMenu.LockRemoteDuringChange)
             {
+                controller.AddParameter(new AnimatorControllerParameter { name = "IsLocal", type = AnimatorControllerParameterType.Bool, defaultBool = false });
                 var preventState = layer.stateMachine.AddState($"{baseName}_prevent", new Vector3(300, -100));
                 preventState.timeParameterActive = true;
                 preventState.timeParameter = preventParameterName;
@@ -268,6 +269,12 @@ namespace net.narazaka.avatarmenucreator.editor
                 toPrevent.hasExitTime = false;
                 toPrevent.conditions = new AnimatorCondition[]
                 {
+                    new AnimatorCondition
+                    {
+                        mode = AnimatorConditionMode.IfNot,
+                        parameter = "IsLocal",
+                        threshold = 1f,
+                    },
                     new AnimatorCondition
                     {
                         mode = AnimatorConditionMode.If,
