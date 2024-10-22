@@ -130,7 +130,12 @@ namespace net.narazaka.avatarmenucreator
             EditorGUILayout.PropertyField(serializedProperty.FindPropertyRelative(nameof(RadialIcon)), new GUIContent(T.アイコン));
             EditorGUILayout.PropertyField(serializedProperty.FindPropertyRelative(nameof(RadialDefaultValue)), new GUIContent(T.パラメーター初期値));
             ShowDetailMenuMulti(serializedProperty);
-            EditorGUILayout.PropertyField(serializedProperty.FindPropertyRelative(nameof(PreventRemoteFloatBug)), new GUIContent(T.リモートでのFloat暴発バグを防ぐ));
+            var lockRemoteDuringChange = serializedProperty.FindPropertyRelative(nameof(LockRemoteDuringChange));
+            EditorGUILayout.PropertyField(lockRemoteDuringChange, new GUIContent(T.変更中リモートをロック));
+            if (lockRemoteDuringChange.hasMultipleDifferentValues || !lockRemoteDuringChange.boolValue)
+            {
+                EditorGUILayout.PropertyField(serializedProperty.FindPropertyRelative(nameof(PreventRemoteFloatBug)), new GUIContent(T.リモートでのFloat暴発バグを防ぐ));
+            }
             serializedObject.ApplyModifiedProperties();
         }
 
