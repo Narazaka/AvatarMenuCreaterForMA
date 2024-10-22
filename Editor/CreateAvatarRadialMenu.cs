@@ -259,21 +259,6 @@ namespace net.narazaka.avatarmenucreator.editor
                 preventState.timeParameter = preventParameterName;
                 preventState.motion = clip;
                 preventState.writeDefaultValues = false;
-                preventState.behaviours = new StateMachineBehaviour[]
-                {
-                    new VRCAvatarParameterDriver
-                    {
-                        parameters = new List<VRC.SDKBase.VRC_AvatarParameterDriver.Parameter>
-                        {
-                            new VRC.SDKBase.VRC_AvatarParameterDriver.Parameter
-                            {
-                                type = VRC.SDKBase.VRC_AvatarParameterDriver.ChangeType.Copy,
-                                source = parameterName,
-                                name = preventParameterName,
-                            }
-                        },
-                    },
-                };
                 var preventWaitState = layer.stateMachine.AddState($"{baseName}_prevent_wait", new Vector3(600, -100));
                 preventWaitState.timeParameterActive = true;
                 preventWaitState.timeParameter = preventParameterName;
