@@ -149,7 +149,8 @@ namespace net.narazaka.avatarmenucreator.editor
             }
             var physBoneAutoResetEffectiveObjects = AvatarMenu.GetPhysBoneAutoResetEffectiveObjects(matchGameObjects, AvatarMenu.RadialValues.Keys).ToArray();
             var changingParameterName = parameterName + "_changing";
-            if (physBoneAutoResetEffectiveObjects.Length > 0 || AvatarMenu.PreventRemoteFloatBug)
+            var needChangingParameter = physBoneAutoResetEffectiveObjects.Length > 0 || AvatarMenu.PreventRemoteFloatBug;
+            if (needChangingParameter)
             {
                 controller.AddParameter(new AnimatorControllerParameter { name = changingParameterName, type = AnimatorControllerParameterType.Bool, defaultBool = false });
             }
@@ -389,7 +390,7 @@ namespace net.narazaka.avatarmenucreator.editor
                     },
                 },
             };
-            if (physBoneAutoResetEffectiveObjects.Length > 0 || AvatarMenu.PreventRemoteFloatBug)
+            if (needChangingParameter)
             {
                 menu.controls[0].parameter = new VRCExpressionsMenu.Control.Parameter
                 {
@@ -419,7 +420,7 @@ namespace net.narazaka.avatarmenucreator.editor
 #endif
                 internalParameter = AvatarMenu.InternalParameter,
             };
-            var parameterConfigs =(physBoneAutoResetEffectiveObjects.Length > 0 ? new ParameterConfig[] { parameterConfig, subParameterConfig } : new ParameterConfig[] { parameterConfig });
+            var parameterConfigs = needChangingParameter ? new ParameterConfig[] { parameterConfig, subParameterConfig } : new ParameterConfig[] { parameterConfig };
             var clips = new List<AnimationClip> { clip };
             if (emptyClip != null) clips.Add(emptyClip);
             if (pbDisableClip != null) clips.Add(pbDisableClip);
