@@ -515,6 +515,21 @@ namespace net.narazaka.avatarmenucreator
             }
         }
 
+        protected void ShaderVectorParameterPickerButton(string child, string name, ref Vector4 value)
+        {
+            var go = GetGameObject(child);
+            if (go == null || !PickerButton()) return;
+            var mesh = go.GetComponent<Renderer>();
+            foreach (var mat in mesh.sharedMaterials)
+            {
+                if (mat.shader.FindPropertyIndex(name) != -1)
+                {
+                    value = mat.GetColor(name);
+                    return;
+                }
+            }
+        }
+
         protected void TransformPickerButton(string child, string transformComponentName, ref Vector3 value)
         {
             var go = GetGameObject(child);

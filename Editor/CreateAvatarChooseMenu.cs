@@ -65,6 +65,12 @@ namespace net.narazaka.avatarmenucreator.editor
                     choices[i].SetCurve(curvePath, typeof(Renderer), curveName, new AnimationCurve(new Keyframe(0, value.ContainsKey(i) ? value[i] : 0)));
                 }
             }
+            foreach (var (child, name) in AvatarMenu.ChooseShaderVectorParameters.Keys)
+            {
+                if (!matchGameObjects.Contains(child)) continue;
+                var value = AvatarMenu.ChooseShaderVectorParameters[(child, name)];
+                SetVector4Curve(choices, typeof(Renderer), child, $"material.{name}", value);
+            }
             foreach (var (child, member) in AvatarMenu.ChooseValues.Keys)
             {
                 if (!matchGameObjects.Contains(child)) continue;
@@ -324,6 +330,18 @@ namespace net.narazaka.avatarmenucreator.editor
                 choices[i].SetCurve(path, typeof(Transform), property + ".x", new AnimationCurve(new Keyframe(0, v.x)));
                 choices[i].SetCurve(path, typeof(Transform), property + ".y", new AnimationCurve(new Keyframe(0, v.y)));
                 choices[i].SetCurve(path, typeof(Transform), property + ".z", new AnimationCurve(new Keyframe(0, v.z)));
+            }
+        }
+
+        void SetVector4Curve(List<AnimationClip> choices, Type type, string path, string property, IntVector4Dictionary value)
+        {
+            for (var i = 0; i < AvatarMenu.ChooseCount; ++i)
+            {
+                var v = value.ContainsKey(i) ? value[i] : Vector4.zero;
+                choices[i].SetCurve(path, type, property + ".x", new AnimationCurve(new Keyframe(0, v.x)));
+                choices[i].SetCurve(path, type, property + ".y", new AnimationCurve(new Keyframe(0, v.y)));
+                choices[i].SetCurve(path, type, property + ".z", new AnimationCurve(new Keyframe(0, v.z)));
+                choices[i].SetCurve(path, type, property + ".w", new AnimationCurve(new Keyframe(0, v.w)));
             }
         }
     }

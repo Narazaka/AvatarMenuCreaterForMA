@@ -34,6 +34,12 @@ namespace net.narazaka.avatarmenucreator.editor
                 var value = AvatarMenu.RadialShaderParameters[(child, name)];
                 clip.SetCurve(child, typeof(Renderer), $"material.{name}", FullAnimationCurve(new Keyframe(value.StartOffsetPercent, value.Start), new Keyframe(value.EndOffsetPercent, value.End)));
             }
+            foreach (var (child, name) in AvatarMenu.RadialShaderVectorParameters.Keys)
+            {
+                if (!matchGameObjects.Contains(child)) continue;
+                var value = AvatarMenu.RadialShaderVectorParameters[(child, name)];
+                SetVector4Curve(clip, typeof(Renderer), child, $"material.{name}", value);
+            }
             foreach (var (child, member) in AvatarMenu.RadialValues.Keys)
             {
                 if (!matchGameObjects.Contains(child)) continue;
@@ -489,6 +495,14 @@ namespace net.narazaka.avatarmenucreator.editor
             clip.SetCurve(child, typeof(Transform), $"{propertyName}.x", FullAnimationCurve(new Keyframe(value.StartOffsetPercent, value.Start.x), new Keyframe(value.EndOffsetPercent, value.End.x)));
             clip.SetCurve(child, typeof(Transform), $"{propertyName}.y", FullAnimationCurve(new Keyframe(value.StartOffsetPercent, value.Start.y), new Keyframe(value.EndOffsetPercent, value.End.y)));
             clip.SetCurve(child, typeof(Transform), $"{propertyName}.z", FullAnimationCurve(new Keyframe(value.StartOffsetPercent, value.Start.z), new Keyframe(value.EndOffsetPercent, value.End.z)));
+        }
+
+        void SetVector4Curve(AnimationClip clip, System.Type type, string child, string propertyName, RadialVector4 value)
+        {
+            clip.SetCurve(child, type, $"{propertyName}.x", FullAnimationCurve(new Keyframe(value.StartOffsetPercent, value.Start.x), new Keyframe(value.EndOffsetPercent, value.End.x)));
+            clip.SetCurve(child, type, $"{propertyName}.y", FullAnimationCurve(new Keyframe(value.StartOffsetPercent, value.Start.y), new Keyframe(value.EndOffsetPercent, value.End.y)));
+            clip.SetCurve(child, type, $"{propertyName}.z", FullAnimationCurve(new Keyframe(value.StartOffsetPercent, value.Start.z), new Keyframe(value.EndOffsetPercent, value.End.z)));
+            clip.SetCurve(child, type, $"{propertyName}.w", FullAnimationCurve(new Keyframe(value.StartOffsetPercent, value.Start.w), new Keyframe(value.EndOffsetPercent, value.End.w)));
         }
     }
 }
