@@ -19,6 +19,8 @@ namespace net.narazaka.avatarmenucreator
         [SerializeField]
         public RadialBlendShapeDictionary RadialShaderParameters = new RadialBlendShapeDictionary();
         [SerializeField]
+        public RadialShaderVectorParameterDictionary RadialShaderVectorParameters = new RadialShaderVectorParameterDictionary();
+        [SerializeField]
         public RadialValueDictionary RadialValues = new RadialValueDictionary();
         [SerializeField]
         public RadialVector3Dictionary Positions = new RadialVector3Dictionary();
@@ -61,14 +63,15 @@ namespace net.narazaka.avatarmenucreator
             }
         }
 
-        public override IEnumerable<string> GetStoredChildren() => RadialBlendShapes.Keys.Select(key => key.Item1).Concat(RadialShaderParameters.Keys.Select(key => key.Item1)).Concat(RadialValues.Keys.Select(key => key.Item1)).Concat(Positions.Keys).Concat(Rotations.Keys).Concat(Scales.Keys).Distinct();
+        public override IEnumerable<string> GetStoredChildren() => RadialBlendShapes.Keys.Select(key => key.Item1).Concat(RadialShaderParameters.Keys.Select(key => key.Item1)).Concat(RadialShaderVectorParameters.Keys.Select(key => key.Item1)).Concat(RadialValues.Keys.Select(key => key.Item1)).Concat(Positions.Keys).Concat(Rotations.Keys).Concat(Scales.Keys).Distinct();
         public override void ReplaceStoredChild(string oldChild, string newChild)
         {
-            if (RadialBlendShapes.ContainsPrimaryKey(oldChild) || RadialShaderParameters.ContainsPrimaryKey(oldChild) || RadialValues.ContainsPrimaryKey(oldChild) || Positions.ContainsKey(oldChild) || Rotations.ContainsKey(oldChild) || Scales.ContainsKey(oldChild))
+            if (RadialBlendShapes.ContainsPrimaryKey(oldChild) || RadialShaderParameters.ContainsPrimaryKey(oldChild) || RadialShaderVectorParameters.ContainsPrimaryKey(oldChild) || RadialValues.ContainsPrimaryKey(oldChild) || Positions.ContainsKey(oldChild) || Rotations.ContainsKey(oldChild) || Scales.ContainsKey(oldChild))
             {
                 WillChange();
                 RadialBlendShapes.ReplacePrimaryKey(oldChild, newChild);
                 RadialShaderParameters.ReplacePrimaryKey(oldChild, newChild);
+                RadialShaderVectorParameters.ReplacePrimaryKey(oldChild, newChild);
                 RadialValues.ReplacePrimaryKey(oldChild, newChild);
                 Positions.ReplaceKey(oldChild, newChild);
                 Rotations.ReplaceKey(oldChild, newChild);
@@ -86,6 +89,10 @@ namespace net.narazaka.avatarmenucreator
             foreach (var key in RadialShaderParameters.Keys.Where(k => !filter.Contains(k.Item1)).ToList())
             {
                 RadialShaderParameters.Remove(key);
+            }
+            foreach (var key in RadialShaderVectorParameters.Keys.Where(k => !filter.Contains(k.Item1)).ToList())
+            {
+                RadialShaderVectorParameters.Remove(key);
             }
             foreach (var key in RadialValues.Keys.Where(k => !filter.Contains(k.Item1)).ToList())
             {
@@ -114,6 +121,10 @@ namespace net.narazaka.avatarmenucreator
             foreach (var key in RadialShaderParameters.Keys.Where(k => k.Item1 == child).ToList())
             {
                 RadialShaderParameters.Remove(key);
+            }
+            foreach (var key in RadialShaderVectorParameters.Keys.Where(k => k.Item1 == child).ToList())
+            {
+                RadialShaderVectorParameters.Remove(key);
             }
             foreach (var key in RadialValues.Keys.Where(k => k.Item1 == child).ToList())
             {
@@ -253,7 +264,7 @@ namespace net.narazaka.avatarmenucreator
                 EditorGUILayout.Space();
                 var gameObjectRef = GetGameObject(child);
                 var names = gameObjectRef == null ? RadialBlendShapes.Names(child).ToList() : Util.GetBlendShapeNames(gameObjectRef);
-                var parameters = gameObjectRef == null ? RadialShaderParameters.Names(child).ToFakeShaderParameters().ToList() : ShaderParametersCache.GetFilteredShaderParameters(gameObjectRef);
+                var parameters = gameObjectRef == null ? RadialShaderParameters.Names(child).ToFakeShaderFloatParameters().Concat(RadialShaderVectorParameters.Names(child).ToFakeShaderVectorParameters()).ToList() : ShaderParametersCache.GetFilteredShaderParameters(gameObjectRef);
                 var components = gameObjectRef == null ? RadialValues.Names(child).Select(n => n.Type) : gameObjectRef.GetAllComponents().Select(c => TypeUtil.GetType(c)).FilterByVRCWhitelist();
                 var members = components.GetAvailableMembersOnlySuitableForTransition();
                 var path = child;
@@ -278,15 +289,36 @@ namespace net.narazaka.avatarmenucreator
                     FoldoutHeaderWithAddItemButton(
                         child,
                         "Shader Parameters",
-                        RadialShaderParameters.HasChild(child),
+                        RadialShaderParameters.HasChild(child) || RadialShaderVectorParameters.HasChild(child),
                         () => parameters.Select(p => new NameAndDescriptionItemContainer(p) as ListTreeViewItemContainer<string>).ToList(),
-                        () => RadialShaderParameters.Names(child).ToImmutableHashSet(),
-                        name => AddRadialBlendShape(RadialShaderParameters, children, child, name, 1),
-                        name => RemoveRadialBlendShape(RadialShaderParameters, children, child, name)
+                        () => RadialShaderParameters.Names(child).Concat(RadialShaderVectorParameters.Names(child)).ToImmutableHashSet(),
+                        name =>
+                        {
+                            if (parameters.Find(p => p.Name == name).IsFloatLike)
+                            {
+                                AddRadialBlendShape(RadialShaderParameters, children, child, name, 1);
+                            }
+                            else
+                            {
+                                AddRadialShaderVectorParameter(children, child, name);
+                            }
+                        },
+                        name =>
+                        {
+                            if (parameters.Find(p => p.Name == name).IsFloatLike)
+                            {
+                                RemoveRadialBlendShape(RadialShaderParameters, children, child, name);
+                            }
+                            else
+                            {
+                                RemoveRadialShaderVectorParameter(children, child, name);
+                            }
+                        }
                         ))
                 {
                     EditorGUI.indentLevel++;
                     ShowRadialBlendShapeControl(false, children, child, RadialShaderParameters, parameters, minValue: null, maxValue: null);
+                    ShowRadialShaderVectorParameterControl(children, child, parameters);
                     EditorGUI.indentLevel--;
                 }
                 if (members.Count > 0 &&
@@ -467,6 +499,144 @@ namespace net.narazaka.avatarmenucreator
             if (!radials.ContainsKey(key)) return;
             WillChange();
             radials.Remove(key);
+        }
+
+        void ShowRadialShaderVectorParameterControl(
+            IList<string> children,
+            string child,
+            IEnumerable<INameAndDescription> names
+            )
+        {
+            foreach (var name in names)
+            {
+                var key = (child, name.Name);
+                RadialVector4 value;
+                if (RadialShaderVectorParameters.TryGetValue(key, out value))
+                {
+                    if (EditorGUILayout.ToggleLeft(name.Description, true))
+                    {
+                        var newValue = new RadialVector4();
+                        {
+                            EditorGUI.indentLevel++;
+                            var widemode = EditorGUIUtility.wideMode;
+                            EditorGUIUtility.wideMode = true;
+                            EditorGUIUtility.labelWidth = 75;
+                            using (new EditorGUILayout.HorizontalScope())
+                            {
+                                newValue.Start = EditorGUILayout.Vector4Field(T.始, value.Start);
+                                ShaderVectorParameterPickerButton(child, name.Name, ref newValue.Start);
+                            }
+                            using (new EditorGUILayout.HorizontalScope())
+                            {
+                                newValue.End = EditorGUILayout.Vector4Field(T.終, value.End);
+                                ShaderVectorParameterPickerButton(child, name.Name, ref newValue.End);
+                            }
+                            EditorGUIUtility.labelWidth = 70;
+                            using (new EditorGUI.DisabledGroupScope(true))
+                            {
+                                EditorGUILayout.Vector4Field(
+                                    T.初期,
+                                    RadialDefaultValue * 100 < value.StartOffsetPercent ? value.Start :
+                                    RadialDefaultValue * 100 > value.EndOffsetPercent ? value.End :
+                                    (value.Start * (value.EndOffsetPercent - RadialDefaultValue * 100) + value.End * (RadialDefaultValue * 100 - value.StartOffsetPercent)) / (value.EndOffsetPercent - value.StartOffsetPercent)
+                                    );
+                            }
+                            EditorGUIUtility.wideMode = widemode;
+                            EditorGUIUtility.labelWidth = 0;
+                            EditorGUI.indentLevel--;
+                        }
+                        using (new EditorGUILayout.HorizontalScope())
+                        {
+                            EditorGUI.indentLevel++;
+                            EditorGUIUtility.labelWidth = 120;
+                            newValue.StartOffsetPercent = EditorGUILayout.FloatField(T.始offset_per_, value.StartOffsetPercent, GUILayout.Width(150));
+                            newValue.EndOffsetPercent = EditorGUILayout.FloatField(T.終offset_per_, value.EndOffsetPercent, GUILayout.Width(150));
+                            EditorGUIUtility.labelWidth = 0;
+                            EditorGUI.indentLevel--;
+                        }
+                        if (!value.Equals(newValue))
+                        {
+                            WillChange();
+                            if (newValue.StartOffsetPercent < 0) newValue.StartOffsetPercent = 0;
+                            if (newValue.EndOffsetPercent < 0) newValue.EndOffsetPercent = 0;
+                            if (newValue.StartOffsetPercent > 100) newValue.StartOffsetPercent = 100;
+                            if (newValue.EndOffsetPercent > 100) newValue.EndOffsetPercent = 100;
+
+                            RadialShaderVectorParameters[key] = newValue;
+                            if (BulkSet)
+                            {
+                                BulkSetRadialShaderVectorParameter(name.Name, newValue, value.ChangedProp(newValue));
+                            }
+                        }
+                    }
+                    else
+                    {
+                        RemoveRadialShaderVectorParameter(children, child, name.Name);
+                    }
+                }
+            }
+        }
+
+        void BulkSetRadialShaderVectorParameter(string radialName, RadialVector4 radialBlendShape, string changedProp)
+        {
+            var matches = new List<(string, string)>();
+            foreach (var (child, name) in RadialShaderVectorParameters.Keys)
+            {
+                if (name == radialName)
+                {
+                    matches.Add((child, name));
+                }
+            }
+            foreach (var key in matches)
+            {
+                RadialShaderVectorParameters[key] = RadialShaderVectorParameters[key].SetProp(changedProp, radialBlendShape.GetProp(changedProp));
+            }
+        }
+
+        void AddRadialShaderVectorParameter(IList<string> children, string child, string name)
+        {
+            if (BulkSet)
+            {
+                foreach (var c in children)
+                {
+                    AddRadialShaderVectorParameterSingle(c, name);
+                }
+            }
+            else
+            {
+                AddRadialShaderVectorParameterSingle(child, name);
+            }
+        }
+
+        void AddRadialShaderVectorParameterSingle(string child, string name)
+        {
+            var key = (child, name);
+            if (RadialShaderVectorParameters.ContainsKey(key)) return;
+            WillChange();
+            RadialShaderVectorParameters[key] = new RadialVector4();
+        }
+
+        void RemoveRadialShaderVectorParameter(IList<string> children, string child, string name)
+        {
+            if (BulkSet)
+            {
+                foreach (var c in children)
+                {
+                    RemoveRadialShaderVectorParameterSingle(c, name);
+                }
+            }
+            else
+            {
+                RemoveRadialShaderVectorParameterSingle(child, name);
+            }
+        }
+
+        void RemoveRadialShaderVectorParameterSingle(string child, string name)
+        {
+            var key = (child, name);
+            if (!RadialShaderVectorParameters.ContainsKey(key)) return;
+            WillChange();
+            RadialShaderVectorParameters.Remove(key);
         }
 
         void ShowRadialValueControl(

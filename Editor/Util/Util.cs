@@ -155,12 +155,21 @@ namespace net.narazaka.avatarmenucreator.util
             });
         }
 
-        public static IEnumerable<ShaderParameter> ToFakeShaderParameters(this IEnumerable<string> names)
+        public static IEnumerable<ShaderParameter> ToFakeShaderFloatParameters(this IEnumerable<string> names)
         {
             return names.Select(name => new ShaderParameter
             {
                 Name = name,
                 Type = UnityEngine.Rendering.ShaderPropertyType.Float,
+            });
+        }
+
+        public static IEnumerable<ShaderParameter> ToFakeShaderVectorParameters(this IEnumerable<string> names)
+        {
+            return names.Select(name => new ShaderParameter
+            {
+                Name = name,
+                Type = UnityEngine.Rendering.ShaderPropertyType.Color,
             });
         }
 

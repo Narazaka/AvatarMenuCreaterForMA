@@ -270,7 +270,7 @@ namespace net.narazaka.avatarmenucreator
 
                 var gameObjectRef = GetGameObject(child);
                 var names = gameObjectRef == null ? ToggleBlendShapes.Names(child).ToList() : Util.GetBlendShapeNames(gameObjectRef);
-                var parameters = gameObjectRef == null ? ToggleShaderParameters.Names(child).ToFakeShaderParameters().ToList() : ShaderParametersCache.GetFilteredShaderParameters(gameObjectRef);
+                var parameters = gameObjectRef == null ? ToggleShaderParameters.Names(child).ToFakeShaderFloatParameters().Concat(ToggleShaderVectorParameters.Names(child).ToFakeShaderVectorParameters()).ToList() : ShaderParametersCache.GetFilteredShaderParameters(gameObjectRef);
                 var components = gameObjectRef == null ? ToggleValues.Names(child).Select(n => n.Type) : gameObjectRef.GetAllComponents().Select(c => TypeUtil.GetType(c)).FilterByVRCWhitelist();
                 var members = components.GetAvailableMembers();
 

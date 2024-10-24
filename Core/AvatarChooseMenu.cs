@@ -27,6 +27,8 @@ namespace net.narazaka.avatarmenucreator
         [SerializeField]
         public ChooseBlendShapeDictionary ChooseShaderParameters = new ChooseBlendShapeDictionary();
         [SerializeField]
+        public ChooseShaderVectorParameterDictionary ChooseShaderVectorParameters = new ChooseShaderVectorParameterDictionary();
+        [SerializeField]
         public ChooseValueDictionary ChooseValues = new ChooseValueDictionary();
         [SerializeField]
         public ChooseVector3Dictionary Positions = new ChooseVector3Dictionary();
@@ -71,16 +73,17 @@ namespace net.narazaka.avatarmenucreator
             return null;
         }
 
-        public override IEnumerable<string> GetStoredChildren() => ChooseObjects.Keys.Concat(ChooseMaterials.Keys.Select(key => key.Item1)).Concat(ChooseBlendShapes.Keys.Select(key => key.Item1)).Concat(ChooseShaderParameters.Keys.Select(key => key.Item1)).Concat(ChooseValues.Keys.Select(key => key.Item1)).Concat(Positions.Keys).Concat(Rotations.Keys).Concat(Scales.Keys).Distinct();
+        public override IEnumerable<string> GetStoredChildren() => ChooseObjects.Keys.Concat(ChooseMaterials.Keys.Select(key => key.Item1)).Concat(ChooseBlendShapes.Keys.Select(key => key.Item1)).Concat(ChooseShaderParameters.Keys.Select(key => key.Item1)).Concat(ChooseShaderVectorParameters.Keys.Select(key => key.Item1)).Concat(ChooseValues.Keys.Select(key => key.Item1)).Concat(Positions.Keys).Concat(Rotations.Keys).Concat(Scales.Keys).Distinct();
 
         public override void ReplaceStoredChild(string oldChild, string newChild)
         {
-            if (ChooseObjects.ContainsKey(oldChild) || ChooseMaterials.ContainsPrimaryKey(oldChild) || ChooseBlendShapes.ContainsPrimaryKey(oldChild) || ChooseShaderParameters.ContainsPrimaryKey(oldChild) || ChooseValues.ContainsPrimaryKey(oldChild) || Positions.ContainsKey(oldChild) || Rotations.ContainsKey(oldChild) || Scales.ContainsKey(oldChild))
+            if (ChooseObjects.ContainsKey(oldChild) || ChooseMaterials.ContainsPrimaryKey(oldChild) || ChooseBlendShapes.ContainsPrimaryKey(oldChild) || ChooseShaderParameters.ContainsPrimaryKey(oldChild) || ChooseShaderVectorParameters.ContainsPrimaryKey(oldChild) || ChooseValues.ContainsPrimaryKey(oldChild) || Positions.ContainsKey(oldChild) || Rotations.ContainsKey(oldChild) || Scales.ContainsKey(oldChild))
             {
                 ChooseObjects.ReplaceKey(oldChild, newChild);
                 ChooseMaterials.ReplacePrimaryKey(oldChild, newChild);
                 ChooseBlendShapes.ReplacePrimaryKey(oldChild, newChild);
                 ChooseShaderParameters.ReplacePrimaryKey(oldChild, newChild);
+                ChooseShaderVectorParameters.ReplacePrimaryKey(oldChild, newChild);
                 ChooseValues.ReplacePrimaryKey(oldChild, newChild);
                 Positions.ReplaceKey(oldChild, newChild);
                 Rotations.ReplaceKey(oldChild, newChild);
@@ -106,6 +109,10 @@ namespace net.narazaka.avatarmenucreator
             foreach (var key in ChooseShaderParameters.Keys.Where(key => !filter.Contains(key.Item1)).ToList())
             {
                 ChooseShaderParameters.Remove(key);
+            }
+            foreach (var key in ChooseShaderVectorParameters.Keys.Where(key => !filter.Contains(key.Item1)).ToList())
+            {
+                ChooseShaderVectorParameters.Remove(key);
             }
             foreach (var key in ChooseValues.Keys.Where(key => !filter.Contains(key.Item1)).ToList())
             {
@@ -141,6 +148,10 @@ namespace net.narazaka.avatarmenucreator
             {
                 ChooseShaderParameters.Remove(key);
             }
+            foreach (var key in ChooseShaderVectorParameters.Keys.Where(key => key.Item1 == child).ToList())
+            {
+                ChooseShaderVectorParameters.Remove(key);
+            }
             foreach (var key in ChooseValues.Keys.Where(key => key.Item1 == child).ToList())
             {
                 ChooseValues.Remove(key);
@@ -150,7 +161,7 @@ namespace net.narazaka.avatarmenucreator
             Scales.Remove(child);
         }
 
-        protected override bool IsSuitableForTransition() => ChooseBlendShapes.Count > 0 || ChooseShaderParameters.Count > 0 || ChooseValues.Names().Where(t => t.MemberType.IsSuitableForTransition()).Count() > 0 || Positions.Count > 0 || Rotations.Count > 0 || Scales.Count > 0;
+        protected override bool IsSuitableForTransition() => ChooseBlendShapes.Count > 0 || ChooseShaderParameters.Count > 0 || ChooseShaderVectorParameters.Count > 0 || ChooseValues.Names().Where(t => t.MemberType.IsSuitableForTransition()).Count() > 0 || Positions.Count > 0 || Rotations.Count > 0 || Scales.Count > 0;
 
         protected override void OnMultiGUI(SerializedProperty serializedProperty)
         {
@@ -391,7 +402,7 @@ namespace net.narazaka.avatarmenucreator
 
                 var gameObjectRef = GetGameObject(child);
                 var names = gameObjectRef == null ? ChooseBlendShapes.Names(child).ToList() : Util.GetBlendShapeNames(gameObjectRef);
-                var parameters = gameObjectRef == null ? ChooseShaderParameters.Names(child).ToFakeShaderParameters().ToList() : ShaderParametersCache.GetFilteredShaderParameters(gameObjectRef);
+                var parameters = gameObjectRef == null ? ChooseShaderParameters.Names(child).ToFakeShaderFloatParameters().Concat(ChooseShaderVectorParameters.Names(child).ToFakeShaderVectorParameters()).ToList() : ShaderParametersCache.GetFilteredShaderParameters(gameObjectRef);
                 var components = gameObjectRef == null ? ChooseValues.Names(child).Select(n => n.Type) : gameObjectRef.GetAllComponents().Select(c => TypeUtil.GetType(c)).FilterByVRCWhitelist();
                 var members = components.GetAvailableMembers();
                 if (names.Count > 0 &&
@@ -413,15 +424,36 @@ namespace net.narazaka.avatarmenucreator
                     FoldoutHeaderWithAddItemButton(
                         child,
                         "Shader Parameters",
-                        ChooseShaderParameters.HasChild(child),
+                        ChooseShaderParameters.HasChild(child) || ChooseShaderVectorParameters.HasChild(child),
                         () => parameters.Select(p => new NameAndDescriptionItemContainer(p) as ListTreeViewItemContainer<string>).ToList(),
-                        () => ChooseShaderParameters.Names(child).ToImmutableHashSet(),
-                        name => AddChooseBlendShape(ChooseShaderParameters, children, child, name),
-                        name => RemoveChooseBlendShape(ChooseShaderParameters, children, child, name)
+                        () => ChooseShaderParameters.Names(child).Concat(ChooseShaderVectorParameters.Names(child)).ToImmutableHashSet(),
+                        name =>
+                        {
+                            if (parameters.Any(p => p.Name == name && p.IsFloatLike))
+                            {
+                                AddChooseBlendShape(ChooseShaderParameters, children, child, name);
+                            }
+                            else
+                            {
+                                AddChooseShaderVectorParameter(children, child, name);
+                            }
+                        },
+                        name =>
+                        {
+                            if (parameters.Any(p => p.Name == name && p.IsFloatLike))
+                            {
+                                RemoveChooseBlendShape(ChooseShaderParameters, children, child, name);
+                            }
+                            else
+                            {
+                                RemoveChooseShaderVectorParameter(children, child, name);
+                            }
+                        }
                         ))
                 {
                     EditorGUI.indentLevel++;
                     ShowChooseBlendShapeControl(false, children, child, ChooseShaderParameters, parameters, minValue: null, maxValue: null);
+                    ShowChooseShaderVectorParameterControl(children, child, parameters);
                     EditorGUI.indentLevel--;
                 }
                 if (members.Count > 0 && FoldoutHeaderWithAddItemButton(
@@ -829,6 +861,106 @@ namespace net.narazaka.avatarmenucreator
             if (!choices.ContainsKey(key)) return;
             WillChange();
             choices.Remove(key);
+        }
+
+        void ShowChooseShaderVectorParameterControl(
+            IList<string> children,
+            string child,
+            IEnumerable<INameAndDescription> names
+            )
+        {
+            foreach (var name in names)
+            {
+                var key = (child, name.Name);
+                IntVector4Dictionary values;
+                if (ChooseShaderVectorParameters.TryGetValue(key, out values))
+                {
+                    if (EditorGUILayout.ToggleLeft(name.Description, true))
+                    {
+                        EditorGUI.indentLevel++;
+                        for (var i = 0; i < ChooseCount; ++i)
+                        {
+                            var value = values.ContainsKey(i) ? values[i] : Vector4.zero;
+                            EditorGUILayout.BeginHorizontal();
+                            var newValue = EditorGUILayout.Vector4Field(ChooseName(i), value);
+                            ShaderVectorParameterPickerButton(child, name.Name, ref newValue);
+                            EditorGUILayout.EndHorizontal();
+
+                            if (value != newValue)
+                            {
+                                WillChange();
+                                values[i] = newValue;
+                                if (BulkSet)
+                                {
+                                    BulkSetChooseShaderVectorParameter(name.Name, i, newValue);
+                                }
+                            }
+                        }
+                        EditorGUI.indentLevel--;
+                    }
+                    else
+                    {
+                        RemoveChooseShaderVectorParameter(children, child, name.Name);
+                    }
+                }
+            }
+        }
+
+        void BulkSetChooseShaderVectorParameter(string toggleName, int choiseIndex, Vector4 choiceValue)
+        {
+            foreach (var (child, name) in ChooseShaderVectorParameters.Keys)
+            {
+                if (name == toggleName)
+                {
+                    ChooseShaderVectorParameters[(child, name)][choiseIndex] = choiceValue;
+                }
+            }
+        }
+
+        void AddChooseShaderVectorParameter(IList<string> children, string child, string name)
+        {
+            if (BulkSet)
+            {
+                foreach (var c in children)
+                {
+                    AddChooseShaderVectorParameterSingle(c, name);
+                }
+            }
+            else
+            {
+                AddChooseShaderVectorParameterSingle(child, name);
+            }
+        }
+
+        void AddChooseShaderVectorParameterSingle(string child, string name)
+        {
+            var key = (child, name);
+            if (ChooseShaderVectorParameters.ContainsKey(key)) return;
+            WillChange();
+            ChooseShaderVectorParameters[key] = new IntVector4Dictionary();
+        }
+
+        void RemoveChooseShaderVectorParameter(IList<string> children, string child, string name)
+        {
+            if (BulkSet)
+            {
+                foreach (var c in children)
+                {
+                    RemoveChooseShaderVectorParameterSingle(c, name);
+                }
+            }
+            else
+            {
+                RemoveChooseShaderVectorParameterSingle(child, name);
+            }
+        }
+
+        void RemoveChooseShaderVectorParameterSingle(string child, string name)
+        {
+            var key = (child, name);
+            if (!ChooseShaderVectorParameters.ContainsKey(key)) return;
+            WillChange();
+            ChooseShaderVectorParameters.Remove(key);
         }
 
         void ShowChooseValueControl(
