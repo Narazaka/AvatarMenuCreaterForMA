@@ -83,27 +83,27 @@ namespace net.narazaka.avatarmenucreator
                             }
                             foreach (var key in ToggleBlendShapes.Keys.ToList())
                             {
-                                ToggleBlendShapes[key] = ToggleBlendShapes[key].ResetAdvanced();
+                                ToggleBlendShapes[key].ResetAdvanced();
                             }
                             foreach (var key in ToggleShaderParameters.Keys.ToList())
                             {
-                                ToggleShaderParameters[key] = ToggleShaderParameters[key].ResetAdvanced();
+                                ToggleShaderParameters[key].ResetAdvanced();
                             }
                             foreach (var key in ToggleValues.Keys.ToList())
                             {
-                                ToggleValues[key] = ToggleValues[key].ResetAdvanced();
+                                ToggleValues[key].ResetAdvanced();
                             }
                             foreach (var key in Positions.Keys.ToList())
                             {
-                                Positions[key] = Positions[key].ResetAdvanced();
+                                Positions[key].ResetAdvanced();
                             }
                             foreach (var key in Rotations.Keys.ToList())
                             {
-                                Rotations[key] = Rotations[key].ResetAdvanced();
+                                Rotations[key].ResetAdvanced();
                             }
                             foreach (var key in Scales.Keys.ToList())
                             {
-                                Scales[key] = Scales[key].ResetAdvanced();
+                                Scales[key].ResetAdvanced();
                             }
                         }
                     }
@@ -724,19 +724,12 @@ namespace net.narazaka.avatarmenucreator
                                 if (newValue.Inactive > (float)maxValue) newValue.Inactive = (float)maxValue;
                                 if (newValue.Active > (float)maxValue) newValue.Active = (float)maxValue;
                             }
-                            if (newValue.TransitionOffsetPercent < 0) newValue.TransitionOffsetPercent = 0;
-                            if (newValue.TransitionOffsetPercent > 100) newValue.TransitionOffsetPercent = 100;
-                            if (newValue.TransitionDurationPercent <= 0) newValue.TransitionDurationPercent = 1;
-                            if (newValue.TransitionDurationPercent > 100) newValue.TransitionDurationPercent = 100;
-                            if (newValue.TransitionOffsetPercent + newValue.TransitionDurationPercent > 100)
-                            {
-                                newValue.TransitionDurationPercent = 100 - newValue.TransitionOffsetPercent;
-                            }
+                            newValue.AdjustTransitionValues();
 
                             toggles[key] = newValue;
                             if (BulkSet)
                             {
-                                BulkSetToggleBlendShape(toggles, name.Name, newValue, value.ChangedProp(newValue));
+                                BulkSetToggleBlendShape(toggles, name.Name, newValue, value.ChangedProps(newValue));
                             }
                         }
                     }
@@ -748,7 +741,7 @@ namespace net.narazaka.avatarmenucreator
             }
         }
 
-        void BulkSetToggleBlendShape(ToggleBlendShapeDictionary toggles, string toggleName, ToggleBlendShape toggleBlendShape, string changedProp)
+        void BulkSetToggleBlendShape(ToggleBlendShapeDictionary toggles, string toggleName, ToggleBlendShape toggleBlendShape, IEnumerable<string> changedProps)
         {
             var matches = new List<(string, string)>();
             foreach (var (child, name) in toggles.Keys)
@@ -760,7 +753,10 @@ namespace net.narazaka.avatarmenucreator
             }
             foreach (var key in matches)
             {
-                toggles[key] = toggles[key].SetProp(changedProp, toggleBlendShape.GetProp(changedProp));
+                foreach (var changedProp in changedProps)
+                {
+                    toggles[key].SetProp(changedProp, toggleBlendShape.GetProp(changedProp));
+                }
             }
         }
 
@@ -968,7 +964,7 @@ namespace net.narazaka.avatarmenucreator
             {
                 foreach (var changedProp in changedProps)
                 {
-                    ToggleValues[key] = ToggleValues[key].SetProp(changedProp, toggleValue.GetProp(changedProp));
+                    ToggleValues[key].SetProp(changedProp, toggleValue.GetProp(changedProp));
                 }
             }
         }
@@ -1098,19 +1094,12 @@ namespace net.narazaka.avatarmenucreator
                     if (!value.Equals(newValue))
                     {
                         WillChange();
-                        if (newValue.TransitionOffsetPercent < 0) newValue.TransitionOffsetPercent = 0;
-                        if (newValue.TransitionOffsetPercent > 100) newValue.TransitionOffsetPercent = 100;
-                        if (newValue.TransitionDurationPercent <= 0) newValue.TransitionDurationPercent = 1;
-                        if (newValue.TransitionDurationPercent > 100) newValue.TransitionDurationPercent = 100;
-                        if (newValue.TransitionOffsetPercent + newValue.TransitionDurationPercent > 100)
-                        {
-                            newValue.TransitionDurationPercent = 100 - newValue.TransitionOffsetPercent;
-                        }
+                        newValue.AdjustTransitionValues();
 
                         values[child] = newValue;
                         if (BulkSet)
                         {
-                            BulkSetTransformComponent(values, newValue, value.ChangedProp(newValue));
+                            BulkSetTransformComponent(values, newValue, value.ChangedProps(newValue));
                         }
                     }
                 }
@@ -1121,11 +1110,14 @@ namespace net.narazaka.avatarmenucreator
             }
         }
 
-        void BulkSetTransformComponent(ToggleVector3Dictionary values, ToggleVector3 value, string changedProp)
+        void BulkSetTransformComponent(ToggleVector3Dictionary values, ToggleVector3 value, IEnumerable<string> changedProps)
         {
             foreach (var key in values.Keys.ToArray())
             {
-                values[key] = values[key].SetProp(changedProp, value.GetProp(changedProp));
+                foreach (var changedProp in changedProps)
+                {
+                    values[key].SetProp(changedProp, value.GetProp(changedProp));
+                }
             }
         }
 

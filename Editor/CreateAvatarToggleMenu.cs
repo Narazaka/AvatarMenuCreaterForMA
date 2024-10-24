@@ -1,4 +1,5 @@
 using nadena.dev.modular_avatar.core;
+using net.narazaka.avatarmenucreator.valuecurve;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEditor;
@@ -27,6 +28,13 @@ namespace net.narazaka.avatarmenucreator.editor
             inactive.name = $"{baseName}_inactive";
             var inactivate = new AnimationClip();
             inactivate.name = $"{baseName}_inactivate";
+            var clipSet = new ToggleAnimationClipSet(
+                active: active,
+                inactive: inactive,
+                activate: activate,
+                inactivate: inactivate,
+                transitionSeconds: AvatarMenu.TransitionSeconds
+                );
             var transitionSeconds = AvatarMenu.TransitionSeconds;
             foreach (var child in AvatarMenu.ToggleObjects.Keys)
             {
@@ -60,97 +68,40 @@ namespace net.narazaka.avatarmenucreator.editor
             foreach (var (child, name) in AvatarMenu.ToggleBlendShapes.Keys)
             {
                 if (!matchGameObjects.Contains(child)) continue;
-                var value = AvatarMenu.ToggleBlendShapes[(child, name)];
-                var curvePath = child;
-                var curveName = $"blendShape.{name}";
-                if (value.UseActive) active.SetCurve(curvePath, typeof(SkinnedMeshRenderer), curveName, value.ActiveCurve());
-                if (value.UseInactive) inactive.SetCurve(curvePath, typeof(SkinnedMeshRenderer), curveName, value.InactiveCurve());
-                if (transitionSeconds > 0)
-                {
-                    activate.SetCurve(curvePath, typeof(SkinnedMeshRenderer), curveName, value.ActivateCurve(transitionSeconds));
-                    inactivate.SetCurve(curvePath, typeof(SkinnedMeshRenderer), curveName, value.InactivateCurve(transitionSeconds));
-                }
+                clipSet.SetupAnimationToggleCurve(AvatarMenu.ToggleBlendShapes[(child, name)], path: child, type: typeof(SkinnedMeshRenderer), propertyName: $"blendShape.{name}");
             }
             foreach (var (child, name) in AvatarMenu.ToggleShaderParameters.Keys)
             {
                 if (!matchGameObjects.Contains(child)) continue;
-                var value = AvatarMenu.ToggleShaderParameters[(child, name)];
-                var curvePath = child;
-                var curveName = $"material.{name}";
-                if (value.UseActive) active.SetCurve(curvePath, typeof(Renderer), curveName, value.ActiveCurve());
-                if (value.UseInactive) inactive.SetCurve(curvePath, typeof(Renderer), curveName, value.InactiveCurve());
-                if (transitionSeconds > 0)
-                {
-                    activate.SetCurve(curvePath, typeof(Renderer), curveName, value.ActivateCurve(transitionSeconds));
-                    inactivate.SetCurve(curvePath, typeof(Renderer), curveName, value.InactivateCurve(transitionSeconds));
-                }
+                clipSet.SetupAnimationToggleCurve(AvatarMenu.ToggleShaderParameters[(child, name)], path: child, type: typeof(Renderer), propertyName: $"material.{name}");
             }
             foreach (var (child, member) in AvatarMenu.ToggleValues.Keys)
             {
                 if (!matchGameObjects.Contains(child)) continue;
                 var value = AvatarMenu.ToggleValues[(child, member)];
-                var curvePath = child;
                 if (member.MemberTypeIsPrimitive)
                 {
-                    var curve = value.AnimationToggleCurve(member.MemberType);
-                    if (value.UseActive) active.SetCurve(curvePath, member.Type, member.AnimationMemberName, curve.ActiveCurve());
-                    if (value.UseInactive) inactive.SetCurve(curvePath, member.Type, member.AnimationMemberName, curve.InactiveCurve());
-                    if (transitionSeconds > 0)
-                    {
-                        activate.SetCurve(curvePath, member.Type, member.AnimationMemberName, curve.ActivateCurve(transitionSeconds));
-                        inactivate.SetCurve(curvePath, member.Type, member.AnimationMemberName, curve.InactivateCurve(transitionSeconds));
-                    }
+                    clipSet.SetupAnimationToggleCurve(value, member.MemberType, path: child, type: member.Type, propertyName: member.AnimationMemberName);
                 }
                 else
                 {
-                    var curve = value.ComplexAnimationToggleCurve(member.MemberType, member.AnimationMemberName);
-                    if (value.UseActive) foreach (var c in curve.ActiveCurve()) active.SetCurve(curvePath, member.Type, c.propertyName, c.curve);
-                    if (value.UseInactive) foreach (var c in curve.InactiveCurve()) inactive.SetCurve(curvePath, member.Type, c.propertyName, c.curve);
-                    if (transitionSeconds > 0)
-                    {
-                        foreach (var c in curve.ActivateCurve(transitionSeconds)) activate.SetCurve(curvePath, member.Type, c.propertyName, c.curve);
-                        foreach (var c in curve.InactivateCurve(transitionSeconds)) inactivate.SetCurve(curvePath, member.Type, c.propertyName, c.curve);
-                    }
+                    clipSet.SetupComplexAnimationToggleCurve(value, member.MemberType, path: child, type: member.Type, prefix: member.AnimationMemberName);
                 }
             }
             foreach (var child in AvatarMenu.Positions.Keys)
             {
                 if (!matchGameObjects.Contains(child)) continue;
-                var value = AvatarMenu.Positions[child];
-                var curvePath = child;
-                if (value.UseActive) foreach (var c in value.ActiveCurve("localPosition")) active.SetCurve(curvePath, typeof(Transform), c.propertyName, c.curve);
-                if (value.UseInactive) foreach (var c in value.InactiveCurve("localPosition")) inactive.SetCurve(curvePath, typeof(Transform), c.propertyName, c.curve);
-                if (transitionSeconds > 0)
-                {
-                    foreach (var c in value.ActivateCurve("localPosition", transitionSeconds)) activate.SetCurve(curvePath, typeof(Transform), c.propertyName, c.curve);
-                    foreach (var c in value.InactivateCurve("localPosition", transitionSeconds)) inactivate.SetCurve(curvePath, typeof(Transform), c.propertyName, c.curve);
-                }
+                clipSet.SetupComplexAnimationToggleCurve(AvatarMenu.Positions[child], path: child, type: typeof(Transform), prefix: "localPosition");
             }
             foreach (var child in AvatarMenu.Rotations.Keys)
             {
                 if (!matchGameObjects.Contains(child)) continue;
-                var value = AvatarMenu.Rotations[child];
-                var curvePath = child;
-                if (value.UseActive) foreach (var c in value.ActiveCurve("localEulerAnglesRaw")) active.SetCurve(curvePath, typeof(Transform), c.propertyName, c.curve);
-                if (value.UseInactive) foreach (var c in value.InactiveCurve("localEulerAnglesRaw")) inactive.SetCurve(curvePath, typeof(Transform), c.propertyName, c.curve);
-                if (transitionSeconds > 0)
-                {
-                    foreach (var c in value.ActivateCurve("localEulerAnglesRaw", transitionSeconds)) activate.SetCurve(curvePath, typeof(Transform), c.propertyName, c.curve);
-                    foreach (var c in value.InactivateCurve("localEulerAnglesRaw", transitionSeconds)) inactivate.SetCurve(curvePath, typeof(Transform), c.propertyName, c.curve);
-                }
+                clipSet.SetupComplexAnimationToggleCurve(AvatarMenu.Rotations[child], path: child, type: typeof(Transform), prefix: "localEulerAnglesRaw");
             }
             foreach (var child in AvatarMenu.Scales.Keys)
             {
                 if (!matchGameObjects.Contains(child)) continue;
-                var value = AvatarMenu.Scales[child];
-                var curvePath = child;
-                if (value.UseActive) foreach (var c in value.ActiveCurve("localScale")) active.SetCurve(curvePath, typeof(Transform), c.propertyName, c.curve);
-                if (value.UseInactive) foreach (var c in value.InactiveCurve("localScale")) inactive.SetCurve(curvePath, typeof(Transform), c.propertyName, c.curve);
-                if (transitionSeconds > 0)
-                {
-                    foreach (var c in value.ActivateCurve("localScale", transitionSeconds)) activate.SetCurve(curvePath, typeof(Transform), c.propertyName, c.curve);
-                    foreach (var c in value.InactivateCurve("localScale", transitionSeconds)) inactivate.SetCurve(curvePath, typeof(Transform), c.propertyName, c.curve);    
-                }
+                clipSet.SetupComplexAnimationToggleCurve(AvatarMenu.Scales[child], path: child, type: typeof(Transform), prefix: "localScale");
             }
             // controller
             var controller = new AnimatorController();
