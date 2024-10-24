@@ -75,6 +75,11 @@ namespace net.narazaka.avatarmenucreator.editor
                 if (!matchGameObjects.Contains(child)) continue;
                 clipSet.SetupAnimationToggleCurve(AvatarMenu.ToggleShaderParameters[(child, name)], path: child, type: typeof(Renderer), propertyName: $"material.{name}");
             }
+            foreach (var (child, name) in AvatarMenu.ToggleShaderVectorParameters.Keys)
+            {
+                if (!matchGameObjects.Contains(child)) continue;
+                clipSet.SetupComplexAnimationToggleCurve(AvatarMenu.ToggleShaderVectorParameters[(child, name)], path: child, type: typeof(Renderer), prefix: $"material.{name}");
+            }
             foreach (var (child, member) in AvatarMenu.ToggleValues.Keys)
             {
                 if (!matchGameObjects.Contains(child)) continue;

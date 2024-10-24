@@ -27,6 +27,8 @@ namespace net.narazaka.avatarmenucreator
         [SerializeField]
         public ToggleBlendShapeDictionary ToggleShaderParameters = new ToggleBlendShapeDictionary();
         [SerializeField]
+        public ToggleShaderVectorParameterDictionary ToggleShaderVectorParameters = new ToggleShaderVectorParameterDictionary();
+        [SerializeField]
         public ToggleValueDictionary ToggleValues = new ToggleValueDictionary();
         [SerializeField]
         public ToggleVector3Dictionary Positions = new ToggleVector3Dictionary();
@@ -89,6 +91,10 @@ namespace net.narazaka.avatarmenucreator
                             {
                                 ToggleShaderParameters[key].ResetAdvanced();
                             }
+                            foreach (var key in ToggleShaderVectorParameters.Keys.ToList())
+                            {
+                                ToggleShaderVectorParameters[key].ResetAdvanced();
+                            }
                             foreach (var key in ToggleValues.Keys.ToList())
                             {
                                 ToggleValues[key].ResetAdvanced();
@@ -114,12 +120,12 @@ namespace net.narazaka.avatarmenucreator
                 }
             }
         }
-        bool HasAdvanced => ToggleObjectUsings.Count > 0 || ToggleMaterials.Any(t => t.Value.HasAdvanced) || ToggleBlendShapes.Any(t => t.Value.HasAdvanced) || ToggleShaderParameters.Any(t => t.Value.HasAdvanced) || ToggleValues.Any(t => t.Value.HasAdvanced) || Positions.Any(t => t.Value.HasAdvanced) || Rotations.Any(t => t.Value.HasAdvanced) || Scales.Any(t => t.Value.HasAdvanced);
+        bool HasAdvanced => ToggleObjectUsings.Count > 0 || ToggleMaterials.Any(t => t.Value.HasAdvanced) || ToggleBlendShapes.Any(t => t.Value.HasAdvanced) || ToggleShaderParameters.Any(t => t.Value.HasAdvanced) || ToggleShaderVectorParameters.Any(t => t.Value.HasAdvanced) || ToggleValues.Any(t => t.Value.HasAdvanced) || Positions.Any(t => t.Value.HasAdvanced) || Rotations.Any(t => t.Value.HasAdvanced) || Scales.Any(t => t.Value.HasAdvanced);
 
-        public override IEnumerable<string> GetStoredChildren() => ToggleObjects.Keys.Concat(ToggleMaterials.Keys.Select(k => k.Item1)).Concat(ToggleBlendShapes.Keys.Select(k => k.Item1)).Concat(ToggleShaderParameters.Keys.Select(k => k.Item1)).Concat(ToggleValues.Keys.Select(k => k.Item1)).Concat(Positions.Keys).Concat(Rotations.Keys).Concat(Scales.Keys).Distinct();
+        public override IEnumerable<string> GetStoredChildren() => ToggleObjects.Keys.Concat(ToggleMaterials.Keys.Select(k => k.Item1)).Concat(ToggleBlendShapes.Keys.Select(k => k.Item1)).Concat(ToggleShaderParameters.Keys.Select(k => k.Item1)).Concat(ToggleShaderVectorParameters.Keys.Select(k => k.Item1)).Concat(ToggleValues.Keys.Select(k => k.Item1)).Concat(Positions.Keys).Concat(Rotations.Keys).Concat(Scales.Keys).Distinct();
         public override void ReplaceStoredChild(string oldChild, string newChild)
         {
-            if (ToggleObjects.ContainsKey(oldChild) || ToggleMaterials.ContainsPrimaryKey(oldChild) || ToggleBlendShapes.ContainsPrimaryKey(oldChild) || ToggleShaderParameters.ContainsPrimaryKey(oldChild) || ToggleValues.ContainsPrimaryKey(oldChild) || Positions.ContainsKey(oldChild) || Rotations.ContainsKey(oldChild) || Scales.ContainsKey(oldChild))
+            if (ToggleObjects.ContainsKey(oldChild) || ToggleMaterials.ContainsPrimaryKey(oldChild) || ToggleBlendShapes.ContainsPrimaryKey(oldChild) || ToggleShaderParameters.ContainsPrimaryKey(oldChild) || ToggleShaderVectorParameters.ContainsPrimaryKey(oldChild) || ToggleValues.ContainsPrimaryKey(oldChild) || Positions.ContainsKey(oldChild) || Rotations.ContainsKey(oldChild) || Scales.ContainsKey(oldChild))
             {
                 WillChange();
                 ToggleObjects.ReplaceKey(oldChild, newChild);
@@ -127,6 +133,7 @@ namespace net.narazaka.avatarmenucreator
                 ToggleMaterials.ReplacePrimaryKey(oldChild, newChild);
                 ToggleBlendShapes.ReplacePrimaryKey(oldChild, newChild);
                 ToggleShaderParameters.ReplacePrimaryKey(oldChild, newChild);
+                ToggleShaderVectorParameters.ReplacePrimaryKey(oldChild, newChild);
                 ToggleValues.ReplacePrimaryKey(oldChild, newChild);
                 Positions.ReplaceKey(oldChild, newChild);
                 Rotations.ReplaceKey(oldChild, newChild);
@@ -156,6 +163,10 @@ namespace net.narazaka.avatarmenucreator
             foreach (var key in ToggleShaderParameters.Keys.Where(k => !filter.Contains(k.Item1)).ToList())
             {
                 ToggleShaderParameters.Remove(key);
+            }
+            foreach (var key in ToggleShaderVectorParameters.Keys.Where(k => !filter.Contains(k.Item1)).ToList())
+            {
+                ToggleShaderVectorParameters.Remove(key);
             }
             foreach (var key in ToggleValues.Keys.Where(k => !filter.Contains(k.Item1)).ToList())
             {
@@ -191,6 +202,10 @@ namespace net.narazaka.avatarmenucreator
             {
                 ToggleShaderParameters.Remove(key);
             }
+            foreach (var key in ToggleShaderVectorParameters.Keys.Where(k => k.Item1 == child).ToList())
+            {
+                ToggleShaderVectorParameters.Remove(key);
+            }
             foreach (var key in ToggleValues.Keys.Where(k => k.Item1 == child).ToList())
             {
                 ToggleValues.Remove(key);
@@ -200,7 +215,7 @@ namespace net.narazaka.avatarmenucreator
             Scales.Remove(child);
         }
         // TODO: ToggleValues
-        protected override bool IsSuitableForTransition() => ToggleBlendShapes.Count > 0 || ToggleShaderParameters.Count > 0 || ToggleValues.Names().Where(t => t.MemberType.IsSuitableForTransition()).Count() > 0 || Positions.Count > 0 || Rotations.Count > 0 || Scales.Count > 0;
+        protected override bool IsSuitableForTransition() => ToggleBlendShapes.Count > 0 || ToggleShaderParameters.Count > 0 || ToggleShaderVectorParameters.Count > 0 || ToggleValues.Names().Where(t => t.MemberType.IsSuitableForTransition()).Count() > 0 || Positions.Count > 0 || Rotations.Count > 0 || Scales.Count > 0;
 
         protected override void OnMultiGUI(SerializedProperty serializedProperty)
         {
@@ -295,15 +310,30 @@ namespace net.narazaka.avatarmenucreator
                     FoldoutHeaderWithAddItemButton(
                         child,
                         "Shader Parameters",
-                        ToggleShaderParameters.HasChild(child),
+                        ToggleShaderParameters.HasChild(child) || ToggleShaderVectorParameters.HasChild(child),
                         () => parameters.Select(p => new NameAndDescriptionItemContainer(p) as ListTreeViewItemContainer<string>).ToList(),
-                        () => ToggleShaderParameters.Names(child).ToImmutableHashSet(),
-                        (name) => AddToggleBlendShape(ToggleShaderParameters, children, child, name, 1),
-                        (name) => RemoveToggleBlendShape(ToggleShaderParameters, children, child, name)
+                        () => ToggleShaderParameters.Names(child).Concat(ToggleShaderVectorParameters.Names(child)).ToImmutableHashSet(),
+                        (name) =>
+                        {
+                            if (parameters.Find(p => p.Name == name).IsFloatLike) AddToggleBlendShape(ToggleShaderParameters, children, child, name, 1);
+                            else AddToggleShaderVectorParameter(children, child, name, 1);
+                        },
+                        (name) =>
+                        {
+                            if (parameters.Find(p => p.Name == name).IsFloatLike)
+                            {
+                                RemoveToggleBlendShape(ToggleShaderParameters, children, child, name);
+                            }
+                            else
+                            {
+                                RemoveToggleShaderVectorParameter(children, child, name);
+                            }
+                        }
                         ))
                 {
                     EditorGUI.indentLevel++;
                     ShowToggleBlendShapeControl(false, children, child, ToggleShaderParameters, parameters, minValue: null, maxValue: null);
+                    ShowToggleShaderVectorParameterControl(children, child, parameters);
                     EditorGUI.indentLevel--;
                 }
                 if (members.Count > 0 && FoldoutHeaderWithAddItemButton(
@@ -804,6 +834,150 @@ namespace net.narazaka.avatarmenucreator
             if (!toggles.ContainsKey(key)) return;
             WillChange();
             toggles.Remove(key);
+        }
+
+        void ShowToggleShaderVectorParameterControl(
+            IList<string> children,
+            string child,
+            IEnumerable<INameAndDescription> names
+            )
+        {
+            foreach (var name in names)
+            {
+                var key = (child, name.Name);
+                ToggleVector4 value;
+                if (ToggleShaderVectorParameters.TryGetValue(key, out value))
+                {
+                    if (EditorGUILayout.ToggleLeft(name.Description, true))
+                    {
+                        var newValue = new ToggleVector4();
+                        EditorGUI.indentLevel++;
+                        var widemode = EditorGUIUtility.wideMode;
+                        EditorGUIUtility.wideMode = true;
+                        EditorGUIUtility.labelWidth = 70;
+                        using (new EditorGUILayout.HorizontalScope())
+                        {
+                            newValue.Inactive = EditorGUILayout.Vector4Field("OFF", value.Inactive);
+                            ShaderVectorParameterPickerButton(child, name.Name, ref newValue.Inactive);
+                        }
+                        using (new EditorGUILayout.HorizontalScope())
+                        {
+                            newValue.Active = EditorGUILayout.Vector4Field("ON", value.Active);
+                            ShaderVectorParameterPickerButton(child, name.Name, ref newValue.Active);
+                        }
+                        EditorGUIUtility.labelWidth = 0;
+                        EditorGUIUtility.wideMode = widemode;
+                        EditorGUI.indentLevel--;
+                        if (TransitionSeconds > 0)
+                        {
+                            using (new EditorGUILayout.HorizontalScope())
+                            {
+                                EditorGUI.indentLevel++;
+                                EditorGUIUtility.labelWidth = 110;
+                                newValue.TransitionOffsetPercent = EditorGUILayout.FloatField(T.変化待機_per_, value.TransitionOffsetPercent, GUILayout.Width(140));
+                                newValue.TransitionDurationPercent = EditorGUILayout.FloatField(T.変化時間_per_, value.TransitionDurationPercent, GUILayout.Width(140));
+                                EditorGUIUtility.labelWidth = 0;
+                                EditorGUI.indentLevel--;
+                            }
+                            // 過去互換性
+                            if (newValue.TransitionDurationPercent <= 0)
+                            {
+                                EditorGUILayout.HelpBox(T.変化時間_per_は0より大きく設定して下さい, MessageType.Error);
+                            }
+                        }
+                        if (UseAdvanced)
+                        {
+                            using (new EditorGUILayout.HorizontalScope())
+                            {
+                                EditorGUI.indentLevel++;
+                                newValue.UseActive = EditorGUILayout.Toggle(T.ONを制御, value.UseActive);
+                                newValue.UseInactive = EditorGUILayout.Toggle(T.OFFを制御, value.UseInactive);
+                                EditorGUI.indentLevel--;
+                            }
+                        }
+                        if (!value.Equals(newValue))
+                        {
+                            WillChange();
+                            newValue.AdjustTransitionValues();
+
+                            ToggleShaderVectorParameters[key] = newValue;
+                            if (BulkSet)
+                            {
+                                BulkSetToggleShaderVectorParameter(name.Name, newValue, value.ChangedProps(newValue));
+                            }
+                        }
+                    }
+                    else
+                    {
+                        RemoveToggleShaderVectorParameter(children, child, name.Name);
+                    }
+                }
+            }
+        }
+
+        void BulkSetToggleShaderVectorParameter(string toggleName, ToggleVector4 toggleBlendShape, IEnumerable<string> changedProps)
+        {
+            var matches = new List<(string, string)>();
+            foreach (var (child, name) in ToggleShaderVectorParameters.Keys)
+            {
+                if (name == toggleName)
+                {
+                    matches.Add((child, name));
+                }
+            }
+            foreach (var key in matches)
+            {
+                foreach (var changedProp in changedProps)
+                {
+                    ToggleShaderVectorParameters[key].SetProp(changedProp, toggleBlendShape.GetProp(changedProp));
+                }
+            }
+        }
+
+        void AddToggleShaderVectorParameter(IList<string> children, string child, string name, float defaultActiveValue = 100)
+        {
+            if (BulkSet)
+            {
+                foreach (var c in children)
+                {
+                    AddToggleShaderVectorParameter(c, name, defaultActiveValue);
+                }
+            }
+            else
+            {
+                AddToggleShaderVectorParameter(child, name, defaultActiveValue);
+            }
+        }
+
+        void AddToggleShaderVectorParameter(string child, string name, float defaultActiveValue = 100)
+        {
+            var key = (child, name);
+            if (ToggleShaderVectorParameters.ContainsKey(key)) return;
+            WillChange();
+            ToggleShaderVectorParameters[key] = new ToggleVector4();
+        }
+
+        void RemoveToggleShaderVectorParameter(IList<string> children, string child, string name)
+        {
+            if (BulkSet)
+            {
+                foreach (var c in children)
+                {
+                    RemoveToggleShaderVectorParameterSingle(c, name);
+                }
+            }
+            else
+            {
+                RemoveToggleShaderVectorParameterSingle(child, name);
+            }
+        }
+
+        void RemoveToggleShaderVectorParameterSingle(string child, string name)
+        {
+            var key = (child, name);
+            if (!ToggleShaderVectorParameters.ContainsKey(key)) return;
+            WillChange();
+            ToggleShaderVectorParameters.Remove(key);
         }
 
         void ShowToggleValueControl(

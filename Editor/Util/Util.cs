@@ -126,7 +126,7 @@ namespace net.narazaka.avatarmenucreator.util
                         }
                     }
                 }
-                return (Filtered[gameObject] = GetShaderParameters(gameObject).ToFlatUniqueShaderParameterValues().OnlyFloatLike().OrderDefault().ToList());
+                return (Filtered[gameObject] = GetShaderParameters(gameObject).ToFlatUniqueShaderParameterValues().OnlyFloatOrVectorLike().OrderDefault().ToList());
             }
 
             bool Valid(Renderer renderer, List<MaterialShaderDescription> descriptions)
@@ -178,6 +178,8 @@ namespace net.narazaka.avatarmenucreator.util
             };
 
             public UnityEngine.Rendering.ShaderPropertyType Type { get; set; }
+            public bool IsFloatLike { get => FloatLikeShaderPropertyType.Contains(Type); }
+            public bool IsVectorLike { get => VectorLikeShaderPropertyType.Contains(Type); }
             public string Name { get; set; }
             public string Description {
                 get {
@@ -234,8 +236,13 @@ namespace net.narazaka.avatarmenucreator.util
             UnityEngine.Rendering.ShaderPropertyType.Float,
         };
 
-        public static IEnumerable<ShaderParameter> OnlyFloatLike(this IEnumerable<ShaderParameter> values) =>
-                values.Where(p => FloatLikeShaderPropertyType.Contains(p.Type));
+        static HashSet<UnityEngine.Rendering.ShaderPropertyType> VectorLikeShaderPropertyType = new HashSet<UnityEngine.Rendering.ShaderPropertyType> {
+            UnityEngine.Rendering.ShaderPropertyType.Vector,
+            UnityEngine.Rendering.ShaderPropertyType.Color,
+        };
+
+        public static IEnumerable<ShaderParameter> OnlyFloatOrVectorLike(this IEnumerable<ShaderParameter> values) =>
+                values.Where(p => FloatLikeShaderPropertyType.Contains(p.Type) || VectorLikeShaderPropertyType.Contains(p.Type));
 
         public static IEnumerable<ShaderParameter> OrderDefault(this IEnumerable<ShaderParameter> values) =>
             values.OrderBy(p => !p.IsCommon).ThenBy(p => p.Name);
