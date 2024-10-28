@@ -336,7 +336,7 @@ namespace net.narazaka.avatarmenucreator.editor
                 // if 0.3s after change start
                 var toPreventWait1 = preventState.AddTransition(preventWaitState);
                 toPreventWait1.exitTime = 0;
-                toPreventWait1.duration = 0.3f;
+                toPreventWait1.duration = AvatarMenu.PreventRemoteFloatBugDuration;
                 toPreventWait1.hasExitTime = false;
                 toPreventWait1.hasFixedDuration = true;
                 toPreventWait1.conditions = new AnimatorCondition[]
@@ -350,7 +350,7 @@ namespace net.narazaka.avatarmenucreator.editor
                 };
                 var toPreventWait2 = preventState.AddTransition(preventWaitState);
                 toPreventWait2.exitTime = 0;
-                toPreventWait2.duration = 0.3f;
+                toPreventWait2.duration = AvatarMenu.PreventRemoteFloatBugDuration;
                 toPreventWait2.hasExitTime = false;
                 toPreventWait2.hasFixedDuration = true;
                 toPreventWait2.conditions = new AnimatorCondition[]
@@ -365,7 +365,7 @@ namespace net.narazaka.avatarmenucreator.editor
                 // 0.1s blending
                 var toPrevented1 = preventWaitState.AddTransition(preventedState);
                 toPrevented1.exitTime = 0;
-                toPrevented1.duration = 0.1f;
+                toPrevented1.duration = 0;
                 toPrevented1.hasExitTime = false;
                 toPrevented1.interruptionSource = TransitionInterruptionSource.Destination;
                 toPrevented1.conditions = new AnimatorCondition[]
@@ -379,7 +379,7 @@ namespace net.narazaka.avatarmenucreator.editor
                 };
                 var toPrevented2 = preventWaitState.AddTransition(preventedState);
                 toPrevented2.exitTime = 0;
-                toPrevented2.duration = 0.1f;
+                toPrevented2.duration = 0;
                 toPrevented2.hasExitTime = false;
                 toPrevented2.interruptionSource = TransitionInterruptionSource.Destination;
                 toPrevented2.conditions = new AnimatorCondition[]

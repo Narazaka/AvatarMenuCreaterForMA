@@ -42,6 +42,8 @@ namespace net.narazaka.avatarmenucreator
         public bool LockRemoteDuringChange;
         [SerializeField]
         public bool PreventRemoteFloatBug;
+        [SerializeField]
+        public float PreventRemoteFloatBugDuration = 0.8f;
 
         public override void Reset()
         {
@@ -151,7 +153,14 @@ namespace net.narazaka.avatarmenucreator
             EditorGUILayout.PropertyField(lockRemoteDuringChange, new GUIContent(T.変更中リモートをロック));
             if (lockRemoteDuringChange.hasMultipleDifferentValues || !lockRemoteDuringChange.boolValue)
             {
-                EditorGUILayout.PropertyField(serializedProperty.FindPropertyRelative(nameof(PreventRemoteFloatBug)), new GUIContent(T.リモートでのFloat暴発バグを防ぐ));
+                var preventRemoteFloatBug = serializedProperty.FindPropertyRelative(nameof(PreventRemoteFloatBug));
+                EditorGUILayout.PropertyField(preventRemoteFloatBug, new GUIContent(T.リモートでのFloat暴発バグを防ぐ));
+                if (preventRemoteFloatBug.hasMultipleDifferentValues || preventRemoteFloatBug.boolValue)
+                {
+                    EditorGUI.indentLevel++;
+                    EditorGUILayout.PropertyField(serializedProperty.FindPropertyRelative(nameof(PreventRemoteFloatBugDuration)), new GUIContent(T.同期待機時間__start_秒_end_));
+                    EditorGUI.indentLevel--;
+                }
             }
             serializedObject.ApplyModifiedProperties();
         }
@@ -182,6 +191,17 @@ namespace net.narazaka.avatarmenucreator
                 {
                     WillChange();
                     PreventRemoteFloatBug = newPreventRemoteFloatBug;
+                }
+                if (PreventRemoteFloatBug)
+                {
+                    EditorGUI.indentLevel++;
+                    var newPreventRemoteFloatBugDuration = FloatField(T.同期待機時間__start_秒_end_, PreventRemoteFloatBugDuration);
+                    if (newPreventRemoteFloatBugDuration != PreventRemoteFloatBugDuration)
+                    {
+                        WillChange();
+                        PreventRemoteFloatBugDuration = newPreventRemoteFloatBugDuration;
+                    }
+                    EditorGUI.indentLevel--;
                 }
             }
 

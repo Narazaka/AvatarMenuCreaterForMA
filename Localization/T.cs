@@ -299,6 +299,9 @@ namespace net.narazaka.avatarmenucreator
         [English("Prevent remote Float outburst bug")]
         public static string リモートでのFloat暴発バグを防ぐ => L;
 
+        [English("wait (s)")]
+        public static string 同期待機時間__start_秒_end_ => L;
+
         [English("Set Invalid Area")]
         public static string 無効領域を設定 => L;
 
