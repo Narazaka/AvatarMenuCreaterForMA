@@ -120,27 +120,35 @@ namespace net.narazaka.avatarmenucreator
                 {
                     var controlHeight = HeaderBulkGUIHeight(children);
                     var clampedHeight = Mathf.Min(controlHeight, BulkHeight);
-                    using (var scrollView = new EditorGUILayout.ScrollViewScope(BulkScrollPosition, GUILayout.Height(clampedHeight)))
+                    var indivisualFoldout = FoldoutGroupIsFoldout("", T.個別設定);
+                    var guiLayoutOptions = indivisualFoldout ? new GUILayoutOption[] { GUILayout.Height(clampedHeight) } : new GUILayoutOption[0];
+                    using (var scrollView = new EditorGUILayout.ScrollViewScope(BulkScrollPosition, guiLayoutOptions))
                     {
                         BulkScrollPosition = scrollView.scrollPosition;
                         OnHeaderBulkGUI(children);
                     }
-                    var delta = DraggableHorizontalLine();
-                    if (delta < 0 || controlHeight > BulkHeight)
+                    if (indivisualFoldout)
                     {
-                        BulkHeight += delta;
-                        if (BulkHeight < 20) BulkHeight = 20;
+                        var delta = DraggableHorizontalLine();
+                        if (delta < 0 || controlHeight > BulkHeight)
+                        {
+                            BulkHeight += delta;
+                            if (BulkHeight < 20) BulkHeight = 20;
+                        }
                     }
                 }
             }
 
-            using (var scrollView = new EditorGUILayout.ScrollViewScope(ScrollPosition))
+            if (!HasHeaderBulkGUI || !BulkSet || FoldoutHeader("", T.個別設定, true))
             {
-                ScrollPosition = scrollView.scrollPosition;
-                OnMainGUI(children);
-                if (ShowMultiSelectInfo && children.Count == 1)
+                using (var scrollView = new EditorGUILayout.ScrollViewScope(ScrollPosition))
                 {
-                    EditorGUILayout.HelpBox(T.ヒント_colon__複数のオブジェクトを選択して一緒に設定出来ます, MessageType.Info);
+                    ScrollPosition = scrollView.scrollPosition;
+                    OnMainGUI(children);
+                    if (ShowMultiSelectInfo && children.Count == 1)
+                    {
+                        EditorGUILayout.HelpBox(T.ヒント_colon__複数のオブジェクトを選択して一緒に設定出来ます, MessageType.Info);
+                    }
                 }
             }
         }
@@ -303,6 +311,11 @@ namespace net.narazaka.avatarmenucreator
                 EditorGUI.EndDisabledGroup();
             }
             EditorGUILayout.EndHorizontal();
+        }
+
+        protected bool FoldoutGroupIsFoldout(string child, string title)
+        {
+            return !FoldoutGroups.TryGetValue(title, out var foldoutGroup) || !foldoutGroup.Contains(child);
         }
 
         protected bool FoldoutHeader(string child, string title, bool hasChildren = true)

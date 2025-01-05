@@ -182,7 +182,10 @@ namespace net.narazaka.avatarmenucreator
         [English("When advanced settings are enabled, you can set the control to ON or OFF one side only.")]
         public static string 高度な設定を有効にするとヽONまたはOFF片方だけ制御する設定ができますゝ => L;
 
-        [English("batch setting")]
+        [English("indivisual settings")]
+        public static string 個別設定 => L;
+
+        [English("batch settings")]
         public static string 一括設定 => L;
 
         [English("No control")]
