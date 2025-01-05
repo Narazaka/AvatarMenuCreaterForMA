@@ -93,6 +93,7 @@ namespace net.narazaka.avatarmenucreator
         Dictionary<string, HashSet<string>> FoldoutGroups = new Dictionary<string, HashSet<string>>();
         Vector2 ScrollPosition;
         Vector2 BulkScrollPosition;
+        float BulkHeight = 220;
 
         protected Util.ShaderParametersCache ShaderParametersCache = new Util.ShaderParametersCache();
         Dictionary<string, GameObject> GameObjectCache = new Dictionary<string, GameObject>();
@@ -117,17 +118,19 @@ namespace net.narazaka.avatarmenucreator
             {
                 if (FoldoutHeader("", T.一括設定, true))
                 {
-                    var height = HeaderBulkGUIHeight(children);
-                    if (height > 220)
-                    {
-                        height = 220;
-                    }
-                    using (var scrollView = new EditorGUILayout.ScrollViewScope(BulkScrollPosition, GUILayout.Height(height)))
+                    var controlHeight = HeaderBulkGUIHeight(children);
+                    var clampedHeight = Mathf.Min(controlHeight, BulkHeight);
+                    using (var scrollView = new EditorGUILayout.ScrollViewScope(BulkScrollPosition, GUILayout.Height(clampedHeight)))
                     {
                         BulkScrollPosition = scrollView.scrollPosition;
                         OnHeaderBulkGUI(children);
                     }
-                    HorizontalLine();
+                    var delta = DraggableHorizontalLine();
+                    if (delta < 0 || controlHeight > BulkHeight)
+                    {
+                        BulkHeight += delta;
+                        if (BulkHeight < 20) BulkHeight = 20;
+                    }
                 }
             }
 
@@ -598,6 +601,40 @@ namespace net.narazaka.avatarmenucreator
             });
             GUI.color = c;
             return rect;
+        }
+
+        protected float DraggableHorizontalLine()
+        {
+            var rect = HorizontalLine();
+            EditorGUIUtility.AddCursorRect(rect, MouseCursor.ResizeVertical);
+            var e = Event.current;
+            var controlId = GUIUtility.GetControlID(FocusType.Passive);
+            float delta = 0;
+            switch (e.type)
+            {
+                case EventType.MouseDown:
+                    if (rect.Contains(e.mousePosition))
+                    {
+                        GUIUtility.hotControl = controlId;
+                        e.Use();
+                    }
+                    break;
+                case EventType.MouseDrag:
+                    if (GUIUtility.hotControl == controlId)
+                    {
+                        delta = e.delta.y;
+                        e.Use();
+                    }
+                    break;
+                case EventType.MouseUp:
+                    if (GUIUtility.hotControl == controlId)
+                    {
+                        GUIUtility.hotControl = 0;
+                        e.Use();
+                    }
+                    break;
+            }
+            return delta;
         }
 #endif
     }
