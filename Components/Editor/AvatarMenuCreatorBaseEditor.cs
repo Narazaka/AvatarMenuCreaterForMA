@@ -235,25 +235,19 @@ namespace net.narazaka.avatarmenucreator.components.editor
                             if (newObj != null)
                             {
                                 var newPath = Util.ChildPath(baseObject, newObj as GameObject);
-                                if (EditorUtility.DisplayDialog(T.本当に変更しますか_Q_, $"{c} -> {newPath}", "OK", "Cancel"))
-                                {
-                                    Creator.AvatarMenu.ReplaceStoredChild(EditChild, newPath);
-                                    UpdateChildren();
-                                    EditChild = null;
-                                    EditChildNew = null;
-                                }
+                                Creator.AvatarMenu.ReplaceStoredChild(EditChild, newPath);
+                                UpdateChildren();
+                                EditChild = null;
+                                EditChildNew = null;
                             }
                             using (new EditorGUI.DisabledScope(c == EditChildNew))
                             {
                                 if (GUILayout.Button("OK"))
                                 {
-                                    if (EditorUtility.DisplayDialog(T.本当に変更しますか_Q_, $"{c} -> {EditChildNew}", "OK", "Cancel"))
-                                    {
-                                        Creator.AvatarMenu.ReplaceStoredChild(EditChild, EditChildNew);
-                                        UpdateChildren();
-                                        EditChild = null;
-                                        EditChildNew = null;
-                                    }
+                                    Creator.AvatarMenu.ReplaceStoredChild(EditChild, EditChildNew);
+                                    UpdateChildren();
+                                    EditChild = null;
+                                    EditChildNew = null;
                                 }
                             }
                         }
