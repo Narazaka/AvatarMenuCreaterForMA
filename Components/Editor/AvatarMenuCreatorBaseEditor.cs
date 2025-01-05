@@ -34,6 +34,14 @@ namespace net.narazaka.avatarmenucreator.components.editor
             UpdateChildren();
         }
 
+        void AddChild(GameObject baseObject, GameObject child)
+        {
+            var path = Util.ChildPath(baseObject, child);
+            if (Children.Contains(path)) return;
+            UndoUtility.RecordObject(this, "Add Children");
+            Children.Add(path);
+        }
+
         void UpdateChildren()
         {
             Children = Creator.AvatarMenu.GetStoredChildren().ToList();
@@ -193,11 +201,31 @@ namespace net.narazaka.avatarmenucreator.components.editor
 
             if (baseObject != null)
             {
-                var child = EditorGUILayout.ObjectField(T.オブジェクトを追加, null, typeof(GameObject), true) as GameObject;
+                var rect = EditorGUILayout.GetControlRect();
+                var ev = Event.current;
+                switch (ev.type)
+                {
+                    case EventType.DragUpdated:
+                    case EventType.DragPerform:
+                        if (!rect.Contains(ev.mousePosition)) break;
+                        DragAndDrop.visualMode = DragAndDropVisualMode.Copy;
+                        if (ev.type == EventType.DragPerform)
+                        {
+                            DragAndDrop.AcceptDrag();
+                            foreach (var obj in DragAndDrop.objectReferences)
+                            {
+                                if (obj is GameObject)
+                                {
+                                    AddChild(baseObject, obj as GameObject);
+                                }
+                            }
+                        }
+                        break;
+                }
+                var child = EditorGUI.ObjectField(rect, T.オブジェクトを追加, null, typeof(GameObject), true) as GameObject;
                 if (child != null)
                 {
-                    UndoUtility.RecordObject(this, "Add Children");
-                    Children.Add(Util.ChildPath(baseObject, child));
+                    AddChild(baseObject, child);
                 }
             }
 
