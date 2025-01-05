@@ -42,7 +42,6 @@ namespace net.narazaka.avatarmenucreator
         public Texture2D ToggleIcon;
 
 #if UNITY_EDITOR
-
         static readonly string[] TransformComponentNames = new[] { "Position", "Rotation", "Scale" };
         ToggleVector3Dictionary TransformComponent(string transformComponentName)
         {
@@ -244,21 +243,27 @@ namespace net.narazaka.avatarmenucreator
             EditorGUILayout.Space();
 
             ShowTransitionSeconds();
+        }
 
-            var allMaterials = children.ToDictionary(child => child, child => GetMaterialSlots(child));
+        protected override bool HasHeaderBulkGUI => true;
 
-            if (BulkSet)
-            {
-                if (FoldoutHeader("", T.一括設定, true))
-                {
-                    ShowToggleBulkMaterialControl(allMaterials);
-                }
-            }
+        protected override float HeaderBulkGUIHeight(IList<string> children)
+        {
+            var allMaterials = GetAllMaterialSlots(children);
+            var keyToMaterial = allMaterials.KeyToMaterial();
+            var sourceMaterials = DistinctSourceMaterial(keyToMaterial);
+            return sourceMaterials.Count() * 2 * (EditorGUIUtility.singleLineHeight + EditorGUIUtility.standardVerticalSpacing) + EditorGUIUtility.standardVerticalSpacing;
+        }
+
+        protected override void OnHeaderBulkGUI(IList<string> children)
+        {
+            var allMaterials = GetAllMaterialSlots(children);
+            ShowToggleBulkMaterialControl(allMaterials);
         }
 
         protected override void OnMainGUI(IList<string> children)
         {
-            var allMaterials = children.ToDictionary(child => child, child => GetMaterialSlots(child));
+            var allMaterials = GetAllMaterialSlots(children);
 
             foreach (var child in children)
             {
@@ -608,10 +613,15 @@ namespace net.narazaka.avatarmenucreator
             ToggleMaterials.Remove(key);
         }
 
+        IEnumerable<Material> DistinctSourceMaterial(Func<(string, int), Material> keyToMaterial)
+        {
+            return ToggleMaterials.Keys.Select(keyToMaterial).Where(m => m != null).Distinct();
+        }
+
         void ShowToggleBulkMaterialControl(Dictionary<string, Material[]> allMaterials)
         {
-            Func<(string, int), Material> keyToMaterial = ((string, int) key) => allMaterials.TryGetValue(key.Item1, out var m) && m != null && m.Length > key.Item2 ? m[key.Item2] : null;
-            var sourceMaterials = ToggleMaterials.Keys.Select(keyToMaterial).Where(m => m != null).Distinct().ToList();
+            var keyToMaterial = allMaterials.KeyToMaterial();
+            var sourceMaterials = DistinctSourceMaterial(keyToMaterial);
             var chooseMaterialGroups = ToggleMaterials.Keys.GroupBy(keyToMaterial).Where(m => m.Key != null).ToDictionary(group => group.Key, group => group.ToList());
             foreach (var sourceMaterial in sourceMaterials)
             {
@@ -1337,6 +1347,8 @@ namespace net.narazaka.avatarmenucreator
             WillChange();
             values.Remove(child);
         }
+
+        Dictionary<string, Material[]> GetAllMaterialSlots(IList<string> children) => children.ToDictionary(child => child, child => GetMaterialSlots(child));
 
         // with prefab shim
         protected override Material[] GetMaterialSlots(string child) => GetGameObject(child)?.GetMaterialSlots() ?? ToggleMaterials.MaterialSlots(child);

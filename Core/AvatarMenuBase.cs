@@ -92,6 +92,7 @@ namespace net.narazaka.avatarmenucreator
         HashSet<string> FoldoutGameObjects = new HashSet<string>();
         Dictionary<string, HashSet<string>> FoldoutGroups = new Dictionary<string, HashSet<string>>();
         Vector2 ScrollPosition;
+        Vector2 BulkScrollPosition;
 
         protected Util.ShaderParametersCache ShaderParametersCache = new Util.ShaderParametersCache();
         Dictionary<string, GameObject> GameObjectCache = new Dictionary<string, GameObject>();
@@ -101,6 +102,9 @@ namespace net.narazaka.avatarmenucreator
         public abstract void FilterStoredTargets(IEnumerable<string> children);
         public abstract void RemoveStoredChild(string child);
         protected abstract void OnHeaderGUI(IList<string> children);
+        protected abstract bool HasHeaderBulkGUI { get; }
+        protected virtual float HeaderBulkGUIHeight(IList<string> children) => 0;
+        protected virtual void OnHeaderBulkGUI(IList<string> children) { }
         protected abstract void OnMainGUI(IList<string> children);
         protected abstract void OnMultiGUI(SerializedProperty serializedProperty);
         protected abstract bool IsSuitableForTransition();
@@ -108,6 +112,24 @@ namespace net.narazaka.avatarmenucreator
         public void OnAvatarMenuGUI(IList<string> children)
         {
             OnHeaderGUI(children);
+
+            if (HasHeaderBulkGUI && BulkSet)
+            {
+                if (FoldoutHeader("", T.一括設定, true))
+                {
+                    var height = HeaderBulkGUIHeight(children);
+                    if (height > 220)
+                    {
+                        height = 220;
+                    }
+                    using (var scrollView = new EditorGUILayout.ScrollViewScope(BulkScrollPosition, GUILayout.Height(height)))
+                    {
+                        BulkScrollPosition = scrollView.scrollPosition;
+                        OnHeaderBulkGUI(children);
+                    }
+                    HorizontalLine();
+                }
+            }
 
             using (var scrollView = new EditorGUILayout.ScrollViewScope(ScrollPosition))
             {
@@ -560,17 +582,22 @@ namespace net.narazaka.avatarmenucreator
             setValue(new SerializedObject(go.GetComponent(member.Type)).FindProperty(member.AnimationMemberName));
         }
 
-        protected void HorizontalLine()
+        protected Rect HorizontalLine()
         {
             var c = GUI.color;
             GUI.color = Color.gray;
-            GUILayout.Box(GUIContent.none, new GUIStyle
+            var rect = EditorGUILayout.GetControlRect(false);
+            var boxRect = rect;
+            boxRect.y += boxRect.height / 2;
+            boxRect.height = 1;
+            GUI.Box(boxRect, GUIContent.none, new GUIStyle
             {
                 normal = { background = EditorGUIUtility.whiteTexture },
                 margin = new RectOffset(10, 10, 10, 10),
                 fixedHeight = 1
             });
             GUI.color = c;
+            return rect;
         }
 #endif
     }

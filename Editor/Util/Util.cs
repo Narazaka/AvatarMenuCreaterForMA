@@ -283,5 +283,10 @@ namespace net.narazaka.avatarmenucreator.util
             clip.SetCurve("__AvatarMenuCreatorForMA_Empty_Animation__", typeof(Transform), "localPosition.x", AnimationCurve.Constant(0, duration, 0));
             return clip;
         }
+
+        public static System.Func<(string, int), Material> KeyToMaterial(this Dictionary<string, Material[]> allMaterials)
+        {
+            return ((string, int) key) => allMaterials.TryGetValue(key.Item1, out var m) && m != null && m.Length > key.Item2 ? m[key.Item2] : null;
+        }
     }
 }

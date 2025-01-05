@@ -277,6 +277,8 @@ namespace net.narazaka.avatarmenucreator
             }
         }
 
+        protected override bool HasHeaderBulkGUI => false;
+
         protected override void OnMainGUI(IList<string> children)
         {
             foreach (var child in children)

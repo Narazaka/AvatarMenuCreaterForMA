@@ -48,7 +48,6 @@ namespace net.narazaka.avatarmenucreator
         public IntTexture2DDictionary ChooseIcons = new IntTexture2DDictionary();
 
 #if UNITY_EDITOR
-
         static readonly string[] TransformComponentNames = new[] { "Position", "Rotation", "Scale" };
         ChooseVector3Dictionary TransformComponent(string transformComponentName)
         {
@@ -299,10 +298,6 @@ namespace net.narazaka.avatarmenucreator
                     HeaderChoises();
                 }
             }
-            
-            HeaderBulkChoises(children);
-
-            HorizontalLine();
         }
 
         void HeaderChoises()
@@ -328,21 +323,25 @@ namespace net.narazaka.avatarmenucreator
             EditorGUI.indentLevel--;
         }
 
-        void HeaderBulkChoises(IList<string> children)
+        protected override bool HasHeaderBulkGUI => true;
+
+        protected override float HeaderBulkGUIHeight(IList<string> children)
         {
-            if (BulkSet)
-            {
-                if (FoldoutHeader("", T.一括設定, true))
-                {
-                    var allMaterials = children.ToDictionary(child => child, child => GetMaterialSlots(child));
-                    ShowChooseBulkMaterialControl(allMaterials);
-                }
-            }
+            var allMaterials = GetAllMaterialSlots(children);
+            var keyToMaterial = allMaterials.KeyToMaterial();
+            var sourceMaterials = DistinctSourceMaterial(keyToMaterial);
+            return (EditorGUIUtility.singleLineHeight + EditorGUIUtility.standardVerticalSpacing) * sourceMaterials.Count() * (ChooseCount + 2) + EditorGUIUtility.standardVerticalSpacing;
+        }
+
+        protected override void OnHeaderBulkGUI(IList<string> children)
+        {
+            var allMaterials = GetAllMaterialSlots(children);
+            ShowChooseBulkMaterialControl(allMaterials);
         }
 
         protected override void OnMainGUI(IList<string> children)
         {
-            var allMaterials = children.ToDictionary(child => child, child => GetMaterialSlots(child));
+            var allMaterials = GetAllMaterialSlots(children);
 
             foreach (var child in children)
             {
@@ -715,10 +714,15 @@ namespace net.narazaka.avatarmenucreator
             ChooseMaterials.Remove(key);
         }
 
+        IEnumerable<Material> DistinctSourceMaterial(Func<(string, int), Material> keyToMaterial)
+        {
+            return ChooseMaterials.Keys.Select(keyToMaterial).Where(m => m != null).Distinct();
+        }
+
         void ShowChooseBulkMaterialControl(Dictionary<string, Material[]> allMaterials)
         {
-            Func<(string, int), Material> keyToMaterial = ((string, int) key) => allMaterials.TryGetValue(key.Item1, out var m) && m != null && m.Length > key.Item2 ? m[key.Item2] : null;
-            var sourceMaterials = ChooseMaterials.Keys.Select(keyToMaterial).Where(m => m != null).Distinct();
+            var keyToMaterial = allMaterials.KeyToMaterial();
+            var sourceMaterials = DistinctSourceMaterial(keyToMaterial);
             var chooseMaterialGroups = ChooseMaterials.Keys.GroupBy(keyToMaterial).Where(m => m.Key != null).ToDictionary(group => group.Key, group => group.ToList());
             foreach (var sourceMaterial in sourceMaterials)
             {
@@ -1228,6 +1232,8 @@ namespace net.narazaka.avatarmenucreator
                 }
             }
         }
+
+        Dictionary<string, Material[]> GetAllMaterialSlots(IList<string> children) => children.ToDictionary(child => child, child => GetMaterialSlots(child));
 
         // with prefab shim
         protected override Material[] GetMaterialSlots(string child) => GetGameObject(child)?.GetMaterialSlots() ?? ChooseMaterials.MaterialSlots(child);
