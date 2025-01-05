@@ -214,7 +214,6 @@ namespace net.narazaka.avatarmenucreator
             Rotations.Remove(child);
             Scales.Remove(child);
         }
-        // TODO: ToggleValues
         protected override bool IsSuitableForTransition() => ToggleBlendShapes.Count > 0 || ToggleShaderParameters.Count > 0 || ToggleShaderVectorParameters.Count > 0 || ToggleValues.Names().Where(t => t.MemberType.IsSuitableForTransition()).Count() > 0 || Positions.Count > 0 || Rotations.Count > 0 || Scales.Count > 0;
 
         protected override void OnMultiGUI(SerializedProperty serializedProperty)
