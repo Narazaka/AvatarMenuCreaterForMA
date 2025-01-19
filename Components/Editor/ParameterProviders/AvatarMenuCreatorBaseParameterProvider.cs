@@ -26,6 +26,9 @@ namespace net.narazaka.avatarmenucreator.editor
                 {
                     WantSynced = Menu.AvatarMenu.Synced,
                     IsHidden = Menu.AvatarMenu.InternalParameter,
+#if HAS_NDMF_ParameterProvider_DefaultValue
+                    DefaultValue = p.defaultValue,
+#endif
                 }
                 );
         }
