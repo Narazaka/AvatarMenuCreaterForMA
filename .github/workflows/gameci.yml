@@ -40,7 +40,9 @@ jobs:
       repos: |
         https://vpm.nadena.dev/vpm.json
         https://vpm.narazaka.net/index.json
-      packages: nadena.dev.modular-avatar ${{ matrix.ma }}
+      packages: |
+        nadena.dev.modular-avatar ${{ matrix.ma }}
+        ${{ matrix.additional_packages }}
       name: MA=${{ matrix.ma }}
       assemblyNames: AvatarMenuCreatorForMA.Test
       assemblyFilters: +AvatarMenuCreatorForMA.*,-AvatarMenuCreatorForMA.Test
@@ -94,14 +96,24 @@ jobs:
 
           - unity: 2019.4.31f1
             ma: 1.9.8
+            additional_packages: nadena.dev.ndmf 1.3.7
             vrcsdk-version: 3.4.2
           - unity: 2022.3.6f1
             ma: 1.9.8
+            additional_packages: nadena.dev.ndmf 1.3.7
             vrcsdk-version: 3.5.2
 
+          # ndmf>=1.4.0 ProvidedParameter
           - unity: 2019.4.31f1
             ma: 1.9.13
+            additional_packages: nadena.dev.ndmf 1.4.1
             vrcsdk-version: 3.4.2
           - unity: 2022.3.6f1
             ma: 1.9.13
+            additional_packages: nadena.dev.ndmf 1.4.1
+            vrcsdk-version: 3.5.2
+            
+          - unity: 2022.3.22f1
+            ma: 1.10.11
+            # ndmf>=1.5 ProvidedParameter.DefaultValue
             vrcsdk-version: 3.5.2
