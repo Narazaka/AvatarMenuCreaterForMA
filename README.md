@@ -54,6 +54,8 @@ https://github.com/Narazaka/AvatarMenuCreaterForMA/releases/latest から `net.n
 
 ## 更新履歴
 
+- 1.28.0
+  - NDMF ProvidedParameter.DefaultValueを追加し互換性を改善。
 - 1.27.0
   - UI改善
     - 一括設定がスクロール可能になりました。
