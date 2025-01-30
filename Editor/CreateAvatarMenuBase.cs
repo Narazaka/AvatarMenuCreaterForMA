@@ -65,6 +65,7 @@ namespace net.narazaka.avatarmenucreator.editor
                     throw new System.ArgumentException($"unknown menu type");
             }
         }
+#endif
 
         Transform GetByPath(string path)
         {
@@ -79,6 +80,5 @@ namespace net.narazaka.avatarmenucreator.editor
             if (component == null) return typeof(Renderer);
             return component.GetType();
         }
-#endif
     }
 }
