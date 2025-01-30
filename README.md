@@ -54,6 +54,9 @@ https://github.com/Narazaka/AvatarMenuCreaterForMA/releases/latest から `net.n
 
 ## 更新履歴
 
+- 1.29.0-beta.0
+  - シェーダーパラメーターとマテリアル変更について、SkinnedMeshRendererとMeshRendererタイプをパスに応じて使うように（1.11.0以降これまではRendererだった）。
+    - 本来レイヤー優先度的に下のはずの他のAnimatorに負けてしまう問題がなくなるはずです。
 - 1.28.1
   - シーン上の邪魔なアイコンがデフォルトで無効になるように
 - 1.28.0
