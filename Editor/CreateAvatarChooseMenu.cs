@@ -15,7 +15,7 @@ namespace net.narazaka.avatarmenucreator.editor
     public class CreateAvatarChooseMenu : CreateAvatarMenuBase
     {
         AvatarChooseMenu AvatarMenu;
-        public CreateAvatarChooseMenu(AvatarChooseMenu avatarChooseMenu) => AvatarMenu = avatarChooseMenu;
+        public CreateAvatarChooseMenu(Transform avatarRoot, AvatarChooseMenu avatarChooseMenu) : base(avatarRoot) => AvatarMenu = avatarChooseMenu;
 
         public override CreatedAssets CreateAssets(string baseName, IEnumerable<string> children = null)
         {
@@ -40,7 +40,7 @@ namespace net.narazaka.avatarmenucreator.editor
                 var curveName = $"m_Materials.Array.data[{index}]";
                 for (var i = 0; i < AvatarMenu.ChooseCount; ++i)
                 {
-                    AnimationUtility.SetObjectReferenceCurve(choices[i], EditorCurveBinding.PPtrCurve(curvePath, typeof(Renderer), curveName), new ObjectReferenceKeyframe[] { new ObjectReferenceKeyframe { time = 0, value = value.ContainsKey(i) ? value[i] : null } });
+                    AnimationUtility.SetObjectReferenceCurve(choices[i], EditorCurveBinding.PPtrCurve(curvePath, GetRendererTypeByPath(child), curveName), new ObjectReferenceKeyframe[] { new ObjectReferenceKeyframe { time = 0, value = value.ContainsKey(i) ? value[i] : null } });
                 }
             }
             foreach (var (child, name) in AvatarMenu.ChooseBlendShapes.Keys)
@@ -62,14 +62,14 @@ namespace net.narazaka.avatarmenucreator.editor
                 var curveName = $"material.{name}";
                 for (var i = 0; i < AvatarMenu.ChooseCount; ++i)
                 {
-                    choices[i].SetCurve(curvePath, typeof(Renderer), curveName, new AnimationCurve(new Keyframe(0, value.ContainsKey(i) ? value[i] : 0)));
+                    choices[i].SetCurve(curvePath, GetRendererTypeByPath(child), curveName, new AnimationCurve(new Keyframe(0, value.ContainsKey(i) ? value[i] : 0)));
                 }
             }
             foreach (var (child, name) in AvatarMenu.ChooseShaderVectorParameters.Keys)
             {
                 if (!matchGameObjects.Contains(child)) continue;
                 var value = AvatarMenu.ChooseShaderVectorParameters[(child, name)];
-                SetVector4Curve(choices, typeof(Renderer), child, $"material.{name}", value);
+                SetVector4Curve(choices, GetRendererTypeByPath(child), child, $"material.{name}", value);
             }
             foreach (var (child, member) in AvatarMenu.ChooseValues.Keys)
             {

@@ -20,7 +20,7 @@ namespace net.narazaka.avatarmenucreator.components.editor
                 foreach (var creator in creators)
                 {
                     if (!creator.IsEffective) continue;
-                    CreateAvatarMenuBase.GetCreateAvatarMenu(creator.AvatarMenu).CreateAssets(creator.name).StoreAssets(creator.gameObject, false);
+                    CreateAvatarMenuBase.GetCreateAvatarMenu(ctx.AvatarRootTransform, creator.AvatarMenu).CreateAssets(creator.name).StoreAssets(creator.gameObject, false);
                     UnityEngine.Object.DestroyImmediate(creator);
                 }
             });

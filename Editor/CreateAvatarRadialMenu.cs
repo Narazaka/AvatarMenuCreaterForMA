@@ -13,7 +13,7 @@ namespace net.narazaka.avatarmenucreator.editor
     public class CreateAvatarRadialMenu : CreateAvatarMenuBase
     {
         AvatarRadialMenu AvatarMenu;
-        public CreateAvatarRadialMenu(AvatarRadialMenu avatarRadialMenu) => AvatarMenu = avatarRadialMenu;
+        public CreateAvatarRadialMenu(Transform avatarRoot, AvatarRadialMenu avatarRadialMenu) : base(avatarRoot) => AvatarMenu = avatarRadialMenu;
 
         public override CreatedAssets CreateAssets(string baseName, IEnumerable<string> children = null)
         {
@@ -32,13 +32,13 @@ namespace net.narazaka.avatarmenucreator.editor
             {
                 if (!matchGameObjects.Contains(child)) continue;
                 var value = AvatarMenu.RadialShaderParameters[(child, name)];
-                clip.SetCurve(child, typeof(Renderer), $"material.{name}", FullAnimationCurve(new Keyframe(value.StartOffsetPercent, value.Start), new Keyframe(value.EndOffsetPercent, value.End)));
+                clip.SetCurve(child, GetRendererTypeByPath(child), $"material.{name}", FullAnimationCurve(new Keyframe(value.StartOffsetPercent, value.Start), new Keyframe(value.EndOffsetPercent, value.End)));
             }
             foreach (var (child, name) in AvatarMenu.RadialShaderVectorParameters.Keys)
             {
                 if (!matchGameObjects.Contains(child)) continue;
                 var value = AvatarMenu.RadialShaderVectorParameters[(child, name)];
-                SetVector4Curve(clip, typeof(Renderer), child, $"material.{name}", value);
+                SetVector4Curve(clip, GetRendererTypeByPath(child), child, $"material.{name}", value);
             }
             foreach (var (child, member) in AvatarMenu.RadialValues.Keys)
             {

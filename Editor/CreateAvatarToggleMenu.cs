@@ -13,7 +13,7 @@ namespace net.narazaka.avatarmenucreator.editor
     public class CreateAvatarToggleMenu : CreateAvatarMenuBase
     {
         AvatarToggleMenu AvatarMenu;
-        public CreateAvatarToggleMenu(AvatarToggleMenu avatarToggleMenu) => AvatarMenu = avatarToggleMenu;
+        public CreateAvatarToggleMenu(Transform avatarRoot, AvatarToggleMenu avatarToggleMenu) : base(avatarRoot) => AvatarMenu = avatarToggleMenu;
 
         public override CreatedAssets CreateAssets(string baseName, IEnumerable<string> children = null)
         {
@@ -56,7 +56,7 @@ namespace net.narazaka.avatarmenucreator.editor
                 var value = AvatarMenu.ToggleMaterials[(child, index)];
                 var curvePath = child;
                 var curveName = $"m_Materials.Array.data[{index}]";
-                var binding = EditorCurveBinding.PPtrCurve(curvePath, typeof(Renderer), curveName);
+                var binding = EditorCurveBinding.PPtrCurve(curvePath, GetRendererTypeByPath(child), curveName);
                 if (value.UseActive) AnimationUtility.SetObjectReferenceCurve(active, binding, value.ActiveCurve());
                 if (value.UseInactive) AnimationUtility.SetObjectReferenceCurve(inactive, binding, value.InactiveCurve());
                 if (transitionSeconds > 0)
@@ -73,12 +73,12 @@ namespace net.narazaka.avatarmenucreator.editor
             foreach (var (child, name) in AvatarMenu.ToggleShaderParameters.Keys)
             {
                 if (!matchGameObjects.Contains(child)) continue;
-                clipSet.SetupAnimationToggleCurve(AvatarMenu.ToggleShaderParameters[(child, name)], path: child, type: typeof(Renderer), propertyName: $"material.{name}");
+                clipSet.SetupAnimationToggleCurve(AvatarMenu.ToggleShaderParameters[(child, name)], path: child, type: GetRendererTypeByPath(child), propertyName: $"material.{name}");
             }
             foreach (var (child, name) in AvatarMenu.ToggleShaderVectorParameters.Keys)
             {
                 if (!matchGameObjects.Contains(child)) continue;
-                clipSet.SetupComplexAnimationToggleCurve(AvatarMenu.ToggleShaderVectorParameters[(child, name)], path: child, type: typeof(Renderer), prefix: $"material.{name}");
+                clipSet.SetupComplexAnimationToggleCurve(AvatarMenu.ToggleShaderVectorParameters[(child, name)], path: child, type: GetRendererTypeByPath(child), prefix: $"material.{name}");
             }
             foreach (var (child, member) in AvatarMenu.ToggleValues.Keys)
             {

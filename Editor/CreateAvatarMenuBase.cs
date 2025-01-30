@@ -10,20 +10,24 @@ namespace net.narazaka.avatarmenucreator.editor
 {
     public abstract class CreateAvatarMenuBase
     {
-        public static CreateAvatarMenuBase GetCreateAvatarMenu<T>(T avatarMenu) where T : AvatarMenuBase
+        public static CreateAvatarMenuBase GetCreateAvatarMenu<T>(Transform avatarRoot, T avatarMenu) where T : AvatarMenuBase
         {
             switch (avatarMenu)
             {
                 case AvatarChooseMenu avatarChooseMenu:
-                    return new CreateAvatarChooseMenu(avatarChooseMenu);
+                    return new CreateAvatarChooseMenu(avatarRoot, avatarChooseMenu);
                 case AvatarToggleMenu avatarToggleMenu:
-                    return new CreateAvatarToggleMenu(avatarToggleMenu);
+                    return new CreateAvatarToggleMenu(avatarRoot, avatarToggleMenu);
                 case AvatarRadialMenu avatarSliderMenu:
-                    return new CreateAvatarRadialMenu(avatarSliderMenu);
+                    return new CreateAvatarRadialMenu(avatarRoot, avatarSliderMenu);
                 default:
                     throw new System.ArgumentException($"unknown avatar menu type {avatarMenu.GetType()}");
             }
         }
+
+        Transform AvatarRoot;
+        
+        protected CreateAvatarMenuBase(Transform avatarRoot) => AvatarRoot = avatarRoot;
 
         public abstract CreatedAssets CreateAssets(string baseName, IEnumerable<string> children = null);
 
@@ -60,6 +64,20 @@ namespace net.narazaka.avatarmenucreator.editor
                 default:
                     throw new System.ArgumentException($"unknown menu type");
             }
+        }
+
+        Transform GetByPath(string path)
+        {
+            return AvatarRoot.Find(path);
+        }
+
+        protected System.Type GetRendererTypeByPath(string path)
+        {
+            var obj = GetByPath(path);
+            if (obj == null) return typeof(Renderer);
+            var component = obj.GetComponent<Renderer>();
+            if (component == null) return typeof(Renderer);
+            return component.GetType();
         }
 #endif
     }

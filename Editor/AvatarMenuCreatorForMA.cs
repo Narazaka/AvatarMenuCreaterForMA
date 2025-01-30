@@ -238,7 +238,7 @@ namespace net.narazaka.avatarmenucreator.editor
                         var prefabPath = EditorUtility.SaveFilePanelInProject(T.保存場所, "New Menu", "prefab", T.保存場所, SaveFolder);
                         if (string.IsNullOrEmpty(prefabPath)) return;
                         var (basePath, baseName) = Util.GetBasePathAndNameFromPrefabPath(prefabPath);
-                        var createAvatarMenu = CreateAvatarMenuBase.GetCreateAvatarMenu(avatarMenu);
+                        var createAvatarMenu = CreateAvatarMenuBase.GetCreateAvatarMenu(VRCAvatarDescriptor.transform, avatarMenu);
                         createAvatarMenu.CreateAssets(baseName, children).SaveAssets(IncludeAssetType, basePath, modifyPrefab);
                         SaveFolder = System.IO.Path.GetDirectoryName(basePath);
                     }

@@ -150,7 +150,7 @@ namespace net.narazaka.avatarmenucreator.components.editor
                         {
                             EditorGUILayout.HelpBox(T.アセットからの復元機能は高度な設定に対応していません_n_生成後のアセットから設定を復元することは出来ません, MessageType.Warning);
                         }
-                        EditorGUI.BeginDisabledGroup(Creator.AvatarMenu.IncludeAssetType == IncludeAssetType.Component);
+                        EditorGUI.BeginDisabledGroup(Creator.AvatarMenu.IncludeAssetType == IncludeAssetType.Component || baseObject == null);
                         if (GUILayout.Button(hasAssets ? T.この設定でアセットを再生成 : T.この設定でアセットを生成))
                         {
                             var prefabPath = AssetDatabase.GetAssetPath(Creator.gameObject);
@@ -164,7 +164,7 @@ namespace net.narazaka.avatarmenucreator.components.editor
                                 return;
                             }
                             var (basePath, baseName) = Util.GetBasePathAndNameFromPrefabPath(prefabPath);
-                            var createAvatarMenu = CreateAvatarMenuBase.GetCreateAvatarMenu(Creator.AvatarMenu);
+                            var createAvatarMenu = CreateAvatarMenuBase.GetCreateAvatarMenu(baseObject.transform, Creator.AvatarMenu);
                             createAvatarMenu.CreateAssets(baseName).SaveAssets(Creator.AvatarMenu.IncludeAssetType, basePath, (prefab) => CreateAvatarMenuBase.GetOrAddMenuCreatorComponent(prefab, Creator.AvatarMenu, true));
                         }
                         EditorGUI.EndDisabledGroup();
