@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
@@ -521,6 +521,10 @@ namespace net.narazaka.avatarmenucreator
                 value.SwapKey(from, to);
             }
             foreach (var value in ChooseShaderParameters.Values)
+            {
+                value.SwapKey(from, to);
+            }
+            foreach (var value in ChooseShaderVectorParameters.Values)
             {
                 value.SwapKey(from, to);
             }
