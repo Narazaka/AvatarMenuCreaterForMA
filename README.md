@@ -54,6 +54,9 @@ https://github.com/Narazaka/AvatarMenuCreaterForMA/releases/latest から `net.n
 
 ## 更新履歴
 
+- 1.30.0
+  - 新機能: 選択肢の削除機能
+  - 不具合修正: 選択肢の順序を変える場合にColor/Vector型のシェーダーパラメーターの順序が変わっていなかった問題を修正
 - 1.29.0
   - シェーダーパラメーターとマテリアル変更について、SkinnedMeshRendererとMeshRendererタイプをパスに応じて使うように（1.11.0以降これまではRendererだった）。
     - 本来レイヤー優先度的に下のはずの他のAnimatorに負けてしまう問題がなくなるはずです。
