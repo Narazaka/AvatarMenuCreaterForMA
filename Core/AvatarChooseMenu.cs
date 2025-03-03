@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
@@ -12,6 +12,7 @@ using System.Text.RegularExpressions;
 #endif
 using net.narazaka.avatarmenucreator.collections.instance;
 using net.narazaka.avatarmenucreator.value;
+using net.narazaka.avatarmenucreator.collections;
 
 namespace net.narazaka.avatarmenucreator
 {
@@ -317,6 +318,10 @@ namespace net.narazaka.avatarmenucreator
                 {
                     MoveChoice(i, i < ChooseCount - 1 ? i + 1 : 0);
                 }
+                if (GUILayout.Button("×", GUILayout.Width(19)))
+                {
+                    RemoveChoice(i);
+                }
                 EditorGUILayout.EndHorizontal();
             }
             EditorGUIUtility.labelWidth = 0;
@@ -543,6 +548,74 @@ namespace net.narazaka.avatarmenucreator
             foreach (var value in Scales.Values)
             {
                 value.SwapKey(from, to);
+            }
+        }
+
+        void RemoveChoice(int index)
+        {
+            WillChange();
+            ChooseCount--;
+            RemoveAndReorderDictionary(ChooseNames, index);
+            RemoveAndReorderDictionary(ChooseIcons, index);
+            RemoveAndReorderHashSet(ChooseObjects, index);
+            RemoveAndReorderValues<Material, IntMaterialDictionary>(ChooseMaterials, index);
+            RemoveAndReorderValues<float, IntFloatDictionary>(ChooseBlendShapes, index);
+            RemoveAndReorderValues<float, IntFloatDictionary>(ChooseShaderParameters, index);
+            RemoveAndReorderValues<Vector4, IntVector4Dictionary>(ChooseShaderVectorParameters, index);
+            RemoveAndReorderValues<value.Value, IntValueDictionary>(ChooseValues, index);
+            RemoveAndReorderValues(Positions, index);
+            RemoveAndReorderValues(Rotations, index);
+            RemoveAndReorderValues(Scales, index);
+        }
+
+        void RemoveAndReorderDictionary<T>(Dictionary<int, T> dic, int index)
+        {
+            dic.Remove(index);
+            foreach (var key in dic.Keys.Where(i => i > index).OrderBy(i => i).ToArray())
+            {
+                dic[key - 1] = dic[key];
+                dic.Remove(key);
+            }
+        }
+
+        void RemoveAndReorderHashSet(IntHashSetDictionary dic, int index)
+        {
+            foreach (var value in dic.Values)
+            {
+                value.Remove(index);
+                foreach (var key in value.Where(i => i > index).OrderBy(i => i).ToArray())
+                {
+                    value.Add(key - 1);
+                    value.Remove(key);
+                }
+            }
+        }
+
+        void RemoveAndReorderValues<V, D>(SerializedTwoTupleDictionary<string, int, D> dic, int index) where D : Dictionary<int, V>
+        {
+            RemoveAndReorderValues<(string, int), V, D>(dic, index);
+        }
+
+        void RemoveAndReorderValues<V, D>(SerializedTwoTupleDictionary<string, string, D> dic, int index) where D : Dictionary<int, V>
+        {
+            RemoveAndReorderValues<(string, string), V, D>(dic, index);
+        }
+
+        void RemoveAndReorderValues<V, D>(SerializedTwoTupleDictionary<string, TypeMember, D> dic, int index) where D : Dictionary<int, V>
+        {
+            RemoveAndReorderValues<(string, TypeMember), V, D>(dic, index);
+        }
+
+        void RemoveAndReorderValues(Dictionary<string, IntVector3Dictionary> dic, int index)
+        {
+            RemoveAndReorderValues<string, Vector3, IntVector3Dictionary>(dic, index);
+        }
+
+        void RemoveAndReorderValues<K, V, D>(Dictionary<K, D> dic, int index) where D : Dictionary<int, V>
+        {
+            foreach (var value in dic.Values)
+            {
+                RemoveAndReorderDictionary(value, index);
             }
         }
 

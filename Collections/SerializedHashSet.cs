@@ -2,11 +2,12 @@ using System;
 using System.Linq;
 using System.Collections.Generic;
 using UnityEngine;
+using System.Collections;
 
 namespace net.narazaka.avatarmenucreator.collections
 {
     [Serializable]
-    public class SerializedHashSet<V> : ISerializationCallbackReceiver
+    public class SerializedHashSet<V> : ISerializationCallbackReceiver, IEnumerable<V>
     {
         [SerializeField]
         V[] values;
@@ -30,6 +31,16 @@ namespace net.narazaka.avatarmenucreator.collections
         {
             values = new V[hashSet.Count];
             hashSet.CopyTo(values);
+        }
+
+        public IEnumerator<V> GetEnumerator()
+        {
+            return hashSet.GetEnumerator();
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return hashSet.GetEnumerator();
         }
     }
 }
