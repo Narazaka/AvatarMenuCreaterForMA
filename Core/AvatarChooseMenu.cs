@@ -174,7 +174,9 @@ namespace net.narazaka.avatarmenucreator
             EditorGUILayout.PropertyField(serializedProperty.FindPropertyRelative(nameof(ChooseParentIcon)), new GUIContent(T.親メニューアイコン));
             EditorGUILayout.PropertyField(serializedProperty.FindPropertyRelative(nameof(ChooseDefaultValue)), new GUIContent(T.パラメーター初期値));
             ShowDetailMenuMulti(serializedProperty);
+#if HAS_COMPRESSED_INT_PARAMETERS
             EditorGUILayout.PropertyField(serializedProperty.FindPropertyRelative(nameof(UseCompressed)), new GUIContent(T.パラメーター圧縮, T.選択肢数に必要最低限なパラメーターbit数にしますゝ同期がほんの少し遅延する可能性がありますゝ));
+#endif
             ShowTransitionSecondsMulti(serializedProperty);
             serializedObject.ApplyModifiedProperties();
         }
