@@ -54,6 +54,9 @@ https://github.com/Narazaka/AvatarMenuCreaterForMA/releases/latest から `net.n
 
 ## 更新履歴
 
+- 1.31.0
+  - [Compressed Int Parameters](https://github.com/Narazaka/CompressedIntParameters) を追加でインストールすることにより、選択式メニューのパラメーターを必要最小限に削減できるように。
+  - 古いAvatar Parameters Driver等のためのAPIを修正
 - 1.30.0
   - 新機能: 選択肢の削除機能
   - 不具合修正: 選択肢の順序を変える場合にColor/Vector型のシェーダーパラメーターの順序が変わっていなかった問題を修正
