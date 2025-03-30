@@ -54,6 +54,8 @@ https://github.com/Narazaka/AvatarMenuCreaterForMA/releases/latest から `net.n
 
 ## 更新履歴
 
+- 1.31.1
+  - Modular Avatar Informationでのパラメーター圧縮時bit数の計算ミスを修正
 - 1.31.0
   - [Compressed Int Parameters](https://github.com/Narazaka/CompressedIntParameters) を追加でインストールすることにより、選択式メニューのパラメーターを必要最小限に削減できるように。
   - 古いAvatar Parameters Driver等のためのAPIを修正
