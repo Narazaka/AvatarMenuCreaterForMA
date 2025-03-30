@@ -25,7 +25,7 @@ namespace net.narazaka.avatarmenucreator.components
                     defaultValue = AvatarChooseMenu.ChooseDefaultValue,
                     internalParameter = AvatarChooseMenu.InternalParameter,
                     saved = AvatarMenu.Saved,
-                }, AvatarChooseMenu.ChooseCount).ToParameterConfigs().Select(parameterConfig => new VRCExpressionParameters.Parameter
+                }, AvatarChooseMenu.ChooseCount - 1).ToParameterConfigs().Select(parameterConfig => new VRCExpressionParameters.Parameter
                 {
                     name = parameterConfig.nameOrPrefix,
                     valueType = parameterConfig.syncType == nadena.dev.modular_avatar.core.ParameterSyncType.Bool ? VRCExpressionParameters.ValueType.Bool : VRCExpressionParameters.ValueType.Int,
