@@ -21,7 +21,7 @@ namespace net.narazaka.avatarmenucreator.components
                 valueType = VRCExpressionParameters.ValueType.Float,
                 defaultValue = AvatarRadialMenu.RadialDefaultValue,
                 saved = AvatarMenu.Saved,
-                networkSynced = true,
+                networkSynced = AvatarMenu.Synced,
             };
             var subParameterConfig = new VRCExpressionParameters.Parameter
             {
@@ -29,7 +29,7 @@ namespace net.narazaka.avatarmenucreator.components
                 valueType = VRCExpressionParameters.ValueType.Bool,
                 defaultValue = 0,
                 saved = false,
-                networkSynced = true,
+                networkSynced = AvatarMenu.Synced,
             };
             if (AvatarRadialMenu.GetPhysBoneAutoResetEffectiveObjects(AvatarRadialMenu.GetStoredChildren(), AvatarRadialMenu.RadialValues.Keys).Any() || AvatarRadialMenu.LockRemoteDuringChange || AvatarRadialMenu.PreventRemoteFloatBug)
             {

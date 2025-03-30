@@ -22,7 +22,7 @@ namespace net.narazaka.avatarmenucreator.components
                     valueType = VRCExpressionParameters.ValueType.Bool,
                     defaultValue = AvatarToggleMenu.ToggleDefaultValue ? 1 : 0,
                     saved = AvatarMenu.Saved,
-                    networkSynced = true,
+                    networkSynced = AvatarMenu.Synced,
                 },
             };
         }
