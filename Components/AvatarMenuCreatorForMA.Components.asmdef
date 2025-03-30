@@ -7,7 +7,8 @@
         "AvatarParametersDriver.Runtime",
         "AvatarMenuCreatorForMA.Collections",
         "AvatarMenuCreatorForMA.Editor.Util",
-        "Narazaka.VRChat.AvatarParametersUtil"
+        "Narazaka.VRChat.AvatarParametersUtil",
+        "Narazaka.VRChat.CompressedIntParameters"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],
@@ -39,6 +40,11 @@
             "name": "nadena.dev.modular-avatar",
             "expression": "[1.5.0,2)",
             "define": "HAS_MENU_MA"
+        },
+        {
+            "name": "net.narazaka.vrchat.compressed-int-parameters",
+            "expression": "[1.0.0,2)",
+            "define": "HAS_COMPRESSED_INT_PARAMETERS"
         }
     ],
     "noEngineReferences": false

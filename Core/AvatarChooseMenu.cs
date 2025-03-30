@@ -42,11 +42,15 @@ namespace net.narazaka.avatarmenucreator
         [SerializeField]
         public int ChooseCount = 2;
         [SerializeField]
+        public bool UseCompressed;
+        [SerializeField]
         public IntStringDictionary ChooseNames = new IntStringDictionary();
         [SerializeField]
         public Texture2D ChooseParentIcon;
         [SerializeField]
         public IntTexture2DDictionary ChooseIcons = new IntTexture2DDictionary();
+
+        public bool CanUseCompressed => Synced && ChooseCount > 1;
 
 #if UNITY_EDITOR
         static readonly string[] TransformComponentNames = new[] { "Position", "Rotation", "Scale" };
@@ -191,6 +195,16 @@ namespace net.narazaka.avatarmenucreator
             ChooseDefaultValue = IntField(T.パラメーター初期値, ChooseDefaultValue);
             EditorStyles.label.fontStyle = labelFontStyle;
             ShowDetailMenu();
+#if HAS_COMPRESSED_INT_PARAMETERS
+            EditorGUI.BeginDisabledGroup(!CanUseCompressed);
+            EditorGUILayout.BeginHorizontal();
+            UseCompressed = Toggle(new GUIContent(T.パラメーター圧縮, T.選択肢数に必要最低限なパラメーターbit数にしますゝ同期がほんの少し遅延する可能性がありますゝ), UseCompressed);
+            EditorGUI.BeginDisabledGroup(!UseCompressed);
+            EditorGUILayout.LabelField(CanUseCompressed ? $"=> {Narazaka.VRChat.CompressedIntParameters.CompressedParameterConfig.Bits(ChooseCount - 1)} bit" : "");
+            EditorGUI.EndDisabledGroup();
+            EditorGUILayout.EndHorizontal();
+            EditorGUI.EndDisabledGroup();
+#endif
 
             EditorGUILayout.Space();
 
@@ -1315,5 +1329,5 @@ namespace net.narazaka.avatarmenucreator
         // with prefab shim
         protected override Material[] GetMaterialSlots(string child) => GetGameObject(child)?.GetMaterialSlots() ?? ChooseMaterials.MaterialSlots(child);
 #endif
+        }
     }
-}

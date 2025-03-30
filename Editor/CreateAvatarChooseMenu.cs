@@ -319,7 +319,7 @@ namespace net.narazaka.avatarmenucreator.editor
 #endif
                     internalParameter = AvatarMenu.InternalParameter,
                 },
-            });
+            }, AvatarMenu.UseCompressed ? AvatarMenu.ChooseCount - 1 : 0);
         }
 
         void SetTransformCurve(List<AnimationClip> choices, string path, string property, IntVector3Dictionary value)

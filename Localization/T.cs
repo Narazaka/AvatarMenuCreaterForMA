@@ -170,6 +170,12 @@ namespace net.narazaka.avatarmenucreator
         [English("Internal Parameter")]
         public static string パラメーター内部値 => L;
 
+        [English("Compress Parameters")]
+        public static string パラメーター圧縮 => L;
+
+        [English("Set the number of parameter bits to the minimum required for the number of choices. Synchronization may be delayed just a bit.")]
+        public static string 選択肢数に必要最低限なパラメーターbit数にしますゝ同期がほんの少し遅延する可能性がありますゝ => L;
+
         [English("Icon")]
         public static string アイコン => L;
 

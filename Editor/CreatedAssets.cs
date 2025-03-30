@@ -19,8 +19,9 @@ namespace net.narazaka.avatarmenucreator.editor
         VRCExpressionsMenu menu;
         VRCExpressionsMenu parentMenu;
         IEnumerable<ParameterConfig> parameters;
+        int compressedMaxValue;
 
-        public CreatedAssets(string baseName, AnimatorController controller, IEnumerable<AnimationClip> clips, VRCExpressionsMenu menu, VRCExpressionsMenu parentMenu, IEnumerable<ParameterConfig> parameters)
+        public CreatedAssets(string baseName, AnimatorController controller, IEnumerable<AnimationClip> clips, VRCExpressionsMenu menu, VRCExpressionsMenu parentMenu, IEnumerable<ParameterConfig> parameters, int compressedMaxValue = 0)
         {
             this.baseName = baseName;
             this.controller = controller;
@@ -28,6 +29,7 @@ namespace net.narazaka.avatarmenucreator.editor
             this.menu = menu;
             this.parentMenu = parentMenu;
             this.parameters = parameters;
+            this.compressedMaxValue = compressedMaxValue;
         }
 
         public void StoreAssets(GameObject baseObject, bool isMenuInstaller = true)
@@ -87,9 +89,20 @@ namespace net.narazaka.avatarmenucreator.editor
             {
                 menuInstaller.menuToAppend = parentMenu == null ? menu : parentMenu;
             }
-            var maParameters = prefab.GetOrAddComponent<ModularAvatarParameters>();
-            maParameters.parameters.Clear();
-            maParameters.parameters.AddRange(parameters);
+#if HAS_COMPRESSED_INT_PARAMETERS
+            if (compressedMaxValue > 0 && parameters.All(p => !p.localOnly))
+            {
+                var maParameters = prefab.GetOrAddComponent<Narazaka.VRChat.CompressedIntParameters.CompressedIntParameters>();
+                maParameters.parameters.Clear();
+                maParameters.parameters.AddRange(parameters.Select(p => Narazaka.VRChat.CompressedIntParameters.CompressedParameterConfig.From(p, compressedMaxValue)));
+            }
+            else
+#endif
+            {
+                var maParameters = prefab.GetOrAddComponent<ModularAvatarParameters>();
+                maParameters.parameters.Clear();
+                maParameters.parameters.AddRange(parameters);
+            }
             var mergeAnimator = prefab.GetOrAddComponent<ModularAvatarMergeAnimator>();
             mergeAnimator.animator = controller;
             mergeAnimator.layerType = VRCAvatarDescriptor.AnimLayerType.FX;
