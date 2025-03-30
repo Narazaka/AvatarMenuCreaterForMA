@@ -54,6 +54,8 @@ https://github.com/Narazaka/AvatarMenuCreaterForMA/releases/latest から `net.n
 
 ## 更新履歴
 
+- 1.31.3
+  - Compressed Int Parametersがインストールされていない状態でパラメーター圧縮の複数編集が表示されないように
 - 1.31.2
   - パラメーター圧縮のチェックを複数編集で編集可能に
 - 1.31.1
