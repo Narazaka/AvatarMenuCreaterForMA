@@ -54,6 +54,8 @@ https://github.com/Narazaka/AvatarMenuCreaterForMA/releases/latest から `net.n
 
 ## 更新履歴
 
+- 1.31.2
+  - パラメーター圧縮のチェックを複数編集で編集可能に
 - 1.31.1
   - Modular Avatar Informationでのパラメーター圧縮時bit数の計算ミスを修正
 - 1.31.0
