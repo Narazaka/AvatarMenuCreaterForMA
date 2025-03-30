@@ -43,7 +43,7 @@ jobs:
       packages: |
         nadena.dev.modular-avatar ${{ matrix.ma }}
         ${{ matrix.additional_packages }}
-      name: MA=${{ matrix.ma }}
+      name: MA=${{ matrix.ma }}${{ matrix.additional_name }}
       assemblyNames: AvatarMenuCreatorForMA.Test
       assemblyFilters: +AvatarMenuCreatorForMA.*,-AvatarMenuCreatorForMA.Test
     strategy:
@@ -120,4 +120,5 @@ jobs:
           - unity: 2022.3.22f1
             ma: 1.10.11
             additional_packages: net.narazaka.vrchat.compressed-int-parameters 1.0.0
+            additional_name: " CompressedIntParameters=1.0.0"
             vrcsdk-version: 3.5.2
