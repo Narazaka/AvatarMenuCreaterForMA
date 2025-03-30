@@ -12,6 +12,12 @@ Avatar Choose Menu Creatorコンポーネント特有の設定です。
 
 パラメーターはInt型で、8bitを消費します。
 
+## パラメーター圧縮
+
+（Avatar Menu Creator>=1.31.0 かつ Compressed Int Parameters>=1.0.0 がインストール済みの場合に利用可能）
+
+パラメーターの必要bit数を必要最小限に削減します。
+
 ## 選択肢
 
 選択肢の数を指定し、各選択肢の名前とアイコンを設定します。
