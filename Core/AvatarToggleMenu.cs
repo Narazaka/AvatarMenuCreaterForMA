@@ -1187,7 +1187,7 @@ namespace net.narazaka.avatarmenucreator
             var key = (child, member);
             if (ToggleValues.ContainsKey(key)) return;
             WillChange();
-            ToggleValues[key] = member.MemberType == typeof(bool) ? new ToggleValue { Active = true, TransitionDurationPercent = 100 } : new ToggleValue { TransitionDurationPercent = 100 };
+            ToggleValues[key] = member.MemberType == typeof(bool) ? new ToggleValue { Active = true, Inactive = false, TransitionDurationPercent = 100 } : new ToggleValue { Active = new value.Value(), Inactive = new value.Value(), TransitionDurationPercent = 100 };
         }
 
         void BulkRemoveToggleValue(IList<string> children, string child, TypeMember member)
