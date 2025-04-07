@@ -236,6 +236,7 @@ namespace net.narazaka.avatarmenucreator.util
                     new MemberInfoContainer(typeof(Camera).GetProperty(nameof(Camera.orthographic))) { Field = "orthographic" },
                     new MemberInfoContainer(typeof(Camera).GetProperty(nameof(Camera.orthographicSize))) { Field = "orthographic size" },
                     new MemberInfoContainer(typeof(Camera).GetProperty(nameof(Camera.fieldOfView))) { Field = "field of view" },
+#if UNITY_2022_2_OR_NEWER
                     new MemberInfoContainer(typeof(Camera).GetProperty(nameof(Camera.iso))) { Field = "m_Iso" },
                     new MemberInfoContainer(typeof(Camera).GetProperty(nameof(Camera.shutterSpeed))) { Field = "m_ShutterSpeed" },
                     new MemberInfoContainer(typeof(Camera).GetProperty(nameof(Camera.aperture))) { Field = "m_Aperture" },
@@ -243,6 +244,7 @@ namespace net.narazaka.avatarmenucreator.util
                     // new MemberInfoContainer(typeof(Camera).GetProperty(nameof(Camera.curvature))) { Field = "m_Curvature" },
                     new MemberInfoContainer(typeof(Camera).GetProperty(nameof(Camera.barrelClipping))) { Field = "m_BarrelClipping" },
                     new MemberInfoContainer(typeof(Camera).GetProperty(nameof(Camera.anamorphism))) { Field = "m_Anamorphism" },
+#endif
                     new MemberInfoContainer(typeof(Camera).GetProperty(nameof(Camera.focalLength))) { Field = "m_FocalLength" },
                     // new MemberInfoContainer(typeof(Camera).GetProperty(nameof(Camera.sensorSize))) { Field = "m_SensorSize" },
                     // new MemberInfoContainer(typeof(Camera).GetProperty(nameof(Camera.lensShift))) { Field = "m_LensShift" },
