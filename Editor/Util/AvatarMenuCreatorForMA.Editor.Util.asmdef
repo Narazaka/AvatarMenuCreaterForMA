@@ -21,6 +21,11 @@
             "name": "com.vrchat.base",
             "expression": "[3.7.0,4)",
             "define": "HAS_VRC_CONSTRAINT"
+        },
+        {
+            "name": "com.vrchat.base",
+            "expression": "[3.5.2,4)",
+            "define": "HAS_VRC_HEADCHOP"
         }
     ],
     "noEngineReferences": false
