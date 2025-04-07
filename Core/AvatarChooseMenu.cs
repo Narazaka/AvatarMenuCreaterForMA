@@ -1123,6 +1123,22 @@ namespace net.narazaka.avatarmenucreator
                                 ValuePickerButton(child, member, p => newValue = p.vector3Value);
                                 EditorGUIUtility.wideMode = widemode;
                             }
+                            else if (member.MemberType == typeof(Quaternion))
+                            {
+                                var widemode = EditorGUIUtility.wideMode;
+                                EditorGUIUtility.wideMode = true;
+                                newValue = EditorGUILayout.Vector4Field(ChooseName(i), ((Quaternion)value).ToVector4()).ToQuaternion();
+                                ValuePickerButton(child, member, p => newValue = p.quaternionValue);
+                                EditorGUIUtility.wideMode = widemode;
+                            }
+                            else if (member.MemberType == typeof(Color))
+                            {
+                                var widemode = EditorGUIUtility.wideMode;
+                                EditorGUIUtility.wideMode = true;
+                                newValue = EditorGUILayout.ColorField(ChooseName(i), (Color)value);
+                                ValuePickerButton(child, member, p => newValue = p.colorValue);
+                                EditorGUIUtility.wideMode = widemode;
+                            }
                             EditorGUILayout.EndHorizontal();
 
                             if (value != newValue)

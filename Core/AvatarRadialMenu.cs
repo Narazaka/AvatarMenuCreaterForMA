@@ -731,6 +731,66 @@ namespace net.narazaka.avatarmenucreator
                             EditorGUIUtility.labelWidth = 0;
                             EditorGUI.indentLevel--;
                         }
+                        else if (member.MemberType == typeof(Quaternion))
+                        {
+                            EditorGUI.indentLevel++;
+                            var widemode = EditorGUIUtility.wideMode;
+                            EditorGUIUtility.wideMode = true;
+                            EditorGUIUtility.labelWidth = 75;
+                            using (new EditorGUILayout.HorizontalScope())
+                            {
+                                newValue.Start = EditorGUILayout.Vector4Field(T.始, ((Quaternion)value.Start).ToVector4()).ToQuaternion();
+                                ValuePickerButton(child, member, p => newValue.Start = p.quaternionValue);
+                            }
+                            using (new EditorGUILayout.HorizontalScope())
+                            {
+                                newValue.End = EditorGUILayout.Vector4Field(T.終, ((Quaternion)value.End).ToVector4()).ToQuaternion();
+                                ValuePickerButton(child, member, p => newValue.End = p.quaternionValue);
+                            }
+                            EditorGUIUtility.labelWidth = 70;
+                            using (new EditorGUI.DisabledGroupScope(true))
+                            {
+                                EditorGUILayout.Vector4Field(
+                                    T.初期,
+                                    RadialDefaultValue * 100 < value.StartOffsetPercent ? ((Quaternion)value.Start).ToVector4() :
+                                    RadialDefaultValue * 100 > value.EndOffsetPercent ? ((Quaternion)value.End).ToVector4() :
+                                    (((Quaternion)value.Start).ToVector4() * (value.EndOffsetPercent - RadialDefaultValue * 100) + ((Quaternion)value.End).ToVector4() * (RadialDefaultValue * 100 - value.StartOffsetPercent)) / (value.EndOffsetPercent - value.StartOffsetPercent)
+                                    );
+                            }
+                            EditorGUIUtility.wideMode = widemode;
+                            EditorGUIUtility.labelWidth = 0;
+                            EditorGUI.indentLevel--;
+                        }
+                        else if (member.MemberType == typeof(Color))
+                        {
+                            EditorGUI.indentLevel++;
+                            var widemode = EditorGUIUtility.wideMode;
+                            EditorGUIUtility.wideMode = true;
+                            EditorGUIUtility.labelWidth = 75;
+                            using (new EditorGUILayout.HorizontalScope())
+                            {
+                                newValue.Start = EditorGUILayout.ColorField(T.始, (Color)value.Start);
+                                ValuePickerButton(child, member, p => newValue.Start = p.colorValue);
+                            }
+                            using (new EditorGUILayout.HorizontalScope())
+                            {
+                                newValue.End = EditorGUILayout.ColorField(T.終, (Color)value.End);
+                                ValuePickerButton(child, member, p => newValue.End = p.colorValue);
+                            }
+                            EditorGUIUtility.labelWidth = 70;
+                            using (new EditorGUI.DisabledGroupScope(true))
+                            {
+                                EditorGUILayout.ColorField(
+                                    T.初期,
+                                    RadialDefaultValue * 100 < value.StartOffsetPercent ? (Color)value.Start :
+                                    RadialDefaultValue * 100 > value.EndOffsetPercent ? (Color)value.End :
+                                    (((Color)value.Start) * (value.EndOffsetPercent - RadialDefaultValue * 100) + ((Color)value.End) * (RadialDefaultValue * 100 - value.StartOffsetPercent)) / (value.EndOffsetPercent - value.StartOffsetPercent)
+                                    );
+                            }
+                            EditorGUIUtility.wideMode = widemode;
+                            EditorGUIUtility.labelWidth = 0;
+                            EditorGUI.indentLevel--;
+                        }
                         using (new EditorGUILayout.HorizontalScope())
                         {
                             EditorGUI.indentLevel++;

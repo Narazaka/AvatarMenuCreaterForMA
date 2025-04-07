@@ -12,12 +12,16 @@ namespace net.narazaka.avatarmenucreator.value
         public static explicit operator float(Value value) => value.AsFloat();
         public static explicit operator int(Value value) => value.AsInt();
         public static explicit operator Vector3(Value value) => value.AsVector3();
+        public static explicit operator Quaternion(Value value) => value.AsQuaternion();
+        public static explicit operator Color(Value value) => value.AsColor();
         public static explicit operator VRCPhysBoneBase.PermissionFilter(Value value) => value.AsPermissionFilterValue();
 
         public static implicit operator Value(bool value) => new BoolValue(value);
         public static implicit operator Value(float value) => new FloatValue(value);
         public static implicit operator Value(int value) => new IntValue(value);
         public static implicit operator Value(Vector3 value) => new Vector3Value(value);
+        public static implicit operator Value(Quaternion value) => new QuaternionValue(value);
+        public static implicit operator Value(Color value) => new ColorValue(value);
         public static implicit operator Value(VRCPhysBoneBase.PermissionFilter value) => new PermissionFilterValue(value);
 
         [SerializeField]
@@ -32,6 +36,8 @@ namespace net.narazaka.avatarmenucreator.value
             if (type == typeof(float)) return (float)this;
             if (type == typeof(int)) return (int)this;
             if (type == typeof(Vector3)) return (Vector3)this;
+            if (type == typeof(Quaternion)) return (Quaternion)this;
+            if (type == typeof(Color)) return (Color)this;
             if (type == typeof(VRCPhysBoneBase.PermissionFilter)) return (VRCPhysBoneBase.PermissionFilter)this;
             return null;
         }

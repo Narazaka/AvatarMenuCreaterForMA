@@ -93,6 +93,28 @@ namespace net.narazaka.avatarmenucreator.editor
                         choices[i].SetCurve(curvePath, member.Type, member.AnimationMemberName + ".z", new AnimationCurve(new Keyframe(0, v.z)));
                     }
                 }
+                else if (member.MemberType == typeof(Quaternion))
+                {
+                    for (var i = 0; i < AvatarMenu.ChooseCount; ++i)
+                    {
+                        var v = value.ContainsKey(i) ? (Quaternion)value[i] : Quaternion.identity;
+                        choices[i].SetCurve(curvePath, member.Type, member.AnimationMemberName + ".x", new AnimationCurve(new Keyframe(0, v.x)));
+                        choices[i].SetCurve(curvePath, member.Type, member.AnimationMemberName + ".y", new AnimationCurve(new Keyframe(0, v.y)));
+                        choices[i].SetCurve(curvePath, member.Type, member.AnimationMemberName + ".z", new AnimationCurve(new Keyframe(0, v.z)));
+                        choices[i].SetCurve(curvePath, member.Type, member.AnimationMemberName + ".w", new AnimationCurve(new Keyframe(0, v.w)));
+                    }
+                }
+                else if (member.MemberType == typeof(Color))
+                {
+                    for (var i = 0; i < AvatarMenu.ChooseCount; ++i)
+                    {
+                        var v = value.ContainsKey(i) ? (Color)value[i] : default(Color);
+                        choices[i].SetCurve(curvePath, member.Type, member.AnimationMemberName + ".r", new AnimationCurve(new Keyframe(0, v.r)));
+                        choices[i].SetCurve(curvePath, member.Type, member.AnimationMemberName + ".g", new AnimationCurve(new Keyframe(0, v.g)));
+                        choices[i].SetCurve(curvePath, member.Type, member.AnimationMemberName + ".b", new AnimationCurve(new Keyframe(0, v.b)));
+                        choices[i].SetCurve(curvePath, member.Type, member.AnimationMemberName + ".a", new AnimationCurve(new Keyframe(0, v.a)));
+                    }
+                }
                 else if (member.MemberType == typeof(VRCPhysBoneBase.PermissionFilter))
                 {
                     for (var i = 0; i < AvatarMenu.ChooseCount; ++i)
@@ -101,6 +123,10 @@ namespace net.narazaka.avatarmenucreator.editor
                         choices[i].SetCurve(curvePath, member.Type, member.AnimationMemberName + ".allowSelf", new AnimationCurve(new Keyframe(0, v.allowSelf ? 1 : 0)));
                         choices[i].SetCurve(curvePath, member.Type, member.AnimationMemberName + ".allowOthers", new AnimationCurve(new Keyframe(0, v.allowOthers ? 1 : 0)));
                     }
+                }
+                else
+                {
+                    throw new NotImplementedException();
                 }
             }
             foreach (var child in AvatarMenu.Positions.Keys)

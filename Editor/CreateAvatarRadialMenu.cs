@@ -56,6 +56,28 @@ namespace net.narazaka.avatarmenucreator.editor
                     clip.SetCurve(child, member.Type, $"{member.AnimationMemberName}.y", FullAnimationCurve(new Keyframe(value.StartOffsetPercent, start.y), new Keyframe(value.EndOffsetPercent, end.y)));
                     clip.SetCurve(child, member.Type, $"{member.AnimationMemberName}.z", FullAnimationCurve(new Keyframe(value.StartOffsetPercent, start.z), new Keyframe(value.EndOffsetPercent, end.z)));
                 }
+                else if (member.MemberType == typeof(Quaternion))
+                {
+                    var start = (Quaternion)value.Start;
+                    var end = (Quaternion)value.End;
+                    clip.SetCurve(child, member.Type, $"{member.AnimationMemberName}.x", FullAnimationCurve(new Keyframe(value.StartOffsetPercent, start.x), new Keyframe(value.EndOffsetPercent, end.x)));
+                    clip.SetCurve(child, member.Type, $"{member.AnimationMemberName}.y", FullAnimationCurve(new Keyframe(value.StartOffsetPercent, start.y), new Keyframe(value.EndOffsetPercent, end.y)));
+                    clip.SetCurve(child, member.Type, $"{member.AnimationMemberName}.z", FullAnimationCurve(new Keyframe(value.StartOffsetPercent, start.z), new Keyframe(value.EndOffsetPercent, end.z)));
+                    clip.SetCurve(child, member.Type, $"{member.AnimationMemberName}.w", FullAnimationCurve(new Keyframe(value.StartOffsetPercent, start.w), new Keyframe(value.EndOffsetPercent, end.w)));
+                }
+                else if (member.MemberType == typeof(Color))
+                {
+                    var start = (Color)value.Start;
+                    var end = (Color)value.End;
+                    clip.SetCurve(child, member.Type, $"{member.AnimationMemberName}.r", FullAnimationCurve(new Keyframe(value.StartOffsetPercent, start.r), new Keyframe(value.EndOffsetPercent, end.r)));
+                    clip.SetCurve(child, member.Type, $"{member.AnimationMemberName}.g", FullAnimationCurve(new Keyframe(value.StartOffsetPercent, start.g), new Keyframe(value.EndOffsetPercent, end.g)));
+                    clip.SetCurve(child, member.Type, $"{member.AnimationMemberName}.b", FullAnimationCurve(new Keyframe(value.StartOffsetPercent, start.b), new Keyframe(value.EndOffsetPercent, end.b)));
+                    clip.SetCurve(child, member.Type, $"{member.AnimationMemberName}.a", FullAnimationCurve(new Keyframe(value.StartOffsetPercent, start.a), new Keyframe(value.EndOffsetPercent, end.a)));
+                }
+                else
+                {
+                    throw new System.NotImplementedException();
+                }
             }
             foreach (var child in AvatarMenu.Positions.Keys)
             {

@@ -8,6 +8,8 @@ namespace net.narazaka.avatarmenucreator.value
         public static FloatValue AsFloat(this Value value) => Unsafe.As<Value, FloatValue>(ref value);
         public static IntValue AsInt(this Value value) => Unsafe.As<Value, IntValue>(ref value);
         public static Vector3Value AsVector3(this Value value) => Unsafe.As<Value, Vector3Value>(ref value);
+        public static QuaternionValue AsQuaternion(this Value value) => Unsafe.As<Value, QuaternionValue>(ref value);
+        public static ColorValue AsColor(this Value value) => Unsafe.As<Value, ColorValue>(ref value);
         public static PermissionFilterValue AsPermissionFilterValue(this Value value) => Unsafe.As<Value, PermissionFilterValue>(ref value);
     }
 }

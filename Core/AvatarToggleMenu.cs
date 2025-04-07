@@ -1081,6 +1081,42 @@ namespace net.narazaka.avatarmenucreator
                             EditorGUIUtility.labelWidth = 0;
                             EditorGUIUtility.wideMode = widemode;
                         }
+                        else if (member.MemberType == typeof(Quaternion))
+                        {
+                            var widemode = EditorGUIUtility.wideMode;
+                            EditorGUIUtility.wideMode = true;
+                            EditorGUIUtility.labelWidth = 70;
+                            using (new EditorGUILayout.HorizontalScope())
+                            {
+                                newValue.Inactive = EditorGUILayout.Vector4Field("OFF", ((Quaternion)value.Inactive).ToVector4()).ToQuaternion();
+                                ValuePickerButton(child, member, p => newValue.Inactive = p.quaternionValue);
+                            }
+                            using (new EditorGUILayout.HorizontalScope())
+                            {
+                                newValue.Active = EditorGUILayout.Vector4Field("ON", ((Quaternion)value.Active).ToVector4()).ToQuaternion();
+                                ValuePickerButton(child, member, p => newValue.Active = p.quaternionValue);
+                            }
+                            EditorGUIUtility.labelWidth = 0;
+                            EditorGUIUtility.wideMode = widemode;
+                        }
+                        else if (member.MemberType == typeof(Color))
+                        {
+                            var widemode = EditorGUIUtility.wideMode;
+                            EditorGUIUtility.wideMode = true;
+                            EditorGUIUtility.labelWidth = 70;
+                            using (new EditorGUILayout.HorizontalScope())
+                            {
+                                newValue.Inactive = EditorGUILayout.ColorField("OFF", (Color)value.Inactive);
+                                ValuePickerButton(child, member, p => newValue.Inactive = p.colorValue);
+                            }
+                            using (new EditorGUILayout.HorizontalScope())
+                            {
+                                newValue.Active = EditorGUILayout.ColorField("ON", (Color)value.Active);
+                                ValuePickerButton(child, member, p => newValue.Active = p.colorValue);
+                            }
+                            EditorGUIUtility.labelWidth = 0;
+                            EditorGUIUtility.wideMode = widemode;
+                        }
                         EditorGUIUtility.labelWidth = 0;
                         EditorGUI.indentLevel--;
                         if (TransitionSeconds > 0)

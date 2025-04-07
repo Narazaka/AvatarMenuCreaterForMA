@@ -157,7 +157,7 @@ namespace net.narazaka.avatarmenucreator.util
             return list;
         }
 
-        public static bool IsSuitableForTransition(this Type type) => type == typeof(float) || type == typeof(Vector3);
+        public static bool IsSuitableForTransition(this Type type) => type == typeof(float) || type == typeof(Vector3) || type == typeof(Quaternion) || type == typeof(Color);
 
         static Dictionary<(Type, string), MemberInfo> MemberInfoCache = new Dictionary<(Type, string), MemberInfo>();
 
