@@ -54,6 +54,20 @@ https://github.com/Narazaka/AvatarMenuCreaterForMA/releases/latest から `net.n
 
 ## 更新履歴
 
+- 1.32.0-beta.1
+  - 新機能: 新たに以下のコンポーネントのプロパティが操作できるように
+    - （※注意: VRChatの制限により、実際にはプレイ中に動作しない可能性があります。動作しなさそうであればご報告下さい。）
+    - AudioSource
+    - Camera
+    - Cloth
+    - Collider
+    - Light
+    - MeshRenderer
+    - RigidBody
+    - SkinnedMeshRenderer
+    - VRCHeadChop
+    - VRCPhysBoneCollider
+    - VRCSpatialAudioSource
 - 1.31.3
   - Compressed Int Parametersがインストールされていない状態でパラメーター圧縮の複数編集が表示されないように
 - 1.31.2
