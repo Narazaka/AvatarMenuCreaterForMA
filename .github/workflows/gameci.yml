@@ -116,9 +116,9 @@ jobs:
           - unity: 2022.3.22f1
             ma: 1.10.11
             # ndmf>=1.5 ProvidedParameter.DefaultValue
-            vrcsdk-version: 3.5.2
+            vrcsdk-version: 3.7.0
           - unity: 2022.3.22f1
             ma: 1.10.11
             additional_packages: net.narazaka.vrchat.compressed-int-parameters 1.0.0
             additional_name: " CompressedIntParameters=1.0.0"
-            vrcsdk-version: 3.5.2
+            vrcsdk-version: 3.7.0
