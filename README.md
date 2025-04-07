@@ -68,6 +68,7 @@ https://github.com/Narazaka/AvatarMenuCreaterForMA/releases/latest から `net.n
     - VRCHeadChop
     - VRCPhysBoneCollider
     - VRCSpatialAudioSource
+  - バグ修正: ON/OFFメニューでComponentsから項目を追加するときにエラーが出ることがあった問題を修正。
 - 1.31.3
   - Compressed Int Parametersがインストールされていない状態でパラメーター圧縮の複数編集が表示されないように
 - 1.31.2
