@@ -54,6 +54,9 @@ https://github.com/Narazaka/AvatarMenuCreaterForMA/releases/latest から `net.n
 
 ## 更新履歴
 
+- 1.33.1
+  - ドキュメントを開けるようにしました。
+    - コンポーネントの「？」マークなどから
 - 1.33.0
   - 新機能:
     - ON/OFFメニューの「高度な設定」において、「徐々に変化」も片方のみ制御できるように。
