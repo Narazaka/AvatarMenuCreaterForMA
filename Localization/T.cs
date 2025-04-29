@@ -188,6 +188,12 @@ namespace net.narazaka.avatarmenucreator
         [English("When advanced settings are enabled, you can set the control to ON or OFF one side only.")]
         public static string 高度な設定を有効にするとヽONまたはOFF片方だけ制御する設定ができますゝ => L;
 
+        [English("Skip transitions if all are uncontrolled")]
+        public static string 全て制御されない変化はスキップする => L;
+
+        [English("If none of the \"Control ->ON\" or \"Control ->OFF\" options are checked, the specified transition will be skipped (the change will occur instantly without gradual adjustment).")]
+        public static string _startj_ONへの変化を制御_endj_または_startj_OFFへの変化を制御_endj_が全てチェックされていない場合ヽその変化はスキップされます_start_徐々に変化せずに一瞬で変化します_end_ゝ => L;
+
         [English("indivisual settings")]
         public static string 個別設定 => L;
 
@@ -224,6 +230,12 @@ namespace net.narazaka.avatarmenucreator
         [English("Control OFF")]
         public static string OFFを制御 => L;
 
+        [English("Control ->ON")]
+        public static string ONへの変化を制御 => L;
+
+        [English("Control ->OFF")]
+        public static string OFFへの変化を制御 => L;
+
         [English("Duration%")]
         public static string 変化時間_per_ => L;
 
@@ -241,6 +253,12 @@ namespace net.narazaka.avatarmenucreator
 
         [English("Multiple settings are made to control OFF")]
         public static string OFFを制御に複数の設定がされています => L;
+
+        [English("Multiple settings are made to control Transition:->ON")]
+        public static string ONへの変化を制御に複数の設定がされています => L;
+
+        [English("Multiple settings are made to control Transition:->OFF")]
+        public static string OFFへの変化を制御に複数の設定がされています => L;
 
         [English("Change duration % should be set greater than 0")]
         public static string 変化時間_per_は0より大きく設定して下さい => L;

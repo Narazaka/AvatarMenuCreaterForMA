@@ -12,6 +12,8 @@ namespace net.narazaka.avatarmenucreator.valuecurve
         readonly string PropertyName;
         readonly bool UseActive;
         readonly bool UseInactive;
+        readonly bool UseTransitionToActive;
+        readonly bool UseTransitionToInactive;
         readonly float TransitionSeconds;
 
         public AnimationToggleCurveSetup(
@@ -22,6 +24,8 @@ namespace net.narazaka.avatarmenucreator.valuecurve
             string propertyName,
             bool useActive,
             bool useInactive,
+            bool useTransitionToActive,
+            bool useTransitionToInactive,
             float transitionSeconds
             )
         {
@@ -32,6 +36,8 @@ namespace net.narazaka.avatarmenucreator.valuecurve
             PropertyName = propertyName;
             UseActive = useActive;
             UseInactive = useInactive;
+            UseTransitionToActive = useTransitionToActive;
+            UseTransitionToInactive = useTransitionToInactive;
             TransitionSeconds = transitionSeconds;
         }
 
@@ -41,8 +47,8 @@ namespace net.narazaka.avatarmenucreator.valuecurve
             if (UseInactive) ClipSet.Inactive.SetCurve(Path, Type, PropertyName, Curve.InactiveCurve());
             if (TransitionSeconds > 0)
             {
-                ClipSet.Activate.SetCurve(Path, Type, PropertyName, Curve.ActivateCurve(TransitionSeconds));
-                ClipSet.Inactivate.SetCurve(Path, Type, PropertyName, Curve.InactivateCurve(TransitionSeconds));
+                if (UseTransitionToActive) ClipSet.Activate.SetCurve(Path, Type, PropertyName, Curve.ActivateCurve(TransitionSeconds));
+                if (UseTransitionToInactive) ClipSet.Inactivate.SetCurve(Path, Type, PropertyName, Curve.InactivateCurve(TransitionSeconds));
             }
         }
     }

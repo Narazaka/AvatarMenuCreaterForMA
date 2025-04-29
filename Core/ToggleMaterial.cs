@@ -6,7 +6,7 @@ using UnityEngine;
 namespace net.narazaka.avatarmenucreator
 {
     [Serializable]
-    public struct ToggleMaterial : System.IEquatable<ToggleMaterial>
+    public class ToggleMaterial : System.IEquatable<ToggleMaterial>, IUseActive
     {
         public Material Inactive;
         public Material Active;
@@ -15,6 +15,10 @@ namespace net.narazaka.avatarmenucreator
         bool OmitInactive;
         [SerializeField]
         bool OmitActive;
+        [SerializeField]
+        bool OmitTransitionToInactive;
+        [SerializeField]
+        bool OmitTransitionToActive;
 
         public bool UseInactive
         {
@@ -26,16 +30,26 @@ namespace net.narazaka.avatarmenucreator
             get => !OmitActive;
             set => OmitActive = !value;
         }
-        public bool HasAdvanced => OmitInactive || OmitActive;
+        public bool UseTransitionToInactive
+        {
+            get => !OmitTransitionToInactive;
+            set => OmitTransitionToInactive = !value;
+        }
+        public bool UseTransitionToActive
+        {
+            get => !OmitTransitionToActive;
+            set => OmitTransitionToActive = !value;
+        }
+        public bool HasAdvanced => OmitInactive || OmitActive || OmitTransitionToInactive || OmitTransitionToActive;
         public ToggleMaterial ResetAdvanced()
         {
-            OmitInactive = OmitActive = false;
+            OmitInactive = OmitActive = OmitTransitionToInactive = OmitTransitionToActive = false;
             return this;
         }
 
         public bool Equals(ToggleMaterial other)
         {
-            return Inactive == other.Inactive && Active == other.Active && TransitionOffsetPercent == other.TransitionOffsetPercent && UseInactive == other.UseInactive && UseActive == other.UseActive;
+            return Inactive == other.Inactive && Active == other.Active && TransitionOffsetPercent == other.TransitionOffsetPercent && UseInactive == other.UseInactive && UseActive == other.UseActive && UseTransitionToInactive == other.UseTransitionToInactive && UseTransitionToActive == other.UseTransitionToActive;
         }
 
         public string ChangedProp(ToggleMaterial other)
@@ -45,6 +59,8 @@ namespace net.narazaka.avatarmenucreator
             if (TransitionOffsetPercent != other.TransitionOffsetPercent) return nameof(TransitionOffsetPercent);
             if (UseInactive != other.UseInactive) return nameof(UseInactive);
             if (UseActive != other.UseActive) return nameof(UseActive);
+            if (UseTransitionToInactive != other.UseTransitionToInactive) return nameof(UseTransitionToInactive);
+            if (UseTransitionToActive != other.UseTransitionToActive) return nameof(UseTransitionToActive);
             return "";
         }
 
@@ -55,6 +71,8 @@ namespace net.narazaka.avatarmenucreator
             if (name == nameof(TransitionOffsetPercent)) return TransitionOffsetPercent;
             if (name == nameof(UseInactive)) return UseInactive;
             if (name == nameof(UseActive)) return UseActive;
+            if (name == nameof(UseTransitionToInactive)) return UseTransitionToInactive;
+            if (name == nameof(UseTransitionToActive)) return UseTransitionToActive;
             return null;
         }
 
@@ -65,6 +83,8 @@ namespace net.narazaka.avatarmenucreator
             if (name == nameof(TransitionOffsetPercent)) TransitionOffsetPercent = (float)value;
             if (name == nameof(UseInactive)) UseInactive = (bool)value;
             if (name == nameof(UseActive)) UseActive = (bool)value;
+            if (name == nameof(UseTransitionToInactive)) UseTransitionToInactive = (bool)value;
+            if (name == nameof(UseTransitionToActive)) UseTransitionToActive = (bool)value;
             return this;
         }
 

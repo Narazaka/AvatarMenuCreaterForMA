@@ -41,13 +41,14 @@ namespace net.narazaka.avatarmenucreator.editor
                 if (!matchGameObjects.Contains(child)) continue;
                 var activeValue = AvatarMenu.ToggleObjects[child] == ToggleType.ON;
                 var use = AvatarMenu.ToggleObjectUsings.TryGetValue(child, out var usingValue) ? usingValue : ToggleUsing.Both;
+                var useTransition = AvatarMenu.ToggleObjectTransitionUsings.TryGetValue(child, out var usingTransitionValue) ? usingTransitionValue : ToggleTransitionUsing.NotSpecified;
                 var curvePath = child;
                 if (use != ToggleUsing.OFF) active.SetCurve(curvePath, typeof(GameObject), "m_IsActive", new AnimationCurve(new Keyframe(0 / 60.0f, activeValue ? 1 : 0)));
                 if (use != ToggleUsing.ON) inactive.SetCurve(curvePath, typeof(GameObject), "m_IsActive", new AnimationCurve(new Keyframe(0 / 60.0f, activeValue ? 0 : 1)));
                 if (transitionSeconds > 0)
                 {
-                    activate.SetCurve(curvePath, typeof(GameObject), "m_IsActive", new AnimationCurve(new Keyframe(0 / 60.0f, 1), new Keyframe(transitionSeconds, activeValue ? 1 : 0)));
-                    inactivate.SetCurve(curvePath, typeof(GameObject), "m_IsActive", new AnimationCurve(new Keyframe(0 / 60.0f, 1), new Keyframe(transitionSeconds, activeValue ? 0 : 1)));
+                    if ((useTransition & ToggleTransitionUsing.OmitON) != ToggleTransitionUsing.OmitON) activate.SetCurve(curvePath, typeof(GameObject), "m_IsActive", new AnimationCurve(new Keyframe(0 / 60.0f, 1), new Keyframe(transitionSeconds, activeValue ? 1 : 0)));
+                    if ((useTransition & ToggleTransitionUsing.OmitOFF) != ToggleTransitionUsing.OmitOFF) inactivate.SetCurve(curvePath, typeof(GameObject), "m_IsActive", new AnimationCurve(new Keyframe(0 / 60.0f, 1), new Keyframe(transitionSeconds, activeValue ? 0 : 1)));
                 }
             }
             foreach (var (child, index) in AvatarMenu.ToggleMaterials.Keys)
@@ -61,8 +62,8 @@ namespace net.narazaka.avatarmenucreator.editor
                 if (value.UseInactive) AnimationUtility.SetObjectReferenceCurve(inactive, binding, value.InactiveCurve());
                 if (transitionSeconds > 0)
                 {
-                    AnimationUtility.SetObjectReferenceCurve(activate, binding, value.ActivateCurve(transitionSeconds));
-                    AnimationUtility.SetObjectReferenceCurve(inactivate, binding, value.InactivateCurve(transitionSeconds));
+                    if (value.UseTransitionToActive) AnimationUtility.SetObjectReferenceCurve(activate, binding, value.ActivateCurve(transitionSeconds));
+                    if (value.UseTransitionToInactive) AnimationUtility.SetObjectReferenceCurve(inactivate, binding, value.InactivateCurve(transitionSeconds));
                 }
             }
             foreach (var (child, name) in AvatarMenu.ToggleBlendShapes.Keys)
@@ -153,11 +154,37 @@ namespace net.narazaka.avatarmenucreator.editor
                     threshold = 1,
                 },
             };
+            var makeInactivate = false;
+            var makeActivate = false;
             if (transitionSeconds > 0)
             {
-                var inactivateState = layer.stateMachine.AddState($"{baseName}_inactivate", new Vector3(500, 0));
-                inactivateState.motion = inactivate;
-                inactivateState.writeDefaultValues = false;
+                makeInactivate = true;
+                makeActivate = true;
+                if (AvatarMenu.SkipTransitionIfAllOmitted)
+                {
+                    if (IsEmptyTransition(inactivate))
+                    {
+                        makeInactivate = false;
+                    }
+                    if (IsEmptyTransition(activate))
+                    {
+                        makeActivate = false;
+                    }
+                }
+                else
+                {
+                    if (IsEmptyTransition(inactivate))
+                    {
+                        inactivate.SetCurve("__AvatarMenuCreator__Ensure__Transition__Seconds__", typeof(GameObject), "m_IsActive", new AnimationCurve(new Keyframe(0, 1), new Keyframe(transitionSeconds, 1)));
+                    }
+                    if (IsEmptyTransition(activate))
+                    {
+                        activate.SetCurve("__AvatarMenuCreator__Ensure__Transition__Seconds__", typeof(GameObject), "m_IsActive", new AnimationCurve(new Keyframe(0, 1), new Keyframe(transitionSeconds, 1)));
+                    }
+                }
+            }
+            if (makeActivate)
+            {
                 var activateState = layer.stateMachine.AddState($"{baseName}_activate", new Vector3(100, 0));
                 activateState.motion = activate;
                 activateState.writeDefaultValues = false;
@@ -178,6 +205,28 @@ namespace net.narazaka.avatarmenucreator.editor
                 toActive.exitTime = 1;
                 toActive.duration = 0;
                 toActive.hasExitTime = true;
+            }
+            else
+            {
+                var toActive = inactiveState.AddTransition(activeState);
+                toActive.exitTime = 0;
+                toActive.duration = 0;
+                toActive.hasExitTime = false;
+                toActive.conditions = new AnimatorCondition[]
+                {
+                    new AnimatorCondition
+                    {
+                        mode = AnimatorConditionMode.If,
+                        parameter = parameterName,
+                        threshold = 1,
+                    },
+                };
+            }
+            if (makeInactivate)
+            {
+                var inactivateState = layer.stateMachine.AddState($"{baseName}_inactivate", new Vector3(500, 0));
+                inactivateState.motion = inactivate;
+                inactivateState.writeDefaultValues = false;
                 var toInactivate = activeState.AddTransition(inactivateState);
                 toInactivate.exitTime = 0;
                 toInactivate.duration = 0;
@@ -198,19 +247,6 @@ namespace net.narazaka.avatarmenucreator.editor
             }
             else
             {
-                var toActive = inactiveState.AddTransition(activeState);
-                toActive.exitTime = 0;
-                toActive.duration = 0;
-                toActive.hasExitTime = false;
-                toActive.conditions = new AnimatorCondition[]
-                {
-                    new AnimatorCondition
-                    {
-                        mode = AnimatorConditionMode.If,
-                        parameter = parameterName,
-                        threshold = 1,
-                    },
-                };
                 var toInactive = activeState.AddTransition(inactiveState);
                 toInactive.exitTime = 0;
                 toInactive.duration = 0;
@@ -425,6 +461,15 @@ namespace net.narazaka.avatarmenucreator.editor
                     internalParameter = AvatarMenu.InternalParameter,
                 },
             });
+        }
+
+        bool IsEmptyTransition(AnimationClip clip)
+        {
+            var bindings = AnimationUtility.GetCurveBindings(clip);
+            if (bindings.Length > 0) return false;
+            var objectBindings = AnimationUtility.GetObjectReferenceCurveBindings(clip);
+            if (objectBindings.Length > 0) return false;
+            return true;
         }
     }
 }

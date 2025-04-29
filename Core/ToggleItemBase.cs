@@ -15,6 +15,10 @@ namespace net.narazaka.avatarmenucreator
         bool OmitInactive;
         [SerializeField]
         bool OmitActive;
+        [SerializeField]
+        bool OmitTransitionToInactive;
+        [SerializeField]
+        bool OmitTransitionToActive;
 
         public bool UseInactive
         {
@@ -26,15 +30,25 @@ namespace net.narazaka.avatarmenucreator
             get => !OmitActive;
             set => OmitActive = !value;
         }
-        public bool HasAdvanced => OmitInactive || OmitActive;
+        public bool UseTransitionToInactive
+        {
+            get => !OmitTransitionToInactive;
+            set => OmitTransitionToInactive = !value;
+        }
+        public bool UseTransitionToActive
+        {
+            get => !OmitTransitionToActive;
+            set => OmitTransitionToActive = !value;
+        }
+        public bool HasAdvanced => OmitInactive || OmitActive || OmitTransitionToInactive || OmitTransitionToActive;
         public void ResetAdvanced()
         {
-            OmitInactive = OmitActive = false;
+            OmitInactive = OmitActive = OmitTransitionToInactive = OmitTransitionToActive = false;
         }
 
         public bool Equals(ToggleItemBase<Item> other)
         {
-            return Inactive.Equals(other.Inactive) && Active.Equals(other.Active) && TransitionOffsetPercent == other.TransitionOffsetPercent && TransitionDurationPercent == other.TransitionDurationPercent && UseInactive == other.UseInactive && UseActive == other.UseActive;
+            return Inactive.Equals(other.Inactive) && Active.Equals(other.Active) && TransitionOffsetPercent == other.TransitionOffsetPercent && TransitionDurationPercent == other.TransitionDurationPercent && UseInactive == other.UseInactive && UseActive == other.UseActive && UseTransitionToInactive == other.UseTransitionToInactive && UseTransitionToActive == other.UseTransitionToActive;
         }
 
         public IEnumerable<string> ChangedProps(ToggleItemBase<Item> other)
@@ -46,6 +60,8 @@ namespace net.narazaka.avatarmenucreator
             if (TransitionDurationPercent != other.TransitionDurationPercent) changed.Add(nameof(TransitionDurationPercent));
             if (UseInactive != other.UseInactive) changed.Add(nameof(UseInactive));
             if (UseActive != other.UseActive) changed.Add(nameof(UseActive));
+            if (UseTransitionToInactive != other.UseTransitionToInactive) changed.Add(nameof(UseTransitionToInactive));
+            if (UseTransitionToActive != other.UseTransitionToActive) changed.Add(nameof(UseTransitionToActive));
             return changed;
         }
 
@@ -57,6 +73,8 @@ namespace net.narazaka.avatarmenucreator
             if (name == nameof(TransitionDurationPercent)) return TransitionDurationPercent;
             if (name == nameof(UseInactive)) return UseInactive;
             if (name == nameof(UseActive)) return UseActive;
+            if (name == nameof(UseTransitionToInactive)) return UseTransitionToInactive;
+            if (name == nameof(UseTransitionToActive)) return UseTransitionToActive;
             return 0;
         }
 
@@ -68,6 +86,8 @@ namespace net.narazaka.avatarmenucreator
             if (name == nameof(TransitionDurationPercent)) TransitionDurationPercent = (float)value;
             if (name == nameof(UseInactive)) UseInactive = (bool)value;
             if (name == nameof(UseActive)) UseActive = (bool)value;
+            if (name == nameof(UseTransitionToInactive)) UseTransitionToInactive = (bool)value;
+            if (name == nameof(UseTransitionToActive)) UseTransitionToActive = (bool)value;
         }
 
         public void AdjustTransitionValues()

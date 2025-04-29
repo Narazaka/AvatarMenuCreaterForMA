@@ -425,6 +425,19 @@ namespace net.narazaka.avatarmenucreator
             }
         }
 
+        protected bool ToggleLeft(string label, bool value)
+        {
+            using (var check = new EditorGUI.ChangeCheckScope())
+            {
+                var newValue = EditorGUILayout.ToggleLeft(label, value);
+                if (check.changed)
+                {
+                    WillChange();
+                }
+                return newValue;
+            }
+        }
+
         protected string TextField(string label, string value)
         {
             using (var check = new EditorGUI.ChangeCheckScope())

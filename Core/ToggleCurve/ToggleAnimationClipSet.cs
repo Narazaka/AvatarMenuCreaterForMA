@@ -35,6 +35,8 @@ namespace net.narazaka.avatarmenucreator.valuecurve
                 type: type,
                 useActive: value.UseActive,
                 useInactive: value.UseInactive,
+                useTransitionToActive: value.UseTransitionToActive,
+                useTransitionToInactive: value.UseTransitionToInactive,
                 transitionSeconds: TransitionSeconds
                 ).Setup();
         }
@@ -54,6 +56,8 @@ namespace net.narazaka.avatarmenucreator.valuecurve
                 type: type,
                 useActive: value.UseActive,
                 useInactive: value.UseInactive,
+                useTransitionToActive: value.UseTransitionToActive,
+                useTransitionToInactive: value.UseTransitionToInactive,
                 transitionSeconds: TransitionSeconds
                 ).Setup();
         }
@@ -71,6 +75,8 @@ namespace net.narazaka.avatarmenucreator.valuecurve
                 type: type,
                 useActive: value.UseActive,
                 useInactive: value.UseInactive,
+                useTransitionToActive: value.UseTransitionToActive,
+                useTransitionToInactive: value.UseTransitionToInactive,
                 transitionSeconds: TransitionSeconds
                 ).Setup();
         }
@@ -89,6 +95,8 @@ namespace net.narazaka.avatarmenucreator.valuecurve
                 type: type,
                 useActive: value.UseActive,
                 useInactive: value.UseInactive,
+                useTransitionToActive: value.UseTransitionToActive,
+                useTransitionToInactive: value.UseTransitionToInactive,
                 transitionSeconds: TransitionSeconds
                 ).Setup();
         }

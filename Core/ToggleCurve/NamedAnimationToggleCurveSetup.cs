@@ -11,6 +11,8 @@ namespace net.narazaka.avatarmenucreator.valuecurve
         readonly Type Type;
         readonly bool UseActive;
         readonly bool UseInactive;
+        readonly bool UseTransitionToActive;
+        readonly bool UseTransitionToInactive;
         readonly float TransitionSeconds;
 
         public NamedAnimationToggleCurveSetup(
@@ -20,6 +22,8 @@ namespace net.narazaka.avatarmenucreator.valuecurve
             Type type,
             bool useActive,
             bool useInactive,
+            bool useTransitionToActive,
+            bool useTransitionToInactive,
             float transitionSeconds
             )
         {
@@ -29,6 +33,8 @@ namespace net.narazaka.avatarmenucreator.valuecurve
             Type = type;
             UseActive = useActive;
             UseInactive = useInactive;
+            UseTransitionToActive = useTransitionToActive;
+            UseTransitionToInactive = useTransitionToInactive;
             TransitionSeconds = transitionSeconds;
         }
 
@@ -38,8 +44,14 @@ namespace net.narazaka.avatarmenucreator.valuecurve
             if (UseInactive) foreach (var c in Curve.InactiveCurve()) ClipSet.Inactive.SetCurve(Path, Type, c.propertyName, c.curve);
             if (TransitionSeconds > 0)
             {
-                foreach (var c in Curve.ActivateCurve(TransitionSeconds)) ClipSet.Activate.SetCurve(Path, Type, c.propertyName, c.curve);
-                foreach (var c in Curve.InactivateCurve(TransitionSeconds)) ClipSet.Inactivate.SetCurve(Path, Type, c.propertyName, c.curve);
+                if (UseTransitionToActive)
+                {
+                    foreach (var c in Curve.ActivateCurve(TransitionSeconds)) ClipSet.Activate.SetCurve(Path, Type, c.propertyName, c.curve);
+                }
+                if (UseTransitionToInactive)
+                {
+                    foreach (var c in Curve.InactivateCurve(TransitionSeconds)) ClipSet.Inactivate.SetCurve(Path, Type, c.propertyName, c.curve);
+                }
             }
         }
     }

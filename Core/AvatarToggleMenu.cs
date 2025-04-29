@@ -21,6 +21,8 @@ namespace net.narazaka.avatarmenucreator
         [SerializeField]
         public ToggleUsingDictionary ToggleObjectUsings = new ToggleUsingDictionary();
         [SerializeField]
+        public ToggleTransitionUsingDictionary ToggleObjectTransitionUsings = new ToggleTransitionUsingDictionary();
+        [SerializeField]
         public ToggleMaterialDictionary ToggleMaterials = new ToggleMaterialDictionary();
         [SerializeField]
         public ToggleBlendShapeDictionary ToggleBlendShapes = new ToggleBlendShapeDictionary();
@@ -36,6 +38,8 @@ namespace net.narazaka.avatarmenucreator
         public ToggleVector3Dictionary Rotations = new ToggleVector3Dictionary();
         [SerializeField]
         public ToggleVector3Dictionary Scales = new ToggleVector3Dictionary();
+        [SerializeField]
+        public bool SkipTransitionIfAllOmitted = true;
         [SerializeField]
         public bool ToggleDefaultValue;
         [SerializeField]
@@ -78,6 +82,7 @@ namespace net.narazaka.avatarmenucreator
                             _UseAdvanced = value;
                             WillChange();
                             ToggleObjectUsings.Clear();
+                            ToggleObjectTransitionUsings.Clear();
                             foreach (var key in ToggleMaterials.Keys.ToList())
                             {
                                 ToggleMaterials[key] = ToggleMaterials[key].ResetAdvanced();
@@ -119,7 +124,7 @@ namespace net.narazaka.avatarmenucreator
                 }
             }
         }
-        bool HasAdvanced => ToggleObjectUsings.Count > 0 || ToggleMaterials.Any(t => t.Value.HasAdvanced) || ToggleBlendShapes.Any(t => t.Value.HasAdvanced) || ToggleShaderParameters.Any(t => t.Value.HasAdvanced) || ToggleShaderVectorParameters.Any(t => t.Value.HasAdvanced) || ToggleValues.Any(t => t.Value.HasAdvanced) || Positions.Any(t => t.Value.HasAdvanced) || Rotations.Any(t => t.Value.HasAdvanced) || Scales.Any(t => t.Value.HasAdvanced);
+        bool HasAdvanced => ToggleObjectUsings.Count > 0 || ToggleObjectTransitionUsings.Count > 0 || ToggleMaterials.Any(t => t.Value.HasAdvanced) || ToggleBlendShapes.Any(t => t.Value.HasAdvanced) || ToggleShaderParameters.Any(t => t.Value.HasAdvanced) || ToggleShaderVectorParameters.Any(t => t.Value.HasAdvanced) || ToggleValues.Any(t => t.Value.HasAdvanced) || Positions.Any(t => t.Value.HasAdvanced) || Rotations.Any(t => t.Value.HasAdvanced) || Scales.Any(t => t.Value.HasAdvanced);
 
         public override IEnumerable<string> GetStoredChildren() => ToggleObjects.Keys.Concat(ToggleMaterials.Keys.Select(k => k.Item1)).Concat(ToggleBlendShapes.Keys.Select(k => k.Item1)).Concat(ToggleShaderParameters.Keys.Select(k => k.Item1)).Concat(ToggleShaderVectorParameters.Keys.Select(k => k.Item1)).Concat(ToggleValues.Keys.Select(k => k.Item1)).Concat(Positions.Keys).Concat(Rotations.Keys).Concat(Scales.Keys).Distinct();
         public override void ReplaceStoredChild(string oldChild, string newChild)
@@ -129,6 +134,7 @@ namespace net.narazaka.avatarmenucreator
                 WillChange();
                 ToggleObjects.ReplaceKey(oldChild, newChild);
                 ToggleObjectUsings.ReplaceKey(oldChild, newChild);
+                ToggleObjectTransitionUsings.ReplaceKey(oldChild, newChild);
                 ToggleMaterials.ReplacePrimaryKey(oldChild, newChild);
                 ToggleBlendShapes.ReplacePrimaryKey(oldChild, newChild);
                 ToggleShaderParameters.ReplacePrimaryKey(oldChild, newChild);
@@ -150,6 +156,10 @@ namespace net.narazaka.avatarmenucreator
             foreach (var key in ToggleObjectUsings.Keys.Where(k => !filter.Contains(k)).ToList())
             {
                 ToggleObjectUsings.Remove(key);
+            }
+            foreach (var key in ToggleObjectTransitionUsings.Keys.Where(k => !filter.Contains(k)).ToList())
+            {
+                ToggleObjectTransitionUsings.Remove(key);
             }
             foreach (var key in ToggleMaterials.Keys.Where(k => !filter.Contains(k.Item1)).ToList())
             {
@@ -189,6 +199,7 @@ namespace net.narazaka.avatarmenucreator
             WillChange();
             ToggleObjects.Remove(child);
             ToggleObjectUsings.Remove(child);
+            ToggleObjectTransitionUsings.Remove(child);
             foreach (var key in ToggleMaterials.Keys.Where(k => k.Item1 == child).ToList())
             {
                 ToggleMaterials.Remove(key);
@@ -238,6 +249,12 @@ namespace net.narazaka.avatarmenucreator
             if (UseAdvanced)
             {
                 EditorGUILayout.HelpBox(T.高度な設定を有効にするとヽONまたはOFF片方だけ制御する設定ができますゝ, MessageType.Info);
+                EditorGUI.BeginDisabledGroup(TransitionSeconds == 0);
+                EditorGUI.indentLevel++;
+                SkipTransitionIfAllOmitted = ToggleLeft(T.全て制御されない変化はスキップする, SkipTransitionIfAllOmitted);
+                EditorGUILayout.HelpBox(T._startj_ONへの変化を制御_endj_または_startj_OFFへの変化を制御_endj_が全てチェックされていない場合ヽその変化はスキップされます_start_徐々に変化せずに一瞬で変化します_end_ゝ, MessageType.Info);
+                EditorGUI.indentLevel--;
+                EditorGUI.EndDisabledGroup();
             }
 
             EditorGUILayout.Space();
@@ -252,7 +269,13 @@ namespace net.narazaka.avatarmenucreator
             var allMaterials = GetAllMaterialSlots(children);
             var keyToMaterial = allMaterials.KeyToMaterial();
             var sourceMaterials = DistinctSourceMaterial(keyToMaterial);
-            return sourceMaterials.Count() * 2 * (EditorGUIUtility.singleLineHeight + EditorGUIUtility.standardVerticalSpacing) + EditorGUIUtility.standardVerticalSpacing;
+            var lines = 2;
+            if (TransitionSeconds > 0) lines += 1;
+            if (UseAdvanced) {
+                lines += 1;
+                if (TransitionSeconds > 0) lines += 1;
+            }
+            return sourceMaterials.Count() * lines * (EditorGUIUtility.singleLineHeight + EditorGUIUtility.standardVerticalSpacing) + EditorGUIUtility.standardVerticalSpacing;
         }
 
         protected override void OnHeaderBulkGUI(IList<string> children)
@@ -460,6 +483,48 @@ namespace net.narazaka.avatarmenucreator
                         }
                     }
                 }
+                if (TransitionSeconds > 0)
+                {
+                    using (new EditorGUILayout.HorizontalScope())
+                    {
+                        if (!ToggleObjectTransitionUsings.TryGetValue(child, out var use))
+                        {
+                            use = ToggleTransitionUsing.NotSpecified;
+                        }
+                        var newUse = ToggleTransitionUsing.NotSpecified;
+                        EditorGUIUtility.labelWidth = 120;
+                        EditorGUI.BeginChangeCheck();
+                        if (!EditorGUILayout.Toggle(T.OFFへの変化を制御, (use & ToggleTransitionUsing.OmitOFF) != ToggleTransitionUsing.OmitOFF)) newUse |= ToggleTransitionUsing.OmitOFF;
+                        if (!EditorGUILayout.Toggle(T.ONへの変化を制御, (use & ToggleTransitionUsing.OmitON) != ToggleTransitionUsing.OmitON)) newUse |= ToggleTransitionUsing.OmitON;
+                        EditorGUIUtility.labelWidth = 0;
+                        if (EditorGUI.EndChangeCheck())
+                        {
+                            WillChange();
+                            if (newUse == ToggleTransitionUsing.NotSpecified)
+                            {
+                                ToggleObjectTransitionUsings.Remove(child);
+                                if (BulkSet)
+                                {
+                                    foreach (var c in children)
+                                    {
+                                        ToggleObjectTransitionUsings.Remove(c);
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                ToggleObjectTransitionUsings[child] = newUse;
+                                if (BulkSet)
+                                {
+                                    foreach (var c in children)
+                                    {
+                                        ToggleObjectTransitionUsings[c] = newUse;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
             }
         }
 
@@ -490,14 +555,7 @@ namespace net.narazaka.avatarmenucreator
                             newValue.TransitionOffsetPercent = EditorGUILayout.FloatField(T.変化待機_per_, value.TransitionOffsetPercent, GUILayout.Width(140));
                             EditorGUIUtility.labelWidth = 0;
                         }
-                        if (UseAdvanced)
-                        {
-                            using (new EditorGUILayout.HorizontalScope())
-                            {
-                                newValue.UseActive = EditorGUILayout.Toggle(T.ONを制御, value.UseActive);
-                                newValue.UseInactive = EditorGUILayout.Toggle(T.OFFを制御, value.UseInactive);
-                            }
-                        }
+                        ShowAdvancedControls(value, newValue);
                         if (!value.Equals(newValue))
                         {
                             WillChange();
@@ -621,10 +679,11 @@ namespace net.narazaka.avatarmenucreator
         void ShowToggleBulkMaterialControl(Dictionary<string, Material[]> allMaterials)
         {
             var keyToMaterial = allMaterials.KeyToMaterial();
-            var sourceMaterials = DistinctSourceMaterial(keyToMaterial);
+            var sourceMaterials = DistinctSourceMaterial(keyToMaterial).ToArray();
             var chooseMaterialGroups = ToggleMaterials.Keys.GroupBy(keyToMaterial).Where(m => m.Key != null).ToDictionary(group => group.Key, group => group.ToList());
-            foreach (var sourceMaterial in sourceMaterials)
+            for (var i = 0; i < sourceMaterials.Length; ++i)
             {
+                var sourceMaterial = sourceMaterials[i];
                 using (new EditorGUI.DisabledGroupScope(true))
                 {
                     EditorGUILayout.ObjectField(sourceMaterial, typeof(Material), false);
@@ -635,7 +694,9 @@ namespace net.narazaka.avatarmenucreator
                 var transitionOffsetPercents = chooseMaterialGroups[sourceMaterial].Select(key => ToggleMaterials.TryGetValue(key, out var tm) ? tm.TransitionOffsetPercent : 0).Distinct().ToList();
                 var useActives = chooseMaterialGroups[sourceMaterial].Select(key => ToggleMaterials.TryGetValue(key, out var tm) ? tm.UseActive : false).Distinct().ToList();
                 var useInactives = chooseMaterialGroups[sourceMaterial].Select(key => ToggleMaterials.TryGetValue(key, out var tm) ? tm.UseInactive : false).Distinct().ToList();
-                var value = new ToggleMaterial { Inactive = inactiveMaterials[0], Active = activeMaterials[0], TransitionOffsetPercent = transitionOffsetPercents[0], UseActive = useActives[0], UseInactive = useInactives[0] };
+                var useTransitionToActives = chooseMaterialGroups[sourceMaterial].Select(key => ToggleMaterials.TryGetValue(key, out var tm) ? tm.UseTransitionToActive : false).Distinct().ToList();
+                var useTransitionToInactives = chooseMaterialGroups[sourceMaterial].Select(key => ToggleMaterials.TryGetValue(key, out var tm) ? tm.UseTransitionToInactive : false).Distinct().ToList();
+                var value = new ToggleMaterial { Inactive = inactiveMaterials[0], Active = activeMaterials[0], TransitionOffsetPercent = transitionOffsetPercents[0], UseActive = useActives[0], UseInactive = useInactives[0], UseTransitionToActive = useTransitionToActives[0], UseTransitionToInactive = useTransitionToInactives[0] };
                 var newValue = new ToggleMaterial();
                 using (new EditorGUILayout.HorizontalScope())
                 {
@@ -650,14 +711,7 @@ namespace net.narazaka.avatarmenucreator
                     newValue.TransitionOffsetPercent = EditorGUILayout.FloatField(T.変化待機_per_, value.TransitionOffsetPercent, GUILayout.Width(140));
                     EditorGUIUtility.labelWidth = 0;
                 }
-                if (UseAdvanced)
-                {
-                    using (new EditorGUILayout.HorizontalScope())
-                    {
-                        newValue.UseActive = EditorGUILayout.Toggle(T.ONを制御, value.UseActive);
-                        newValue.UseInactive = EditorGUILayout.Toggle(T.OFFを制御, value.UseInactive);
-                    }
-                }
+                ShowAdvancedControls(value, newValue);
                 if (!value.Equals(newValue))
                 {
                     WillChange();
@@ -687,6 +741,17 @@ namespace net.narazaka.avatarmenucreator
                     if (useInactives.Count != 1)
                     {
                         EditorGUILayout.HelpBox(T.OFFを制御に複数の設定がされています, MessageType.Warning);
+                    }
+                    if (TransitionSeconds > 0)
+                    {
+                        if (useTransitionToActives.Count != 1)
+                        {
+                            EditorGUILayout.HelpBox(T.ONへの変化を制御に複数の設定がされています, MessageType.Warning);
+                        }
+                        if (useTransitionToInactives.Count != 1)
+                        {
+                            EditorGUILayout.HelpBox(T.OFFへの変化を制御に複数の設定がされています, MessageType.Warning);
+                        }
                     }
                 }
                 EditorGUI.indentLevel--;
@@ -740,16 +805,7 @@ namespace net.narazaka.avatarmenucreator
                                 EditorGUILayout.HelpBox(T.変化時間_per_は0より大きく設定して下さい, MessageType.Error);
                             }
                         }
-                        if (UseAdvanced)
-                        {
-                            using (new EditorGUILayout.HorizontalScope())
-                            {
-                                EditorGUI.indentLevel++;
-                                newValue.UseActive = EditorGUILayout.Toggle(T.ONを制御, value.UseActive);
-                                newValue.UseInactive = EditorGUILayout.Toggle(T.OFFを制御, value.UseInactive);
-                                EditorGUI.indentLevel--;
-                            }
-                        }
+                        ShowAdvancedControlsWithIndent(value, newValue);
                         if (!value.Equals(newValue))
                         {
                             WillChange();
@@ -894,16 +950,7 @@ namespace net.narazaka.avatarmenucreator
                                 EditorGUILayout.HelpBox(T.変化時間_per_は0より大きく設定して下さい, MessageType.Error);
                             }
                         }
-                        if (UseAdvanced)
-                        {
-                            using (new EditorGUILayout.HorizontalScope())
-                            {
-                                EditorGUI.indentLevel++;
-                                newValue.UseActive = EditorGUILayout.Toggle(T.ONを制御, value.UseActive);
-                                newValue.UseInactive = EditorGUILayout.Toggle(T.OFFを制御, value.UseInactive);
-                                EditorGUI.indentLevel--;
-                            }
-                        }
+                        ShowAdvancedControlsWithIndent(value, newValue);
                         if (!value.Equals(newValue))
                         {
                             WillChange();
@@ -1139,16 +1186,7 @@ namespace net.narazaka.avatarmenucreator
                                 EditorGUILayout.HelpBox(T.変化時間_per_は0より大きく設定して下さい, MessageType.Error);
                             }
                         }
-                        if (UseAdvanced)
-                        {
-                            using (new EditorGUILayout.HorizontalScope())
-                            {
-                                EditorGUI.indentLevel++;
-                                newValue.UseActive = EditorGUILayout.Toggle(T.ONを制御, value.UseActive);
-                                newValue.UseInactive = EditorGUILayout.Toggle(T.OFFを制御, value.UseInactive);
-                                EditorGUI.indentLevel--;
-                            }
-                        }
+                        ShowAdvancedControlsWithIndent(value, newValue);
                         if (!value.Equals(newValue))
                         {
                             WillChange();
@@ -1300,16 +1338,7 @@ namespace net.narazaka.avatarmenucreator
                             EditorGUI.indentLevel--;
                         }
                     }
-                    if (UseAdvanced)
-                    {
-                        using (new EditorGUILayout.HorizontalScope())
-                        {
-                            EditorGUI.indentLevel++;
-                            newValue.UseActive = EditorGUILayout.Toggle(T.ONを制御, value.UseActive);
-                            newValue.UseInactive = EditorGUILayout.Toggle(T.OFFを制御, value.UseInactive);
-                            EditorGUI.indentLevel--;
-                        }
-                    }
+                    ShowAdvancedControlsWithIndent(value, newValue);
                     if (!value.Equals(newValue))
                     {
                         WillChange();
@@ -1382,6 +1411,53 @@ namespace net.narazaka.avatarmenucreator
             if (!values.ContainsKey(child)) return;
             WillChange();
             values.Remove(child);
+        }
+
+        void ShowAdvancedControlsWithIndent(IUseActive value, IUseActive newValue)
+        {
+            EditorGUI.indentLevel++;
+            ShowAdvancedControls(value, newValue);
+            EditorGUI.indentLevel--;
+        }
+
+        void ShowAdvancedControls(IUseActive value, IUseActive newValue)
+        {
+            if (UseAdvanced)
+            {
+                EditorGUI.indentLevel++;
+                using (new EditorGUILayout.HorizontalScope())
+                {
+                    var rect = EditorGUI.IndentedRect(EditorGUILayout.GetControlRect());
+                    var indentLevel = EditorGUI.indentLevel;
+                    EditorGUI.indentLevel = 0;
+                    EditorGUIUtility.labelWidth = 104;
+                    rect.width /= 2f;
+                    newValue.UseInactive = EditorGUI.Toggle(rect, T.OFFを制御, value.UseInactive);
+                    rect.x += rect.width;
+                    newValue.UseActive = EditorGUI.Toggle(rect, T.ONを制御, value.UseActive);
+                    EditorGUIUtility.labelWidth = 0;
+                    EditorGUI.indentLevel = indentLevel;
+                }
+                if (TransitionSeconds > 0)
+                {
+                    var rect = EditorGUI.IndentedRect(EditorGUILayout.GetControlRect());
+                    var indentLevel = EditorGUI.indentLevel;
+                    EditorGUI.indentLevel = 0;
+                    EditorGUIUtility.labelWidth = 104;
+                    rect.width /= 2f;
+                    newValue.UseTransitionToInactive = EditorGUI.Toggle(rect, T.OFFへの変化を制御, value.UseTransitionToInactive);
+                    rect.x += rect.width;
+                    newValue.UseTransitionToActive = EditorGUI.Toggle(rect, T.ONへの変化を制御, value.UseTransitionToActive);
+                    EditorGUIUtility.labelWidth = 0;
+                    EditorGUI.indentLevel = indentLevel;
+                }
+                else
+                {
+                    newValue.UseTransitionToInactive = value.UseTransitionToInactive;
+                    newValue.UseTransitionToActive = value.UseTransitionToActive;
+                }
+                EditorGUI.indentLevel--;
+            }
         }
 
         Dictionary<string, Material[]> GetAllMaterialSlots(IList<string> children) => children.ToDictionary(child => child, child => GetMaterialSlots(child));
