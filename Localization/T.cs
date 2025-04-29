@@ -14,6 +14,9 @@ namespace net.narazaka.avatarmenucreator
             }
         }
 
+        [English("Documentation")]
+        public static string ドキュメント => L;
+
         [English("Batch setting of parameters and material slots with the same name")]
         public static string 同名パラメーターや同マテリアルスロットを一括設定 => L;
 

@@ -115,9 +115,18 @@ namespace net.narazaka.avatarmenucreator.editor
                 VRCAvatarDescriptor = newVRCAvatarDescriptor;
             }
 
+            using (new EditorGUILayout.HorizontalScope())
+            {
 #if NET_NARAZAKA_VRCHAT_AvatarMenuCreator_HAS_NDMF_LOCALIZATION
-            nadena.dev.ndmf.ui.LanguageSwitcher.DrawImmediate();
+                EditorGUIUtility.labelWidth = 100;
+                nadena.dev.ndmf.ui.LanguageSwitcher.DrawImmediate();
+                EditorGUIUtility.labelWidth = 0;
 #endif
+                if (GUILayout.Button(T.ドキュメント, GUILayout.Width(100)))
+                {
+                    Application.OpenURL("https://avatar-menu-creator-for-ma.vrchat.narazaka.net/guides/basic/");
+                }
+            }
 
             if (VRCAvatarDescriptor == null)
             {

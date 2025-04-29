@@ -5,6 +5,7 @@ using VRC.SDK3.Avatars.ScriptableObjects;
 
 namespace net.narazaka.avatarmenucreator.components
 {
+    [HelpURL("https://avatar-menu-creator-for-ma.vrchat.narazaka.net/references/radial/")]
     public class AvatarRadialMenuCreator : AvatarMenuCreatorBase
     {
         [SerializeField]
