@@ -115,6 +115,10 @@ namespace net.narazaka.avatarmenucreator.editor
                 VRCAvatarDescriptor = newVRCAvatarDescriptor;
             }
 
+#if NET_NARAZAKA_VRCHAT_AvatarMenuCreator_HAS_NDMF_LOCALIZATION
+            nadena.dev.ndmf.ui.LanguageSwitcher.DrawImmediate();
+#endif
+
             if (VRCAvatarDescriptor == null)
             {
                 VRCAvatarDescriptor = null;

@@ -8,7 +8,8 @@
         "AvatarMenuCreatorForMA.Collections",
         "AvatarMenuCreatorForMA.Components",
         "AvatarMenuCreatorForMA.Localization",
-        "Narazaka.VRChat.CompressedIntParameters"
+        "Narazaka.VRChat.CompressedIntParameters",
+        "nadena.dev.ndmf"
     ],
     "includePlatforms": [
         "Editor"
@@ -24,6 +25,11 @@
             "name": "nadena.dev.ndmf",
             "expression": "[1.0.0,2)",
             "define": "NET_NARAZAKA_VRCHAT_AvatarMenuCreator_HAS_NDMF"
+        },
+        {
+            "name": "nadena.dev.ndmf",
+            "expression": "[1.3.0,2)",
+            "define": "NET_NARAZAKA_VRCHAT_AvatarMenuCreator_HAS_NDMF_LOCALIZATION"
         },
         {
             "name": "nadena.dev.modular-avatar",

@@ -57,6 +57,10 @@ namespace net.narazaka.avatarmenucreator.components.editor
             {
                 OnInspectorGUIMultiple();
             }
+#if NET_NARAZAKA_VRCHAT_AvatarMenuCreator_HAS_NDMF_LOCALIZATION
+            EditorGUILayout.Space();
+            nadena.dev.ndmf.ui.LanguageSwitcher.DrawImmediate();
+#endif
         }
 
         void OnInspectorGUISingle()
