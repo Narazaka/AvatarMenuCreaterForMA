@@ -15,7 +15,11 @@ namespace net.narazaka.avatarmenucreator.editor
         AvatarRadialMenu AvatarMenu;
         public CreateAvatarRadialMenu(Transform avatarRoot, AvatarRadialMenu avatarRadialMenu) : base(avatarRoot) => AvatarMenu = avatarRadialMenu;
 
+#if NET_NARAZAKA_VRCHAT_AvatarMenuCreator_HAS_NDMF
+        public override CreatedAssets CreateAssets(string baseName, IEnumerable<string> children = null, nadena.dev.ndmf.BuildContext buildContext = null)
+#else
         public override CreatedAssets CreateAssets(string baseName, IEnumerable<string> children = null)
+#endif
         {
             var matchGameObjects = new HashSet<string>(children ?? AvatarMenu.GetStoredChildren());
             var parameterName = string.IsNullOrEmpty(AvatarMenu.ParameterName) ? baseName : AvatarMenu.ParameterName;

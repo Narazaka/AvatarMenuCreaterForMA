@@ -29,7 +29,11 @@ namespace net.narazaka.avatarmenucreator.editor
         
         protected CreateAvatarMenuBase(Transform avatarRoot) => AvatarRoot = avatarRoot;
 
+#if NET_NARAZAKA_VRCHAT_AvatarMenuCreator_HAS_NDMF
+        public abstract CreatedAssets CreateAssets(string baseName, IEnumerable<string> children = null, nadena.dev.ndmf.BuildContext buildContext = null);
+#else
         public abstract CreatedAssets CreateAssets(string baseName, IEnumerable<string> children = null);
+#endif
 
 #if NET_NARAZAKA_VRCHAT_AvatarMenuCreator_HAS_NDMF && !NET_NARAZAKA_VRCHAT_AvatarMenuCreator_HAS_NO_MENU_MA
         public static AvatarMenuCreatorBase GetOrAddMenuCreatorComponent(GameObject obj, AvatarMenuBase avatarMenu, bool addMenuInstaller)
@@ -67,7 +71,7 @@ namespace net.narazaka.avatarmenucreator.editor
         }
 #endif
 
-        Transform GetByPath(string path)
+        protected Transform GetByPath(string path)
         {
             return AvatarRoot.Find(path);
         }

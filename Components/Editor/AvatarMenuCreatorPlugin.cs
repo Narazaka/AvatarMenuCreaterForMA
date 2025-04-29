@@ -14,13 +14,13 @@ namespace net.narazaka.avatarmenucreator.components.editor
 
         protected override void Configure()
         {
-            InPhase(BuildPhase.Generating).BeforePlugin("nadena.dev.modular-avatar").Run("AvatarMenuCreatorForMA", ctx =>
+            InPhase(BuildPhase.Transforming).BeforePlugin("nadena.dev.modular-avatar").AfterPlugin("net.rs64.tex-trans-tool").Run("AvatarMenuCreatorForMA", ctx =>
             {
                 var creators = ctx.AvatarRootTransform.GetComponentsInChildren<AvatarMenuCreatorBase>(true);
                 foreach (var creator in creators)
                 {
                     if (!creator.IsEffective) continue;
-                    CreateAvatarMenuBase.GetCreateAvatarMenu(ctx.AvatarRootTransform, creator.AvatarMenu).CreateAssets(creator.name).StoreAssets(creator.gameObject, false);
+                    CreateAvatarMenuBase.GetCreateAvatarMenu(ctx.AvatarRootTransform, creator.AvatarMenu).CreateAssets(creator.name, buildContext: ctx).StoreAssets(creator.gameObject, false);
                     UnityEngine.Object.DestroyImmediate(creator);
                 }
             });

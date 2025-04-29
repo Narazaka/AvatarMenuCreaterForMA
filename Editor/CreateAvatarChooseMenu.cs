@@ -17,7 +17,11 @@ namespace net.narazaka.avatarmenucreator.editor
         AvatarChooseMenu AvatarMenu;
         public CreateAvatarChooseMenu(Transform avatarRoot, AvatarChooseMenu avatarChooseMenu) : base(avatarRoot) => AvatarMenu = avatarChooseMenu;
 
+#if NET_NARAZAKA_VRCHAT_AvatarMenuCreator_HAS_NDMF
+        public override CreatedAssets CreateAssets(string baseName, IEnumerable<string> children = null, nadena.dev.ndmf.BuildContext buildContext = null)
+#else
         public override CreatedAssets CreateAssets(string baseName, IEnumerable<string> children = null)
+#endif
         {
             var matchGameObjects = new HashSet<string>(children ?? AvatarMenu.GetStoredChildren());
             var parameterName = string.IsNullOrEmpty(AvatarMenu.ParameterName) ? baseName : AvatarMenu.ParameterName;
@@ -40,7 +44,19 @@ namespace net.narazaka.avatarmenucreator.editor
                 var curveName = $"m_Materials.Array.data[{index}]";
                 for (var i = 0; i < AvatarMenu.ChooseCount; ++i)
                 {
-                    AnimationUtility.SetObjectReferenceCurve(choices[i], EditorCurveBinding.PPtrCurve(curvePath, GetRendererTypeByPath(child), curveName), new ObjectReferenceKeyframe[] { new ObjectReferenceKeyframe { time = 0, value = value.ContainsKey(i) ? value[i] : null } });
+                    var material = value.ContainsKey(i) ? value[i] : null;
+#if NET_NARAZAKA_VRCHAT_AvatarMenuCreator_HAS_NDMF_OBJECT_REGISTRY
+                    if (buildContext != null && material != null)
+                    {
+                        var renderer = GetByPath(child).GetComponent<Renderer>();
+                        var currentMaterial = renderer != null && renderer.sharedMaterials.Length > index ? renderer.sharedMaterials[index] : null;
+                        if (nadena.dev.ndmf.ObjectRegistry.GetReference(currentMaterial).TryResolve(buildContext.ErrorReport, out var originalMaterial) && material == originalMaterial)
+                        {
+                            material = currentMaterial;
+                        }
+                    }
+#endif
+                    AnimationUtility.SetObjectReferenceCurve(choices[i], EditorCurveBinding.PPtrCurve(curvePath, GetRendererTypeByPath(child), curveName), new ObjectReferenceKeyframe[] { new ObjectReferenceKeyframe { time = 0, value = material } });
                 }
             }
             foreach (var (child, name) in AvatarMenu.ChooseBlendShapes.Keys)

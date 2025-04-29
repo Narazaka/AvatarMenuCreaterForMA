@@ -15,7 +15,11 @@ namespace net.narazaka.avatarmenucreator.editor
         AvatarToggleMenu AvatarMenu;
         public CreateAvatarToggleMenu(Transform avatarRoot, AvatarToggleMenu avatarToggleMenu) : base(avatarRoot) => AvatarMenu = avatarToggleMenu;
 
+#if NET_NARAZAKA_VRCHAT_AvatarMenuCreator_HAS_NDMF
+        public override CreatedAssets CreateAssets(string baseName, IEnumerable<string> children = null, nadena.dev.ndmf.BuildContext buildContext = null)
+#else
         public override CreatedAssets CreateAssets(string baseName, IEnumerable<string> children = null)
+#endif
         {
             var matchGameObjects = new HashSet<string>(children ?? AvatarMenu.GetStoredChildren());
             var parameterName = string.IsNullOrEmpty(AvatarMenu.ParameterName) ? baseName : AvatarMenu.ParameterName;
@@ -58,6 +62,24 @@ namespace net.narazaka.avatarmenucreator.editor
                 var curvePath = child;
                 var curveName = $"m_Materials.Array.data[{index}]";
                 var binding = EditorCurveBinding.PPtrCurve(curvePath, GetRendererTypeByPath(child), curveName);
+#if NET_NARAZAKA_VRCHAT_AvatarMenuCreator_HAS_NDMF_OBJECT_REGISTRY
+                if (buildContext != null && (value.Active != null || value.Inactive != null))
+                {
+                    var renderer = GetByPath(child).GetComponent<Renderer>();
+                    var currentMaterial = renderer != null && renderer.sharedMaterials.Length > index ? renderer.sharedMaterials[index] : null;
+                    if (nadena.dev.ndmf.ObjectRegistry.GetReference(currentMaterial).TryResolve(buildContext.ErrorReport, out var originalMaterial))
+                    {
+                        if (value.Active != null && value.Active == originalMaterial)
+                        {
+                            value.ReplacedActive = currentMaterial;
+                        }
+                        if (value.Inactive != null && value.Inactive == originalMaterial)
+                        {
+                            value.ReplacedInactive = currentMaterial;
+                        }
+                    }
+                }
+#endif
                 if (value.UseActive) AnimationUtility.SetObjectReferenceCurve(active, binding, value.ActiveCurve());
                 if (value.UseInactive) AnimationUtility.SetObjectReferenceCurve(inactive, binding, value.InactiveCurve());
                 if (transitionSeconds > 0)

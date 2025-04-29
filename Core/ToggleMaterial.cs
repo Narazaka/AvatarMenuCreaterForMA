@@ -97,22 +97,28 @@ namespace net.narazaka.avatarmenucreator
         public bool NeedInactivateEndKey { get => 1f - InactivateChangeRate > 0; }
 
 #if UNITY_EDITOR
-        public ObjectReferenceKeyframe[] ActiveCurve() => new ObjectReferenceKeyframe[] { new ObjectReferenceKeyframe { time = 0, value = Active } };
-        public ObjectReferenceKeyframe[] InactiveCurve() => new ObjectReferenceKeyframe[] { new ObjectReferenceKeyframe { time = 0, value = Inactive } };
+        [NonSerialized]
+        public Material ReplacedActive;
+        [NonSerialized]
+        public Material ReplacedInactive;
+        Material EffectiveActive => ReplacedActive != null ? ReplacedActive : Active;
+        Material EffectiveInactive => ReplacedInactive != null ? ReplacedInactive : Inactive;
+        public ObjectReferenceKeyframe[] ActiveCurve() => new ObjectReferenceKeyframe[] { new ObjectReferenceKeyframe { time = 0, value = EffectiveActive } };
+        public ObjectReferenceKeyframe[] InactiveCurve() => new ObjectReferenceKeyframe[] { new ObjectReferenceKeyframe { time = 0, value = EffectiveInactive } };
         public ObjectReferenceKeyframe[] ActivateCurve(float transitionSeconds)
         {
             var curve = new List<ObjectReferenceKeyframe>();
-            if (NeedActivateStartKey) curve.Add(new ObjectReferenceKeyframe { time = 0, value = Inactive });
-            curve.Add(new ObjectReferenceKeyframe { time = transitionSeconds * ActivateChangeRate, value = Active });
-            if (NeedActivateEndKey) curve.Add(new ObjectReferenceKeyframe { time = transitionSeconds, value = Active });
+            if (NeedActivateStartKey) curve.Add(new ObjectReferenceKeyframe { time = 0, value = EffectiveInactive });
+            curve.Add(new ObjectReferenceKeyframe { time = transitionSeconds * ActivateChangeRate, value = EffectiveActive });
+            if (NeedActivateEndKey) curve.Add(new ObjectReferenceKeyframe { time = transitionSeconds, value = EffectiveActive });
             return curve.ToArray();
         }
         public ObjectReferenceKeyframe[] InactivateCurve(float transitionSeconds)
         {
             var curve = new List<ObjectReferenceKeyframe>();
-            if (NeedInactivateStartKey) curve.Add(new ObjectReferenceKeyframe { time = 0, value = Active });
-            curve.Add(new ObjectReferenceKeyframe { time = transitionSeconds * InactivateChangeRate, value = Inactive });
-            if (NeedInactivateEndKey) curve.Add(new ObjectReferenceKeyframe { time = transitionSeconds, value = Inactive });
+            if (NeedInactivateStartKey) curve.Add(new ObjectReferenceKeyframe { time = 0, value = EffectiveActive });
+            curve.Add(new ObjectReferenceKeyframe { time = transitionSeconds * InactivateChangeRate, value = EffectiveInactive });
+            if (NeedInactivateEndKey) curve.Add(new ObjectReferenceKeyframe { time = transitionSeconds, value = EffectiveInactive });
             return curve.ToArray();
         }
 #endif

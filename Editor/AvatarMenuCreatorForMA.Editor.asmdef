@@ -32,6 +32,11 @@
             "define": "NET_NARAZAKA_VRCHAT_AvatarMenuCreator_HAS_NDMF_LOCALIZATION"
         },
         {
+            "name": "nadena.dev.ndmf",
+            "expression": "[1.3.0,2)",
+            "define": "NET_NARAZAKA_VRCHAT_AvatarMenuCreator_HAS_NDMF_OBJECT_REGISTRY"
+        },
+        {
             "name": "nadena.dev.modular-avatar",
             "expression": "[1.0.0,1.5.0)",
             "define": "NET_NARAZAKA_VRCHAT_AvatarMenuCreator_HAS_NO_MENU_MA"
