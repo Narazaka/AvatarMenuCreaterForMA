@@ -220,10 +220,7 @@ namespace net.narazaka.avatarmenucreator
             EditorGUILayout.BeginHorizontal();
             var rect = EditorGUILayout.GetControlRect(false, GUILayout.Width(EditorGUIUtility.labelWidth));
             ChoiceFoldout = EditorGUI.Foldout(rect, ChoiceFoldout, T.選択肢の数);
-            ChooseCount = IntField(ChooseCount, index =>
-            {
-                ChoiceList = null;
-            });
+            ChooseCount = IntField(ChooseCount);
             EditorGUILayout.EndHorizontal();
 
             if (ChooseCount < 1) ChooseCount = 1;
@@ -327,7 +324,7 @@ namespace net.narazaka.avatarmenucreator
         {
             if (ChoiceList == null)
             {
-                ChoiceList = new ReorderableList(Enumerable.Range(0, ChooseCount).ToList(), typeof(int), true, false, true, true);
+                ChoiceList = new ReorderableList(new CountViewList(() => ChooseCount, (chooseCount) => ChooseCount = chooseCount), typeof(int), true, false, true, true);
                 ChoiceList.drawElementCallback = (rect, index, isActive, isFocused) =>
                 {
                     rect.height = EditorGUIUtility.singleLineHeight;
@@ -347,17 +344,16 @@ namespace net.narazaka.avatarmenucreator
                     var index = ChooseCount - 1;
                     ChooseNames[index] = ChooseName(index);
                     ChooseIcons[index] = ChooseIcon(index);
-                    list.list.Add(index); // dummy
                 };
                 ChoiceList.onRemoveCallback = list =>
                 {
                     RemoveChoice(list.index);
-                    list.list.RemoveAt(list.index);
                 };
                 ChoiceList.onReorderCallbackWithDetails = (list, oldIndex, newIndex) =>
                 {
                     MoveChoice(oldIndex, newIndex);
                 };
+                ChoiceList.onCanRemoveCallback = list => ChooseCount > 1;
             }
             ChoiceList.DoLayoutList();
         }
