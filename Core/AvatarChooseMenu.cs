@@ -7,6 +7,7 @@ using VRC.Dynamics;
 
 #if UNITY_EDITOR
 using UnityEditor;
+using UnityEditorInternal;
 using net.narazaka.avatarmenucreator.util;
 using System.Text.RegularExpressions;
 #endif
@@ -189,6 +190,7 @@ namespace net.narazaka.avatarmenucreator
         string ChooseNameRenameSearch = "";
         string ChooseNameRenameResult = "";
         Vector2 ScrollPositionChoises;
+        ReorderableList ChoiceList = null;
 
         protected override void OnHeaderGUI(IList<string> children)
         {
@@ -218,7 +220,10 @@ namespace net.narazaka.avatarmenucreator
             EditorGUILayout.BeginHorizontal();
             var rect = EditorGUILayout.GetControlRect(false, GUILayout.Width(EditorGUIUtility.labelWidth));
             ChoiceFoldout = EditorGUI.Foldout(rect, ChoiceFoldout, T.選択肢の数);
-            ChooseCount = IntField(ChooseCount);
+            ChooseCount = IntField(ChooseCount, index =>
+            {
+                ChoiceList = null;
+            });
             EditorGUILayout.EndHorizontal();
 
             if (ChooseCount < 1) ChooseCount = 1;
@@ -320,29 +325,41 @@ namespace net.narazaka.avatarmenucreator
 
         void HeaderChoises()
         {
-            EditorGUI.indentLevel++;
-            EditorGUIUtility.labelWidth = 65;
-            for (var i = 0; i < ChooseCount; ++i)
+            if (ChoiceList == null)
             {
-                EditorGUILayout.BeginHorizontal();
-                ChooseNames[i] = TextField($"{T.選択肢}{i}", ChooseName(i));
-                ChooseIcons[i] = TextureField(ChooseIcon(i));
-                if (GUILayout.Button("↑", GUILayout.Width(19)))
+                ChoiceList = new ReorderableList(Enumerable.Range(0, ChooseCount).ToList(), typeof(int), true, false, true, true);
+                ChoiceList.drawElementCallback = (rect, index, isActive, isFocused) =>
                 {
-                    MoveChoice(i, i > 0 ? i - 1 : ChooseCount - 1);
-                }
-                if (GUILayout.Button("↓", GUILayout.Width(19)))
+                    rect.height = EditorGUIUtility.singleLineHeight;
+                    rect.y += 2;
+                    rect.width -= EditorGUIUtility.standardVerticalSpacing;
+                    rect.width /= 2;
+                    EditorGUIUtility.labelWidth = 50;
+                    ChooseNames[index] = TextField(rect, $"{T.選択肢}{index}", ChooseName(index));
+                    EditorGUIUtility.labelWidth = 0;
+                    rect.x += rect.width + EditorGUIUtility.standardVerticalSpacing;
+                    ChooseIcons[index] = TextureField(rect, ChooseIcon(index));
+                };
+                ChoiceList.onAddCallback = list =>
                 {
-                    MoveChoice(i, i < ChooseCount - 1 ? i + 1 : 0);
-                }
-                if (GUILayout.Button("×", GUILayout.Width(19)))
+                    WillChange();
+                    ChooseCount++;
+                    var index = ChooseCount - 1;
+                    ChooseNames[index] = ChooseName(index);
+                    ChooseIcons[index] = ChooseIcon(index);
+                    list.list.Add(index); // dummy
+                };
+                ChoiceList.onRemoveCallback = list =>
                 {
-                    RemoveChoice(i);
-                }
-                EditorGUILayout.EndHorizontal();
+                    RemoveChoice(list.index);
+                    list.list.RemoveAt(list.index);
+                };
+                ChoiceList.onReorderCallbackWithDetails = (list, oldIndex, newIndex) =>
+                {
+                    MoveChoice(oldIndex, newIndex);
+                };
             }
-            EditorGUIUtility.labelWidth = 0;
-            EditorGUI.indentLevel--;
+            ChoiceList.DoLayoutList();
         }
 
         protected override bool HasHeaderBulkGUI => true;

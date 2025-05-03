@@ -451,6 +451,19 @@ namespace net.narazaka.avatarmenucreator
             }
         }
 
+        protected string TextField(Rect rect, string label, string value)
+        {
+            using (var check = new EditorGUI.ChangeCheckScope())
+            {
+                var newValue = EditorGUI.TextField(rect, label, value);
+                if (check.changed)
+                {
+                    WillChange();
+                }
+                return newValue;
+            }
+        }
+
         protected int IntField(string label, int value)
         {
             using (var check = new EditorGUI.ChangeCheckScope())
@@ -464,7 +477,7 @@ namespace net.narazaka.avatarmenucreator
             }
         }
 
-        protected int IntField(int value)
+        protected int IntField(int value, Action<int> onChange = null)
         {
             using (var check = new EditorGUI.ChangeCheckScope())
             {
@@ -472,6 +485,7 @@ namespace net.narazaka.avatarmenucreator
                 if (check.changed)
                 {
                     WillChange();
+                    onChange?.Invoke(newValue);
                 }
                 return newValue;
             }
@@ -521,6 +535,19 @@ namespace net.narazaka.avatarmenucreator
             using (var check = new EditorGUI.ChangeCheckScope())
             {
                 var newValue = EditorGUILayout.ObjectField(texture2D, typeof(Texture2D), false, GUILayout.Height(18)) as Texture2D;
+                if (check.changed)
+                {
+                    WillChange();
+                }
+                return newValue;
+            }
+        }
+
+        protected Texture2D TextureField(Rect rect, Texture2D texture2D)
+        {
+            using (var check = new EditorGUI.ChangeCheckScope())
+            {
+                var newValue = EditorGUI.ObjectField(rect, texture2D, typeof(Texture2D), false) as Texture2D;
                 if (check.changed)
                 {
                     WillChange();
