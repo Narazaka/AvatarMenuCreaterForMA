@@ -54,6 +54,9 @@ https://github.com/Narazaka/AvatarMenuCreaterForMA/releases/latest から `net.n
 
 ## 更新履歴
 
+- 1.34.0-beta.1
+  - UI改善
+    - 選択肢メニューの選択肢の並べ替えが便利に
 - 1.33.1
   - ドキュメントを開けるようにしました。
     - コンポーネントの「？」マークなどから
