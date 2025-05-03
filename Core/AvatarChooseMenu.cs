@@ -329,13 +329,19 @@ namespace net.narazaka.avatarmenucreator
                 {
                     rect.height = EditorGUIUtility.singleLineHeight;
                     rect.y += 2;
-                    rect.width -= EditorGUIUtility.standardVerticalSpacing;
+                    rect.width -= EditorGUIUtility.standardVerticalSpacing * 2 + 20;
                     rect.width /= 2;
                     EditorGUIUtility.labelWidth = 50;
                     ChooseNames[index] = TextField(rect, $"{T.選択肢}{index}", ChooseName(index));
                     EditorGUIUtility.labelWidth = 0;
                     rect.x += rect.width + EditorGUIUtility.standardVerticalSpacing;
                     ChooseIcons[index] = TextureField(rect, ChooseIcon(index));
+                    rect.x += rect.width + EditorGUIUtility.standardVerticalSpacing;
+                    rect.width = 20;
+                    if (GUI.Button(rect, "×", EditorStyles.miniButton))
+                    {
+                        RemoveChoice(index);
+                    }
                 };
                 ChoiceList.onAddCallback = list =>
                 {
