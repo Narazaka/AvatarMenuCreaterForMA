@@ -357,7 +357,11 @@ namespace net.narazaka.avatarmenucreator
                 };
                 ChoiceList.onReorderCallbackWithDetails = (list, oldIndex, newIndex) =>
                 {
-                    MoveChoice(oldIndex, newIndex);
+                    var direction = oldIndex < newIndex ? 1 : -1;
+                    for (var i = oldIndex; i != newIndex; i = i + direction)
+                    {
+                        MoveChoice(i, i + direction);
+                    }
                 };
                 ChoiceList.onCanRemoveCallback = list => ChooseCount > 1;
             }
