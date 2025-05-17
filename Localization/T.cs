@@ -275,6 +275,9 @@ namespace net.narazaka.avatarmenucreator
         [English("Option")]
         public static string 選択肢 => L;
 
+        [English("Make Parent Menu")]
+        public static string 親メニューを作る => L;
+
         [English("Parent Menu Icon")]
         public static string 親メニューアイコン => L;
 

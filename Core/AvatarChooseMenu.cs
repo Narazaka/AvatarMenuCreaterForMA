@@ -47,6 +47,8 @@ namespace net.narazaka.avatarmenucreator
         [SerializeField]
         public IntStringDictionary ChooseNames = new IntStringDictionary();
         [SerializeField]
+        public bool UseParentMenu = true;
+        [SerializeField]
         public Texture2D ChooseParentIcon;
         [SerializeField]
         public IntTexture2DDictionary ChooseIcons = new IntTexture2DDictionary();
@@ -172,6 +174,7 @@ namespace net.narazaka.avatarmenucreator
         {
             var serializedObject = serializedProperty.serializedObject;
             serializedObject.Update();
+            EditorGUILayout.PropertyField(serializedProperty.FindPropertyRelative(nameof(UseParentMenu)), new GUIContent(T.親メニューを作る));
             EditorGUILayout.PropertyField(serializedProperty.FindPropertyRelative(nameof(ChooseParentIcon)), new GUIContent(T.親メニューアイコン));
             EditorGUILayout.PropertyField(serializedProperty.FindPropertyRelative(nameof(ChooseDefaultValue)), new GUIContent(T.パラメーター初期値));
             ShowDetailMenuMulti(serializedProperty);
@@ -194,7 +197,11 @@ namespace net.narazaka.avatarmenucreator
 
         protected override void OnHeaderGUI(IList<string> children)
         {
-            ChooseParentIcon = TextureField(T.親メニューアイコン, ChooseParentIcon);
+            UseParentMenu = Toggle(T.親メニューを作る, UseParentMenu);
+            if (UseParentMenu)
+            {
+                ChooseParentIcon = TextureField(T.親メニューアイコン, ChooseParentIcon);
+            }
             var labelFontStyle = EditorStyles.label.fontStyle;
             EditorStyles.label.fontStyle = FontStyle.Bold;
             ChooseDefaultValue = IntField(T.パラメーター初期値, ChooseDefaultValue);

@@ -70,17 +70,31 @@ namespace net.narazaka.avatarmenucreator.editor
             if (menuInstaller == null || !isMenuInstaller)
             {
 #if !NET_NARAZAKA_VRCHAT_AvatarMenuCreator_HAS_NO_MENU_MA
-                var menuItem = prefab.GetOrAddComponent<ModularAvatarMenuItem>();
-                menuItem.Control = (parentMenu == null ? menu : parentMenu).controls[0].DeepCopy();
-                if (parentMenu != null)
+                if (parentMenu == null && menu.controls.Count > 1)
                 {
-                    menuItem.MenuSource = SubmenuSource.Children;
+                    var menuGroup = prefab.GetOrAddComponent<ModularAvatarMenuGroup>();
                     foreach (var control in menu.controls)
                     {
                         var menuGo = new GameObject(control.name);
                         menuGo.transform.SetParent(prefab.transform);
                         var subMenuItem = menuGo.AddComponent<ModularAvatarMenuItem>();
                         subMenuItem.Control = control.DeepCopy();
+                    }
+                }
+                else
+                {
+                    var menuItem = prefab.GetOrAddComponent<ModularAvatarMenuItem>();
+                    menuItem.Control = (parentMenu == null ? menu : parentMenu).controls[0].DeepCopy();
+                    if (parentMenu != null)
+                    {
+                        menuItem.MenuSource = SubmenuSource.Children;
+                        foreach (var control in menu.controls)
+                        {
+                            var menuGo = new GameObject(control.name);
+                            menuGo.transform.SetParent(prefab.transform);
+                            var subMenuItem = menuGo.AddComponent<ModularAvatarMenuItem>();
+                            subMenuItem.Control = control.DeepCopy();
+                        }
                     }
                 }
 #endif

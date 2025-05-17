@@ -332,7 +332,7 @@ namespace net.narazaka.avatarmenucreator.editor
                 },
             };
             parentMenu.name = $"{baseName}_parent";
-            return new CreatedAssets(baseName, controller, choices, menu, parentMenu, new ParameterConfig[]
+            return new CreatedAssets(baseName, controller, choices, menu, AvatarMenu.UseParentMenu ? parentMenu : null, new ParameterConfig[]
             {
                 new ParameterConfig
                 {
