@@ -54,6 +54,8 @@ https://github.com/Narazaka/AvatarMenuCreaterForMA/releases/latest から `net.n
 
 ## 更新履歴
 
+- 1.34.0-beta.3
+  - 選択式メニューに「親メニューを作る」オプションを追加（親メニューを作らない事が可能になりました）
 - 1.34.0-beta.2
   - 選択肢の並べ替えがUIとあっていなかった問題を修正
 - 1.34.0-beta.1
