@@ -54,6 +54,8 @@ https://github.com/Narazaka/AvatarMenuCreaterForMA/releases/latest から `net.n
 
 ## 更新履歴
 
+- 1.34.1
+  - コンポーネント上でGameObjectを差し替えた場合に元の参照を保持してしまう不具合等を修正
 - 1.34.0
   - UI改善
     - 選択肢メニューの選択肢の並べ替えが便利に
