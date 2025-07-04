@@ -1376,7 +1376,14 @@ namespace net.narazaka.avatarmenucreator
         Dictionary<string, Material[]> GetAllMaterialSlots(IList<string> children) => children.ToDictionary(child => child, child => GetMaterialSlots(child));
 
         // with prefab shim
-        protected override Material[] GetMaterialSlots(string child) => GetGameObject(child)?.GetMaterialSlots() ?? ChooseMaterials.MaterialSlots(child);
-#endif
+        protected override Material[] GetMaterialSlots(string child)
+        {
+            var go = GetGameObject(child);
+            Material[] slots = null;
+            if (go != null) slots = go.GetMaterialSlots();
+            if (slots == null) slots = ChooseMaterials.MaterialSlots(child);
+            return slots;
         }
+#endif
     }
+}

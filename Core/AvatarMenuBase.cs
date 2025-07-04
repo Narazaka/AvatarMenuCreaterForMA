@@ -282,7 +282,7 @@ namespace net.narazaka.avatarmenucreator
         {
             if (BaseObject == null) return null;
             if (GameObjectCache == null) GameObjectCache = new Dictionary<string, GameObject>();
-            if (!GameObjectCache.TryGetValue(child, out var gameObjectRef))
+            if (!GameObjectCache.TryGetValue(child, out var gameObjectRef) || gameObjectRef == null)
             {
                 var transform = BaseObject.transform.Find(child);
                 GameObjectCache[child] = gameObjectRef = transform == null ? null : transform.gameObject;
