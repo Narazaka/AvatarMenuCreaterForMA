@@ -32,7 +32,7 @@ namespace net.narazaka.avatarmenucreator.components
                 saved = false,
                 networkSynced = AvatarMenu.Synced,
             };
-            if (AvatarRadialMenu.GetPhysBoneAutoResetEffectiveObjects(AvatarRadialMenu.GetStoredChildren(), AvatarRadialMenu.RadialValues.Keys).Any() || AvatarRadialMenu.LockRemoteDuringChange || AvatarRadialMenu.PreventRemoteFloatBug)
+            if (AvatarRadialMenu.GetPhysBoneAutoResetEffectiveObjects(AvatarRadialMenu.GetStoredChildren(), AvatarRadialMenu.RadialValues.Keys).Any() || AvatarRadialMenu.LockRemoteDuringChange)
             {
                 return new VRCExpressionParameters.Parameter[]
                 {

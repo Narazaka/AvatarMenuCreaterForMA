@@ -177,7 +177,7 @@ namespace net.narazaka.avatarmenucreator.editor
             }
             var physBoneAutoResetEffectiveObjects = AvatarMenu.GetPhysBoneAutoResetEffectiveObjects(matchGameObjects, AvatarMenu.RadialValues.Keys).ToArray();
             var changingParameterName = parameterName + "_changing";
-            var needChangingParameter = physBoneAutoResetEffectiveObjects.Length > 0 || AvatarMenu.LockRemoteDuringChange || AvatarMenu.PreventRemoteFloatBug;
+            var needChangingParameter = physBoneAutoResetEffectiveObjects.Length > 0 || AvatarMenu.LockRemoteDuringChange;
             if (needChangingParameter)
             {
                 controller.AddParameter(new AnimatorControllerParameter { name = changingParameterName, type = AnimatorControllerParameterType.Bool, defaultBool = false });
@@ -264,7 +264,7 @@ namespace net.narazaka.avatarmenucreator.editor
                 toIdle.hasExitTime = true;
             }
             var preventParameterName = parameterName + "_prevent";
-            if (AvatarMenu.LockRemoteDuringChange || AvatarMenu.PreventRemoteFloatBug)
+            if (AvatarMenu.LockRemoteDuringChange)
             {
                 controller.AddParameter(new AnimatorControllerParameter { name = preventParameterName, type = AnimatorControllerParameterType.Float, defaultFloat = AvatarMenu.RadialDefaultValue });
                 state.behaviours = new StateMachineBehaviour[]
@@ -311,109 +311,6 @@ namespace net.narazaka.avatarmenucreator.editor
                     },
                 };
                 var toActive = preventState.AddTransition(state);
-                toActive.exitTime = 0;
-                toActive.duration = 0;
-                toActive.hasExitTime = false;
-                toActive.conditions = new AnimatorCondition[]
-                {
-                    new AnimatorCondition
-                    {
-                        mode = AnimatorConditionMode.IfNot,
-                        parameter = changingParameterName,
-                        threshold = 1,
-                    },
-                };
-            }
-            else if (AvatarMenu.PreventRemoteFloatBug)
-            {
-                var preventState = layer.stateMachine.AddState($"{baseName}_prevent", new Vector3(300, -100));
-                preventState.timeParameterActive = true;
-                preventState.timeParameter = preventParameterName;
-                preventState.motion = clip;
-                preventState.writeDefaultValues = false;
-                var preventWaitState = layer.stateMachine.AddState($"{baseName}_prevent_wait", new Vector3(600, -100));
-                preventWaitState.timeParameterActive = true;
-                preventWaitState.timeParameter = preventParameterName;
-                preventWaitState.motion = clip;
-                preventWaitState.writeDefaultValues = false;
-                var preventedState = layer.stateMachine.AddState($"{baseName}_prevented", new Vector3(600, 0));
-                preventedState.timeParameterActive = true;
-                preventedState.timeParameter = parameterName;
-                preventedState.motion = clip;
-                preventedState.writeDefaultValues = false;
-                // if change start
-                var toPrevent = state.AddTransition(preventState);
-                toPrevent.exitTime = 0;
-                toPrevent.duration = 0;
-                toPrevent.hasExitTime = false;
-                toPrevent.conditions = new AnimatorCondition[]
-                {
-                    new AnimatorCondition
-                    {
-                        mode = AnimatorConditionMode.If,
-                        parameter = changingParameterName,
-                        threshold = 1,
-                    },
-                };
-                // if 0.3s after change start
-                var toPreventWait1 = preventState.AddTransition(preventWaitState);
-                toPreventWait1.exitTime = 0;
-                toPreventWait1.duration = AvatarMenu.PreventRemoteFloatBugDuration;
-                toPreventWait1.hasExitTime = false;
-                toPreventWait1.hasFixedDuration = true;
-                toPreventWait1.conditions = new AnimatorCondition[]
-                {
-                    new AnimatorCondition
-                    {
-                        mode = AnimatorConditionMode.If,
-                        parameter = changingParameterName,
-                        threshold = 1,
-                    },
-                };
-                var toPreventWait2 = preventState.AddTransition(preventWaitState);
-                toPreventWait2.exitTime = 0;
-                toPreventWait2.duration = AvatarMenu.PreventRemoteFloatBugDuration;
-                toPreventWait2.hasExitTime = false;
-                toPreventWait2.hasFixedDuration = true;
-                toPreventWait2.conditions = new AnimatorCondition[]
-                {
-                    new AnimatorCondition
-                    {
-                        mode = AnimatorConditionMode.IfNot,
-                        parameter = changingParameterName,
-                        threshold = 1,
-                    },
-                };
-                // 0.1s blending
-                var toPrevented1 = preventWaitState.AddTransition(preventedState);
-                toPrevented1.exitTime = 0;
-                toPrevented1.duration = 0;
-                toPrevented1.hasExitTime = false;
-                toPrevented1.interruptionSource = TransitionInterruptionSource.Destination;
-                toPrevented1.conditions = new AnimatorCondition[]
-                {
-                    new AnimatorCondition
-                    {
-                        mode = AnimatorConditionMode.If,
-                        parameter = changingParameterName,
-                        threshold = 1,
-                    },
-                };
-                var toPrevented2 = preventWaitState.AddTransition(preventedState);
-                toPrevented2.exitTime = 0;
-                toPrevented2.duration = 0;
-                toPrevented2.hasExitTime = false;
-                toPrevented2.interruptionSource = TransitionInterruptionSource.Destination;
-                toPrevented2.conditions = new AnimatorCondition[]
-                {
-                    new AnimatorCondition
-                    {
-                        mode = AnimatorConditionMode.IfNot,
-                        parameter = changingParameterName,
-                        threshold = 1,
-                    },
-                };
-                var toActive = preventedState.AddTransition(state);
                 toActive.exitTime = 0;
                 toActive.duration = 0;
                 toActive.hasExitTime = false;

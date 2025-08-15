@@ -40,15 +40,14 @@ namespace net.narazaka.avatarmenucreator
         public Texture2D RadialIcon;
         [SerializeField]
         public bool LockRemoteDuringChange;
-        [SerializeField]
+        [SerializeField, Obsolete("Fixed by VRChat")]
         public bool PreventRemoteFloatBug;
-        [SerializeField]
+        [SerializeField, Obsolete("Fixed by VRChat")]
         public float PreventRemoteFloatBugDuration = 0.8f;
 
         public override void Reset()
         {
             base.Reset();
-            PreventRemoteFloatBug = true;
         }
 
 #if UNITY_EDITOR
@@ -151,17 +150,6 @@ namespace net.narazaka.avatarmenucreator
             ShowDetailMenuMulti(serializedProperty);
             var lockRemoteDuringChange = serializedProperty.FindPropertyRelative(nameof(LockRemoteDuringChange));
             EditorGUILayout.PropertyField(lockRemoteDuringChange, new GUIContent(T.変更中リモートをロック));
-            if (lockRemoteDuringChange.hasMultipleDifferentValues || !lockRemoteDuringChange.boolValue)
-            {
-                var preventRemoteFloatBug = serializedProperty.FindPropertyRelative(nameof(PreventRemoteFloatBug));
-                EditorGUILayout.PropertyField(preventRemoteFloatBug, new GUIContent(T.リモートでのFloat暴発バグを防ぐ));
-                if (preventRemoteFloatBug.hasMultipleDifferentValues || preventRemoteFloatBug.boolValue)
-                {
-                    EditorGUI.indentLevel++;
-                    EditorGUILayout.PropertyField(serializedProperty.FindPropertyRelative(nameof(PreventRemoteFloatBugDuration)), new GUIContent(T.同期待機時間__start_秒_end_));
-                    EditorGUI.indentLevel--;
-                }
-            }
             serializedObject.ApplyModifiedProperties();
         }
 
@@ -183,26 +171,6 @@ namespace net.narazaka.avatarmenucreator
             {
                 WillChange();
                 LockRemoteDuringChange = newLockRemoteDuringChange;
-            }
-            if (!LockRemoteDuringChange)
-            {
-                var newPreventRemoteFloatBug = EditorGUILayout.Toggle(T.リモートでのFloat暴発バグを防ぐ, PreventRemoteFloatBug);
-                if (newPreventRemoteFloatBug != PreventRemoteFloatBug)
-                {
-                    WillChange();
-                    PreventRemoteFloatBug = newPreventRemoteFloatBug;
-                }
-                if (PreventRemoteFloatBug)
-                {
-                    EditorGUI.indentLevel++;
-                    var newPreventRemoteFloatBugDuration = FloatField(T.同期待機時間__start_秒_end_, PreventRemoteFloatBugDuration);
-                    if (newPreventRemoteFloatBugDuration != PreventRemoteFloatBugDuration)
-                    {
-                        WillChange();
-                        PreventRemoteFloatBugDuration = newPreventRemoteFloatBugDuration;
-                    }
-                    EditorGUI.indentLevel--;
-                }
             }
 
             if (RadialInactiveRange)
