@@ -54,6 +54,8 @@ https://github.com/Narazaka/AvatarMenuCreaterForMA/releases/latest から `net.n
 
 ## 更新履歴
 
+- 1.34.2-rc.0
+  - Floatバグへの応急処置を削除（VRChat側でバグ修正されたため）
 - 1.34.1
   - コンポーネント上でGameObjectを差し替えた場合に元の参照を保持してしまう不具合等を修正
 - 1.34.0
