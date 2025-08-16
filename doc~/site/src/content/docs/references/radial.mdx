@@ -35,19 +35,6 @@ Avatar Radial Menu Creatorコンポーネント特有の設定です。
 
 RadialMenuを開いている間、リモートでは変更が反映されなくなります。
 
-このオプションが有効な場合、下記の「リモートでのFloat暴発バグを防ぐ」が自動的に満たされます。
-
-## リモートでのFloat暴発バグを防ぐ
-
-VRChatでRadialPuppetを開いた瞬間に、リモートでFloatパラメーターが一瞬1になるバグがあります。
-
-これははるか2021年から存在するバグで、未だに修正されていません。
-（[関連Canny: [BUG] Float on a radial open on wrong value remotely | Voters | VRChat](https://feedback.vrchat.com/avatar-30/p/bug-float-on-a-radial-open-on-wrong-value-remotely)）
-
-「リモートでのFloat暴発バグを防ぐ」はこの問題への応急的な対応として、RadialPuppetを開いてから0.3秒間値を固定する機能です。
-
-なおメニューを開いた状態でRadialPuppetを開いた時のバグはこのオプションで防止できますが、RadialPuppetを開いたままリングメニュー自体を閉じて、再度開いた時もこのバグが発生します。これはこの対処では防げません。
-
 ## 無効領域を設定
 
 ON/OFFメニューなど他のメニューで同一項目を制御している場合の干渉防止のための項目です。
@@ -65,3 +52,15 @@ ON/OFFメニューなど他のメニューで同一項目を制御している�
 - パラメーター初期値が0.5
   - これより大きい場合=0.49
   - これより小さい場合=0.51
+
+## 削除された機能
+
+### リモートでのFloat暴発バグを防ぐ
+
+VRChatでRadialPuppetを開いた瞬間に、リモートでFloatパラメーターが一瞬1になるという、2021年から2025年まで存在したバグへの応急処置でした。
+
+（[関連Canny: [BUG] Float on a radial open on wrong value remotely | Voters | VRChat](https://feedback.vrchat.com/avatar-30/p/bug-float-on-a-radial-open-on-wrong-value-remotely)）
+
+「リモートでのFloat暴発バグを防ぐ」はこの問題への応急的な対応として、RadialPuppetを開いてから0.8秒程度間値を固定する機能でした。
+
+2025-08-07のVRChat 2025.3.1でこのバグは修正されたため、機能は削除されました。古いバージョンのAvatar Menu Creatorから新しいバージョンにして再アップロードすると自動的にこの応急処置が削除されます。
