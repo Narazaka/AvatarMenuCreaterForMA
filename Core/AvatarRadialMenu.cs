@@ -371,19 +371,24 @@ namespace net.narazaka.avatarmenucreator
                             EditorGUIUtility.labelWidth = 75;
                             newValue.Start = EditorGUILayout.FloatField(T.始, value.Start, GUILayout.Width(105));
                             BlendShapeLikePickerButton(isBlendShape, child, name.Name, ref newValue.Start);
+                            BlendShapeLikeApplyButton(isBlendShape, child, name.Name, newValue.Start);
                             newValue.End = EditorGUILayout.FloatField(T.終, value.End, GUILayout.Width(105));
                             BlendShapeLikePickerButton(isBlendShape, child, name.Name, ref newValue.End);
+                            BlendShapeLikeApplyButton(isBlendShape, child, name.Name, newValue.End);
                             EditorGUIUtility.labelWidth = 70;
+                            var initialValue =
+                                RadialDefaultValue * 100 < value.StartOffsetPercent ? value.Start :
+                                RadialDefaultValue * 100 > value.EndOffsetPercent ? value.End :
+                                (value.Start * (value.EndOffsetPercent - RadialDefaultValue * 100) + value.End * (RadialDefaultValue * 100 - value.StartOffsetPercent)) / (value.EndOffsetPercent - value.StartOffsetPercent);
                             using (new EditorGUI.DisabledGroupScope(true))
                             {
                                 EditorGUILayout.FloatField(
                                     T.初期,
-                                    RadialDefaultValue * 100 < value.StartOffsetPercent ? value.Start :
-                                    RadialDefaultValue * 100 > value.EndOffsetPercent ? value.End :
-                                    (value.Start * (value.EndOffsetPercent - RadialDefaultValue * 100) + value.End * (RadialDefaultValue * 100 - value.StartOffsetPercent)) / (value.EndOffsetPercent - value.StartOffsetPercent),
+                                    initialValue,
                                     GUILayout.Width(105)
                                     );
                             }
+                            BlendShapeLikeApplyButton(isBlendShape, child, name.Name, initialValue);
                             EditorGUIUtility.labelWidth = 0;
                             EditorGUI.indentLevel--;
                         }
@@ -515,21 +520,30 @@ namespace net.narazaka.avatarmenucreator
                             {
                                 newValue.Start = EditorGUILayout.Vector4Field(T.始, value.Start);
                                 ShaderVectorParameterPickerButton(child, name.Name, ref newValue.Start);
+                                ShaderVectorParameterApplyButton(child, name.Name, newValue.Start);
                             }
                             using (new EditorGUILayout.HorizontalScope())
                             {
                                 newValue.End = EditorGUILayout.Vector4Field(T.終, value.End);
                                 ShaderVectorParameterPickerButton(child, name.Name, ref newValue.End);
+                                ShaderVectorParameterApplyButton(child, name.Name, newValue.End);
                             }
                             EditorGUIUtility.labelWidth = 70;
-                            using (new EditorGUI.DisabledGroupScope(true))
+                            var initialValue =
+                                RadialDefaultValue * 100 < value.StartOffsetPercent ? value.Start :
+                                RadialDefaultValue * 100 > value.EndOffsetPercent ? value.End :
+                                (value.Start * (value.EndOffsetPercent - RadialDefaultValue * 100) + value.End * (RadialDefaultValue * 100 - value.StartOffsetPercent)) / (value.EndOffsetPercent - value.StartOffsetPercent);
+
+                            using (new EditorGUILayout.HorizontalScope())
                             {
-                                EditorGUILayout.Vector4Field(
-                                    T.初期,
-                                    RadialDefaultValue * 100 < value.StartOffsetPercent ? value.Start :
-                                    RadialDefaultValue * 100 > value.EndOffsetPercent ? value.End :
-                                    (value.Start * (value.EndOffsetPercent - RadialDefaultValue * 100) + value.End * (RadialDefaultValue * 100 - value.StartOffsetPercent)) / (value.EndOffsetPercent - value.StartOffsetPercent)
-                                    );
+                                using (new EditorGUI.DisabledGroupScope(true))
+                                {
+                                    EditorGUILayout.Vector4Field(
+                                        T.初期,
+                                        initialValue
+                                        );
+                                }
+                                ShaderVectorParameterApplyButton(child, name.Name, initialValue);
                             }
                             EditorGUIUtility.wideMode = widemode;
                             EditorGUIUtility.labelWidth = 0;
@@ -652,19 +666,24 @@ namespace net.narazaka.avatarmenucreator
                                 EditorGUIUtility.labelWidth = 75;
                                 newValue.Start = EditorGUILayout.FloatField(T.始, (float)value.Start, GUILayout.Width(105));
                                 ValuePickerButton(child, member, p => newValue.Start = p.floatValue);
+                                ValueApplyButton(child, member, p => p.floatValue = (float)newValue.Start);
                                 newValue.End = EditorGUILayout.FloatField(T.終, (float)value.End, GUILayout.Width(105));
                                 ValuePickerButton(child, member, p => newValue.End = p.floatValue);
+                                ValueApplyButton(child, member, p => p.floatValue = (float)newValue.End);
                                 EditorGUIUtility.labelWidth = 70;
+                                var initialValue =
+                                    RadialDefaultValue * 100 < value.StartOffsetPercent ? (float)value.Start :
+                                    RadialDefaultValue * 100 > value.EndOffsetPercent ? (float)value.End :
+                                    (((float)value.Start) * (value.EndOffsetPercent - RadialDefaultValue * 100) + ((float)value.End) * (RadialDefaultValue * 100 - value.StartOffsetPercent)) / (value.EndOffsetPercent - value.StartOffsetPercent);
                                 using (new EditorGUI.DisabledGroupScope(true))
                                 {
                                     EditorGUILayout.FloatField(
                                         T.初期,
-                                        RadialDefaultValue * 100 < value.StartOffsetPercent ? (float)value.Start :
-                                        RadialDefaultValue * 100 > value.EndOffsetPercent ? (float)value.End :
-                                        (((float)value.Start) * (value.EndOffsetPercent - RadialDefaultValue * 100) + ((float)value.End) * (RadialDefaultValue * 100 - value.StartOffsetPercent)) / (value.EndOffsetPercent - value.StartOffsetPercent),
+                                        initialValue,
                                         GUILayout.Width(105)
                                         );
                                 }
+                                ValueApplyButton(child, member, p => p.floatValue = initialValue);
                                 EditorGUIUtility.labelWidth = 0;
                                 EditorGUI.indentLevel--;
                             }
@@ -679,21 +698,30 @@ namespace net.narazaka.avatarmenucreator
                             {
                                 newValue.Start = EditorGUILayout.Vector3Field(T.始, (Vector3)value.Start);
                                 ValuePickerButton(child, member, p => newValue.Start = p.vector3Value);
+                                ValueApplyButton(child, member, p => p.vector3Value = (Vector3)newValue.Start);
                             }
                             using (new EditorGUILayout.HorizontalScope())
                             {
                                 newValue.End = EditorGUILayout.Vector3Field(T.終, (Vector3)value.End);
                                 ValuePickerButton(child, member, p => newValue.End = p.vector3Value);
+                                ValueApplyButton(child, member, p => p.vector3Value = (Vector3)newValue.End);
                             }
                             EditorGUIUtility.labelWidth = 70;
-                            using (new EditorGUI.DisabledGroupScope(true))
+                            var initialValue =
+                                RadialDefaultValue * 100 < value.StartOffsetPercent ? (Vector3)value.Start :
+                                RadialDefaultValue * 100 > value.EndOffsetPercent ? (Vector3)value.End :
+                                (((Vector3)value.Start) * (value.EndOffsetPercent - RadialDefaultValue * 100) + ((Vector3)value.End) * (RadialDefaultValue * 100 - value.StartOffsetPercent)) / (value.EndOffsetPercent - value.StartOffsetPercent);
+
+                            using (new EditorGUILayout.HorizontalScope())
                             {
-                                EditorGUILayout.Vector3Field(
-                                    T.初期,
-                                    RadialDefaultValue * 100 < value.StartOffsetPercent ? (Vector3)value.Start :
-                                    RadialDefaultValue * 100 > value.EndOffsetPercent ? (Vector3)value.End :
-                                    (((Vector3)value.Start) * (value.EndOffsetPercent - RadialDefaultValue * 100) + ((Vector3)value.End) * (RadialDefaultValue * 100 - value.StartOffsetPercent)) / (value.EndOffsetPercent - value.StartOffsetPercent)
-                                    );
+                                using (new EditorGUI.DisabledGroupScope(true))
+                                {
+                                    EditorGUILayout.Vector3Field(
+                                        T.初期,
+                                        initialValue
+                                        );
+                                }
+                                ValueApplyButton(child, member, p => p.vector3Value = initialValue);
                             }
                             EditorGUIUtility.wideMode = widemode;
                             EditorGUIUtility.labelWidth = 0;
@@ -709,21 +737,30 @@ namespace net.narazaka.avatarmenucreator
                             {
                                 newValue.Start = EditorGUILayout.Vector4Field(T.始, ((Quaternion)value.Start).ToVector4()).ToQuaternion();
                                 ValuePickerButton(child, member, p => newValue.Start = p.quaternionValue);
+                                ValueApplyButton(child, member, p => p.quaternionValue = (Quaternion)newValue.Start);
                             }
                             using (new EditorGUILayout.HorizontalScope())
                             {
                                 newValue.End = EditorGUILayout.Vector4Field(T.終, ((Quaternion)value.End).ToVector4()).ToQuaternion();
                                 ValuePickerButton(child, member, p => newValue.End = p.quaternionValue);
+                                ValueApplyButton(child, member, p => p.quaternionValue = (Quaternion)newValue.End);
                             }
                             EditorGUIUtility.labelWidth = 70;
-                            using (new EditorGUI.DisabledGroupScope(true))
+                            var initialValue =
+                                RadialDefaultValue * 100 < value.StartOffsetPercent ? ((Quaternion)value.Start).ToVector4() :
+                                RadialDefaultValue * 100 > value.EndOffsetPercent ? ((Quaternion)value.End).ToVector4() :
+                                (((Quaternion)value.Start).ToVector4() * (value.EndOffsetPercent - RadialDefaultValue * 100) + ((Quaternion)value.End).ToVector4() * (RadialDefaultValue * 100 - value.StartOffsetPercent)) / (value.EndOffsetPercent - value.StartOffsetPercent);
+
+                            using (new EditorGUILayout.HorizontalScope())
                             {
-                                EditorGUILayout.Vector4Field(
-                                    T.初期,
-                                    RadialDefaultValue * 100 < value.StartOffsetPercent ? ((Quaternion)value.Start).ToVector4() :
-                                    RadialDefaultValue * 100 > value.EndOffsetPercent ? ((Quaternion)value.End).ToVector4() :
-                                    (((Quaternion)value.Start).ToVector4() * (value.EndOffsetPercent - RadialDefaultValue * 100) + ((Quaternion)value.End).ToVector4() * (RadialDefaultValue * 100 - value.StartOffsetPercent)) / (value.EndOffsetPercent - value.StartOffsetPercent)
-                                    );
+                                using (new EditorGUI.DisabledGroupScope(true))
+                                {
+                                    EditorGUILayout.Vector4Field(
+                                        T.初期,
+                                        initialValue
+                                        );
+                                }
+                                ValueApplyButton(child, member, p => p.quaternionValue = initialValue.ToQuaternion());
                             }
                             EditorGUIUtility.wideMode = widemode;
                             EditorGUIUtility.labelWidth = 0;
@@ -739,21 +776,30 @@ namespace net.narazaka.avatarmenucreator
                             {
                                 newValue.Start = EditorGUILayout.ColorField(T.始, (Color)value.Start);
                                 ValuePickerButton(child, member, p => newValue.Start = p.colorValue);
+                                ValueApplyButton(child, member, p => p.colorValue = (Color)newValue.Start);
                             }
                             using (new EditorGUILayout.HorizontalScope())
                             {
                                 newValue.End = EditorGUILayout.ColorField(T.終, (Color)value.End);
                                 ValuePickerButton(child, member, p => newValue.End = p.colorValue);
+                                ValueApplyButton(child, member, p => p.colorValue = (Color)newValue.End);
                             }
                             EditorGUIUtility.labelWidth = 70;
-                            using (new EditorGUI.DisabledGroupScope(true))
+                            var initialValue =
+                                RadialDefaultValue * 100 < value.StartOffsetPercent ? (Color)value.Start :
+                                RadialDefaultValue * 100 > value.EndOffsetPercent ? (Color)value.End :
+                                (((Color)value.Start) * (value.EndOffsetPercent - RadialDefaultValue * 100) + ((Color)value.End) * (RadialDefaultValue * 100 - value.StartOffsetPercent)) / (value.EndOffsetPercent - value.StartOffsetPercent);
+
+                            using (new EditorGUILayout.HorizontalScope())
                             {
-                                EditorGUILayout.ColorField(
-                                    T.初期,
-                                    RadialDefaultValue * 100 < value.StartOffsetPercent ? (Color)value.Start :
-                                    RadialDefaultValue * 100 > value.EndOffsetPercent ? (Color)value.End :
-                                    (((Color)value.Start) * (value.EndOffsetPercent - RadialDefaultValue * 100) + ((Color)value.End) * (RadialDefaultValue * 100 - value.StartOffsetPercent)) / (value.EndOffsetPercent - value.StartOffsetPercent)
-                                    );
+                                using (new EditorGUI.DisabledGroupScope(true))
+                                {
+                                    EditorGUILayout.ColorField(
+                                        T.初期,
+                                        initialValue
+                                        );
+                                }
+                                ValueApplyButton(child, member, p => p.colorValue = initialValue);
                             }
                             EditorGUIUtility.wideMode = widemode;
                             EditorGUIUtility.labelWidth = 0;
@@ -867,21 +913,30 @@ namespace net.narazaka.avatarmenucreator
                         {
                             newValue.Start = EditorGUILayout.Vector3Field(T.始, value.Start);
                             TransformPickerButton(child, title, ref newValue.Start);
+                            TransformApplyButton(child, title, newValue.Start);
                         }
                         using (new EditorGUILayout.HorizontalScope())
                         {
                             newValue.End = EditorGUILayout.Vector3Field(T.終, value.End);
                             TransformPickerButton(child, title, ref newValue.End);
+                            TransformApplyButton(child, title, newValue.End);
                         }
                         EditorGUIUtility.labelWidth = 70;
-                        using (new EditorGUI.DisabledGroupScope(true))
+                        var initialValue =
+                            RadialDefaultValue * 100 < value.StartOffsetPercent ? value.Start :
+                            RadialDefaultValue * 100 > value.EndOffsetPercent ? value.End :
+                            (value.Start * (value.EndOffsetPercent - RadialDefaultValue * 100) + value.End * (RadialDefaultValue * 100 - value.StartOffsetPercent)) / (value.EndOffsetPercent - value.StartOffsetPercent);
+
+                        using (new EditorGUILayout.HorizontalScope())
                         {
-                            EditorGUILayout.Vector3Field(
-                                T.初期,
-                                RadialDefaultValue * 100 < value.StartOffsetPercent ? value.Start :
-                                RadialDefaultValue * 100 > value.EndOffsetPercent ? value.End :
-                                (value.Start * (value.EndOffsetPercent - RadialDefaultValue * 100) + value.End * (RadialDefaultValue * 100 - value.StartOffsetPercent)) / (value.EndOffsetPercent - value.StartOffsetPercent)
-                                );
+                            using (new EditorGUI.DisabledGroupScope(true))
+                            {
+                                EditorGUILayout.Vector3Field(
+                                    T.初期,
+                                    initialValue
+                                    );
+                            }
+                            TransformApplyButton(child, title, initialValue);
                         }
                         EditorGUIUtility.wideMode = widemode;
                         EditorGUIUtility.labelWidth = 0;
