@@ -563,7 +563,7 @@ namespace net.narazaka.avatarmenucreator
 
         protected bool PickerButton()
         {
-            return GUILayout.Button(EditorGUIUtility.IconContent("Grid.PickingTool"), GUILayout.Width(20), GUILayout.Height(18));
+            return GUILayout.Button(EditorGUIUtility.IconContent("Grid.PickingTool", T.アバターから値を取得), GUILayout.Width(20), GUILayout.Height(18));
         }
 
         protected void MaterialPickerButton(string child, int index, ref Material value)
@@ -655,7 +655,7 @@ namespace net.narazaka.avatarmenucreator
 
         protected bool ApplyButton()
         {
-            return GUILayout.Button(EditorGUIUtility.IconContent("PlayButton"), GUILayout.Width(20), GUILayout.Height(18));
+            return GUILayout.Button(EditorGUIUtility.IconContent("PlayButton", T.アバターにこの値を設定), GUILayout.Width(20), GUILayout.Height(18));
         }
 
         protected void MaterialApplyButton(string child, int index, Material value)

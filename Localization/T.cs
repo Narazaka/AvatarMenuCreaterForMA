@@ -373,5 +373,11 @@ namespace net.narazaka.avatarmenucreator
 
         [English("To enable PhysBone auto-reset, delete the PhysBone.enabled setting.")]
         public static string PhysBone自動リセットを有効にするには_PhysBone_dot_enabled_設定を削除して下さいゝ => L;
+
+        [English("Get value from avatar")]
+        public static string アバターから値を取得 => L;
+
+        [English("Set this value to the avatar")]
+        public static string アバターにこの値を設定 => L;
     }
 }
