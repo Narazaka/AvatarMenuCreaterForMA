@@ -54,6 +54,8 @@ https://github.com/Narazaka/AvatarMenuCreaterForMA/releases/latest から `net.n
 
 ## 更新履歴
 
+- 1.35.0-beta.0
+  - 設定値を書き戻す機能を追加
 - 1.34.2
   - Floatバグへの応急処置を削除（VRChat側でバグ修正されたため）
 - 1.34.2-rc.0
