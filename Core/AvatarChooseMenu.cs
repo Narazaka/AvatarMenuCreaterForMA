@@ -726,6 +726,7 @@ namespace net.narazaka.avatarmenucreator
                             EditorGUILayout.BeginHorizontal();
                             var newValue = EditorGUILayout.ObjectField(ChooseName(j), value, typeof(Material), false) as Material;
                             MaterialPickerButton(child, i, ref newValue);
+                            MaterialApplyButton(child, i, newValue);
                             EditorGUILayout.EndHorizontal();
                             if (value != newValue)
                             {
@@ -904,6 +905,7 @@ namespace net.narazaka.avatarmenucreator
                             EditorGUILayout.BeginHorizontal();
                             var newValue = EditorGUILayout.FloatField(ChooseName(i), value);
                             BlendShapeLikePickerButton(isBlendShape, child, name.Name, ref newValue);
+                            BlendShapeLikeApplyButton(isBlendShape, child, name.Name, newValue);
                             EditorGUILayout.EndHorizontal();
 
                             if (value != newValue)
@@ -1012,6 +1014,7 @@ namespace net.narazaka.avatarmenucreator
                             EditorGUILayout.BeginHorizontal();
                             var newValue = EditorGUILayout.Vector4Field(ChooseName(i), value);
                             ShaderVectorParameterPickerButton(child, name.Name, ref newValue);
+                            ShaderVectorParameterApplyButton(child, name.Name, newValue);
                             EditorGUILayout.EndHorizontal();
 
                             if (value != newValue)
@@ -1115,16 +1118,19 @@ namespace net.narazaka.avatarmenucreator
                             {
                                 newValue = EditorGUILayout.FloatField(ChooseName(i), (float)value);
                                 ValuePickerButton(child, member, p => newValue = p.floatValue);
+                                ValueApplyButton(child, member, p => p.floatValue = (float)newValue);
                             }
                             else if (member.MemberType == typeof(int))
                             {
                                 newValue = EditorGUILayout.IntField(ChooseName(i), (int)value);
                                 ValuePickerButton(child, member, p => newValue = p.intValue);
+                                ValueApplyButton(child, member, p => p.intValue = (int)newValue);
                             }
                             else if (member.MemberType == typeof(bool))
                             {
                                 newValue = EditorGUILayout.Toggle(ChooseName(i), (bool)value);
                                 ValuePickerButton(child, member, p => newValue = p.boolValue);
+                                ValueApplyButton(child, member, p => p.boolValue = (bool)newValue);
                             }
                             else if (member.MemberType.IsSubclassOf(typeof(Enum)))
                             {
@@ -1132,6 +1138,7 @@ namespace net.narazaka.avatarmenucreator
                                 var enumValues = member.MemberType.GetEnumValuesCached();
                                 newValue = EditorGUILayout.IntPopup(ChooseName(i), (int)value, enumNames, enumValues);
                                 ValuePickerButton(child, member, p => newValue = enumValues[p.enumValueIndex]);
+                                ValueApplyButton(child, member, p => p.enumValueIndex = Array.IndexOf(enumValues, (int)newValue));
                             }
                             else if (member.MemberType == typeof(VRCPhysBoneBase.PermissionFilter))
                             {
@@ -1151,6 +1158,7 @@ namespace net.narazaka.avatarmenucreator
                                 EditorGUIUtility.wideMode = true;
                                 newValue = EditorGUILayout.Vector3Field(ChooseName(i), (Vector3)value);
                                 ValuePickerButton(child, member, p => newValue = p.vector3Value);
+                                ValueApplyButton(child, member, p => p.vector3Value = (Vector3)newValue);
                                 EditorGUIUtility.wideMode = widemode;
                             }
                             else if (member.MemberType == typeof(Quaternion))
@@ -1159,6 +1167,7 @@ namespace net.narazaka.avatarmenucreator
                                 EditorGUIUtility.wideMode = true;
                                 newValue = EditorGUILayout.Vector4Field(ChooseName(i), ((Quaternion)value).ToVector4()).ToQuaternion();
                                 ValuePickerButton(child, member, p => newValue = p.quaternionValue);
+                                ValueApplyButton(child, member, p => p.quaternionValue = (Quaternion)newValue);
                                 EditorGUIUtility.wideMode = widemode;
                             }
                             else if (member.MemberType == typeof(Color))
@@ -1167,6 +1176,7 @@ namespace net.narazaka.avatarmenucreator
                                 EditorGUIUtility.wideMode = true;
                                 newValue = EditorGUILayout.ColorField(ChooseName(i), (Color)value);
                                 ValuePickerButton(child, member, p => newValue = p.colorValue);
+                                ValueApplyButton(child, member, p => p.colorValue = (Color)newValue);
                                 EditorGUIUtility.wideMode = widemode;
                             }
                             EditorGUILayout.EndHorizontal();
@@ -1263,6 +1273,7 @@ namespace net.narazaka.avatarmenucreator
                         EditorGUILayout.BeginHorizontal();
                         var newValue = EditorGUILayout.Vector3Field(ChooseName(i), value);
                         TransformPickerButton(child, title, ref newValue);
+                        TransformApplyButton(child, title, newValue);
                         EditorGUILayout.EndHorizontal();
 
                         if (value != newValue)
@@ -1383,6 +1394,15 @@ namespace net.narazaka.avatarmenucreator
             if (go != null) slots = go.GetMaterialSlots();
             if (slots == null) slots = ChooseMaterials.MaterialSlots(child);
             return slots;
+        }
+
+        protected override void SetMaterialSlot(string child, int index, Material mat)
+        {
+            var go = GetGameObject(child);
+            if (go != null)
+            {
+                go.SetMaterialSlot(index, mat);
+            }
         }
 #endif
     }

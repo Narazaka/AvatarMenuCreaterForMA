@@ -558,6 +558,8 @@ namespace net.narazaka.avatarmenucreator
 
         // for MaterialPickerButton
         protected virtual Material[] GetMaterialSlots(string child) { throw new NotImplementedException(); }
+        // for MaterualApplyButton
+        protected virtual void SetMaterialSlot(string child, int index, Material mat) { throw new NotImplementedException(); }
 
         protected bool PickerButton()
         {
@@ -649,6 +651,91 @@ namespace net.narazaka.avatarmenucreator
             var go = GetGameObject(child);
             if (go == null || !PickerButton()) return;
             setValue(new SerializedObject(go.GetComponent(member.Type)).FindProperty(member.AnimationMemberName));
+        }
+
+        protected bool ApplyButton()
+        {
+            return GUILayout.Button(EditorGUIUtility.IconContent("PlayButton"), GUILayout.Width(20), GUILayout.Height(18));
+        }
+
+        protected void MaterialApplyButton(string child, int index, Material value)
+        {
+            var go = GetGameObject(child);
+            if (go == null || !ApplyButton()) return;
+            SetMaterialSlot(child, index, value);
+        }
+
+        protected void BlendShapeLikeApplyButton(bool isBlendShape, string child, string name, float value)
+        {
+            if (isBlendShape)
+            {
+                BlendShapeApplyButton(child, name, value);
+            }
+            else
+            {
+                ShaderParameterApplyButton(child, name, value);
+            }
+        }
+
+        void BlendShapeApplyButton(string child, string name, float value)
+        {
+            var go = GetGameObject(child);
+            if (go == null || !ApplyButton()) return;
+            var mesh = go.GetComponent<SkinnedMeshRenderer>();
+            Undo.RecordObject(mesh, "AvatarMenuCreator Apply");
+            mesh.SetBlendShapeWeight(mesh.sharedMesh.GetBlendShapeIndex(name), value);
+        }
+
+        void ShaderParameterApplyButton(string child, string name, float value)
+        {
+            var go = GetGameObject(child);
+            if (go == null || !ApplyButton()) return;
+            var mesh = go.GetComponent<Renderer>();
+            foreach (var mat in mesh.sharedMaterials)
+            {
+                if (mat.shader.FindPropertyIndex(name) != -1)
+                {
+                    Undo.RecordObject(mat, "AvatarMenuCreator Apply");
+                    mat.SetFloat(name, value);
+                    return;
+                }
+            }
+        }
+
+        protected void ShaderVectorParameterApplyButton(string child, string name, Vector4 value)
+        {
+            var go = GetGameObject(child);
+            if (go == null || !ApplyButton()) return;
+            var mesh = go.GetComponent<Renderer>();
+            foreach (var mat in mesh.sharedMaterials)
+            {
+                if (mat.shader.FindPropertyIndex(name) != -1)
+                {
+                    Undo.RecordObject(mat, "AvatarMenuCreator Apply");
+                    mat.SetColor(name, value);
+                    return;
+                }
+            }
+        }
+
+        protected void TransformApplyButton(string child, string transformComponentName, Vector3 value)
+        {
+            var go = GetGameObject(child);
+            if (go == null || !ApplyButton()) return;
+            var component = go.GetComponent<Transform>();
+            var memberInfo = typeof(Transform).GetProperty(TransformPropertyName(transformComponentName), System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance);
+            if (memberInfo is System.Reflection.PropertyInfo propertyInfo)
+            {
+                Undo.RecordObject(component, "AvatarMenuCreator Apply");
+                propertyInfo.SetValue(component, value);
+            }
+        }
+
+        protected void ValueApplyButton(string child, TypeMember member, Action<SerializedProperty> setProperty)
+        {
+            var go = GetGameObject(child);
+            if (go == null || !ApplyButton()) return;
+            setProperty(new SerializedObject(go.GetComponent(member.Type)).FindProperty(member.AnimationMemberName));
         }
 
         protected Rect HorizontalLine()

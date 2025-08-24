@@ -51,6 +51,19 @@ namespace net.narazaka.avatarmenucreator.util
             return renderer.sharedMaterials;
         }
 
+        public static void SetMaterialSlot(this GameObject gameObject, int index, Material material)
+        {
+            var renderer = gameObject.GetComponent<Renderer>();
+            if (renderer == null) return;
+            var materials = renderer.sharedMaterials;
+            if (index < 0 || index >= materials.Length) return;
+            materials[index] = material;
+#if UNITY_EDITOR
+            UnityEditor.Undo.RecordObject(renderer, "Set Material Slot");
+#endif
+            renderer.sharedMaterials = materials;
+        }
+
         public static List<string> GetBlendShapeNames(GameObject gameObject)
         {
             var shapekeyNames = new List<string>();
