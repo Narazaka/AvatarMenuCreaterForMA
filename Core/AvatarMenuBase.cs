@@ -295,6 +295,11 @@ namespace net.narazaka.avatarmenucreator
             GameObjectCache = null;
         }
 
+        protected Dictionary<string, Material[]> GetAllMaterialSlots(IList<string> children)
+        {
+            return children.ToDictionary(child => child, child => GetMaterialSlots(child));
+        }
+
         protected void GameObjectHeader(string child)
         {
             EditorGUILayout.BeginHorizontal();
@@ -345,10 +350,13 @@ namespace net.narazaka.avatarmenucreator
             return !newNotFoldout;
         }
 
+        GUILayoutOption AddItemButtonWidth = GUILayout.Width(20);
+        static readonly GUIContent AddItemButtonGUIContent = new GUIContent("+");
+
         protected void AddItemButton<T>(Func<IList<T>> getChildren, Func<IEnumerable<T>> getExistChildren, Action<T> onAdd, Action<T> onRemove)
         {
-            var rect = EditorGUILayout.GetControlRect(GUILayout.Width(20));
-            if (GUI.Button(rect, "+"))
+            var rect = EditorGUILayout.GetControlRect(AddItemButtonWidth);
+            if (GUI.Button(rect, AddItemButtonGUIContent))
             {
                 PopupWindow.Show(rect, new ListPopupWindow<T>(getChildren(), getExistChildren) { OnAdd = onAdd, OnRemove = onRemove });
             }
@@ -356,8 +364,8 @@ namespace net.narazaka.avatarmenucreator
 
         protected void AddItemButton<T>(Func<IList<ListTreeViewItemContainer<T>>> getChildren, Func<IEnumerable<T>> getExistChildren, Action<T> onAdd, Action<T> onRemove)
         {
-            var rect = EditorGUILayout.GetControlRect(GUILayout.Width(20));
-            if (GUI.Button(rect, "+"))
+            var rect = EditorGUILayout.GetControlRect(AddItemButtonWidth);
+            if (GUI.Button(rect, AddItemButtonGUIContent))
             {
                 PopupWindow.Show(rect, new ListPopupWindow<T>(getChildren(), getExistChildren) { OnAdd = onAdd, OnRemove = onRemove });
             }
@@ -561,9 +569,27 @@ namespace net.narazaka.avatarmenucreator
         // for MaterualApplyButton
         protected virtual void SetMaterialSlot(string child, int index, Material mat) { throw new NotImplementedException(); }
 
+        GUILayoutOption PickerGUIWidth = GUILayout.Width(20);
+        GUILayoutOption PickerGUIHeight = GUILayout.Height(20);
+
+        float _PickerGUIContentTick;
+        GUIContent _PickerGUIContent;
+        GUIContent PickerGUIContent
+        {
+            get
+            {
+                if (_PickerGUIContent == null || _PickerGUIContentTick != Time.time)
+                {
+                    _PickerGUIContentTick = Time.time;
+                    _PickerGUIContent = EditorGUIUtility.IconContent("Grid.PickingTool", T.アバターから値を取得);
+                }
+                return _PickerGUIContent;
+            }
+        }
+
         protected bool PickerButton()
         {
-            return GUILayout.Button(EditorGUIUtility.IconContent("Grid.PickingTool", T.アバターから値を取得), GUILayout.Width(20), GUILayout.Height(18));
+            return GUILayout.Button(PickerGUIContent, PickerGUIWidth, PickerGUIHeight);
         }
 
         protected void MaterialPickerButton(string child, int index, ref Material value)
@@ -653,9 +679,27 @@ namespace net.narazaka.avatarmenucreator
             setValue(new SerializedObject(go.GetComponent(member.Type)).FindProperty(member.AnimationMemberName));
         }
 
+        GUILayoutOption ApplyGUIWidth = GUILayout.Width(20);
+        GUILayoutOption ApplyGUIHeight = GUILayout.Height(18);
+
+        float _ApplyGUIContentTick;
+        GUIContent _ApplyGUIContent;
+        GUIContent ApplyGUIContent
+        {
+            get
+            {
+                if (_ApplyGUIContent == null || _ApplyGUIContentTick != Time.time)
+                {
+                    _ApplyGUIContentTick = Time.time;
+                    _ApplyGUIContent = EditorGUIUtility.IconContent("PlayButton", T.アバターにこの値を設定);
+                }
+                return _ApplyGUIContent;
+            }
+        }
+
         protected bool ApplyButton()
         {
-            return GUILayout.Button(EditorGUIUtility.IconContent("PlayButton", T.アバターにこの値を設定), GUILayout.Width(20), GUILayout.Height(18));
+            return GUILayout.Button(ApplyGUIContent, ApplyGUIWidth, ApplyGUIHeight);
         }
 
         protected void MaterialApplyButton(string child, int index, Material value)

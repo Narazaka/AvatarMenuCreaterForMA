@@ -1480,8 +1480,6 @@ namespace net.narazaka.avatarmenucreator
             }
         }
 
-        Dictionary<string, Material[]> GetAllMaterialSlots(IList<string> children) => children.ToDictionary(child => child, child => GetMaterialSlots(child));
-
         // with prefab shim
         protected override Material[] GetMaterialSlots(string child) => GetGameObject(child)?.GetMaterialSlots() ?? ToggleMaterials.MaterialSlots(child);
 
