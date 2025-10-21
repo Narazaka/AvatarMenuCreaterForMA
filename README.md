@@ -54,6 +54,8 @@ https://github.com/Narazaka/AvatarMenuCreaterForMA/releases/latest から `net.n
 
 ## 更新履歴
 
+- 1.35.0-beta.1
+  - GUIが遅くなった問題を改善
 - 1.35.0-beta.0
   - 設定値を書き戻す機能を追加
 - 1.34.2
