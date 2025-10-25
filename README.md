@@ -54,6 +54,11 @@ https://github.com/Narazaka/AvatarMenuCreaterForMA/releases/latest から `net.n
 
 ## 更新履歴
 
+- 1.36.0
+  - UI改善
+    - 設定値を書き戻す機能を追加
+  - VRCSDK対応
+    - VRCSDK-3.9.1-beta.1でコンパイルエラーになる問題を修正
 - 1.35.0-beta.1
   - GUIが遅くなった問題を改善
 - 1.35.0-beta.0
