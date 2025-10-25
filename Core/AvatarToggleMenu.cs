@@ -1119,8 +1119,26 @@ namespace net.narazaka.avatarmenucreator
                                 inactiveAllowOthers = EditorGUILayout.ToggleLeft("OFF allowOthers", inactive.allowOthers);
                                 activeAllowOthers = EditorGUILayout.ToggleLeft("ON allowOthers", active.allowOthers);
                             }
-                            newValue.Inactive = new VRCPhysBoneBase.PermissionFilter { allowSelf = inactiveAllowSelf, allowOthers = inactiveAllowOthers };
-                            newValue.Active = new VRCPhysBoneBase.PermissionFilter { allowSelf = activeAllowSelf, allowOthers = activeAllowOthers };
+                            newValue.Inactive =
+#if HAS_VRCSDK3_9_1_OR_HIGHER
+                                new VRCPhysBoneBase.PermissionFilter(true, DynamicsUsageFlags.Everything)
+#else
+                                new VRCPhysBoneBase.PermissionFilter
+#endif
+                                {
+                                    allowSelf = inactiveAllowSelf,
+                                    allowOthers = inactiveAllowOthers,
+                                };
+                            newValue.Active =
+#if HAS_VRCSDK3_9_1_OR_HIGHER
+                                new VRCPhysBoneBase.PermissionFilter(true, DynamicsUsageFlags.Everything)
+#else
+                                new VRCPhysBoneBase.PermissionFilter
+#endif
+                                {
+                                    allowSelf = activeAllowSelf,
+                                    allowOthers = activeAllowOthers,
+                                };
                         }
                         else if (member.MemberType == typeof(Vector3))
                         {

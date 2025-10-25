@@ -1145,7 +1145,12 @@ namespace net.narazaka.avatarmenucreator
                                 EditorGUILayout.LabelField(ChooseName(i), GUILayout.Width(EditorGUIUtility.labelWidth));
                                 EditorGUIUtility.labelWidth = 85;
                                 var filter = (VRCPhysBoneBase.PermissionFilter)value;
-                                newValue = new VRCPhysBoneBase.PermissionFilter
+                                newValue =
+#if HAS_VRCSDK3_9_1_OR_HIGHER
+                                    new VRCPhysBoneBase.PermissionFilter(true, DynamicsUsageFlags.Everything)
+#else
+                                    new VRCPhysBoneBase.PermissionFilter
+#endif
                                 {
                                     allowSelf = EditorGUILayout.ToggleLeft($"allowSelf", filter.allowSelf, GUILayout.Width(115)),
                                     allowOthers = EditorGUILayout.ToggleLeft("allowOthers", filter.allowOthers, GUILayout.Width(130)),

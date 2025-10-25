@@ -119,7 +119,13 @@ namespace net.narazaka.avatarmenucreator.editor
                 {
                     for (var i = 0; i < AvatarMenu.ChooseCount; ++i)
                     {
-                        var v = value.ContainsKey(i) ? (VRCPhysBoneBase.PermissionFilter)value[i] : new VRCPhysBoneBase.PermissionFilter();
+                        var v = value.ContainsKey(i) ?
+                            (VRCPhysBoneBase.PermissionFilter)value[i] :
+#if HAS_VRCSDK3_9_1_OR_HIGHER
+                            new VRCPhysBoneBase.PermissionFilter(true, DynamicsUsageFlags.Everything);
+#else
+                            new VRCPhysBoneBase.PermissionFilter();
+#endif
                         choices[i].SetCurve(curvePath, member.Type, member.AnimationMemberName + ".allowSelf", new AnimationCurve(new Keyframe(0, v.allowSelf ? 1 : 0)));
                         choices[i].SetCurve(curvePath, member.Type, member.AnimationMemberName + ".allowOthers", new AnimationCurve(new Keyframe(0, v.allowOthers ? 1 : 0)));
                     }

@@ -35,6 +35,11 @@
             "name": "net.narazaka.vrchat.compressed-int-parameters",
             "expression": "[1.0.0,2)",
             "define": "HAS_COMPRESSED_INT_PARAMETERS"
+        },
+        {
+            "name": "com.vrchat.base",
+            "expression": "3.9.1-a",
+            "define": "HAS_VRCSDK3_9_1_OR_HIGHER"
         }
     ],
     "noEngineReferences": false
