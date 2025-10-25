@@ -112,7 +112,7 @@ jobs:
             ma: 1.9.13
             additional_packages: nadena.dev.ndmf 1.4.1
             vrcsdk-version: 3.5.2
-            
+
           - unity: 2022.3.22f1
             ma: 1.10.11
             # ndmf>=1.5 ProvidedParameter.DefaultValue
@@ -122,3 +122,7 @@ jobs:
             additional_packages: net.narazaka.vrchat.compressed-int-parameters 1.0.0
             additional_name: " CompressedIntParameters=1.0.0"
             vrcsdk-version: 3.7.0
+          - unity: 2022.3.22f1
+            ma: 1.14.3
+            # vrcsdk 3.9.1 breaks value
+            vrcsdk-version: 3.9.1-beta.1
