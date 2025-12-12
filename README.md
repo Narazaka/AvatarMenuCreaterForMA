@@ -54,6 +54,8 @@ https://github.com/Narazaka/AvatarMenuCreaterForMA/releases/latest から `net.n
 
 ## 更新履歴
 
+- 1.37.0-beta.1
+  - GameObjectでも変化待機を設定出来るように（主にMAリアクティブオブジェクト用）
 - 1.36.0
   - UI改善
     - 設定値を書き戻す機能を追加
