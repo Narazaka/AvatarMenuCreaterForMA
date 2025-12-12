@@ -42,13 +42,14 @@ namespace net.narazaka.avatarmenucreator.editor
                 var activeValue = AvatarMenu.ToggleObjects[child] == ToggleType.ON;
                 var use = AvatarMenu.ToggleObjectUsings.TryGetValue(child, out var usingValue) ? usingValue : ToggleUsing.Both;
                 var useTransition = AvatarMenu.ToggleObjectTransitionUsings.TryGetValue(child, out var usingTransitionValue) ? usingTransitionValue : ToggleTransitionUsing.NotSpecified;
+                var offsetPercent = Mathf.Clamp(AvatarMenu.ToggleObjectTransitionOffsetPercents.TryGetValue(child, out var offsetValue) ? offsetValue : activeValue ? 0 : 100, 0, 100);
                 var curvePath = child;
                 if (use != ToggleUsing.OFF) active.SetCurve(curvePath, typeof(GameObject), "m_IsActive", new AnimationCurve(new Keyframe(0 / 60.0f, activeValue ? 1 : 0)));
                 if (use != ToggleUsing.ON) inactive.SetCurve(curvePath, typeof(GameObject), "m_IsActive", new AnimationCurve(new Keyframe(0 / 60.0f, activeValue ? 0 : 1)));
                 if (transitionSeconds > 0)
                 {
-                    if ((useTransition & ToggleTransitionUsing.OmitON) != ToggleTransitionUsing.OmitON) activate.SetCurve(curvePath, typeof(GameObject), "m_IsActive", new AnimationCurve(new Keyframe(0 / 60.0f, 1), new Keyframe(transitionSeconds, activeValue ? 1 : 0)));
-                    if ((useTransition & ToggleTransitionUsing.OmitOFF) != ToggleTransitionUsing.OmitOFF) inactivate.SetCurve(curvePath, typeof(GameObject), "m_IsActive", new AnimationCurve(new Keyframe(0 / 60.0f, 1), new Keyframe(transitionSeconds, activeValue ? 0 : 1)));
+                    if ((useTransition & ToggleTransitionUsing.OmitON) != ToggleTransitionUsing.OmitON) activate.SetCurve(curvePath, typeof(GameObject), "m_IsActive", ObjectActivateCurve(activeValue, transitionSeconds, offsetPercent));
+                    if ((useTransition & ToggleTransitionUsing.OmitOFF) != ToggleTransitionUsing.OmitOFF) inactivate.SetCurve(curvePath, typeof(GameObject), "m_IsActive", ObjectActivateCurve(!activeValue, transitionSeconds, 100 - offsetPercent));
                 }
             }
             foreach (var (child, index) in AvatarMenu.ToggleMaterials.Keys)
@@ -470,6 +471,20 @@ namespace net.narazaka.avatarmenucreator.editor
             var objectBindings = AnimationUtility.GetObjectReferenceCurveBindings(clip);
             if (objectBindings.Length > 0) return false;
             return true;
+        }
+
+        AnimationCurve ObjectActivateCurve(bool toActive, float transitionSeconds, float offsetPercent)
+        {
+            var offsetRate = offsetPercent / 100f;
+            var startValue = toActive ? 0f : 1f;
+            var endValue = toActive ? 1f : 0f;
+            var thresholdTime = transitionSeconds * offsetRate;
+            var curve = new List<Keyframe>();
+            if (offsetPercent > 0) curve.Add(new Keyframe { time = 0, value = startValue });
+            if (thresholdTime > 1 / 60f) curve.Add(new Keyframe { time = thresholdTime - 1 / 60f, value = startValue }); 
+            curve.Add(new Keyframe { time = thresholdTime, value = endValue });
+            if (offsetPercent < 100) curve.Add(new Keyframe { time = transitionSeconds, value = endValue });
+            return new AnimationCurve(curve.ToArray());
         }
     }
 }

@@ -23,6 +23,8 @@ namespace net.narazaka.avatarmenucreator
         [SerializeField]
         public ToggleTransitionUsingDictionary ToggleObjectTransitionUsings = new ToggleTransitionUsingDictionary();
         [SerializeField]
+        public ToggleTransitionOffsetDictionary ToggleObjectTransitionOffsetPercents = new ToggleTransitionOffsetDictionary();
+        [SerializeField]
         public ToggleMaterialDictionary ToggleMaterials = new ToggleMaterialDictionary();
         [SerializeField]
         public ToggleBlendShapeDictionary ToggleBlendShapes = new ToggleBlendShapeDictionary();
@@ -83,6 +85,7 @@ namespace net.narazaka.avatarmenucreator
                             WillChange();
                             ToggleObjectUsings.Clear();
                             ToggleObjectTransitionUsings.Clear();
+                            ToggleObjectTransitionOffsetPercents.Clear();
                             foreach (var key in ToggleMaterials.Keys.ToList())
                             {
                                 ToggleMaterials[key] = ToggleMaterials[key].ResetAdvanced();
@@ -135,6 +138,7 @@ namespace net.narazaka.avatarmenucreator
                 ToggleObjects.ReplaceKey(oldChild, newChild);
                 ToggleObjectUsings.ReplaceKey(oldChild, newChild);
                 ToggleObjectTransitionUsings.ReplaceKey(oldChild, newChild);
+                ToggleObjectTransitionOffsetPercents.ReplaceKey(oldChild, newChild);
                 ToggleMaterials.ReplacePrimaryKey(oldChild, newChild);
                 ToggleBlendShapes.ReplacePrimaryKey(oldChild, newChild);
                 ToggleShaderParameters.ReplacePrimaryKey(oldChild, newChild);
@@ -160,6 +164,10 @@ namespace net.narazaka.avatarmenucreator
             foreach (var key in ToggleObjectTransitionUsings.Keys.Where(k => !filter.Contains(k)).ToList())
             {
                 ToggleObjectTransitionUsings.Remove(key);
+            }
+            foreach (var key in ToggleObjectTransitionOffsetPercents.Keys.Where(k => !filter.Contains(k)).ToList())
+            {
+                ToggleObjectTransitionOffsetPercents.Remove(key);
             }
             foreach (var key in ToggleMaterials.Keys.Where(k => !filter.Contains(k.Item1)).ToList())
             {
@@ -200,6 +208,7 @@ namespace net.narazaka.avatarmenucreator
             ToggleObjects.Remove(child);
             ToggleObjectUsings.Remove(child);
             ToggleObjectTransitionUsings.Remove(child);
+            ToggleObjectTransitionOffsetPercents.Remove(child);
             foreach (var key in ToggleMaterials.Keys.Where(k => k.Item1 == child).ToList())
             {
                 ToggleMaterials.Remove(key);
@@ -438,6 +447,61 @@ namespace net.narazaka.avatarmenucreator
                         {
                             ToggleObjects[c] = newType;
                         }
+                    }
+                }
+            }
+            if (newType != ToggleType.None && TransitionSeconds > 0)
+            {
+                using (new EditorGUILayout.HorizontalScope())
+                {
+                    using (new EditorGUI.IndentLevelScope())
+                    {
+                        EditorGUIUtility.labelWidth = 90;
+                        if (ToggleObjectTransitionOffsetPercents.TryGetValue(child, out var offset))
+                        {
+                            if (!EditorGUILayout.Toggle(T.変化待機_per_, true, GUILayout.Width(110)))
+                            {
+                                WillChange();
+                                ToggleObjectTransitionOffsetPercents.Remove(child);
+                                if (BulkSet)
+                                {
+                                    foreach (var c in children)
+                                    {
+                                        ToggleObjectTransitionOffsetPercents.Remove(c);
+                                    }
+                                }
+                            }
+                            var newOffset = EditorGUILayout.FloatField(offset, GUILayout.Width(70));
+                            if (newOffset != offset)
+                            {
+                                WillChange();
+                                ToggleObjectTransitionOffsetPercents[child] = Mathf.Clamp(newOffset, 0, 100);
+                                if (BulkSet)
+                                {
+                                    foreach (var c in children)
+                                    {
+                                        ToggleObjectTransitionOffsetPercents[c] = newOffset;
+                                    }
+                                }
+                            }
+                        }
+                        else
+                        {
+                            if (EditorGUILayout.Toggle(T.変化待機_per_, false, GUILayout.Width(110)))
+                            {
+                                WillChange();
+                                var initialValue = type == ToggleType.ON ? 0 : 100;
+                                ToggleObjectTransitionOffsetPercents[child] = initialValue;
+                                if (BulkSet)
+                                {
+                                    foreach (var c in children)
+                                    {
+                                        ToggleObjectTransitionOffsetPercents[c] = initialValue;
+                                    }
+                                }
+                            }
+                        }
+                        EditorGUIUtility.labelWidth = 0;
                     }
                 }
             }
