@@ -599,7 +599,7 @@ namespace net.narazaka.avatarmenucreator
             PickMaterial(child, index, ref value);
         }
 
-        void PickMaterial(string child, int index, ref Material value)
+        protected void PickMaterial(string child, int index, ref Material value)
         {
             var slots = GetMaterialSlots(child);
             if (index < 0 || index >= slots.Length) return;
@@ -625,7 +625,7 @@ namespace net.narazaka.avatarmenucreator
             PickBlendShapeWeight(child, name, ref value);
         }
 
-        void PickBlendShapeWeight(string child, string name, ref float value)
+        protected void PickBlendShapeWeight(string child, string name, ref float value)
         {
             var go = GetGameObject(child);
             if (go == null) return;
@@ -642,7 +642,7 @@ namespace net.narazaka.avatarmenucreator
             PickShaderFloatParameter(child, name, ref value);
         }
 
-        void PickShaderFloatParameter(string child, string name, ref float value)
+        protected void PickShaderFloatParameter(string child, string name, ref float value)
         {
             var go = GetGameObject(child);
             if (go == null) return;
@@ -664,7 +664,7 @@ namespace net.narazaka.avatarmenucreator
             PickShaderVectorParameter(child, name, ref value);
         }
 
-        void PickShaderVectorParameter(string child, string name, ref Vector4 value)
+        protected void PickShaderVectorParameter(string child, string name, ref Vector4 value)
         {
             var go = GetGameObject(child);
             if (go == null) return;
@@ -686,7 +686,7 @@ namespace net.narazaka.avatarmenucreator
             PickTransform(child, transformComponentName, ref value);
         }
 
-        void PickTransform(string child, string transformComponentName, ref Vector3 value)
+        protected void PickTransform(string child, string transformComponentName, ref Vector3 value)
         {
             var go = GetGameObject(child);
             if (go == null) return;
@@ -716,17 +716,15 @@ namespace net.narazaka.avatarmenucreator
             PickValue(child, member, ref value);
         }
 
-        void PickValue(string child, TypeMember member, ref Value value)
+        protected void PickValue(string child, TypeMember member, ref Value value)
         {
             var go = GetGameObject(child);
             if (go == null) return;
             var property = new SerializedObject(go.GetComponent(member.Type)).FindProperty(member.AnimationMemberName);
             if (property == null) return;
-            Debug.Log(property.propertyType);
             if (member.MemberType == typeof(float))
             {
                 value = property.floatValue;
-                Debug.Log((float)value);
             }
             else if (member.MemberType == typeof(int))
             {
@@ -799,10 +797,10 @@ namespace net.narazaka.avatarmenucreator
         {
             var go = GetGameObject(child);
             if (go == null || !ApplyButton()) return;
-            ApplyMaterialSlot(child, index, value);
+            ApplyMaterial(child, index, value);
         }
 
-        void ApplyMaterialSlot(string child, int index, Material mat)
+        protected void ApplyMaterial(string child, int index, Material mat)
         {
             var go = GetGameObject(child);
             if (go != null)
@@ -830,7 +828,7 @@ namespace net.narazaka.avatarmenucreator
             ApplyBlendShapeWeight(child, name, value);
         }
 
-        void ApplyBlendShapeWeight(string child, string name, float value)
+        protected void ApplyBlendShapeWeight(string child, string name, float value)
         {
             var go = GetGameObject(child);
             if (go == null) return;
@@ -848,7 +846,7 @@ namespace net.narazaka.avatarmenucreator
             ApplyShaderFloatParameter(child, name, value);
         }
 
-        void ApplyShaderFloatParameter(string child, string name, float value)
+        protected void ApplyShaderFloatParameter(string child, string name, float value)
         {
             var go = GetGameObject(child);
             if (go == null) return;
@@ -871,7 +869,7 @@ namespace net.narazaka.avatarmenucreator
             ApplyShaderVectorParameter(child, name, value);
         }
 
-        void ApplyShaderVectorParameter(string child, string name, Vector4 value)
+        protected void ApplyShaderVectorParameter(string child, string name, Vector4 value)
         {
             var go = GetGameObject(child);
             if (go == null) return;
@@ -894,7 +892,7 @@ namespace net.narazaka.avatarmenucreator
             ApplyTransform(child, transformComponentName, value);
         }
 
-        void ApplyTransform(string child, string transformComponentName, Vector3 value)
+        protected void ApplyTransform(string child, string transformComponentName, Vector3 value)
         {
             var go = GetGameObject(child);
             if (go == null) return;
@@ -914,7 +912,7 @@ namespace net.narazaka.avatarmenucreator
             ApplyValue(child, member, value);
         }
 
-        void ApplyValue(string child, TypeMember member, Value value)
+        protected void ApplyValue(string child, TypeMember member, Value value)
         {
             var go = GetGameObject(child);
             if (go == null) return;

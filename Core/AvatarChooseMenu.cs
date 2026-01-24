@@ -336,13 +336,25 @@ namespace net.narazaka.avatarmenucreator
                 {
                     rect.height = EditorGUIUtility.singleLineHeight;
                     rect.y += 2;
-                    rect.width -= EditorGUIUtility.standardVerticalSpacing * 2 + 20;
+                    rect.width -= EditorGUIUtility.standardVerticalSpacing * 5 + 20 * 3;
                     rect.width /= 2;
                     EditorGUIUtility.labelWidth = 50;
                     ChooseNames[index] = TextField(rect, $"{T.選択肢}{index}", ChooseName(index));
                     EditorGUIUtility.labelWidth = 0;
                     rect.x += rect.width + EditorGUIUtility.standardVerticalSpacing;
                     ChooseIcons[index] = TextureField(rect, ChooseIcon(index));
+                    rect.x += rect.width + EditorGUIUtility.standardVerticalSpacing;
+                    rect.width = 20;
+                    if (GUI.Button(rect, PickerGUIContent))
+                    {
+                        PickAll(index);
+                    }
+                    rect.x += rect.width + EditorGUIUtility.standardVerticalSpacing;
+                    rect.width = 20;
+                    if (GUI.Button(rect, ApplyGUIContent))
+                    {
+                        ApplyAll(index);
+                    }
                     rect.x += rect.width + EditorGUIUtility.standardVerticalSpacing;
                     rect.width = 20;
                     if (GUI.Button(rect, "×", EditorStyles.miniButton))
@@ -1387,6 +1399,218 @@ namespace net.narazaka.avatarmenucreator
                 for (var i = 0; i < len; ++i)
                 {
                     onEachDrop(i, objects[i]);
+                }
+            }
+        }
+
+        void PickAll(int chooseIndex)
+        {
+            WillChange();
+            foreach (var child in GetStoredChildren())
+            {
+                var go = GetGameObject(child);
+                if (go != null)
+                {
+                    ChooseObjects.TryGetValue(child, out var objIndexes);
+                    if (objIndexes != null)
+                    {
+                        if (go.activeSelf != objIndexes.Contains(chooseIndex))
+                        {
+                            if (go.activeSelf)
+                            {
+                                objIndexes.Add(chooseIndex);
+                            }
+                            else
+                            {
+                                objIndexes.Remove(chooseIndex);
+                            }
+                            ChooseObjects[child] = objIndexes;
+                        }
+                    }
+                }
+            }
+            // materials
+            foreach (var (child, index) in ChooseMaterials.Keys)
+            {
+                var key = (child, index);
+                if (ChooseMaterials.TryGetValue(key, out var values))
+                {
+                    var mat = values.ContainsKey(chooseIndex) ? values[chooseIndex] : null;
+                    PickMaterial(child, index, ref mat);
+                    values[chooseIndex] = mat;
+                }
+            }
+            // blendShapes
+            foreach (var (child, name) in ChooseBlendShapes.Keys)
+            {
+                var key = (child, name);
+                if (ChooseBlendShapes.TryGetValue(key, out var values))
+                {
+                    var value = values.ContainsKey(chooseIndex) ? values[chooseIndex] : 0f;
+                    PickBlendShapeWeight(child, name, ref value);
+                    values[chooseIndex] = value;
+                }
+            }
+            // shader float parameters
+            foreach (var (child, name) in ChooseShaderParameters.Keys)
+            {
+                var key = (child, name);
+                if (ChooseShaderParameters.TryGetValue(key, out var values))
+                {
+                    var value = values[chooseIndex];
+                    PickShaderFloatParameter(child, name, ref value);
+                    values[chooseIndex] = value;
+                }
+            }
+            // shader vector parameters
+            foreach (var (child, name) in ChooseShaderVectorParameters.Keys)
+            {
+                var key = (child, name);
+                if (ChooseShaderVectorParameters.TryGetValue(key, out var values))
+                {
+                    var value = values.ContainsKey(chooseIndex) ? values[chooseIndex] : Vector4.zero;
+                    PickShaderVectorParameter(child, name, ref value);
+                    values[chooseIndex] = value;
+                }
+            }
+            // values
+            foreach (var (child, member) in ChooseValues.Keys)
+            {
+                var key = (child, member);
+                if (ChooseValues.TryGetValue(key, out var values))
+                {
+                    var value = values.ContainsKey(chooseIndex) ? values[chooseIndex] : new Value();
+                    PickValue(child, member, ref value);
+                    values[chooseIndex] = value;
+                }
+            }
+            // positions
+            foreach (var child in Positions.Keys)
+            {
+                var key = child;
+                if (Positions.TryGetValue(key, out var values))
+                {
+                    var value = values.ContainsKey(chooseIndex) ? values[chooseIndex] : Vector3.zero;
+                    PickTransform(child, "Position", ref value);
+                    values[chooseIndex] = value;
+                }
+            }
+            // rotations
+            foreach (var child in Rotations.Keys)
+            {
+                var key = child;
+                if (Rotations.TryGetValue(key, out var values))
+                {
+                    var value = values.ContainsKey(chooseIndex) ? values[chooseIndex] : Vector3.zero;
+                    PickTransform(child, "Rotation", ref value);
+                    values[chooseIndex] = value;
+                }
+            }
+            // scales
+            foreach (var child in Scales.Keys)
+            {
+                var key = child;
+                if (Scales.TryGetValue(key, out var values))
+                {
+                    var value = values.ContainsKey(chooseIndex) ? values[chooseIndex] : Vector3.one;
+                    PickTransform(child, "Scale", ref value);
+                    values[chooseIndex] = value;
+                }
+            }
+        }
+
+        void ApplyAll(int chooseIndex)
+        {
+            foreach (var child in GetStoredChildren())
+            {
+                var go = GetGameObject(child);
+                if (go == null) return;
+                // GameObject active
+                ChooseObjects.TryGetValue(child, out var objIndexes);
+                if (objIndexes != null)
+                {
+                    Undo.RecordObject(go, "AvatarMenuCreator Apply");
+                    go.SetActive(objIndexes.Contains(chooseIndex));
+                }
+            }
+            // materials
+            foreach (var (child, index) in ChooseMaterials.Keys)
+            {
+                var key = (child, index);
+                if (ChooseMaterials.TryGetValue(key, out var values))
+                {
+                    var mat = values.ContainsKey(chooseIndex) ? values[chooseIndex] : null;
+                    ApplyMaterial(child, index, mat);
+                }
+            }
+            // blendShapes
+            foreach (var (child, name) in ChooseBlendShapes.Keys)
+            {
+                var key = (child, name);
+                if (ChooseBlendShapes.TryGetValue(key, out var values))
+                {
+                    var value = values.ContainsKey(chooseIndex) ? values[chooseIndex] : 0f;
+                    ApplyBlendShapeWeight(child, name, value);
+                }
+            }
+            // shader float parameters
+            foreach (var (child, name) in ChooseShaderParameters.Keys)
+            {
+                var key = (child, name);
+                if (ChooseShaderParameters.TryGetValue(key, out var values))
+                {
+                    var value = values.ContainsKey(chooseIndex) ? values[chooseIndex] : 0f;
+                    ApplyShaderFloatParameter(child, name, value);
+                }
+            }
+            // shader vector parameters
+            foreach (var (child, name) in ChooseShaderVectorParameters.Keys)
+            {
+                var key = (child, name);
+                if (ChooseShaderVectorParameters.TryGetValue(key, out var values))
+                {
+                    var value = values.ContainsKey(chooseIndex) ? values[chooseIndex] : Vector4.zero;
+                    ApplyShaderVectorParameter(child, name, value);
+                }
+            }
+            // values
+            foreach (var (child, member) in ChooseValues.Keys)
+            {
+                var key = (child, member);
+                if (ChooseValues.TryGetValue(key, out var values))
+                {
+                    var value = values.ContainsKey(chooseIndex) ? values[chooseIndex] : new Value();
+                    ApplyValue(child, member, value);
+                }
+            }
+            // positions
+            foreach (var child in Positions.Keys)
+            {
+                var key = child;
+                if (Positions.TryGetValue(key, out var values))
+                {
+                    var value = values.ContainsKey(chooseIndex) ? values[chooseIndex] : Vector3.zero;
+                    ApplyTransform(child, "Position", value);
+                }
+            }
+            // rotations
+            foreach (var child in Rotations.Keys)
+            {
+                var key = child;
+                if (Rotations.TryGetValue(key, out var values))
+                {
+                    var value = values.ContainsKey(chooseIndex) ? values[chooseIndex] : Vector3.zero;
+                    ApplyTransform(child, "Rotation", value);
+                }
+            }
+            // scales
+            foreach (var child in Scales.Keys)
+            {
+                var key = child;
+                if (Scales.TryGetValue(key, out var values))
+                {
+                    var value = values.ContainsKey(chooseIndex) ? values[chooseIndex] : Vector3.one;
+                    ApplyTransform(child, "Scale", value);
                 }
             }
         }
