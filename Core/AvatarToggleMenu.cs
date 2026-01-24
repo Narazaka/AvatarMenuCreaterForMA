@@ -1566,11 +1566,6 @@ namespace net.narazaka.avatarmenucreator
 
         // with prefab shim
         protected override Material[] GetMaterialSlots(string child) => GetGameObject(child)?.GetMaterialSlots() ?? ToggleMaterials.MaterialSlots(child);
-
-        protected override void SetMaterialSlot(string child, int index, Material mat)
-        {
-            GetGameObject(child)?.SetMaterialSlot(index, mat);
-        }
 #endif
     }
 }

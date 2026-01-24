@@ -1400,15 +1400,6 @@ namespace net.narazaka.avatarmenucreator
             if (slots == null) slots = ChooseMaterials.MaterialSlots(child);
             return slots;
         }
-
-        protected override void SetMaterialSlot(string child, int index, Material mat)
-        {
-            var go = GetGameObject(child);
-            if (go != null)
-            {
-                go.SetMaterialSlot(index, mat);
-            }
-        }
 #endif
     }
 }

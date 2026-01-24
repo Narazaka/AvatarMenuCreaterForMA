@@ -566,15 +566,13 @@ namespace net.narazaka.avatarmenucreator
 
         // for MaterialPickerButton
         protected virtual Material[] GetMaterialSlots(string child) { throw new NotImplementedException(); }
-        // for MaterualApplyButton
-        protected virtual void SetMaterialSlot(string child, int index, Material mat) { throw new NotImplementedException(); }
 
         GUILayoutOption PickerGUIWidth = GUILayout.Width(20);
         GUILayoutOption PickerGUIHeight = GUILayout.Height(20);
 
         float _PickerGUIContentTick;
         GUIContent _PickerGUIContent;
-        GUIContent PickerGUIContent
+        protected GUIContent PickerGUIContent
         {
             get
             {
@@ -596,6 +594,11 @@ namespace net.narazaka.avatarmenucreator
         {
             var go = GetGameObject(child);
             if (go == null || !PickerButton()) return;
+            PickMaterial(child, index, ref value);
+        }
+
+        void PickMaterial(string child, int index, ref Material value)
+        {
             value = GetMaterialSlots(child)[index];
         }
 
@@ -615,6 +618,13 @@ namespace net.narazaka.avatarmenucreator
         {
             var go = GetGameObject(child);
             if (go == null || !PickerButton()) return;
+            PickBlendShapeWeight(child, name, ref value);
+        }
+
+        void PickBlendShapeWeight(string child, string name, ref float value)
+        {
+            var go = GetGameObject(child);
+            if (go == null) return;
             var mesh = go.GetComponent<SkinnedMeshRenderer>();
             value = mesh.GetBlendShapeWeight(mesh.sharedMesh.GetBlendShapeIndex(name));
         }
@@ -623,6 +633,13 @@ namespace net.narazaka.avatarmenucreator
         {
             var go = GetGameObject(child);
             if (go == null || !PickerButton()) return;
+            PickShaderFloatParameter(child, name, ref value);
+        }
+
+        void PickShaderFloatParameter(string child, string name, ref float value)
+        {
+            var go = GetGameObject(child);
+            if (go == null) return;
             var mesh = go.GetComponent<Renderer>();
             foreach (var mat in mesh.sharedMaterials)
             {
@@ -638,6 +655,13 @@ namespace net.narazaka.avatarmenucreator
         {
             var go = GetGameObject(child);
             if (go == null || !PickerButton()) return;
+            PickShaderVectorParameter(child, name, ref value);
+        }
+
+        void PickShaderVectorParameter(string child, string name, ref Vector4 value)
+        {
+            var go = GetGameObject(child);
+            if (go == null) return;
             var mesh = go.GetComponent<Renderer>();
             foreach (var mat in mesh.sharedMaterials)
             {
@@ -653,6 +677,13 @@ namespace net.narazaka.avatarmenucreator
         {
             var go = GetGameObject(child);
             if (go == null || !PickerButton()) return;
+            PickTransform(child, transformComponentName, ref value);
+        }
+
+        void PickTransform(string child, string transformComponentName, ref Vector3 value)
+        {
+            var go = GetGameObject(child);
+            if (go == null) return;
             var component = go.GetComponent<Transform>();
             var memberInfo = typeof(Transform).GetProperty(TransformPropertyName(transformComponentName), System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance);
             if (memberInfo is System.Reflection.PropertyInfo propertyInfo)
@@ -676,6 +707,13 @@ namespace net.narazaka.avatarmenucreator
         {
             var go = GetGameObject(child);
             if (go == null || !PickerButton()) return;
+            PickValue(child, member, setValue);
+        }
+
+        void PickValue(string child, TypeMember member, Action<SerializedProperty> setValue)
+        {
+            var go = GetGameObject(child);
+            if (go == null) return;
             setValue(new SerializedObject(go.GetComponent(member.Type)).FindProperty(member.AnimationMemberName));
         }
 
@@ -684,7 +722,7 @@ namespace net.narazaka.avatarmenucreator
 
         float _ApplyGUIContentTick;
         GUIContent _ApplyGUIContent;
-        GUIContent ApplyGUIContent
+        protected GUIContent ApplyGUIContent
         {
             get
             {
@@ -706,7 +744,16 @@ namespace net.narazaka.avatarmenucreator
         {
             var go = GetGameObject(child);
             if (go == null || !ApplyButton()) return;
-            SetMaterialSlot(child, index, value);
+            ApplyMaterialSlot(child, index, value);
+        }
+
+        void ApplyMaterialSlot(string child, int index, Material mat)
+        {
+            var go = GetGameObject(child);
+            if (go != null)
+            {
+                go.SetMaterialSlot(index, mat);
+            }
         }
 
         protected void BlendShapeLikeApplyButton(bool isBlendShape, string child, string name, float value)
@@ -725,6 +772,13 @@ namespace net.narazaka.avatarmenucreator
         {
             var go = GetGameObject(child);
             if (go == null || !ApplyButton()) return;
+            ApplyBlendShapeWeight(child, name, value);
+        }
+
+        void ApplyBlendShapeWeight(string child, string name, float value)
+        {
+            var go = GetGameObject(child);
+            if (go == null) return;
             var mesh = go.GetComponent<SkinnedMeshRenderer>();
             Undo.RecordObject(mesh, "AvatarMenuCreator Apply");
             mesh.SetBlendShapeWeight(mesh.sharedMesh.GetBlendShapeIndex(name), value);
@@ -734,6 +788,13 @@ namespace net.narazaka.avatarmenucreator
         {
             var go = GetGameObject(child);
             if (go == null || !ApplyButton()) return;
+            ApplyShaderFloatParameter(child, name, value);
+        }
+
+        void ApplyShaderFloatParameter(string child, string name, float value)
+        {
+            var go = GetGameObject(child);
+            if (go == null) return;
             var mesh = go.GetComponent<Renderer>();
             foreach (var mat in mesh.sharedMaterials)
             {
@@ -750,6 +811,13 @@ namespace net.narazaka.avatarmenucreator
         {
             var go = GetGameObject(child);
             if (go == null || !ApplyButton()) return;
+            ApplyShaderVectorParameter(child, name, value);
+        }
+
+        void ApplyShaderVectorParameter(string child, string name, Vector4 value)
+        {
+            var go = GetGameObject(child);
+            if (go == null) return;
             var mesh = go.GetComponent<Renderer>();
             foreach (var mat in mesh.sharedMaterials)
             {
@@ -766,6 +834,13 @@ namespace net.narazaka.avatarmenucreator
         {
             var go = GetGameObject(child);
             if (go == null || !ApplyButton()) return;
+            ApplyTransform(child, transformComponentName, value);
+        }
+
+        void ApplyTransform(string child, string transformComponentName, Vector3 value)
+        {
+            var go = GetGameObject(child);
+            if (go == null) return;
             var component = go.GetComponent<Transform>();
             var memberInfo = typeof(Transform).GetProperty(TransformPropertyName(transformComponentName), System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance);
             if (memberInfo is System.Reflection.PropertyInfo propertyInfo)
@@ -779,6 +854,13 @@ namespace net.narazaka.avatarmenucreator
         {
             var go = GetGameObject(child);
             if (go == null || !ApplyButton()) return;
+            ApplyValue(child, member, setProperty);
+        }
+
+        void ApplyValue(string child, TypeMember member, Action<SerializedProperty> setProperty)
+        {
+            var go = GetGameObject(child);
+            if (go == null) return;
             setProperty(new SerializedObject(go.GetComponent(member.Type)).FindProperty(member.AnimationMemberName));
         }
 
