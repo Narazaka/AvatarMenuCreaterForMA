@@ -54,6 +54,8 @@ https://github.com/Narazaka/AvatarMenuCreaterForMA/releases/latest から `net.n
 
 ## 更新履歴
 
+- 1.38.0-beta.0
+  - 選択式メニューに全抽出/全適用ボタンを追加
 - 1.37.0
   - 新機能
     - GameObjectでも変化待機を設定出来るように（主にMAリアクティブオブジェクト用）
