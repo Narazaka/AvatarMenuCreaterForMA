@@ -78,6 +78,22 @@ namespace net.narazaka.avatarmenucreator.util
             return shapekeyNames;
         }
 
+        public static List<string> UnionBlendShapeNames(this List<string> a, List<string> b)
+        {
+            var exists = new HashSet<string>(a);
+            var result = new List<string>(a);
+            var len = b.Count;
+            for (var i = 0; i < len; ++i)
+            {
+                var name = b[i];
+                if (exists.Add(name))
+                {
+                    result.Add(name);
+                }
+            }
+            return result;
+        }
+
         public class NameWithDescription : INameAndDescription
         {
             public string Name { get; set; }
@@ -184,6 +200,22 @@ namespace net.narazaka.avatarmenucreator.util
                 Name = name,
                 Type = UnityEngine.Rendering.ShaderPropertyType.Color,
             });
+        }
+
+        public static List<ShaderParameter> UnionShaderParameters(this List<ShaderParameter> a, List<ShaderParameter> b)
+        {
+            var exists = new HashSet<ShaderParameter>(a, new ShaderParameterComparator());
+            var result = new List<ShaderParameter>(a);
+            var len = b.Count;
+            for (var i = 0; i < len; ++i)
+            {
+                var param = b[i];
+                if (exists.Add(param))
+                {
+                    result.Add(param);
+                }
+            }
+            return result;
         }
 
         public class ShaderParameter : ShaderParameterValue

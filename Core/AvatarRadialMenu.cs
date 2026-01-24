@@ -253,8 +253,10 @@ namespace net.narazaka.avatarmenucreator
             {
                 EditorGUILayout.Space();
                 var gameObjectRef = GetGameObject(child);
-                var names = gameObjectRef == null ? RadialBlendShapes.Names(child).ToList() : Util.GetBlendShapeNames(gameObjectRef);
-                var parameters = gameObjectRef == null ? RadialShaderParameters.Names(child).ToFakeShaderFloatParameters().Concat(RadialShaderVectorParameters.Names(child).ToFakeShaderVectorParameters()).ToList() : ShaderParametersCache.GetFilteredShaderParameters(gameObjectRef);
+                var existNames = RadialBlendShapes.Names(child).ToList();
+                var names = gameObjectRef == null ? existNames : Util.GetBlendShapeNames(gameObjectRef).UnionBlendShapeNames(existNames);
+                var existParameters = RadialShaderParameters.Names(child).ToFakeShaderFloatParameters().Concat(RadialShaderVectorParameters.Names(child).ToFakeShaderVectorParameters()).ToList();
+                var parameters = gameObjectRef == null ? existParameters : ShaderParametersCache.GetFilteredShaderParameters(gameObjectRef).UnionShaderParameters(existParameters);
                 var components = gameObjectRef == null ? RadialValues.Names(child).Select(n => n.Type) : gameObjectRef.GetAllComponents().Select(c => TypeUtil.GetType(c)).FilterByVRCWhitelist();
                 var members = components.GetAvailableMembersOnlySuitableForTransition();
                 var path = child;

@@ -452,8 +452,10 @@ namespace net.narazaka.avatarmenucreator
                 }
 
                 var gameObjectRef = GetGameObject(child);
-                var names = gameObjectRef == null ? ChooseBlendShapes.Names(child).ToList() : Util.GetBlendShapeNames(gameObjectRef);
-                var parameters = gameObjectRef == null ? ChooseShaderParameters.Names(child).ToFakeShaderFloatParameters().Concat(ChooseShaderVectorParameters.Names(child).ToFakeShaderVectorParameters()).ToList() : ShaderParametersCache.GetFilteredShaderParameters(gameObjectRef);
+                var existNames = ChooseBlendShapes.Names(child).ToList();
+                var names = gameObjectRef == null ? ChooseBlendShapes.Names(child).ToList() : Util.GetBlendShapeNames(gameObjectRef).UnionBlendShapeNames(existNames);
+                var existParameters = ChooseShaderParameters.Names(child).ToFakeShaderFloatParameters().Concat(ChooseShaderVectorParameters.Names(child).ToFakeShaderVectorParameters()).ToList();
+                var parameters = gameObjectRef == null ? existParameters : ShaderParametersCache.GetFilteredShaderParameters(gameObjectRef).UnionShaderParameters(existParameters);
                 var components = gameObjectRef == null ? ChooseValues.Names(child).Select(n => n.Type) : gameObjectRef.GetAllComponents().Select(c => TypeUtil.GetType(c)).FilterByVRCWhitelist();
                 var members = components.GetAvailableMembers();
                 if (names.Count > 0 &&
