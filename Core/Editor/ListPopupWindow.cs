@@ -17,11 +17,13 @@ namespace net.narazaka.avatarmenucreator
         SearchField SearchField;
         string SearchQuery;
         ListTreeView<T> TreeView;
+        bool CanAddCustomStringItem;
 
-        public ListPopupWindow(IList<T> items, Func<IEnumerable<T>> getExistItems)
+        public ListPopupWindow(IList<T> items, Func<IEnumerable<T>> getExistItems, bool canAddCustomStringItem)
         {
             Items = items;
             GetExistItems = getExistItems;
+            CanAddCustomStringItem = canAddCustomStringItem;
         }
 
         public ListPopupWindow(IList<ListTreeViewItemContainer<T>> items, Func<IEnumerable<T>> getExistItems)
@@ -42,6 +44,20 @@ namespace net.narazaka.avatarmenucreator
 
             rect.y += EditorGUIUtility.singleLineHeight;
             rect.height -= EditorGUIUtility.singleLineHeight;
+
+            if (CanAddCustomStringItem)
+            {
+                EditorGUI.BeginDisabledGroup(string.IsNullOrWhiteSpace(SearchQuery));
+                if (GUI.Button(new Rect(rect.x + EditorGUIUtility.singleLineHeight * 2, rect.y, Mathf.Min(rect.width - EditorGUIUtility.singleLineHeight * 2, 210), EditorGUIUtility.singleLineHeight), net.narazaka.avatarmenucreator.T.入力名をBlendShapeとして追加))
+                {
+                    OnAdd.Invoke((T)(object)SearchQuery); // unsafe
+                    return;
+                }
+                EditorGUI.EndDisabledGroup();
+
+                rect.y += EditorGUIUtility.singleLineHeight;
+                rect.height -= EditorGUIUtility.singleLineHeight;
+            }
 
             if (TreeView == null)
             {

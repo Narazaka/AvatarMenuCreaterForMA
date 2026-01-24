@@ -358,7 +358,7 @@ namespace net.narazaka.avatarmenucreator
             var rect = EditorGUILayout.GetControlRect(AddItemButtonWidth);
             if (GUI.Button(rect, AddItemButtonGUIContent))
             {
-                PopupWindow.Show(rect, new ListPopupWindow<T>(getChildren(), getExistChildren) { OnAdd = onAdd, OnRemove = onRemove });
+                PopupWindow.Show(rect, new ListPopupWindow<T>(getChildren(), getExistChildren, true) { OnAdd = onAdd, OnRemove = onRemove });
             }
         }
 

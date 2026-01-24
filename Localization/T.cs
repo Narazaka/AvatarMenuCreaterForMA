@@ -379,5 +379,8 @@ namespace net.narazaka.avatarmenucreator
 
         [English("Set this value to the avatar")]
         public static string アバターにこの値を設定 => L;
+
+        [English("Add Entered Name as BlendShape")]
+        public static string 入力名をBlendShapeとして追加 => L;
     }
 }
