@@ -3,6 +3,8 @@ using System.Linq;
 using System.Collections.Generic;
 using UnityEngine;
 using net.narazaka.avatarmenucreator.collections.instance;
+using net.narazaka.avatarmenucreator.value;
+using VRC.Dynamics;
 
 #if UNITY_EDITOR
 using UnityEditor;
@@ -599,7 +601,9 @@ namespace net.narazaka.avatarmenucreator
 
         void PickMaterial(string child, int index, ref Material value)
         {
-            value = GetMaterialSlots(child)[index];
+            var slots = GetMaterialSlots(child);
+            if (index < 0 || index >= slots.Length) return;
+            value = slots[index];
         }
 
         protected void BlendShapeLikePickerButton(bool isBlendShape, string child, string name, ref float value)
@@ -626,7 +630,9 @@ namespace net.narazaka.avatarmenucreator
             var go = GetGameObject(child);
             if (go == null) return;
             var mesh = go.GetComponent<SkinnedMeshRenderer>();
-            value = mesh.GetBlendShapeWeight(mesh.sharedMesh.GetBlendShapeIndex(name));
+            var index = mesh.sharedMesh.GetBlendShapeIndex(name);
+            if (index == -1) return;
+            value = mesh.GetBlendShapeWeight(index);
         }
 
         void ShaderParameterPickerButton(string child, string name, ref float value)
@@ -703,18 +709,67 @@ namespace net.narazaka.avatarmenucreator
             }
         }
 
-        protected void ValuePickerButton(string child, TypeMember member, Action<SerializedProperty> setValue)
+        protected void ValuePickerButton(string child, TypeMember member, ref Value value)
         {
             var go = GetGameObject(child);
             if (go == null || !PickerButton()) return;
-            PickValue(child, member, setValue);
+            PickValue(child, member, ref value);
         }
 
-        void PickValue(string child, TypeMember member, Action<SerializedProperty> setValue)
+        void PickValue(string child, TypeMember member, ref Value value)
         {
             var go = GetGameObject(child);
             if (go == null) return;
-            setValue(new SerializedObject(go.GetComponent(member.Type)).FindProperty(member.AnimationMemberName));
+            var property = new SerializedObject(go.GetComponent(member.Type)).FindProperty(member.AnimationMemberName);
+            if (property == null) return;
+            Debug.Log(property.propertyType);
+            if (member.MemberType == typeof(float))
+            {
+                value = property.floatValue;
+                Debug.Log((float)value);
+            }
+            else if (member.MemberType == typeof(int))
+            {
+                value = property.intValue;
+            }
+            else if (member.MemberType == typeof(bool))
+            {
+                value = property.boolValue;
+            }
+            else if (member.MemberType.IsSubclassOf(typeof(Enum)))
+            {
+                var enumValues = member.MemberType.GetEnumValuesCached();
+                value = enumValues[property.enumValueIndex];
+            }
+            else if (member.MemberType == typeof(Vector3))
+            {
+                value = property.vector3Value;
+            }
+            else if (member.MemberType == typeof(Quaternion))
+            {
+                value = property.quaternionValue;
+            }
+            else if (member.MemberType == typeof(Color))
+            {
+                value = property.colorValue;
+            }
+            else if (member.MemberType == typeof(VRCPhysBoneBase.PermissionFilter))
+            {
+                value =
+#if HAS_VRCSDK3_9_1_OR_HIGHER
+                    new VRCPhysBoneBase.PermissionFilter(true, DynamicsUsageFlags.Everything)
+#else
+                    new VRCPhysBoneBase.PermissionFilter
+#endif
+                    {
+                        allowSelf = property.FindPropertyRelative("allowSelf").boolValue,
+                        allowOthers = property.FindPropertyRelative("allowOthers").boolValue,
+                    };
+            }
+            else
+            {
+                throw new NotSupportedException();
+            }
         }
 
         GUILayoutOption ApplyGUIWidth = GUILayout.Width(20);
@@ -780,8 +835,10 @@ namespace net.narazaka.avatarmenucreator
             var go = GetGameObject(child);
             if (go == null) return;
             var mesh = go.GetComponent<SkinnedMeshRenderer>();
+            var index = mesh.sharedMesh.GetBlendShapeIndex(name);
+            if (index == -1) return;
             Undo.RecordObject(mesh, "AvatarMenuCreator Apply");
-            mesh.SetBlendShapeWeight(mesh.sharedMesh.GetBlendShapeIndex(name), value);
+            mesh.SetBlendShapeWeight(index, value);
         }
 
         void ShaderParameterApplyButton(string child, string name, float value)
@@ -850,18 +907,59 @@ namespace net.narazaka.avatarmenucreator
             }
         }
 
-        protected void ValueApplyButton(string child, TypeMember member, Action<SerializedProperty> setProperty)
+        protected void ValueApplyButton(string child, TypeMember member, Value value)
         {
             var go = GetGameObject(child);
             if (go == null || !ApplyButton()) return;
-            ApplyValue(child, member, setProperty);
+            ApplyValue(child, member, value);
         }
 
-        void ApplyValue(string child, TypeMember member, Action<SerializedProperty> setProperty)
+        void ApplyValue(string child, TypeMember member, Value value)
         {
             var go = GetGameObject(child);
             if (go == null) return;
-            setProperty(new SerializedObject(go.GetComponent(member.Type)).FindProperty(member.AnimationMemberName));
+            var property = new SerializedObject(go.GetComponent(member.Type)).FindProperty(member.AnimationMemberName);
+            if (property == null) return;
+            if (member.MemberType == typeof(float))
+            {
+                property.floatValue = (float)value;
+            }
+            else if (member.MemberType == typeof(int))
+            {
+                property.intValue = (int)value;
+            }
+            else if (member.MemberType == typeof(bool))
+            {
+                property.boolValue = (bool)value;
+            }
+            else if (member.MemberType.IsSubclassOf(typeof(Enum)))
+            {
+                var enumValues = member.MemberType.GetEnumValuesCached();
+                property.enumValueIndex = Array.IndexOf(enumValues, (int)value);
+            }
+            else if (member.MemberType == typeof(Vector3))
+            {
+                property.vector3Value = (Vector3)value;
+            }
+            else if (member.MemberType == typeof(Quaternion))
+            {
+                property.quaternionValue = (Quaternion)value;
+            }
+            else if (member.MemberType == typeof(Color))
+            {
+                property.colorValue = (Color)value;
+            }
+            else if (member.MemberType == typeof(VRCPhysBoneBase.PermissionFilter))
+            {
+                var pf = (VRCPhysBoneBase.PermissionFilter)value;
+                property.FindPropertyRelative("allowSelf").boolValue = pf.allowSelf;
+                property.FindPropertyRelative("allowOthers").boolValue = pf.allowOthers;
+            }
+            else
+            {
+                throw new NotSupportedException();
+            }
+            property.serializedObject.ApplyModifiedProperties();
         }
 
         protected Rect HorizontalLine()

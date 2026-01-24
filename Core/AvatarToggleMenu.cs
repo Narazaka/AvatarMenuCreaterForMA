@@ -1130,20 +1130,20 @@ namespace net.narazaka.avatarmenucreator
                             if (member.MemberType == typeof(float))
                             {
                                 newValue.Inactive = EditorGUILayout.FloatField("OFF", (float)value.Inactive, GUILayout.Width(110));
-                                ValuePickerButton(child, member, p => newValue.Inactive = p.floatValue);
-                                ValueApplyButton(child, member, p => p.floatValue = (float)newValue.Inactive);
+                                ValuePickerButton(child, member, ref newValue.Inactive);
+                                ValueApplyButton(child, member, newValue.Inactive);
                                 newValue.Active = EditorGUILayout.FloatField("ON", (float)value.Active, GUILayout.Width(110));
-                                ValuePickerButton(child, member, p => newValue.Active = p.floatValue);
-                                ValueApplyButton(child, member, p => p.floatValue = (float)newValue.Active);
+                                ValuePickerButton(child, member, ref newValue.Active);
+                                ValueApplyButton(child, member, newValue.Active);
                             }
                             else if (member.MemberType == typeof(int))
                             {
                                 newValue.Inactive = EditorGUILayout.IntField("OFF", (int)value.Inactive, GUILayout.Width(100));
-                                ValuePickerButton(child, member, p => newValue.Inactive = p.intValue);
-                                ValueApplyButton(child, member, p => p.intValue = (int)newValue.Inactive);
+                                ValuePickerButton(child, member, ref newValue.Inactive);
+                                ValueApplyButton(child, member, newValue.Inactive);
                                 newValue.Active = EditorGUILayout.IntField("ON", (int)value.Active, GUILayout.Width(100));
-                                ValuePickerButton(child, member, p => newValue.Active = p.intValue);
-                                ValueApplyButton(child, member, p => p.intValue = (int)newValue.Active);
+                                ValuePickerButton(child, member, ref newValue.Active);
+                                ValueApplyButton(child, member, newValue.Active);
                             }
                             else if (member.MemberType == typeof(bool))
                             {
@@ -1162,11 +1162,11 @@ namespace net.narazaka.avatarmenucreator
                                 var enumNames = member.MemberType.GetEnumNamesCached();
                                 var enumValues = member.MemberType.GetEnumValuesCached();
                                 newValue.Inactive = EditorGUILayout.IntPopup("OFF", (int)value.Inactive, enumNames, enumValues);
-                                ValuePickerButton(child, member, p => newValue.Inactive = enumValues[p.enumValueIndex]);
-                                ValueApplyButton(child, member, p => p.enumValueIndex = Array.IndexOf(enumValues, newValue.Inactive));
+                                ValuePickerButton(child, member, ref newValue.Inactive);
+                                ValueApplyButton(child, member, newValue.Inactive);
                                 newValue.Active = EditorGUILayout.IntPopup("ON", (int)value.Active, enumNames, enumValues);
-                                ValuePickerButton(child, member, p => newValue.Active = enumValues[p.enumValueIndex]);
-                                ValueApplyButton(child, member, p => p.enumValueIndex = Array.IndexOf(enumValues, newValue.Active));
+                                ValuePickerButton(child, member, ref newValue.Active);
+                                ValueApplyButton(child, member, newValue.Active);
                             }
                         }
                         if (member.MemberType == typeof(VRCPhysBoneBase.PermissionFilter))
@@ -1214,14 +1214,14 @@ namespace net.narazaka.avatarmenucreator
                             using (new EditorGUILayout.HorizontalScope())
                             {
                                 newValue.Inactive = EditorGUILayout.Vector3Field("OFF", (Vector3)value.Inactive);
-                                ValuePickerButton(child, member, p => newValue.Inactive = p.vector3Value);
-                                ValueApplyButton(child, member, p => p.vector3Value = (Vector3)newValue.Inactive);
+                                ValuePickerButton(child, member, ref newValue.Inactive);
+                                ValueApplyButton(child, member, newValue.Inactive);
                             }
                             using (new EditorGUILayout.HorizontalScope())
                             {
                                 newValue.Active = EditorGUILayout.Vector3Field("ON", (Vector3)value.Active);
-                                ValuePickerButton(child, member, p => newValue.Active = p.vector3Value);
-                                ValueApplyButton(child, member, p => p.vector3Value = (Vector3)newValue.Active);
+                                ValuePickerButton(child, member, ref newValue.Active);
+                                ValueApplyButton(child, member, newValue.Active);
                             }
                             EditorGUIUtility.labelWidth = 0;
                             EditorGUIUtility.wideMode = widemode;
@@ -1234,14 +1234,14 @@ namespace net.narazaka.avatarmenucreator
                             using (new EditorGUILayout.HorizontalScope())
                             {
                                 newValue.Inactive = EditorGUILayout.Vector4Field("OFF", ((Quaternion)value.Inactive).ToVector4()).ToQuaternion();
-                                ValuePickerButton(child, member, p => newValue.Inactive = p.quaternionValue);
-                                ValueApplyButton(child, member, p => p.quaternionValue = (Quaternion)newValue.Inactive);
+                                ValuePickerButton(child, member, ref newValue.Inactive);
+                                ValueApplyButton(child, member, newValue.Inactive);
                             }
                             using (new EditorGUILayout.HorizontalScope())
                             {
                                 newValue.Active = EditorGUILayout.Vector4Field("ON", ((Quaternion)value.Active).ToVector4()).ToQuaternion();
-                                ValuePickerButton(child, member, p => newValue.Active = p.quaternionValue);
-                                ValueApplyButton(child, member, p => p.quaternionValue = (Quaternion)newValue.Active);
+                                ValuePickerButton(child, member, ref newValue.Active);
+                                ValueApplyButton(child, member, newValue.Active);
                             }
                             EditorGUIUtility.labelWidth = 0;
                             EditorGUIUtility.wideMode = widemode;
@@ -1254,14 +1254,14 @@ namespace net.narazaka.avatarmenucreator
                             using (new EditorGUILayout.HorizontalScope())
                             {
                                 newValue.Inactive = EditorGUILayout.ColorField("OFF", (Color)value.Inactive);
-                                ValuePickerButton(child, member, p => newValue.Inactive = p.colorValue);
-                                ValueApplyButton(child, member, p => p.colorValue = (Color)newValue.Inactive);
+                                ValuePickerButton(child, member, ref newValue.Inactive);
+                                ValueApplyButton(child, member, newValue.Inactive);
                             }
                             using (new EditorGUILayout.HorizontalScope())
                             {
                                 newValue.Active = EditorGUILayout.ColorField("ON", (Color)value.Active);
-                                ValuePickerButton(child, member, p => newValue.Active = p.colorValue);
-                                ValueApplyButton(child, member, p => p.colorValue = (Color)newValue.Active);
+                                ValuePickerButton(child, member, ref newValue.Active);
+                                ValueApplyButton(child, member, newValue.Active);
                             }
                             EditorGUIUtility.labelWidth = 0;
                             EditorGUIUtility.wideMode = widemode;

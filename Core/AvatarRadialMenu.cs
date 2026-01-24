@@ -667,11 +667,11 @@ namespace net.narazaka.avatarmenucreator
                                 EditorGUI.indentLevel++;
                                 EditorGUIUtility.labelWidth = 75;
                                 newValue.Start = EditorGUILayout.FloatField(T.始, (float)value.Start, GUILayout.Width(105));
-                                ValuePickerButton(child, member, p => newValue.Start = p.floatValue);
-                                ValueApplyButton(child, member, p => p.floatValue = (float)newValue.Start);
+                                ValuePickerButton(child, member, ref newValue.Start);
+                                ValueApplyButton(child, member, newValue.Start);
                                 newValue.End = EditorGUILayout.FloatField(T.終, (float)value.End, GUILayout.Width(105));
-                                ValuePickerButton(child, member, p => newValue.End = p.floatValue);
-                                ValueApplyButton(child, member, p => p.floatValue = (float)newValue.End);
+                                ValuePickerButton(child, member, ref newValue.End);
+                                ValueApplyButton(child, member, newValue.End);
                                 EditorGUIUtility.labelWidth = 70;
                                 var initialValue =
                                     RadialDefaultValue * 100 < value.StartOffsetPercent ? (float)value.Start :
@@ -685,7 +685,7 @@ namespace net.narazaka.avatarmenucreator
                                         GUILayout.Width(105)
                                         );
                                 }
-                                ValueApplyButton(child, member, p => p.floatValue = initialValue);
+                                ValueApplyButton(child, member, initialValue);
                                 EditorGUIUtility.labelWidth = 0;
                                 EditorGUI.indentLevel--;
                             }
@@ -699,14 +699,14 @@ namespace net.narazaka.avatarmenucreator
                             using (new EditorGUILayout.HorizontalScope())
                             {
                                 newValue.Start = EditorGUILayout.Vector3Field(T.始, (Vector3)value.Start);
-                                ValuePickerButton(child, member, p => newValue.Start = p.vector3Value);
-                                ValueApplyButton(child, member, p => p.vector3Value = (Vector3)newValue.Start);
+                                ValuePickerButton(child, member, ref newValue.Start);
+                                ValueApplyButton(child, member, newValue.Start);
                             }
                             using (new EditorGUILayout.HorizontalScope())
                             {
                                 newValue.End = EditorGUILayout.Vector3Field(T.終, (Vector3)value.End);
-                                ValuePickerButton(child, member, p => newValue.End = p.vector3Value);
-                                ValueApplyButton(child, member, p => p.vector3Value = (Vector3)newValue.End);
+                                ValuePickerButton(child, member, ref newValue.End);
+                                ValueApplyButton(child, member, newValue.End);
                             }
                             EditorGUIUtility.labelWidth = 70;
                             var initialValue =
@@ -723,7 +723,7 @@ namespace net.narazaka.avatarmenucreator
                                         initialValue
                                         );
                                 }
-                                ValueApplyButton(child, member, p => p.vector3Value = initialValue);
+                                ValueApplyButton(child, member, initialValue);
                             }
                             EditorGUIUtility.wideMode = widemode;
                             EditorGUIUtility.labelWidth = 0;
@@ -738,14 +738,14 @@ namespace net.narazaka.avatarmenucreator
                             using (new EditorGUILayout.HorizontalScope())
                             {
                                 newValue.Start = EditorGUILayout.Vector4Field(T.始, ((Quaternion)value.Start).ToVector4()).ToQuaternion();
-                                ValuePickerButton(child, member, p => newValue.Start = p.quaternionValue);
-                                ValueApplyButton(child, member, p => p.quaternionValue = (Quaternion)newValue.Start);
+                                ValuePickerButton(child, member, ref newValue.Start);
+                                ValueApplyButton(child, member, newValue.Start);
                             }
                             using (new EditorGUILayout.HorizontalScope())
                             {
                                 newValue.End = EditorGUILayout.Vector4Field(T.終, ((Quaternion)value.End).ToVector4()).ToQuaternion();
-                                ValuePickerButton(child, member, p => newValue.End = p.quaternionValue);
-                                ValueApplyButton(child, member, p => p.quaternionValue = (Quaternion)newValue.End);
+                                ValuePickerButton(child, member, ref newValue.End);
+                                ValueApplyButton(child, member, newValue.End);
                             }
                             EditorGUIUtility.labelWidth = 70;
                             var initialValue =
@@ -762,7 +762,7 @@ namespace net.narazaka.avatarmenucreator
                                         initialValue
                                         );
                                 }
-                                ValueApplyButton(child, member, p => p.quaternionValue = initialValue.ToQuaternion());
+                                ValueApplyButton(child, member, initialValue.ToQuaternion());
                             }
                             EditorGUIUtility.wideMode = widemode;
                             EditorGUIUtility.labelWidth = 0;
@@ -777,14 +777,14 @@ namespace net.narazaka.avatarmenucreator
                             using (new EditorGUILayout.HorizontalScope())
                             {
                                 newValue.Start = EditorGUILayout.ColorField(T.始, (Color)value.Start);
-                                ValuePickerButton(child, member, p => newValue.Start = p.colorValue);
-                                ValueApplyButton(child, member, p => p.colorValue = (Color)newValue.Start);
+                                ValuePickerButton(child, member, ref newValue.Start);
+                                ValueApplyButton(child, member, newValue.Start);
                             }
                             using (new EditorGUILayout.HorizontalScope())
                             {
                                 newValue.End = EditorGUILayout.ColorField(T.終, (Color)value.End);
-                                ValuePickerButton(child, member, p => newValue.End = p.colorValue);
-                                ValueApplyButton(child, member, p => p.colorValue = (Color)newValue.End);
+                                ValuePickerButton(child, member, ref newValue.End);
+                                ValueApplyButton(child, member, newValue.End);
                             }
                             EditorGUIUtility.labelWidth = 70;
                             var initialValue =
@@ -801,7 +801,7 @@ namespace net.narazaka.avatarmenucreator
                                         initialValue
                                         );
                                 }
-                                ValueApplyButton(child, member, p => p.colorValue = initialValue);
+                                ValueApplyButton(child, member, initialValue);
                             }
                             EditorGUIUtility.wideMode = widemode;
                             EditorGUIUtility.labelWidth = 0;
