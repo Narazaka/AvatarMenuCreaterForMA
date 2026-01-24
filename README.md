@@ -54,6 +54,12 @@ https://github.com/Narazaka/AvatarMenuCreaterForMA/releases/latest から `net.n
 
 ## 更新履歴
 
+- 1.37.0
+  - 新機能
+    - GameObjectでも変化待機を設定出来るように（主にMAリアクティブオブジェクト用）
+    - 存在しないBlendShapeを名前指定出来るように
+  - バグ修正
+    - Applyボタン（再生マーク）でComponentsが適用できていなかった問題を修正
 - 1.37.0-beta.1
   - GameObjectでも変化待機を設定出来るように（主にMAリアクティブオブジェクト用）
 - 1.36.0
