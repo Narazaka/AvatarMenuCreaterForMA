@@ -41,9 +41,11 @@ export default defineConfig({
 					lang: 'ja',
 				}
 			},
-			social: {
-				github: 'https://github.com/Narazaka/AvatarMenuCreaterForMA',
-			},
+			social: [{
+				icon: 'github',
+				label: 'GitHub',
+				href: 'https://github.com/Narazaka/AvatarMenuCreaterForMA',
+			}],
 			editLink: {
 				baseUrl: 'https://github.com/Narazaka/AvatarMenuCreaterForMA/edit/master/doc~/site',
 			},
