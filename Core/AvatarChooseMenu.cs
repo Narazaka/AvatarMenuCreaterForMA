@@ -1457,7 +1457,7 @@ namespace net.narazaka.avatarmenucreator
                 var key = (child, name);
                 if (ChooseShaderParameters.TryGetValue(key, out var values))
                 {
-                    var value = values[chooseIndex];
+                    var value = values.ContainsKey(chooseIndex) ? values[chooseIndex] : 0f;
                     PickShaderFloatParameter(child, name, ref value);
                     values[chooseIndex] = value;
                 }
