@@ -14,7 +14,7 @@ namespace net.narazaka.avatarmenucreator
 
         public bool Equals(RadialValue other)
         {
-            return Start == other.Start && End == other.End && StartOffsetPercent == other.StartOffsetPercent && EndOffsetPercent == other.EndOffsetPercent;
+            return other != null && Start == other.Start && End == other.End && StartOffsetPercent == other.StartOffsetPercent && EndOffsetPercent == other.EndOffsetPercent;
         }
 
         public IEnumerable<string> ChangedProps(RadialValue other)

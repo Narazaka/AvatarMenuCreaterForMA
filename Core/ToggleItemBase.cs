@@ -48,7 +48,7 @@ namespace net.narazaka.avatarmenucreator
 
         public bool Equals(ToggleItemBase<Item> other)
         {
-            return Inactive.Equals(other.Inactive) && Active.Equals(other.Active) && TransitionOffsetPercent == other.TransitionOffsetPercent && TransitionDurationPercent == other.TransitionDurationPercent && UseInactive == other.UseInactive && UseActive == other.UseActive && UseTransitionToInactive == other.UseTransitionToInactive && UseTransitionToActive == other.UseTransitionToActive;
+            return other != null && Inactive.Equals(other.Inactive) && Active.Equals(other.Active) && TransitionOffsetPercent == other.TransitionOffsetPercent && TransitionDurationPercent == other.TransitionDurationPercent && UseInactive == other.UseInactive && UseActive == other.UseActive && UseTransitionToInactive == other.UseTransitionToInactive && UseTransitionToActive == other.UseTransitionToActive;
         }
 
         public IEnumerable<string> ChangedProps(ToggleItemBase<Item> other)
