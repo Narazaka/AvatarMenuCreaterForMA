@@ -243,6 +243,21 @@ namespace net.narazaka.avatarmenucreator
                     RadialInactiveRange = true;
                 }
             }
+
+            EditorGUILayout.Space();
+
+            using (new EditorGUILayout.HorizontalScope())
+            {
+                EditorGUILayout.LabelField(T.値を抽出_sl_適用, GUILayout.Width(EditorGUIUtility.labelWidth));
+                EditorGUILayout.LabelField(T.始, GUILayout.Width(30));
+                if (PickerButton()) { PickAll(0f); }
+                if (ApplyButton()) { ApplyAll(0f); }
+                EditorGUILayout.LabelField(T.終, GUILayout.Width(25));
+                if (PickerButton()) { PickAll(1f); }
+                if (ApplyButton()) { ApplyAll(1f); }
+                EditorGUILayout.LabelField(T.初期, GUILayout.Width(25));
+                if (ApplyButton()) { ApplyAll(RadialDefaultValue); }
+            }
         }
 
         protected override bool HasHeaderBulkGUI => false;
@@ -1004,6 +1019,205 @@ namespace net.narazaka.avatarmenucreator
             if (!values.ContainsKey(child)) return;
             WillChange();
             values.Remove(child);
+        }
+
+        void PickAll(float radialValue)
+        {
+            var isStart = radialValue == 0f;
+            // blendShapes
+            foreach (var (child, name) in RadialBlendShapes.Keys)
+            {
+                var key = (child, name);
+                if (RadialBlendShapes.TryGetValue(key, out var value))
+                {
+                    if (isStart)
+                    {
+                        PickBlendShapeWeight(child, name, ref value.Start);
+                    }
+                    else
+                    {
+                        PickBlendShapeWeight(child, name, ref value.End);
+                    }
+                }
+            }
+            // shader float parameters
+            foreach (var (child, name) in RadialShaderParameters.Keys)
+            {
+                var key = (child, name);
+                if (RadialShaderParameters.TryGetValue(key, out var value))
+                {
+                    if (isStart)
+                    {
+                        PickShaderFloatParameter(child, name, ref value.Start);
+                    }
+                    else
+                    {
+                        PickShaderFloatParameter(child, name, ref value.End);
+                    }
+                }
+            }
+            // shader vector parameters
+            foreach (var (child, name) in RadialShaderVectorParameters.Keys)
+            {
+                var key = (child, name);
+                if (RadialShaderVectorParameters.TryGetValue(key, out var value))
+                {
+                    if (isStart)
+                    {
+                        PickShaderVectorParameter(child, name, ref value.Start);
+                    }
+                    else
+                    {
+                        PickShaderVectorParameter(child, name, ref value.End);
+                    }
+                }
+            }
+            // values
+            foreach (var (child, member) in RadialValues.Keys)
+            {
+                var key = (child, member);
+                if (RadialValues.TryGetValue(key, out var value))
+                {
+                    if (isStart)
+                    {
+                        PickValue(child, member, ref value.Start);
+                    }
+                    else
+                    {
+                        PickValue(child, member, ref value.End);
+                    }
+                }
+            }
+            // positions
+            foreach (var child in Positions.Keys)
+            {
+                var key = child;
+                if (Positions.TryGetValue(key, out var value))
+                {
+                    if (isStart)
+                    {
+                        PickTransform(child, "Position", ref value.Start);
+                    }
+                    else
+                    {
+                        PickTransform(child, "Position", ref value.End);
+                    }
+                }
+            }
+            // rotations
+            foreach (var child in Rotations.Keys)
+            {
+                var key = child;
+                if (Rotations.TryGetValue(key, out var value))
+                {
+                    if (isStart)
+                    {
+                        PickTransform(child, "Rotation", ref value.Start);
+                    }
+                    else
+                    {
+                        PickTransform(child, "Rotation", ref value.End);
+                    }
+                }
+            }
+            // scales
+            foreach (var child in Scales.Keys)
+            {
+                var key = child;
+                if (Scales.TryGetValue(key, out var value))
+                {
+                    if (isStart)
+                    {
+                        PickTransform(child, "Scale", ref value.Start);
+                    }
+                    else
+                    {
+                        PickTransform(child, "Scale", ref value.End);
+                    }
+                }
+            }
+        }
+
+        void ApplyAll(float radialValue)
+        {
+            // blendShapes
+            foreach (var (child, name) in RadialBlendShapes.Keys)
+            {
+                var key = (child, name);
+                if (RadialBlendShapes.TryGetValue(key, out var value))
+                {
+                    ApplyBlendShapeWeight(child, name, value.Value(radialValue));
+                }
+            }
+            // shader float parameters
+            foreach (var (child, name) in RadialShaderParameters.Keys)
+            {
+                var key = (child, name);
+                if (RadialShaderParameters.TryGetValue(key, out var value))
+                {
+                    ApplyShaderFloatParameter(child, name, value.Value(radialValue));
+                }
+            }
+            // shader vector parameters
+            foreach (var (child, name) in RadialShaderVectorParameters.Keys)
+            {
+                var key = (child, name);
+                if (RadialShaderVectorParameters.TryGetValue(key, out var value))
+                {
+                    ApplyShaderVectorParameter(child, name, value.Value(radialValue));
+                }
+            }
+            // values
+            foreach (var (child, member) in RadialValues.Keys)
+            {
+                var key = (child, member);
+                if (RadialValues.TryGetValue(key, out var value))
+                {
+                    if (member.MemberType == typeof(float))
+                    {
+                        ApplyValue(child, member, value.FloatValue(radialValue));
+                    }
+                    else if (member.MemberType == typeof(Vector3))
+                    {
+                        ApplyValue(child, member, value.Vector3Value(radialValue));
+                    }
+                    else if (member.MemberType == typeof(Quaternion))
+                    {
+                        ApplyValue(child, member, value.QuaternionValue(radialValue));
+                    }
+                    else if (member.MemberType == typeof(Color))
+                    {
+                        ApplyValue(child, member, value.ColorValue(radialValue));
+                    }
+                }
+            }
+            // positions
+            foreach (var child in Positions.Keys)
+            {
+                var key = child;
+                if (Positions.TryGetValue(key, out var value))
+                {
+                    ApplyTransform(child, "Position", value.Value(radialValue));
+                }
+            }
+            // rotations
+            foreach (var child in Rotations.Keys)
+            {
+                var key = child;
+                if (Rotations.TryGetValue(key, out var value))
+                {
+                    ApplyTransform(child, "Rotation", value.Value(radialValue));
+                }
+            }
+            // scales
+            foreach (var child in Scales.Keys)
+            {
+                var key = child;
+                if (Scales.TryGetValue(key, out var value))
+                {
+                    ApplyTransform(child, "Scale", value.Value(radialValue));
+                }
+            }
         }
 #endif
     }
