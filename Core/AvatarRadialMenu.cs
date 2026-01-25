@@ -144,7 +144,6 @@ namespace net.narazaka.avatarmenucreator
         {
             var serializedObject = serializedProperty.serializedObject;
             serializedObject.Update();
-            serializedObject.FindProperty(nameof(AvatarRadialMenu));
             EditorGUILayout.PropertyField(serializedProperty.FindPropertyRelative(nameof(RadialIcon)), new GUIContent(T.アイコン));
             EditorGUILayout.PropertyField(serializedProperty.FindPropertyRelative(nameof(RadialDefaultValue)), new GUIContent(T.パラメーター初期値));
             ShowDetailMenuMulti(serializedProperty);
