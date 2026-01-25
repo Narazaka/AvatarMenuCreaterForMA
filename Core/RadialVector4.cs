@@ -4,12 +4,10 @@ using UnityEngine;
 namespace net.narazaka.avatarmenucreator
 {
     [Serializable]
-    public class RadialVector4 : System.IEquatable<RadialVector4>
+    public class RadialVector4 : RadialValueBase, System.IEquatable<RadialVector4>
     {
         public Vector4 Start;
         public Vector4 End;
-        public float StartOffsetPercent;
-        public float EndOffsetPercent = 100;
 
         public bool Equals(RadialVector4 other)
         {
@@ -41,6 +39,11 @@ namespace net.narazaka.avatarmenucreator
             if (name == nameof(StartOffsetPercent)) StartOffsetPercent = (float)value;
             if (name == nameof(EndOffsetPercent)) EndOffsetPercent = (float)value;
             return this;
+        }
+
+        public Vector4 Value(float rate)
+        {
+            return IsPreStart(rate) ? Start : IsPostEnd(rate) ? End : (Start * StartFactor(rate) + End * EndFactor(rate)) / TotalFactor;
         }
     }
 }

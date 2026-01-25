@@ -1,16 +1,16 @@
 using System;
 using System.Collections.Generic;
+using net.narazaka.avatarmenucreator.util;
 using net.narazaka.avatarmenucreator.value;
+using UnityEngine;
 
 namespace net.narazaka.avatarmenucreator
 {
     [Serializable]
-    public class RadialValue : System.IEquatable<RadialValue>
+    public class RadialValue : RadialValueBase, System.IEquatable<RadialValue>
     {
         public Value Start;
         public Value End;
-        public float StartOffsetPercent;
-        public float EndOffsetPercent = 100;
 
         public bool Equals(RadialValue other)
         {
@@ -43,6 +43,26 @@ namespace net.narazaka.avatarmenucreator
             if (name == nameof(StartOffsetPercent)) StartOffsetPercent = (float)value;
             if (name == nameof(EndOffsetPercent)) EndOffsetPercent = (float)value;
             return this;
+        }
+
+        public float FloatValue(float rate)
+        {
+            return IsPreStart(rate) ? (float)Start : IsPostEnd(rate) ? (float)End : ((float)Start * StartFactor(rate) + (float)End * EndFactor(rate)) / TotalFactor;
+        }
+
+        public Vector3 Vector3Value(float rate)
+        {
+            return IsPreStart(rate) ? (Vector3)Start : IsPostEnd(rate) ? (Vector3)End : ((Vector3)Start * StartFactor(rate) + (Vector3)End * EndFactor(rate)) / TotalFactor;
+        }
+
+        public Quaternion QuaternionValue(float rate)
+        {
+            return IsPreStart(rate) ? (Quaternion)Start : IsPostEnd(rate) ? (Quaternion)End : ((((Quaternion)Start).ToVector4() * StartFactor(rate) + ((Quaternion)End).ToVector4() * EndFactor(rate)) / TotalFactor).ToQuaternion();
+        }
+
+        public Color ColorValue(float rate)
+        {
+            return IsPreStart(rate) ? (Color)Start : IsPostEnd(rate) ? (Color)End : ((Color)Start * StartFactor(rate) + (Color)End * EndFactor(rate)) / TotalFactor;
         }
     }
 }

@@ -378,10 +378,7 @@ namespace net.narazaka.avatarmenucreator
                             BlendShapeLikePickerButton(isBlendShape, child, name.Name, ref newValue.End);
                             BlendShapeLikeApplyButton(isBlendShape, child, name.Name, newValue.End);
                             EditorGUIUtility.labelWidth = 70;
-                            var initialValue =
-                                RadialDefaultValue * 100 < value.StartOffsetPercent ? value.Start :
-                                RadialDefaultValue * 100 > value.EndOffsetPercent ? value.End :
-                                (value.Start * (value.EndOffsetPercent - RadialDefaultValue * 100) + value.End * (RadialDefaultValue * 100 - value.StartOffsetPercent)) / (value.EndOffsetPercent - value.StartOffsetPercent);
+                            var initialValue = value.Value(RadialDefaultValue);
                             using (new EditorGUI.DisabledGroupScope(true))
                             {
                                 EditorGUILayout.FloatField(
@@ -531,10 +528,7 @@ namespace net.narazaka.avatarmenucreator
                                 ShaderVectorParameterApplyButton(child, name.Name, newValue.End);
                             }
                             EditorGUIUtility.labelWidth = 70;
-                            var initialValue =
-                                RadialDefaultValue * 100 < value.StartOffsetPercent ? value.Start :
-                                RadialDefaultValue * 100 > value.EndOffsetPercent ? value.End :
-                                (value.Start * (value.EndOffsetPercent - RadialDefaultValue * 100) + value.End * (RadialDefaultValue * 100 - value.StartOffsetPercent)) / (value.EndOffsetPercent - value.StartOffsetPercent);
+                            var initialValue = value.Value(RadialDefaultValue);
 
                             using (new EditorGUILayout.HorizontalScope())
                             {
@@ -673,10 +667,7 @@ namespace net.narazaka.avatarmenucreator
                                 ValuePickerButton(child, member, ref newValue.End);
                                 ValueApplyButton(child, member, newValue.End);
                                 EditorGUIUtility.labelWidth = 70;
-                                var initialValue =
-                                    RadialDefaultValue * 100 < value.StartOffsetPercent ? (float)value.Start :
-                                    RadialDefaultValue * 100 > value.EndOffsetPercent ? (float)value.End :
-                                    (((float)value.Start) * (value.EndOffsetPercent - RadialDefaultValue * 100) + ((float)value.End) * (RadialDefaultValue * 100 - value.StartOffsetPercent)) / (value.EndOffsetPercent - value.StartOffsetPercent);
+                                var initialValue = value.FloatValue(RadialDefaultValue);
                                 using (new EditorGUI.DisabledGroupScope(true))
                                 {
                                     EditorGUILayout.FloatField(
@@ -709,10 +700,7 @@ namespace net.narazaka.avatarmenucreator
                                 ValueApplyButton(child, member, newValue.End);
                             }
                             EditorGUIUtility.labelWidth = 70;
-                            var initialValue =
-                                RadialDefaultValue * 100 < value.StartOffsetPercent ? (Vector3)value.Start :
-                                RadialDefaultValue * 100 > value.EndOffsetPercent ? (Vector3)value.End :
-                                (((Vector3)value.Start) * (value.EndOffsetPercent - RadialDefaultValue * 100) + ((Vector3)value.End) * (RadialDefaultValue * 100 - value.StartOffsetPercent)) / (value.EndOffsetPercent - value.StartOffsetPercent);
+                            var initialValue = value.Vector3Value(RadialDefaultValue);
 
                             using (new EditorGUILayout.HorizontalScope())
                             {
@@ -748,10 +736,7 @@ namespace net.narazaka.avatarmenucreator
                                 ValueApplyButton(child, member, newValue.End);
                             }
                             EditorGUIUtility.labelWidth = 70;
-                            var initialValue =
-                                RadialDefaultValue * 100 < value.StartOffsetPercent ? ((Quaternion)value.Start).ToVector4() :
-                                RadialDefaultValue * 100 > value.EndOffsetPercent ? ((Quaternion)value.End).ToVector4() :
-                                (((Quaternion)value.Start).ToVector4() * (value.EndOffsetPercent - RadialDefaultValue * 100) + ((Quaternion)value.End).ToVector4() * (RadialDefaultValue * 100 - value.StartOffsetPercent)) / (value.EndOffsetPercent - value.StartOffsetPercent);
+                            var initialValue = value.QuaternionValue(RadialDefaultValue);
 
                             using (new EditorGUILayout.HorizontalScope())
                             {
@@ -759,10 +744,10 @@ namespace net.narazaka.avatarmenucreator
                                 {
                                     EditorGUILayout.Vector4Field(
                                         T.初期,
-                                        initialValue
+                                        initialValue.ToVector4()
                                         );
                                 }
-                                ValueApplyButton(child, member, initialValue.ToQuaternion());
+                                ValueApplyButton(child, member, initialValue);
                             }
                             EditorGUIUtility.wideMode = widemode;
                             EditorGUIUtility.labelWidth = 0;
@@ -787,10 +772,7 @@ namespace net.narazaka.avatarmenucreator
                                 ValueApplyButton(child, member, newValue.End);
                             }
                             EditorGUIUtility.labelWidth = 70;
-                            var initialValue =
-                                RadialDefaultValue * 100 < value.StartOffsetPercent ? (Color)value.Start :
-                                RadialDefaultValue * 100 > value.EndOffsetPercent ? (Color)value.End :
-                                (((Color)value.Start) * (value.EndOffsetPercent - RadialDefaultValue * 100) + ((Color)value.End) * (RadialDefaultValue * 100 - value.StartOffsetPercent)) / (value.EndOffsetPercent - value.StartOffsetPercent);
+                            var initialValue = value.ColorValue(RadialDefaultValue);
 
                             using (new EditorGUILayout.HorizontalScope())
                             {
@@ -924,10 +906,7 @@ namespace net.narazaka.avatarmenucreator
                             TransformApplyButton(child, title, newValue.End);
                         }
                         EditorGUIUtility.labelWidth = 70;
-                        var initialValue =
-                            RadialDefaultValue * 100 < value.StartOffsetPercent ? value.Start :
-                            RadialDefaultValue * 100 > value.EndOffsetPercent ? value.End :
-                            (value.Start * (value.EndOffsetPercent - RadialDefaultValue * 100) + value.End * (RadialDefaultValue * 100 - value.StartOffsetPercent)) / (value.EndOffsetPercent - value.StartOffsetPercent);
+                        var initialValue = value.Value(RadialDefaultValue);
 
                         using (new EditorGUILayout.HorizontalScope())
                         {

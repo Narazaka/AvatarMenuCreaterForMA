@@ -3,12 +3,10 @@
 namespace net.narazaka.avatarmenucreator
 {
     [Serializable]
-    public class RadialBlendShape : System.IEquatable<RadialBlendShape>
+    public class RadialBlendShape : RadialValueBase, System.IEquatable<RadialBlendShape>
     {
         public float Start;
         public float End;
-        public float StartOffsetPercent;
-        public float EndOffsetPercent = 100;
 
         public bool Equals(RadialBlendShape other)
         {
@@ -40,6 +38,11 @@ namespace net.narazaka.avatarmenucreator
             if (name == nameof(StartOffsetPercent)) StartOffsetPercent = value;
             if (name == nameof(EndOffsetPercent)) EndOffsetPercent = value;
             return this;
+        }
+
+        public float Value(float rate)
+        {
+            return IsPreStart(rate) ? Start : IsPostEnd(rate) ? End : (Start * StartFactor(rate) + End * EndFactor(rate)) / TotalFactor;
         }
     }
 }
