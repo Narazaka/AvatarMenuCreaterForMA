@@ -64,9 +64,11 @@ namespace net.narazaka.avatarmenucreator.value
 #if NET_UNITY_4_8 || UNITY_2021_2_OR_NEWER
             if (value.Length == 2) return HashCode.Combine(value[0], value[1]);
             if (value.Length == 3) return HashCode.Combine(value[0], value[1], value[2]);
+            if (value.Length == 4) return HashCode.Combine(value[0], value[1], value[2], value[3]);
 #else
             if (value.Length == 2) return (value[0].GetHashCode() * 397) ^ value[1].GetHashCode();
             if (value.Length == 3) return (((value[0].GetHashCode() * 397) ^ value[1].GetHashCode()) * 397) ^ value[2].GetHashCode();
+            if (value.Length == 4) return ((((value[0].GetHashCode() * 397) ^ value[1].GetHashCode()) * 397) ^ value[2].GetHashCode()) * 397 ^ value[3].GetHashCode();
 #endif
             return 0;
         }
