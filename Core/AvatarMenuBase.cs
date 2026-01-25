@@ -671,9 +671,10 @@ namespace net.narazaka.avatarmenucreator
             var go = GetGameObject(child);
             if (go == null) return;
             var mesh = go.GetComponent<Renderer>();
+            if (mesh == null || mesh.sharedMaterials == null) return;
             foreach (var mat in mesh.sharedMaterials)
             {
-                if (mat.shader.FindPropertyIndex(name) != -1)
+                if (mat != null && mat.shader.FindPropertyIndex(name) != -1)
                 {
                     value = mat.GetColor(name);
                     return;
@@ -838,6 +839,7 @@ namespace net.narazaka.avatarmenucreator
             var go = GetGameObject(child);
             if (go == null) return;
             var mesh = go.GetComponent<SkinnedMeshRenderer>();
+            if (mesh == null || mesh.sharedMesh == null) return;
             var index = mesh.sharedMesh.GetBlendShapeIndex(name);
             if (index == -1) return;
             Undo.RecordObject(mesh, "AvatarMenuCreator Apply");
@@ -856,9 +858,10 @@ namespace net.narazaka.avatarmenucreator
             var go = GetGameObject(child);
             if (go == null) return;
             var mesh = go.GetComponent<Renderer>();
+            if (mesh == null || mesh.sharedMaterials == null) return;
             foreach (var mat in mesh.sharedMaterials)
             {
-                if (mat.shader.FindPropertyIndex(name) != -1)
+                if (mat != null && mat.shader.FindPropertyIndex(name) != -1)
                 {
                     Undo.RecordObject(mat, "AvatarMenuCreator Apply");
                     mat.SetFloat(name, value);
@@ -879,9 +882,10 @@ namespace net.narazaka.avatarmenucreator
             var go = GetGameObject(child);
             if (go == null) return;
             var mesh = go.GetComponent<Renderer>();
+            if (mesh == null || mesh.sharedMaterials == null) return;
             foreach (var mat in mesh.sharedMaterials)
             {
-                if (mat.shader.FindPropertyIndex(name) != -1)
+                if (mat != null && mat.shader.FindPropertyIndex(name) != -1)
                 {
                     Undo.RecordObject(mat, "AvatarMenuCreator Apply");
                     mat.SetColor(name, value);
