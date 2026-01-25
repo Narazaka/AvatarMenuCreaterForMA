@@ -269,6 +269,19 @@ namespace net.narazaka.avatarmenucreator
             EditorGUILayout.Space();
 
             ShowTransitionSeconds();
+
+            EditorGUILayout.Space();
+
+            using (new EditorGUILayout.HorizontalScope())
+            {
+                EditorGUILayout.LabelField(T.値を抽出_sl_適用, GUILayout.Width(EditorGUIUtility.labelWidth));
+                EditorGUILayout.LabelField("OFF", GUILayout.Width(25));
+                if (PickerButton()) { PickAll(false); }
+                if (ApplyButton()) { ApplyAll(false); }
+                EditorGUILayout.LabelField("ON", GUILayout.Width(25));
+                if (PickerButton()) { PickAll(true); }
+                if (ApplyButton()) { ApplyAll(true); }
+            }
         }
 
         protected override bool HasHeaderBulkGUI => true;
@@ -1561,6 +1574,316 @@ namespace net.narazaka.avatarmenucreator
                     newValue.UseTransitionToActive = value.UseTransitionToActive;
                 }
                 EditorGUI.indentLevel--;
+            }
+        }
+
+        void PickAll(bool isActive)
+        {
+            WillChange();
+            foreach (var child in GetStoredChildren().ToArray())
+            {
+                var go = GetGameObject(child);
+                if (go != null)
+                {
+                    ToggleObjects.TryGetValue(child, out var type);
+                    if (type != ToggleType.None)
+                    {
+                        var active = go.activeSelf;
+                        if (isActive)
+                        {
+                            ToggleObjects[child] = active ? ToggleType.ON : ToggleType.OFF;
+                        }
+                        else
+                        {
+                            ToggleObjects[child] = active ? ToggleType.OFF : ToggleType.ON;
+                        }
+                    }
+                }
+            }
+            // materials
+            foreach (var (child, index) in ToggleMaterials.Keys)
+            {
+                var key = (child, index);
+                if (ToggleMaterials.TryGetValue(key, out var value))
+                {
+                    if (isActive)
+                    {
+                        PickMaterial(child, index, ref value.Active);
+                    }
+                    else
+                    {
+                        PickMaterial(child, index, ref value.Inactive);
+                    }
+                }
+            }
+            // blendShapes
+            foreach (var (child, name) in ToggleBlendShapes.Keys)
+            {
+                var key = (child, name);
+                if (ToggleBlendShapes.TryGetValue(key, out var value))
+                {
+                    if (isActive)
+                    {
+                        PickBlendShapeWeight(child, name, ref value.Active);
+                    }
+                    else
+                    {
+                        PickBlendShapeWeight(child, name, ref value.Inactive);
+                    }
+                }
+            }
+            // shader float parameters
+            foreach (var (child, name) in ToggleShaderParameters.Keys)
+            {
+                var key = (child, name);
+                if (ToggleShaderParameters.TryGetValue(key, out var value))
+                {
+                    if (isActive)
+                    {
+                        PickShaderFloatParameter(child, name, ref value.Active);
+                    }
+                    else
+                    {
+                        PickShaderFloatParameter(child, name, ref value.Inactive);
+                    }
+                }
+            }
+            // shader vector parameters
+            foreach (var (child, name) in ToggleShaderVectorParameters.Keys)
+            {
+                var key = (child, name);
+                if (ToggleShaderVectorParameters.TryGetValue(key, out var value))
+                {
+                    if (isActive)
+                    {
+                        PickShaderVectorParameter(child, name, ref value.Active);
+                    }
+                    else
+                    {
+                        PickShaderVectorParameter(child, name, ref value.Inactive);
+                    }
+                }
+            }
+            // values
+            foreach (var (child, member) in ToggleValues.Keys)
+            {
+                var key = (child, member);
+                if (ToggleValues.TryGetValue(key, out var value))
+                {
+                    if (isActive)
+                    {
+                        PickValue(child, member, ref value.Active);
+                    }
+                    else
+                    {
+                        PickValue(child, member, ref value.Inactive);
+                    }
+                    if (member.MemberType == typeof(bool))
+                    {
+                        if (isActive)
+                        {
+                            value.Inactive = !(bool)value.Active;
+                        }
+                        else
+                        {
+                            value.Active = !(bool)value.Inactive;
+                        }
+                    }
+                }
+            }
+            // positions
+            foreach (var child in Positions.Keys)
+            {
+                var key = child;
+                if (Positions.TryGetValue(key, out var value))
+                {
+                    if (isActive)
+                    {
+                        PickTransform(child, "Position", ref value.Active);
+                    }
+                    else
+                    {
+                        PickTransform(child, "Position", ref value.Inactive);
+                    }
+                }
+            }
+            // rotations
+            foreach (var child in Rotations.Keys)
+            {
+                var key = child;
+                if (Rotations.TryGetValue(key, out var value))
+                {
+                    if (isActive)
+                    {
+                        PickTransform(child, "Rotation", ref value.Active);
+                    }
+                    else
+                    {
+                        PickTransform(child, "Rotation", ref value.Inactive);
+                    }
+                }
+            }
+            // scales
+            foreach (var child in Scales.Keys)
+            {
+                var key = child;
+                if (Scales.TryGetValue(key, out var value))
+                {
+                    if (isActive)
+                    {
+                        PickTransform(child, "Scale", ref value.Active);
+                    }
+                    else
+                    {
+                        PickTransform(child, "Scale", ref value.Inactive);
+                    }
+                }
+            }
+        }
+
+        void ApplyAll(bool isActive)
+        {
+            foreach (var child in GetStoredChildren())
+            {
+                var go = GetGameObject(child);
+                if (go == null) continue;
+                ToggleObjects.TryGetValue(child, out var type);
+                if (type != ToggleType.None) { 
+                    var active = (type == ToggleType.ON) == isActive;
+                    if (go.activeSelf != active)
+                    {
+                        Undo.RecordObject(go, "AvatarMenuCreator Apply");
+                        go.SetActive(active);
+                    }
+                }
+            }
+            // materials
+            foreach (var (child, index) in ToggleMaterials.Keys)
+            {
+                var key = (child, index);
+                if (ToggleMaterials.TryGetValue(key, out var value))
+                {
+                    if (isActive)
+                    {
+                        ApplyMaterial(child, index, value.Active);
+                    }
+                    else
+                    {
+                        ApplyMaterial(child, index, value.Inactive);
+                    }
+                }
+            }
+            // blendShapes
+            foreach (var (child, name) in ToggleBlendShapes.Keys)
+            {
+                var key = (child, name);
+                if (ToggleBlendShapes.TryGetValue(key, out var value))
+                {
+                    if (isActive)
+                    {
+                        ApplyBlendShapeWeight(child, name, value.Active);
+                    }
+                    else
+                    {
+                        ApplyBlendShapeWeight(child, name, value.Inactive);
+                    }
+                }
+            }
+            // shader float parameters
+            foreach (var (child, name) in ToggleShaderParameters.Keys)
+            {
+                var key = (child, name);
+                if (ToggleShaderParameters.TryGetValue(key, out var value))
+                {
+                    if (isActive)
+                    {
+                        ApplyShaderFloatParameter(child, name, value.Active);
+                    }
+                    else
+                    {
+                        ApplyShaderFloatParameter(child, name, value.Inactive);
+                    }
+                }
+            }
+            // shader vector parameters
+            foreach (var (child, name) in ToggleShaderVectorParameters.Keys)
+            {
+                var key = (child, name);
+                if (ToggleShaderVectorParameters.TryGetValue(key, out var value))
+                {
+                    if (isActive)
+                    {
+                        ApplyShaderVectorParameter(child, name, value.Active);
+                    }
+                    else
+                    {
+                        ApplyShaderVectorParameter(child, name, value.Inactive);
+                    }
+                }
+            }
+            // values
+            foreach (var (child, member) in ToggleValues.Keys)
+            {
+                var key = (child, member);
+                if (ToggleValues.TryGetValue(key, out var value))
+                {
+                    if (isActive)
+                    {
+                        ApplyValue(child, member, value.Active);
+                    }
+                    else
+                    {
+                        ApplyValue(child, member, value.Inactive);
+                    }
+                }
+            }
+            // positions
+            foreach (var child in Positions.Keys)
+            {
+                var key = child;
+                if (Positions.TryGetValue(key, out var value))
+                {
+                    if (isActive)
+                    {
+                        ApplyTransform(child, "Position", value.Active);
+                    }
+                    else
+                    {
+                        ApplyTransform(child, "Position", value.Inactive);
+                    }
+                }
+            }
+            // rotations
+            foreach (var child in Rotations.Keys)
+            {
+                var key = child;
+                if (Rotations.TryGetValue(key, out var value))
+                {
+                    if (isActive)
+                    {
+                        ApplyTransform(child, "Rotation", value.Active);
+                    }
+                    else
+                    {
+                        ApplyTransform(child, "Rotation", value.Inactive);
+                    }
+                }
+            }
+            // scales
+            foreach (var child in Scales.Keys)
+            {
+                var key = child;
+                if (Scales.TryGetValue(key, out var value))
+                {
+                    if (isActive)
+                    {
+                        ApplyTransform(child, "Scale", value.Active);
+                    }
+                    else
+                    {
+                        ApplyTransform(child, "Scale", value.Inactive);
+                    }
+                }
             }
         }
 

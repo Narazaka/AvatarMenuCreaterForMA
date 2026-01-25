@@ -382,5 +382,8 @@ namespace net.narazaka.avatarmenucreator
 
         [English("Add Entered Name as BlendShape")]
         public static string 入力名をBlendShapeとして追加 => L;
+
+        [English("Extract / Apply values")]
+        public static string 値を抽出_sl_適用 => L;
     }
 }
