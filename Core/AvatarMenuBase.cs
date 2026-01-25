@@ -630,6 +630,7 @@ namespace net.narazaka.avatarmenucreator
             var go = GetGameObject(child);
             if (go == null) return;
             var mesh = go.GetComponent<SkinnedMeshRenderer>();
+            if (mesh == null || mesh.sharedMesh == null) return;
             var index = mesh.sharedMesh.GetBlendShapeIndex(name);
             if (index == -1) return;
             value = mesh.GetBlendShapeWeight(index);
@@ -647,9 +648,10 @@ namespace net.narazaka.avatarmenucreator
             var go = GetGameObject(child);
             if (go == null) return;
             var mesh = go.GetComponent<Renderer>();
+            if (mesh == null || mesh.sharedMaterials == null) return;
             foreach (var mat in mesh.sharedMaterials)
             {
-                if (mat.shader.FindPropertyIndex(name) != -1)
+                if (mat != null && mat.shader.FindPropertyIndex(name) != -1)
                 {
                     value = mat.GetFloat(name);
                     return;
@@ -720,7 +722,9 @@ namespace net.narazaka.avatarmenucreator
         {
             var go = GetGameObject(child);
             if (go == null) return;
-            var property = new SerializedObject(go.GetComponent(member.Type)).FindProperty(member.AnimationMemberName);
+            var component = go.GetComponent(member.Type);
+            if (component == null) return;
+            var property = new SerializedObject(component).FindProperty(member.AnimationMemberName);
             if (property == null) return;
             if (member.MemberType == typeof(float))
             {
@@ -737,6 +741,7 @@ namespace net.narazaka.avatarmenucreator
             else if (member.MemberType.IsSubclassOf(typeof(Enum)))
             {
                 var enumValues = member.MemberType.GetEnumValuesCached();
+                if (property.enumValueIndex < 0 || property.enumValueIndex >= enumValues.Length) return;
                 value = enumValues[property.enumValueIndex];
             }
             else if (member.MemberType == typeof(Vector3))
@@ -933,7 +938,10 @@ namespace net.narazaka.avatarmenucreator
             else if (member.MemberType.IsSubclassOf(typeof(Enum)))
             {
                 var enumValues = member.MemberType.GetEnumValuesCached();
-                property.enumValueIndex = Array.IndexOf(enumValues, (int)value);
+                var index = Array.IndexOf(enumValues, (int)value);
+                if (index != -1) {
+                    property.enumValueIndex = index;
+                }
             }
             else if (member.MemberType == typeof(Vector3))
             {
