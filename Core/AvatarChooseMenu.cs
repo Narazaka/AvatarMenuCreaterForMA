@@ -1524,7 +1524,7 @@ namespace net.narazaka.avatarmenucreator
             foreach (var child in GetStoredChildren())
             {
                 var go = GetGameObject(child);
-                if (go == null) return;
+                if (go == null) continue;
                 // GameObject active
                 ChooseObjects.TryGetValue(child, out var objIndexes);
                 if (objIndexes != null)
