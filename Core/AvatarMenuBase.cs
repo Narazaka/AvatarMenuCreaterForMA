@@ -114,6 +114,8 @@ namespace net.narazaka.avatarmenucreator
 
         public void OnAvatarMenuGUI(IList<string> children)
         {
+            ClearGameObjectCache();
+
             OnHeaderGUI(children);
 
             if (HasHeaderBulkGUI && BulkSet)
