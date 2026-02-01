@@ -1,5 +1,8 @@
 window.dataLayer = window.dataLayer || [];
-function gtag(){dataLayer.push(arguments);}
-gtag('js', new Date());
+function gtag() {
+  // biome-ignore lint/complexity/noArguments: ga tag function
+  dataLayer.push(arguments);
+}
+gtag("js", new Date());
 
-gtag('config', 'G-YKE861NPYC');
+gtag("config", "G-YKE861NPYC");
