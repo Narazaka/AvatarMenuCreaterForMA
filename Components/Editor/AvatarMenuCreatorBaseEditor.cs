@@ -326,7 +326,7 @@ namespace net.narazaka.avatarmenucreator.components.editor
         GameObject GetParentAvatar()
         {
             if (Creator == null) return null;
-            return Creator.GetComponentInParent<VRCAvatarDescriptor>()?.gameObject;
+            return Creator.GetComponentInParent<VRCAvatarDescriptor>(true)?.gameObject;
         }
 
         [MenuItem("CONTEXT/ModularAvatarParameters/AvatarMenuCreator for MA/アセット内容から設定を復元 (Restore)")]
