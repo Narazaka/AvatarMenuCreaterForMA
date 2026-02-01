@@ -4,6 +4,7 @@ import starlight from '@astrojs/starlight';
 
 // https://astro.build/config
 export default defineConfig({
+  	site: 'https://avatar-menu-creator-for-ma.vrchat.narazaka.net',
 	integrations: [
 		starlight({
 			title: 'Avatar Menu Creator for MA',
@@ -24,13 +25,6 @@ export default defineConfig({
 						src: "/ga.js",
 					}
 				},
-				{
-					tag: "meta",
-					attrs: {
-						property: "og:image",
-						content: "https://avatar-menu-creator-for-ma.vrchat.narazaka.net/AvatarMenuCreator.png",
-					}
-				}
 			],
 			customCss: [
 				'./src/styles/custom.css',
@@ -63,6 +57,7 @@ export default defineConfig({
 					autogenerate: { directory: 'references' },
 				},
 			],
+      		routeMiddleware: './src/routeData.ts',
 		}),
 	],
 });
