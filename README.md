@@ -54,6 +54,10 @@ https://github.com/Narazaka/AvatarMenuCreaterForMA/releases/latest から `net.n
 
 ## 更新履歴
 
+- 1.38.1
+  - 不具合修正
+    - 参照先オブジェクトをリネームしたときに前の状態を保持していた問題を修正
+    - アバターが非アクティブでも動作するように
 - 1.38.0
   - 新機能
     - 一括全抽出/全適用ボタンを追加
