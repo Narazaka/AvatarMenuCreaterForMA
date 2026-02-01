@@ -62,14 +62,8 @@ jobs:
 
           - unity: 2019.4.31f1
             ma: 1.5.1
-            vrcsdk-version: 3.2.0
-          - unity: 2019.4.31f1
-            ma: 1.5.1
             vrcsdk-version: 3.4.2
 
-          - unity: 2019.4.31f1
-            ma: 1.7.7
-            vrcsdk-version: 3.2.0
           - unity: 2019.4.31f1
             ma: 1.7.7
             vrcsdk-version: 3.4.2
