@@ -320,6 +320,13 @@ namespace net.narazaka.avatarmenucreator
             EditorGUILayout.EndHorizontal();
         }
 
+        protected SkinnedMeshRenderer GetSkinnedMeshRenderer(string child)
+        {
+            var go = GetGameObject(child);
+            if (go == null) return null;
+            return go.GetComponent<SkinnedMeshRenderer>();
+        }
+
         protected bool FoldoutGroupIsFoldout(string child, string title)
         {
             return !FoldoutGroups.TryGetValue(title, out var foldoutGroup) || !foldoutGroup.Contains(child);

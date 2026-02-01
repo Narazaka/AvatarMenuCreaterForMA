@@ -342,7 +342,7 @@ namespace net.narazaka.avatarmenucreator
                     EditorGUI.indentLevel--;
                 }
 
-                if (names.Count > 0 &&
+                if (GetSkinnedMeshRenderer(child) != null &&
                     FoldoutHeaderWithAddItemButton(
                         child,
                         "BlendShapes",

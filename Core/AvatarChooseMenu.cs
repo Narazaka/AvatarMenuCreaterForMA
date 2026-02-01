@@ -470,7 +470,7 @@ namespace net.narazaka.avatarmenucreator
                 var parameters = gameObjectRef == null ? existParameters : ShaderParametersCache.GetFilteredShaderParameters(gameObjectRef).UnionShaderParameters(existParameters);
                 var components = gameObjectRef == null ? ChooseValues.Names(child).Select(n => n.Type) : gameObjectRef.GetAllComponents().Select(c => TypeUtil.GetType(c)).FilterByVRCWhitelist();
                 var members = components.GetAvailableMembers();
-                if (names.Count > 0 &&
+                if (GetSkinnedMeshRenderer(child) != null &&
                     FoldoutHeaderWithAddItemButton(
                         child,
                         "BlendShapes",

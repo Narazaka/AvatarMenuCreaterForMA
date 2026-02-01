@@ -276,7 +276,7 @@ namespace net.narazaka.avatarmenucreator
                 var path = child;
                 GameObjectHeader(child);
                 EditorGUI.indentLevel++;
-                if (names.Count > 0 &&
+                if (GetSkinnedMeshRenderer(child) != null &&
                     FoldoutHeaderWithAddItemButton(
                         child,
                         "BlendShapes",
