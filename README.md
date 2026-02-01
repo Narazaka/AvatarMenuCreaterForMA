@@ -56,9 +56,6 @@ https://github.com/Narazaka/AvatarMenuCreaterForMA/releases/latest から `net.n
 
 - 1.38.2
   - 不具合修正
-    - 2019でのコンパイルエラー修正
-- 1.38.1
-  - 不具合修正
     - 参照先オブジェクトをリネームしたときに前の状態を保持していた問題を修正
     - アバターが非アクティブでも動作するように(Unity2022)
 - 1.38.0
