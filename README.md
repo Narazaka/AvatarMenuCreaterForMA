@@ -54,6 +54,12 @@ https://github.com/Narazaka/AvatarMenuCreaterForMA/releases/latest から `net.n
 
 ## 更新履歴
 
+- 1.38.0
+  - 新機能
+    - 一括全抽出/全適用ボタンを追加
+  - 修正
+    - BlendShapeがないSkinnedMeshにもBlendShape追加ボタンを出すように（存在しないBlendShapeを名前指定出来るように出来るため）
+    - エラーチェックを強化
 - 1.38.0-beta.2
   - エラーチェックを強化
 - 1.38.0-beta.1
