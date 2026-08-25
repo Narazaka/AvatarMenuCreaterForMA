@@ -14,7 +14,7 @@ namespace net.narazaka.avatarmenucreator
 
             var selectedIndex = System.Array.IndexOf(values, System.Convert.ToInt32(selected));
             var nextSelectedIndex = EditorGUILayout.Popup(label, selectedIndex, names);
-            return (T)System.Enum.ToObject(typeof(T), values[nextSelectedIndex]);
+            return nextSelectedIndex < 0 ? selected : (T)System.Enum.ToObject(typeof(T), values[nextSelectedIndex]);
         }
 
         public static T EnumPopup<T>(string label, T selected) where T : System.Enum

@@ -16,7 +16,7 @@ namespace net.narazaka.avatarmenucreator
             var values = ToolbarValues<T>();
             var selectedIndex = System.Array.IndexOf(values, System.Convert.ToInt32(selected));
             var nextSelectedIndex = GUILayout.Toolbar(selectedIndex, ToolbarLabels<T>());
-            return (T)System.Enum.ToObject(typeof(T), values[nextSelectedIndex]);
+            return nextSelectedIndex < 0 ? selected : (T)System.Enum.ToObject(typeof(T), values[nextSelectedIndex]);
         }
 
         static int[] ToolbarValues<T>() where T : System.Enum
