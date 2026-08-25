@@ -934,7 +934,9 @@ namespace net.narazaka.avatarmenucreator
         {
             var go = GetGameObject(child);
             if (go == null) return;
-            var property = new SerializedObject(go.GetComponent(member.Type)).FindProperty(member.AnimationMemberName);
+            var component = go.GetComponent(member.Type);
+            if (component == null) return;
+            var property = new SerializedObject(component).FindProperty(member.AnimationMemberName);
             if (property == null) return;
             if (member.MemberType == typeof(float))
             {
