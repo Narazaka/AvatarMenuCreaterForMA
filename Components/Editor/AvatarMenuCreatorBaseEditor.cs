@@ -47,6 +47,16 @@ namespace net.narazaka.avatarmenucreator.components.editor
             Children = Creator.AvatarMenu.GetStoredChildren().ToList();
         }
 
+        void ReplaceStoredChildWithConfirm(string oldChild, string newChild)
+        {
+            if (oldChild != newChild && Creator.AvatarMenu.GetStoredChildren().Contains(newChild) &&
+                !EditorUtility.DisplayDialog(T.本当に置換しますか_Q_, T.置換先に既存の設定がありヽ上書きされますゝ, "OK", "Cancel")) return;
+            Creator.AvatarMenu.ReplaceStoredChild(oldChild, newChild);
+            UpdateChildren();
+            EditChild = null;
+            EditChildNew = null;
+        }
+
         public override void OnInspectorGUI()
         {
             if (targets.Length == 1)
@@ -267,19 +277,13 @@ namespace net.narazaka.avatarmenucreator.components.editor
                             if (newObj != null)
                             {
                                 var newPath = Util.ChildPath(baseObject, newObj as GameObject);
-                                Creator.AvatarMenu.ReplaceStoredChild(EditChild, newPath);
-                                UpdateChildren();
-                                EditChild = null;
-                                EditChildNew = null;
+                                ReplaceStoredChildWithConfirm(EditChild, newPath);
                             }
                             using (new EditorGUI.DisabledScope(c == EditChildNew))
                             {
                                 if (GUILayout.Button("OK"))
                                 {
-                                    Creator.AvatarMenu.ReplaceStoredChild(EditChild, EditChildNew);
-                                    UpdateChildren();
-                                    EditChild = null;
-                                    EditChildNew = null;
+                                    ReplaceStoredChildWithConfirm(EditChild, EditChildNew);
                                 }
                             }
                         }

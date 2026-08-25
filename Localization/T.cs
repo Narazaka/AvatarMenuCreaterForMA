@@ -53,6 +53,12 @@ namespace net.narazaka.avatarmenucreator
         [English("Are you sure you want to delete it?")]
         public static string 本当に削除しますか_Q_ => L;
 
+        [English("Are you sure you want to replace it?")]
+        public static string 本当に置換しますか_Q_ => L;
+
+        [English("The replacement destination already has settings, which will be overwritten.")]
+        public static string 置換先に既存の設定がありヽ上書きされますゝ => L;
+
         [English("Remove MA Merge Animator and MA Parameters.\nReset the menu installed by MA Menu Installer.")]
         public static string MA_Merge_AnimatorとMA_Parametersを削除しますゝ_n_MA_Menu_Installerのインストールされるメニューをリセットしますゝ => L;
 
