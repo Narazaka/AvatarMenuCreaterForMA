@@ -120,3 +120,4 @@ jobs:
             ma: 1.14.3
             # vrcsdk 3.9.1 breaks value
             vrcsdk-version: 3.9.1-beta.1
+            additional_packages: nadena.dev.ndmf 1.14.3
