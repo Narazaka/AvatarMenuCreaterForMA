@@ -86,6 +86,7 @@ namespace net.narazaka.avatarmenucreator
         {
             if (ChooseObjects.ContainsKey(oldChild) || ChooseMaterials.ContainsPrimaryKey(oldChild) || ChooseBlendShapes.ContainsPrimaryKey(oldChild) || ChooseShaderParameters.ContainsPrimaryKey(oldChild) || ChooseShaderVectorParameters.ContainsPrimaryKey(oldChild) || ChooseValues.ContainsPrimaryKey(oldChild) || Positions.ContainsKey(oldChild) || Rotations.ContainsKey(oldChild) || Scales.ContainsKey(oldChild))
             {
+                WillChange();
                 ChooseObjects.ReplaceKey(oldChild, newChild);
                 ChooseMaterials.ReplacePrimaryKey(oldChild, newChild);
                 ChooseBlendShapes.ReplacePrimaryKey(oldChild, newChild);
