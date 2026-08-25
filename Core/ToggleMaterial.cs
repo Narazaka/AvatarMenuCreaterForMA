@@ -52,16 +52,17 @@ namespace net.narazaka.avatarmenucreator
             return Inactive == other.Inactive && Active == other.Active && TransitionOffsetPercent == other.TransitionOffsetPercent && UseInactive == other.UseInactive && UseActive == other.UseActive && UseTransitionToInactive == other.UseTransitionToInactive && UseTransitionToActive == other.UseTransitionToActive;
         }
 
-        public string ChangedProp(ToggleMaterial other)
+        public IEnumerable<string> ChangedProps(ToggleMaterial other)
         {
-            if (Inactive != other.Inactive) return nameof(Inactive);
-            if (Active != other.Active) return nameof(Active);
-            if (TransitionOffsetPercent != other.TransitionOffsetPercent) return nameof(TransitionOffsetPercent);
-            if (UseInactive != other.UseInactive) return nameof(UseInactive);
-            if (UseActive != other.UseActive) return nameof(UseActive);
-            if (UseTransitionToInactive != other.UseTransitionToInactive) return nameof(UseTransitionToInactive);
-            if (UseTransitionToActive != other.UseTransitionToActive) return nameof(UseTransitionToActive);
-            return "";
+            var changed = new List<string>();
+            if (Inactive != other.Inactive) changed.Add(nameof(Inactive));
+            if (Active != other.Active) changed.Add(nameof(Active));
+            if (TransitionOffsetPercent != other.TransitionOffsetPercent) changed.Add(nameof(TransitionOffsetPercent));
+            if (UseInactive != other.UseInactive) changed.Add(nameof(UseInactive));
+            if (UseActive != other.UseActive) changed.Add(nameof(UseActive));
+            if (UseTransitionToInactive != other.UseTransitionToInactive) changed.Add(nameof(UseTransitionToInactive));
+            if (UseTransitionToActive != other.UseTransitionToActive) changed.Add(nameof(UseTransitionToActive));
+            return changed;
         }
 
         public object GetProp(string name)
