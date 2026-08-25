@@ -35,7 +35,7 @@ namespace net.narazaka.avatarmenucreator.valuecurve
             var curve = new C();
             curve.AddKey(transitionSeconds * ActivateStartRate, InactiveValue);
             curve.AddKey(transitionSeconds * ActivateEndRate, ActiveValue);
-            if (NeedActivateEndKey) curve.AddKey(transitionSeconds, ActiveValue);
+            if (NeedActivateEndKey(transitionSeconds)) curve.AddKey(transitionSeconds, ActiveValue);
             return NamedAnimationCurve.SetTangentModes(curve.GetCurves(Prefix));
         }
 
@@ -44,7 +44,7 @@ namespace net.narazaka.avatarmenucreator.valuecurve
             var curve = new C();
             curve.AddKey(transitionSeconds * InactivateStartRate, ActiveValue);
             curve.AddKey(transitionSeconds * InactivateEndRate, InactiveValue);
-            if (NeedInactivateEndKey) curve.AddKey(transitionSeconds, InactiveValue);
+            if (NeedInactivateEndKey(transitionSeconds)) curve.AddKey(transitionSeconds, InactiveValue);
             return NamedAnimationCurve.SetTangentModes(curve.GetCurves(Prefix));
         }
     }

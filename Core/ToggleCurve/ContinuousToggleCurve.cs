@@ -13,7 +13,7 @@
         protected float ActivateEndRate { get => TransitionOffsetRate + TransitionDurationRate; }
         protected float InactivateStartRate { get => 1f - ActivateEndRate; }
         protected float InactivateEndRate { get => 1f - ActivateStartRate; }
-        protected bool NeedActivateEndKey { get => 1f - ActivateEndRate >= 1f / 60; }
-        protected bool NeedInactivateEndKey { get => 1f - InactivateEndRate >= 1f / 60; }
+        protected bool NeedActivateEndKey(float transitionSeconds) => (1f - ActivateEndRate) * transitionSeconds >= 1f / 60;
+        protected bool NeedInactivateEndKey(float transitionSeconds) => (1f - InactivateEndRate) * transitionSeconds >= 1f / 60;
     }
 }

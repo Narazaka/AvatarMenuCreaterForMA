@@ -19,7 +19,7 @@ namespace net.narazaka.avatarmenucreator.valuecurve
         public AnimationCurve ActivateCurve(float transitionSeconds)
         {
             var curve = new AnimationCurve(new Keyframe(transitionSeconds * ActivateStartRate, InactiveValue), new Keyframe(transitionSeconds * ActivateEndRate, ActiveValue));
-            if (NeedActivateEndKey) curve.AddKey(transitionSeconds, ActiveValue);
+            if (NeedActivateEndKey(transitionSeconds)) curve.AddKey(transitionSeconds, ActiveValue);
             AnimationUtility.SetKeyLeftTangentMode(curve, 0, AnimationUtility.TangentMode.Constant);
             AnimationUtility.SetKeyRightTangentMode(curve, 0, AnimationUtility.TangentMode.Linear);
             AnimationUtility.SetKeyLeftTangentMode(curve, 1, AnimationUtility.TangentMode.Linear);
@@ -29,7 +29,7 @@ namespace net.narazaka.avatarmenucreator.valuecurve
         public AnimationCurve InactivateCurve(float transitionSeconds)
         {
             var curve = new AnimationCurve(new Keyframe(transitionSeconds * InactivateStartRate, ActiveValue), new Keyframe(transitionSeconds * InactivateEndRate, InactiveValue));
-            if (NeedInactivateEndKey) curve.AddKey(transitionSeconds, InactiveValue);
+            if (NeedInactivateEndKey(transitionSeconds)) curve.AddKey(transitionSeconds, InactiveValue);
             AnimationUtility.SetKeyLeftTangentMode(curve, 0, AnimationUtility.TangentMode.Constant);
             AnimationUtility.SetKeyRightTangentMode(curve, 0, AnimationUtility.TangentMode.Linear);
             AnimationUtility.SetKeyLeftTangentMode(curve, 1, AnimationUtility.TangentMode.Linear);
