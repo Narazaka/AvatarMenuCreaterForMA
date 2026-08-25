@@ -432,7 +432,7 @@ namespace net.narazaka.avatarmenucreator
                             radials[key] = newValue;
                             if (BulkSet)
                             {
-                                BulkSetRadialBlendShape(radials, name.Name, newValue, value.ChangedProp(newValue));
+                                BulkSetRadialBlendShape(radials, name.Name, newValue, value.ChangedProps(newValue));
                             }
                         }
                     }
@@ -444,7 +444,7 @@ namespace net.narazaka.avatarmenucreator
             }
         }
 
-        void BulkSetRadialBlendShape(RadialBlendShapeDictionary radials, string radialName, RadialBlendShape radialBlendShape, string changedProp)
+        void BulkSetRadialBlendShape(RadialBlendShapeDictionary radials, string radialName, RadialBlendShape radialBlendShape, IEnumerable<string> changedProps)
         {
             var matches = new List<(string, string)>();
             foreach (var (child, name) in radials.Keys)
@@ -456,7 +456,10 @@ namespace net.narazaka.avatarmenucreator
             }
             foreach (var key in matches)
             {
-                radials[key] = radials[key].SetProp(changedProp, radialBlendShape.GetProp(changedProp));
+                foreach (var changedProp in changedProps)
+                {
+                    radials[key] = radials[key].SetProp(changedProp, radialBlendShape.GetProp(changedProp));
+                }
             }
         }
 
@@ -573,7 +576,7 @@ namespace net.narazaka.avatarmenucreator
                             RadialShaderVectorParameters[key] = newValue;
                             if (BulkSet)
                             {
-                                BulkSetRadialShaderVectorParameter(name.Name, newValue, value.ChangedProp(newValue));
+                                BulkSetRadialShaderVectorParameter(name.Name, newValue, value.ChangedProps(newValue));
                             }
                         }
                     }
@@ -585,7 +588,7 @@ namespace net.narazaka.avatarmenucreator
             }
         }
 
-        void BulkSetRadialShaderVectorParameter(string radialName, RadialVector4 radialBlendShape, string changedProp)
+        void BulkSetRadialShaderVectorParameter(string radialName, RadialVector4 radialBlendShape, IEnumerable<string> changedProps)
         {
             var matches = new List<(string, string)>();
             foreach (var (child, name) in RadialShaderVectorParameters.Keys)
@@ -597,7 +600,10 @@ namespace net.narazaka.avatarmenucreator
             }
             foreach (var key in matches)
             {
-                RadialShaderVectorParameters[key] = RadialShaderVectorParameters[key].SetProp(changedProp, radialBlendShape.GetProp(changedProp));
+                foreach (var changedProp in changedProps)
+                {
+                    RadialShaderVectorParameters[key] = RadialShaderVectorParameters[key].SetProp(changedProp, radialBlendShape.GetProp(changedProp));
+                }
             }
         }
 
@@ -945,7 +951,7 @@ namespace net.narazaka.avatarmenucreator
                         values[child] = newValue;
                         if (BulkSet)
                         {
-                            BulkSetTransformComponent(values, newValue, value.ChangedProp(newValue));
+                            BulkSetTransformComponent(values, newValue, value.ChangedProps(newValue));
                         }
                     }
                 }
@@ -956,11 +962,14 @@ namespace net.narazaka.avatarmenucreator
             }
         }
 
-        void BulkSetTransformComponent(RadialVector3Dictionary values, RadialVector3 value, string changedProp)
+        void BulkSetTransformComponent(RadialVector3Dictionary values, RadialVector3 value, IEnumerable<string> changedProps)
         {
             foreach (var key in values.Keys.ToArray())
             {
-                values[key] = values[key].SetProp(changedProp, value.GetProp(changedProp));
+                foreach (var changedProp in changedProps)
+                {
+                    values[key] = values[key].SetProp(changedProp, value.GetProp(changedProp));
+                }
             }
         }
 

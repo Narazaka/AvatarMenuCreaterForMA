@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace net.narazaka.avatarmenucreator
@@ -14,13 +15,14 @@ namespace net.narazaka.avatarmenucreator
             return Start == other.Start && End == other.End && StartOffsetPercent == other.StartOffsetPercent && EndOffsetPercent == other.EndOffsetPercent;
         }
 
-        public string ChangedProp(RadialVector3 other)
+        public IEnumerable<string> ChangedProps(RadialVector3 other)
         {
-            if (Start != other.Start) return nameof(Start);
-            if (End != other.End) return nameof(End);
-            if (StartOffsetPercent != other.StartOffsetPercent) return nameof(StartOffsetPercent);
-            if (EndOffsetPercent != other.EndOffsetPercent) return nameof(EndOffsetPercent);
-            return "";
+            var changed = new List<string>();
+            if (Start != other.Start) changed.Add(nameof(Start));
+            if (End != other.End) changed.Add(nameof(End));
+            if (StartOffsetPercent != other.StartOffsetPercent) changed.Add(nameof(StartOffsetPercent));
+            if (EndOffsetPercent != other.EndOffsetPercent) changed.Add(nameof(EndOffsetPercent));
+            return changed;
         }
 
         public object GetProp(string name)

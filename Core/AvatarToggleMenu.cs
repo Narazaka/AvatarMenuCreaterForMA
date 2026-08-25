@@ -643,7 +643,7 @@ namespace net.narazaka.avatarmenucreator
                             ToggleMaterials[key] = newValue;
                             if (BulkSet)
                             {
-                                BulkSetToggleMaterial(materials[i], newValue, value.ChangedProp(newValue));
+                                BulkSetToggleMaterial(materials[i], newValue, value.ChangedProps(newValue));
                             }
                         }
                         EditorGUI.indentLevel--;
@@ -671,7 +671,7 @@ namespace net.narazaka.avatarmenucreator
             }
         }
 
-        void BulkSetToggleMaterial(Material sourceMaterial, ToggleMaterial toggleMaterial, string changedProp)
+        void BulkSetToggleMaterial(Material sourceMaterial, ToggleMaterial toggleMaterial, IEnumerable<string> changedProps)
         {
             var matches = new List<(string, int)>();
             foreach (var (child, index) in ToggleMaterials.Keys)
@@ -684,7 +684,10 @@ namespace net.narazaka.avatarmenucreator
             }
             foreach (var key in matches)
             {
-                ToggleMaterials[key] = ToggleMaterials[key].SetProp(changedProp, toggleMaterial.GetProp(changedProp));
+                foreach (var changedProp in changedProps)
+                {
+                    ToggleMaterials[key] = ToggleMaterials[key].SetProp(changedProp, toggleMaterial.GetProp(changedProp));
+                }
             }
         }
 
@@ -796,7 +799,7 @@ namespace net.narazaka.avatarmenucreator
                 if (!value.Equals(newValue))
                 {
                     WillChange();
-                    BulkSetToggleMaterial(sourceMaterial, newValue, value.ChangedProp(newValue));
+                    BulkSetToggleMaterial(sourceMaterial, newValue, value.ChangedProps(newValue));
                 }
                 if (inactiveMaterials.Count != 1)
                 {
