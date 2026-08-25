@@ -85,7 +85,6 @@ namespace net.narazaka.avatarmenucreator
                             WillChange();
                             ToggleObjectUsings.Clear();
                             ToggleObjectTransitionUsings.Clear();
-                            ToggleObjectTransitionOffsetPercents.Clear();
                             foreach (var key in ToggleMaterials.Keys.ToList())
                             {
                                 ToggleMaterials[key] = ToggleMaterials[key].ResetAdvanced();
