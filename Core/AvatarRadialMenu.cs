@@ -1010,6 +1010,7 @@ namespace net.narazaka.avatarmenucreator
 
         void PickAll(float radialValue)
         {
+            WillChange();
             var isStart = radialValue == 0f;
             // blendShapes
             foreach (var (child, name) in RadialBlendShapes.Keys)
