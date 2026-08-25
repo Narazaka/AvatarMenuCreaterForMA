@@ -213,7 +213,7 @@ namespace net.narazaka.avatarmenucreator.editor
                     }
                 }
             }
-            using (new EditorGUI.DisabledScope(isComponent && !MakeMultipleObjects && string.IsNullOrEmpty(BaseName)))
+            using (new EditorGUI.DisabledScope(isComponent && !MakeMultipleObjectsEffective && string.IsNullOrEmpty(BaseName)))
             {
                 if (GUILayout.Button("Create!"))
                 {
