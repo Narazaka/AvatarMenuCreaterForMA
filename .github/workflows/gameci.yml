@@ -41,8 +41,8 @@ jobs:
         https://vpm.nadena.dev/vpm.json
         https://vpm.narazaka.net/index.json
       packages: |
-        nadena.dev.modular-avatar ${{ matrix.ma }}
         ${{ matrix.additional_packages }}
+        nadena.dev.modular-avatar ${{ matrix.ma }}
       name: MA=${{ matrix.ma }}${{ matrix.additional_name }}
       assemblyNames: AvatarMenuCreatorForMA.Test
       assemblyFilters: +AvatarMenuCreatorForMA.*,-AvatarMenuCreatorForMA.Test
