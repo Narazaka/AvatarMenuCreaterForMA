@@ -45,6 +45,10 @@ namespace net.narazaka.avatarmenucreator.util
             get
             {
                 if (DescriptionCache != null) return DescriptionCache;
+                if (Type == null)
+                {
+                    return DescriptionCache = $"{TypeName}.{MemberName}";
+                }
                 if (MemberName == "enabled")
                 {
                     return DescriptionCache = $"{Type.Name}.enabled";
@@ -93,26 +97,27 @@ namespace net.narazaka.avatarmenucreator.util
             if (Type == null || Member == null)
             {
                 Type = TypeUtil.GetType(TypeName);
-                Member = TypeMemberUtil.GetMember(Type, MemberName);
+                Member = Type == null ? null : TypeMemberUtil.GetMember(Type, MemberName);
             }
         }
 
         public bool Equals(TypeMember other)
         {
-            return Type == other.Type && MemberName == other.MemberName;
+            if (ReferenceEquals(other, null)) return false;
+            return TypeName == other.TypeName && MemberName == other.MemberName;
         }
 
         public override bool Equals(object obj)
         {
-            return Equals((TypeMember)obj);
+            return Equals(obj as TypeMember);
         }
 
         public override int GetHashCode()
         {
 #if NET_UNITY_4_8 || UNITY_2021_2_OR_NEWER
-            return HashCode.Combine(Type, MemberName);
+            return HashCode.Combine(TypeName, MemberName);
 #else
-            return (Type.GetHashCode() * 397) ^ MemberName.GetHashCode();
+            return (TypeName.GetHashCode() * 397) ^ MemberName.GetHashCode();
 #endif
         }
 
