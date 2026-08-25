@@ -54,7 +54,7 @@ https://github.com/Narazaka/AvatarMenuCreaterForMA/releases/latest から `net.n
 
 ## 更新履歴
 
-- 1.38.4
+- 1.38.5
   - 不具合修正
     - 選択式メニューでパスリネームを行った場合、その変更が場合によって巻き戻ったりUndo出来なかったりした問題を修正。
 - 1.38.2
