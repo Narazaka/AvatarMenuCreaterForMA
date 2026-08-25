@@ -99,6 +99,20 @@ namespace net.narazaka.avatarmenucreator
             }
         }
 
+        public override void ReplaceStoredChildren(Dictionary<string, string> mapping)
+        {
+            WillChange();
+            ChooseObjects.ReplaceKeys(mapping);
+            ChooseMaterials.ReplacePrimaryKeys(mapping);
+            ChooseBlendShapes.ReplacePrimaryKeys(mapping);
+            ChooseShaderParameters.ReplacePrimaryKeys(mapping);
+            ChooseShaderVectorParameters.ReplacePrimaryKeys(mapping);
+            ChooseValues.ReplacePrimaryKeys(mapping);
+            Positions.ReplaceKeys(mapping);
+            Rotations.ReplaceKeys(mapping);
+            Scales.ReplaceKeys(mapping);
+        }
+
         public override void FilterStoredTargets(IEnumerable<string> children)
         {
             var filter = new HashSet<string>(children);

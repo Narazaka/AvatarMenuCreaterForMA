@@ -148,6 +148,22 @@ namespace net.narazaka.avatarmenucreator
                 Scales.ReplaceKey(oldChild, newChild);
             }
         }
+        public override void ReplaceStoredChildren(Dictionary<string, string> mapping)
+        {
+            WillChange();
+            ToggleObjects.ReplaceKeys(mapping);
+            ToggleObjectUsings.ReplaceKeys(mapping);
+            ToggleObjectTransitionUsings.ReplaceKeys(mapping);
+            ToggleObjectTransitionOffsetPercents.ReplaceKeys(mapping);
+            ToggleMaterials.ReplacePrimaryKeys(mapping);
+            ToggleBlendShapes.ReplacePrimaryKeys(mapping);
+            ToggleShaderParameters.ReplacePrimaryKeys(mapping);
+            ToggleShaderVectorParameters.ReplacePrimaryKeys(mapping);
+            ToggleValues.ReplacePrimaryKeys(mapping);
+            Positions.ReplaceKeys(mapping);
+            Rotations.ReplaceKeys(mapping);
+            Scales.ReplaceKeys(mapping);
+        }
         public override void FilterStoredTargets(IEnumerable<string> children)
         {
             WillChange();

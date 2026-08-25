@@ -33,6 +33,10 @@ namespace net.narazaka.avatarmenucreator
         public bool InternalParameter = false;
         [SerializeField]
         public StringHashSet PhysBoneAutoResetDisabledObjects = new StringHashSet();
+        /// fix path by ref
+        /// cf. MA AvatarObjectReference
+        [SerializeField]
+        public GameObjectDictionary ChildReferences = new GameObjectDictionary();
 
         protected bool PhysBoneAutoResetEnabled(string child) => !PhysBoneAutoResetDisabledObjects.Contains(child);
         protected void EnablePhysBoneAutoReset(string child) => PhysBoneAutoResetDisabledObjects.Remove(child);
@@ -102,6 +106,7 @@ namespace net.narazaka.avatarmenucreator
 
         public abstract IEnumerable<string> GetStoredChildren();
         public abstract void ReplaceStoredChild(string oldChild, string newChild);
+        public abstract void ReplaceStoredChildren(Dictionary<string, string> mapping);
         public abstract void FilterStoredTargets(IEnumerable<string> children);
         public abstract void RemoveStoredChild(string child);
         protected abstract void OnHeaderGUI(IList<string> children);
@@ -297,6 +302,70 @@ namespace net.narazaka.avatarmenucreator
         public void ClearGameObjectCache()
         {
             GameObjectCache = null;
+        }
+
+        public bool SyncChildReferences(GameObject baseObject)
+        {
+            if (baseObject == null) return false;
+            var children = GetStoredChildren().ToList();
+            var childSet = new HashSet<string>(children);
+            List<(string oldPath, string newPath)> moves = null;
+            List<(string path, GameObject target)> fills = null;
+            foreach (var child in children)
+            {
+                if (
+                    ChildReferences.TryGetValue(child, out var target)
+                    && target != null
+                    && target.transform.IsChildOf(baseObject.transform)
+                    // アバタールートへの参照(path="")は起こらないはず
+                    && target != baseObject
+                    )
+                {
+                    if (!Util.TryChildPath(baseObject, target, out var newPath) || newPath == child) continue;
+                    if (moves == null) moves = new List<(string, string)>();
+                    moves.Add((child, newPath));
+                }
+                else
+                {
+                    var found = baseObject.transform.Find(child);
+                    if (found == null) continue;
+                    if (fills == null) fills = new List<(string, GameObject)>();
+                    fills.Add((child, found.gameObject));
+                }
+            }
+            if (moves != null) RemoveCollidedMoves(moves, childSet);
+            var hasMoves = moves != null && moves.Count > 0;
+            var prunes = ChildReferences.Keys.Where(k => !childSet.Contains(k)).ToList();
+            if (!hasMoves && fills == null && prunes.Count == 0) return false;
+            WillChange();
+            if (fills != null)
+            {
+                foreach (var fill in fills) ChildReferences[fill.path] = fill.target;
+            }
+            foreach (var key in prunes) ChildReferences.Remove(key);
+            if (hasMoves)
+            {
+                var mapping = moves.ToDictionary(m => m.oldPath, m => m.newPath);
+                ReplaceStoredChildren(mapping);
+                ChildReferences.ReplaceKeys(mapping);
+                ClearGameObjectCache();
+            }
+            return hasMoves;
+        }
+
+        static void RemoveCollidedMoves(List<(string oldPath, string newPath)> moves, HashSet<string> childSet)
+        {
+            int removedCount;
+            do
+            {
+                // 移動しない既存パス
+                // 破棄された移動の旧パスもここに加わるため破棄が出なくなるまで繰り返す必要がある
+                var stayingPaths = new HashSet<string>(childSet.Except(moves.Select(m => m.oldPath)));
+                // 複数の移動がかち合う移動先
+                var contestedPaths = new HashSet<string>(moves.GroupBy(m => m.newPath).Where(g => g.Count() > 1).Select(g => g.Key));
+                // 既存パスへの移動・複数の移動がかち合うものを削除
+                removedCount = moves.RemoveAll(m => stayingPaths.Contains(m.newPath) || contestedPaths.Contains(m.newPath));
+            } while (removedCount > 0);
         }
 
         protected Dictionary<string, Material[]> GetAllMaterialSlots(IList<string> children)

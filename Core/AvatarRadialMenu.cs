@@ -79,6 +79,17 @@ namespace net.narazaka.avatarmenucreator
                 Scales.ReplaceKey(oldChild, newChild);
             }
         }
+        public override void ReplaceStoredChildren(Dictionary<string, string> mapping)
+        {
+            WillChange();
+            RadialBlendShapes.ReplacePrimaryKeys(mapping);
+            RadialShaderParameters.ReplacePrimaryKeys(mapping);
+            RadialShaderVectorParameters.ReplacePrimaryKeys(mapping);
+            RadialValues.ReplacePrimaryKeys(mapping);
+            Positions.ReplaceKeys(mapping);
+            Rotations.ReplaceKeys(mapping);
+            Scales.ReplaceKeys(mapping);
+        }
         public override void FilterStoredTargets(IEnumerable<string> children)
         {
             WillChange();

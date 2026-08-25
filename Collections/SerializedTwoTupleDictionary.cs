@@ -25,6 +25,17 @@ namespace net.narazaka.avatarmenucreator.collections
             }
         }
 
+        public void ReplacePrimaryKeys(Dictionary<K1, K1> mapping)
+        {
+            if (!Keys.Any(k => mapping.ContainsKey(k.Item1))) return;
+            var pairs = this.ToArray();
+            Clear();
+            foreach (var pair in pairs)
+            {
+                this[(mapping.TryGetValue(pair.Key.Item1, out var newKey) ? newKey : pair.Key.Item1, pair.Key.Item2)] = pair.Value;
+            }
+        }
+
         public void ReplaceKey((K1, K2) oldKey, (K1, K2) newKey)
         {
             if (!ContainsKey(oldKey)) return;

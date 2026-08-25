@@ -27,6 +27,16 @@ namespace net.narazaka.avatarmenucreator.components.editor
         [NonSerialized]
         string EditChildNew;
 
+        static long HierarchyChangedSeq = 1;
+        [NonSerialized]
+        long SyncedHierarchySeq;
+
+        [InitializeOnLoadMethod]
+        static void WatchHierarchyChange()
+        {
+            EditorApplication.hierarchyChanged += () => HierarchyChangedSeq++;
+        }
+
         void OnEnable()
         {
             Creator = target as AvatarMenuCreatorBase;
@@ -80,6 +90,11 @@ namespace net.narazaka.avatarmenucreator.components.editor
         void OnInspectorGUISingle()
         {
             var baseObject = GetParentAvatar();
+            if (SyncedHierarchySeq != HierarchyChangedSeq)
+            {
+                SyncedHierarchySeq = HierarchyChangedSeq;
+                if (Creator.AvatarMenu.SyncChildReferences(baseObject)) UpdateChildren();
+            }
 
             var hasAssets = !Creator.IsEffective;
             if (hasAssets)
