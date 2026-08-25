@@ -9,9 +9,9 @@ namespace net.narazaka.avatarmenucreator.components
 {
     [DisallowMultipleComponent]
     public abstract class AvatarMenuCreatorBase : MonoBehaviour, IEditorOnly
-#if NET_NARAZAKA_VRCHAT_AvatarMenuCreator_HAS_AvatarParametersUtil
+#if UNITY_EDITOR && NET_NARAZAKA_VRCHAT_AvatarMenuCreator_HAS_AvatarParametersUtil
         , Narazaka.VRChat.AvatarParametersUtil.IParameterNameAndTypesProvider
-#elif NET_NARAZAKA_VRCHAT_AvatarMenuCreator_HAS_AvatarParametersDriver
+#elif UNITY_EDITOR && NET_NARAZAKA_VRCHAT_AvatarMenuCreator_HAS_AvatarParametersDriver
         , net.narazaka.vrchat.avatar_parameters_driver.IParameterNameAndTypesProvider
 #endif
     {
