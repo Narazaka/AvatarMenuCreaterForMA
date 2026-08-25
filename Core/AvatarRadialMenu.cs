@@ -427,10 +427,7 @@ namespace net.narazaka.avatarmenucreator
                                 if (newValue.Start > (float)maxValue) newValue.Start = (float)maxValue;
                                 if (newValue.End > (float)maxValue) newValue.End = (float)maxValue;
                             }
-                            if (newValue.StartOffsetPercent < 0) newValue.StartOffsetPercent = 0;
-                            if (newValue.EndOffsetPercent < 0) newValue.EndOffsetPercent = 0;
-                            if (newValue.StartOffsetPercent > 100) newValue.StartOffsetPercent = 100;
-                            if (newValue.EndOffsetPercent > 100) newValue.EndOffsetPercent = 100;
+                            newValue.AdjustOffsetValues();
 
                             radials[key] = newValue;
                             if (BulkSet)
@@ -571,10 +568,7 @@ namespace net.narazaka.avatarmenucreator
                         if (!value.Equals(newValue))
                         {
                             WillChange();
-                            if (newValue.StartOffsetPercent < 0) newValue.StartOffsetPercent = 0;
-                            if (newValue.EndOffsetPercent < 0) newValue.EndOffsetPercent = 0;
-                            if (newValue.StartOffsetPercent > 100) newValue.StartOffsetPercent = 100;
-                            if (newValue.EndOffsetPercent > 100) newValue.EndOffsetPercent = 100;
+                            newValue.AdjustOffsetValues();
 
                             RadialShaderVectorParameters[key] = newValue;
                             if (BulkSet)
@@ -815,10 +809,7 @@ namespace net.narazaka.avatarmenucreator
                         if (!value.Equals(newValue))
                         {
                             WillChange();
-                            if (newValue.StartOffsetPercent < 0) newValue.StartOffsetPercent = 0;
-                            if (newValue.EndOffsetPercent < 0) newValue.EndOffsetPercent = 0;
-                            if (newValue.StartOffsetPercent > 100) newValue.StartOffsetPercent = 100;
-                            if (newValue.EndOffsetPercent > 100) newValue.EndOffsetPercent = 100;
+                            newValue.AdjustOffsetValues();
 
                             RadialValues[key] = newValue;
                             if (BulkSet)
@@ -949,10 +940,7 @@ namespace net.narazaka.avatarmenucreator
                     if (!value.Equals(newValue))
                     {
                         WillChange();
-                        if (newValue.StartOffsetPercent < 0) newValue.StartOffsetPercent = 0;
-                        if (newValue.EndOffsetPercent < 0) newValue.EndOffsetPercent = 0;
-                        if (newValue.StartOffsetPercent > 100) newValue.StartOffsetPercent = 100;
-                        if (newValue.EndOffsetPercent > 100) newValue.EndOffsetPercent = 100;
+                        newValue.AdjustOffsetValues();
 
                         values[child] = newValue;
                         if (BulkSet)

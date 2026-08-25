@@ -10,5 +10,13 @@ namespace net.narazaka.avatarmenucreator
         public float TotalFactor => EndOffsetPercent - StartOffsetPercent;
         public bool IsPreStart(float rate) => rate * 100 < StartOffsetPercent;
         public bool IsPostEnd(float rate) => rate * 100 > EndOffsetPercent;
+
+        public void AdjustOffsetValues()
+        {
+            if (StartOffsetPercent < 0) StartOffsetPercent = 0;
+            if (StartOffsetPercent > 99) StartOffsetPercent = 99;
+            if (EndOffsetPercent > 100) EndOffsetPercent = 100;
+            if (EndOffsetPercent <= StartOffsetPercent) EndOffsetPercent = StartOffsetPercent + 1;
+        }
     }
 }
