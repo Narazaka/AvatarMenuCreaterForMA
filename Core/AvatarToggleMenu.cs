@@ -490,12 +490,13 @@ namespace net.narazaka.avatarmenucreator
                             if (newOffset != offset)
                             {
                                 WillChange();
-                                ToggleObjectTransitionOffsetPercents[child] = Mathf.Clamp(newOffset, 0, 100);
+                                var clampedOffset = Mathf.Clamp(newOffset, 0, 100);
+                                ToggleObjectTransitionOffsetPercents[child] = clampedOffset;
                                 if (BulkSet)
                                 {
                                     foreach (var c in children)
                                     {
-                                        ToggleObjectTransitionOffsetPercents[c] = newOffset;
+                                        ToggleObjectTransitionOffsetPercents[c] = clampedOffset;
                                     }
                                 }
                             }
@@ -633,7 +634,7 @@ namespace net.narazaka.avatarmenucreator
                         if (TransitionSeconds > 0)
                         {
                             EditorGUIUtility.labelWidth = 110;
-                            newValue.TransitionOffsetPercent = EditorGUILayout.FloatField(T.変化待機_per_, value.TransitionOffsetPercent, GUILayout.Width(140));
+                            newValue.TransitionOffsetPercent = Mathf.Clamp(EditorGUILayout.FloatField(T.変化待機_per_, value.TransitionOffsetPercent, GUILayout.Width(140)), 0, 100);
                             EditorGUIUtility.labelWidth = 0;
                         }
                         ShowAdvancedControls(value, newValue);
@@ -789,7 +790,7 @@ namespace net.narazaka.avatarmenucreator
                 if (TransitionSeconds > 0)
                 {
                     EditorGUIUtility.labelWidth = 110;
-                    newValue.TransitionOffsetPercent = EditorGUILayout.FloatField(T.変化待機_per_, value.TransitionOffsetPercent, GUILayout.Width(140));
+                    newValue.TransitionOffsetPercent = Mathf.Clamp(EditorGUILayout.FloatField(T.変化待機_per_, value.TransitionOffsetPercent, GUILayout.Width(140)), 0, 100);
                     EditorGUIUtility.labelWidth = 0;
                 }
                 ShowAdvancedControls(value, newValue);
