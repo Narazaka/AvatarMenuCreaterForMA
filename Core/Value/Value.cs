@@ -49,7 +49,7 @@ namespace net.narazaka.avatarmenucreator.value
 
             for (int i = 0; i < value.Length; i++)
             {
-                if (this.value[i] != other.value[i]) return false;
+                if (!this.value[i].Equals(other.value[i])) return false;
             }
             return true;
         }
