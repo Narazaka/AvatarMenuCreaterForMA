@@ -18,6 +18,7 @@ namespace net.narazaka.avatarmenucreator.util
         /// <param name="baseObject">親 (nullなら絶対パス)</param>
         /// <param name="targetObject">子</param>
         /// <returns>パス</returns>
+        [System.Obsolete("Use TryChildPath")]
         public static string ChildPath(GameObject baseObject, GameObject targetObject)
         {
             var paths = new List<string>();
@@ -30,6 +31,33 @@ namespace net.narazaka.avatarmenucreator.util
             }
             paths.Reverse();
             return string.Join("/", paths.ToArray());
+        }
+
+        /// <summary>
+        /// 子GameObjectの相対パスを返す (子孫でない場合やパスに使う名前が「/」を含む場合は失敗)
+        /// </summary>
+        /// <param name="baseObject">親</param>
+        /// <param name="targetObject">子</param>
+        /// <param name="path">パス</param>
+        /// <returns>成功なら真</returns>
+        public static bool TryChildPath(GameObject baseObject, GameObject targetObject, out string path)
+        {
+            path = null;
+            if (baseObject == null || targetObject == null || baseObject == targetObject) return false;
+            var paths = new List<string>();
+            var transform = targetObject.transform;
+            var baseTransform = baseObject.transform;
+            while (transform != null && transform != baseTransform)
+            {
+                var name = transform.gameObject.name;
+                if (name.Contains("/")) return false;
+                paths.Add(name);
+                transform = transform.parent;
+            }
+            if (transform != baseTransform) return false;
+            paths.Reverse();
+            path = string.Join("/", paths.ToArray());
+            return true;
         }
 
         public static (string basePath, string baseName) GetBasePathAndNameFromPrefabPath(string prefabPath)

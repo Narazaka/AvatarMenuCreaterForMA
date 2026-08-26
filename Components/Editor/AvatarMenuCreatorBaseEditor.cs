@@ -36,7 +36,11 @@ namespace net.narazaka.avatarmenucreator.components.editor
 
         void AddChild(GameObject baseObject, GameObject child)
         {
-            var path = Util.ChildPath(baseObject, child);
+            if (!Util.TryChildPath(baseObject, child, out var path))
+            {
+                EditorUtility.DisplayDialog(child == null ? "" : child.name, T.対象アバターの子孫でないか名前に_sl_を含むため使用できません, "OK");
+                return;
+            }
             if (Children.Contains(path)) return;
             UndoUtility.RecordObject(this, "Add Children");
             Children.Add(path);
@@ -276,8 +280,14 @@ namespace net.narazaka.avatarmenucreator.components.editor
                             var newObj = EditorGUILayout.ObjectField(null, typeof(GameObject), true);
                             if (newObj != null)
                             {
-                                var newPath = Util.ChildPath(baseObject, newObj as GameObject);
-                                ReplaceStoredChildWithConfirm(EditChild, newPath);
+                                if (Util.TryChildPath(baseObject, newObj as GameObject, out var newPath))
+                                {
+                                    ReplaceStoredChildWithConfirm(EditChild, newPath);
+                                }
+                                else
+                                {
+                                    EditorUtility.DisplayDialog(newObj.name, T.対象アバターの子孫でないか名前に_sl_を含むため使用できません, "OK");
+                                }
                             }
                             using (new EditorGUI.DisabledScope(c == EditChildNew))
                             {

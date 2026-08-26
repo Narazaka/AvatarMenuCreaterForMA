@@ -1,3 +1,4 @@
+using System.Linq;
 using UnityEngine;
 using UnityEditor;
 using VRC.SDK3.Avatars.Components;
@@ -97,11 +98,12 @@ namespace net.narazaka.avatarmenucreator.editor
             AvatarChooseMenu.ClearGameObjectCache();
             AvatarRadialMenu.ClearGameObjectCache();
             selectedGameObjects = Selection.gameObjects;
-            children = new string[selectedGameObjects.Length];
-            for (int i = 0; i < selectedGameObjects.Length; i++)
-            {
-                children[i] = util.Util.ChildPath(VRCAvatarDescriptor.gameObject, selectedGameObjects[i]);
-            }
+            var baseObject = VRCAvatarDescriptor == null ? null : VRCAvatarDescriptor.gameObject;
+            children = selectedGameObjects
+                .Select(go => util.Util.TryChildPath(baseObject, go, out var path) ? path : null)
+                .Where(path => path != null)
+                .Distinct()
+                .ToArray();
             return children;
         }
 

@@ -56,6 +56,9 @@ namespace net.narazaka.avatarmenucreator
         [English("Are you sure you want to replace it?")]
         public static string 本当に置換しますか_Q_ => L;
 
+        [English("It cannot be used because it is not a descendant of the target avatar or its name contains \"/\".")]
+        public static string 対象アバターの子孫でないか名前に_sl_を含むため使用できません => L;
+
         [English("The replacement destination already has settings, which will be overwritten.")]
         public static string 置換先に既存の設定がありヽ上書きされますゝ => L;
 
