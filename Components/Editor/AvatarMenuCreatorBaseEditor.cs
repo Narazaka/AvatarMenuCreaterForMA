@@ -146,7 +146,7 @@ namespace net.narazaka.avatarmenucreator.components.editor
                             if (GUILayout.Button(T.MA_Menu_Installerを追加))
                             {
                                 var installer = Creator.gameObject.AddComponent<ModularAvatarMenuInstaller>();
-                                Undo.RegisterCreatedObjectUndo(installer, "Remove MA Menu Installer");
+                                Undo.RegisterCreatedObjectUndo(installer, "Add MA Menu Installer");
                             }
                         }
                     }
