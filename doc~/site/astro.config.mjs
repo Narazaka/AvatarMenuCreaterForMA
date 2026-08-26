@@ -48,15 +48,15 @@ export default defineConfig({
       sidebar: [
         {
           label: "ガイド",
-          autogenerate: { directory: "guides" },
+          items: [{ autogenerate: { directory: "guides" } }],
         },
         {
           label: "詳しい使い方",
-          autogenerate: { directory: "usecases" },
+          items: [{ autogenerate: { directory: "usecases" } }],
         },
         {
           label: "リファレンス",
-          autogenerate: { directory: "references" },
+          items: [{ autogenerate: { directory: "references" } }],
         },
       ],
       routeMiddleware: "./src/routeData.ts",
