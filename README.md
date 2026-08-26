@@ -54,6 +54,8 @@ https://github.com/Narazaka/AvatarMenuCreaterForMA/releases/latest から `net.n
 
 ## 更新履歴
 
+- 1.39.0-beta.1
+  - パッケージからテストを省くように
 - 1.39.0-beta.0
   - 機能改善
     - MA的なリネーム追従をするように（参照が残っていればリネーム追従）
