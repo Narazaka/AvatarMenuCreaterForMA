@@ -90,7 +90,7 @@ namespace net.narazaka.avatarmenucreator.editor
         string[] children;
         string[] GetChildren()
         {
-            if (selectedGameObjects == Selection.gameObjects && children != null)
+            if (children != null && selectedGameObjects != null && selectedGameObjects.SequenceEqual(Selection.gameObjects))
             {
                 return children;
             }
