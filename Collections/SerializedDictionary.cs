@@ -38,13 +38,14 @@ namespace net.narazaka.avatarmenucreator.collections
             }
         }
 
-        public virtual K DefaultKey => default;
         public void OnAfterDeserialize()
         {
             Clear();
-            for(var i = 0; i < keys.Length; i++)
+            if (keys == null || values == null) return;
+            var length = Mathf.Min(keys.Length, values.Length);
+            for(var i = 0; i < length; i++)
             {
-                this[ContainsKey(keys[i]) ? DefaultKey : keys[i]] = values[i];
+                this[keys[i]] = values[i];
             }
         }
 
