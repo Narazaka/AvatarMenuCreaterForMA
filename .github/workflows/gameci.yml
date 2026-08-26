@@ -24,6 +24,9 @@ jobs:
     uses: Narazaka/vpm-repos/.github/workflows/release.yml@main
     with:
       ma: true
+      exclude: |
+        Test
+        Test.meta
 
   test:
     uses: Narazaka/vpm-repos/.github/workflows/gameci.yml@main
