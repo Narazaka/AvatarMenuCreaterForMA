@@ -54,6 +54,9 @@ https://github.com/Narazaka/AvatarMenuCreaterForMA/releases/latest から `net.n
 
 ## 更新履歴
 
+- 1.39.0-beta.0
+  - 機能改善
+    - MA的なリネーム追従をするように（参照が残っていればリネーム追従）
 - 1.38.6
   - UI改善
     - 選択式で選択肢を削除するときにパラメーター初期値が追従するように
