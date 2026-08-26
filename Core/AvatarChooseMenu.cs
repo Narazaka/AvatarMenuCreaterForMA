@@ -177,7 +177,14 @@ namespace net.narazaka.avatarmenucreator
             serializedObject.Update();
             EditorGUILayout.PropertyField(serializedProperty.FindPropertyRelative(nameof(UseParentMenu)), new GUIContent(T.親メニューを作る));
             EditorGUILayout.PropertyField(serializedProperty.FindPropertyRelative(nameof(ChooseParentIcon)), new GUIContent(T.親メニューアイコン));
-            EditorGUILayout.PropertyField(serializedProperty.FindPropertyRelative(nameof(ChooseDefaultValue)), new GUIContent(T.パラメーター初期値));
+            var chooseDefaultValue = serializedProperty.FindPropertyRelative(nameof(ChooseDefaultValue));
+            EditorGUILayout.PropertyField(chooseDefaultValue, new GUIContent(T.パラメーター初期値));
+            if (!chooseDefaultValue.hasMultipleDifferentValues)
+            {
+                var chooseCount = serializedProperty.FindPropertyRelative(nameof(ChooseCount));
+                if (chooseDefaultValue.intValue < 0) chooseDefaultValue.intValue = 0;
+                if (!chooseCount.hasMultipleDifferentValues && chooseDefaultValue.intValue >= chooseCount.intValue) chooseDefaultValue.intValue = chooseCount.intValue - 1;
+            }
             ShowDetailMenuMulti(serializedProperty);
 #if HAS_COMPRESSED_INT_PARAMETERS
             EditorGUILayout.PropertyField(serializedProperty.FindPropertyRelative(nameof(UseCompressed)), new GUIContent(T.パラメーター圧縮, T.選択肢数に必要最低限なパラメーターbit数にしますゝ同期がほんの少し遅延する可能性がありますゝ));
@@ -617,6 +624,7 @@ namespace net.narazaka.avatarmenucreator
         {
             WillChange();
             ChooseCount--;
+            if (ChooseDefaultValue > index) ChooseDefaultValue--;
             RemoveAndReorderDictionary(ChooseNames, index);
             RemoveAndReorderDictionary(ChooseIcons, index);
             RemoveAndReorderHashSet(ChooseObjects, index);
