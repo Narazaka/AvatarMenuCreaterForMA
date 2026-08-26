@@ -317,14 +317,8 @@ namespace net.narazaka.avatarmenucreator
                         },
                         name =>
                         {
-                            if (parameters.Find(p => p.Name == name).IsFloatLike)
-                            {
-                                RemoveRadialBlendShape(RadialShaderParameters, children, child, name);
-                            }
-                            else
-                            {
-                                RemoveRadialShaderVectorParameter(children, child, name);
-                            }
+                            RemoveRadialBlendShape(RadialShaderParameters, children, child, name);
+                            RemoveRadialShaderVectorParameter(children, child, name);
                         }
                         ))
                 {

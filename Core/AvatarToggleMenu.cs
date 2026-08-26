@@ -370,14 +370,8 @@ namespace net.narazaka.avatarmenucreator
                         },
                         (name) =>
                         {
-                            if (parameters.Find(p => p.Name == name).IsFloatLike)
-                            {
-                                RemoveToggleBlendShape(ToggleShaderParameters, children, child, name);
-                            }
-                            else
-                            {
-                                RemoveToggleShaderVectorParameter(children, child, name);
-                            }
+                            RemoveToggleBlendShape(ToggleShaderParameters, children, child, name);
+                            RemoveToggleShaderVectorParameter(children, child, name);
                         }
                         ))
                 {

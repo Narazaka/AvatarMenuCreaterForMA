@@ -525,14 +525,8 @@ namespace net.narazaka.avatarmenucreator
                         },
                         name =>
                         {
-                            if (parameters.Any(p => p.Name == name && p.IsFloatLike))
-                            {
-                                RemoveChooseBlendShape(ChooseShaderParameters, children, child, name);
-                            }
-                            else
-                            {
-                                RemoveChooseShaderVectorParameter(children, child, name);
-                            }
+                            RemoveChooseBlendShape(ChooseShaderParameters, children, child, name);
+                            RemoveChooseShaderVectorParameter(children, child, name);
                         }
                         ))
                 {
