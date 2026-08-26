@@ -1,17 +1,17 @@
 name: Build documentation
 
-on: 
+on:
   workflow_dispatch:
   push:
     branches:
       - master
   release:
     types:
-    - published
-    - created
-    - edited
-    - prereleased
-    - released
+      - published
+      - created
+      - edited
+      - prereleased
+      - released
 
 # Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
 permissions:
@@ -31,13 +31,13 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3 # check out this repo
+      - uses: actions/checkout@v7 # check out this repo
 
       - name: Use Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v7
         with:
           node-version: 20
-          cache: 'npm'
+          cache: "npm"
           cache-dependency-path: doc~/site/package-lock.json
 
       - run: npm ci
@@ -46,13 +46,13 @@ jobs:
         working-directory: doc~/site
 
       - name: Setup Pages
-        uses: actions/configure-pages@v5
+        uses: actions/configure-pages@v6
 
       - name: Upload artifact
-        uses: actions/upload-pages-artifact@v3
+        uses: actions/upload-pages-artifact@v5
         with:
           path: doc~/site/dist
 
       - name: Deploy to GitHub Pages
         id: deployment
-        uses: actions/deploy-pages@v4
+        uses: actions/deploy-pages@v5
