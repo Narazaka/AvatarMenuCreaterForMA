@@ -87,16 +87,7 @@ namespace net.narazaka.avatarmenucreator.components.editor
                 EditorGUILayout.HelpBox(T.MA_Merge_AnimatorまたはMA_Parametersがある場合ヽ_このコンポーネントは影響せずそれらの設定がそのまま使われますゝ, MessageType.Info);
                 if (GUILayout.Button(T.コンポーネントの設定を優先する) && EditorUtility.DisplayDialog(T.本当に削除しますか_Q_, T.MA_Merge_AnimatorとMA_Parametersを削除しますゝ_n_MA_Menu_Installerのインストールされるメニューをリセットしますゝ, "OK", "Cancel"))
                 {
-                    var mergeAnimator = Creator.GetComponent<ModularAvatarMergeAnimator>();
-                    if (mergeAnimator != null)
-                    {
-                        Undo.DestroyObjectImmediate(mergeAnimator);
-                    }
-                    var parameters = Creator.GetComponent<ModularAvatarParameters>();
-                    if (parameters != null)
-                    {
-                        Undo.DestroyObjectImmediate(parameters);
-                    }
+                    Creator.DestroyMAComponents();
                     var maMenuInstaller = Creator.GetComponent<ModularAvatarMenuInstaller>();
                     if (maMenuInstaller != null)
                     {

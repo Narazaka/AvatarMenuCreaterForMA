@@ -106,6 +106,8 @@ namespace net.narazaka.avatarmenucreator.editor
 #if HAS_COMPRESSED_INT_PARAMETERS
             if (compressedMaxValue > 0 && parameters.All(p => !p.localOnly))
             {
+                var oldParameters = prefab.GetComponent<ModularAvatarParameters>();
+                if (oldParameters != null) UnityEngine.Object.DestroyImmediate(oldParameters);
                 var maParameters = prefab.GetOrAddComponent<Narazaka.VRChat.CompressedIntParameters.CompressedIntParameters>();
                 maParameters.parameters.Clear();
                 maParameters.parameters.AddRange(parameters.Select(p => Narazaka.VRChat.CompressedIntParameters.CompressedParameterConfig.From(p, compressedMaxValue)));
@@ -113,6 +115,10 @@ namespace net.narazaka.avatarmenucreator.editor
             else
 #endif
             {
+#if HAS_COMPRESSED_INT_PARAMETERS
+                var oldCompressed = prefab.GetComponent<Narazaka.VRChat.CompressedIntParameters.CompressedIntParameters>();
+                if (oldCompressed != null) UnityEngine.Object.DestroyImmediate(oldCompressed);
+#endif
                 var maParameters = prefab.GetOrAddComponent<ModularAvatarParameters>();
                 maParameters.parameters.Clear();
                 maParameters.parameters.AddRange(parameters);

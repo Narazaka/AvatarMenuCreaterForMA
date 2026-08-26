@@ -24,7 +24,23 @@ namespace net.narazaka.avatarmenucreator.components
 #if UNITY_EDITOR
         public abstract UnityEditor.SerializedProperty AvatarMenuProperty(UnityEditor.SerializedObject serializedObject);
 
-        public bool IsEffective => GetComponent<ModularAvatarMergeAnimator>() == null && GetComponent<ModularAvatarParameters>() == null;
+        public bool IsEffective => GetComponent<ModularAvatarMergeAnimator>() == null && GetComponent<ModularAvatarParameters>() == null
+#if HAS_COMPRESSED_INT_PARAMETERS
+            && GetComponent<Narazaka.VRChat.CompressedIntParameters.CompressedIntParameters>() == null
+#endif
+            ;
+
+        public void DestroyMAComponents()
+        {
+            var mergeAnimator = GetComponent<ModularAvatarMergeAnimator>();
+            if (mergeAnimator != null) UnityEditor.Undo.DestroyObjectImmediate(mergeAnimator);
+            var parameters = GetComponent<ModularAvatarParameters>();
+            if (parameters != null) UnityEditor.Undo.DestroyObjectImmediate(parameters);
+#if HAS_COMPRESSED_INT_PARAMETERS
+            var compressed = GetComponent<Narazaka.VRChat.CompressedIntParameters.CompressedIntParameters>();
+            if (compressed != null) UnityEditor.Undo.DestroyObjectImmediate(compressed);
+#endif
+        }
 
         public IEnumerable<VRCExpressionParameters.Parameter> GetParameterNameAndTypes()
         {
