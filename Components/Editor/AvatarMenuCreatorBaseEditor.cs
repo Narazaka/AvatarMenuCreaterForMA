@@ -114,11 +114,12 @@ namespace net.narazaka.avatarmenucreator.components.editor
                 }
 
                 EditorGUILayout.HelpBox(T.MA_Menu_Installerのインストール先にインストールされますゝ_n_MA_Menu_Installer_が無い場合は_MA_Menu_Item_のように振る舞いますゝ__start_ネストしたメニューなどに便利_end_, MessageType.Info);
-                if (baseObject != null)
+                var parentTransform = Creator.transform.parent;
+                if (baseObject != null && parentTransform != null)
                 {
-                    var parentMenuItem = Creator.transform.parent.GetComponent<ModularAvatarMenuItem>();
-                    var parentMenuGroup = Creator.transform.parent.GetComponent<ModularAvatarMenuGroup>();
-                    var parentChooseMenu = Creator.transform.parent.GetComponent<AvatarChooseMenuCreator>();
+                    var parentMenuItem = parentTransform.GetComponent<ModularAvatarMenuItem>();
+                    var parentMenuGroup = parentTransform.GetComponent<ModularAvatarMenuGroup>();
+                    var parentChooseMenu = parentTransform.GetComponent<AvatarChooseMenuCreator>();
                     if (parentChooseMenu != null || parentMenuGroup != null || (parentMenuItem != null && parentMenuItem.Control.type == VRC.SDK3.Avatars.ScriptableObjects.VRCExpressionsMenu.Control.ControlType.SubMenu && parentMenuItem.MenuSource == SubmenuSource.Children))
                     {
                         if (maMenuInstaller != null)
