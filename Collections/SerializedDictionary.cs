@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace net.narazaka.avatarmenucreator.collections
@@ -19,6 +20,17 @@ namespace net.narazaka.avatarmenucreator.collections
             var value = this[oldKey];
             Remove(oldKey);
             this[newKey] = value;
+        }
+
+        public void ReplaceKeys(Dictionary<K, K> mapping)
+        {
+            if (!mapping.Keys.Any(ContainsKey)) return;
+            var pairs = this.ToArray();
+            Clear();
+            foreach (var pair in pairs)
+            {
+                this[mapping.TryGetValue(pair.Key, out var newKey) ? newKey : pair.Key] = pair.Value;
+            }
         }
 
         public void SwapKey(K key1, K key2)
