@@ -246,7 +246,7 @@ namespace net.narazaka.avatarmenucreator
             {
                 EditorGUILayout.BeginHorizontal();
                 var dropRect = EditorGUILayout.GetControlRect(false, GUILayout.Height(EditorGUIUtility.singleLineHeight));
-                DropAreaGUI(dropRect, T.アイコンをドラッグ__and__ドロップ, (index, icon) => ChooseIcons[index] = icon as Texture2D);
+                DropAreaGUI(dropRect, T.アイコンをドラッグ__and__ドロップ, (index, icon) => { WillChange(); ChooseIcons[index] = icon as Texture2D; });
                 if (GUILayout.Button(T.選択肢名を変更)) ChooseNameFoldout = !ChooseNameFoldout;
                 EditorGUILayout.EndHorizontal();
 
@@ -347,10 +347,22 @@ namespace net.narazaka.avatarmenucreator
                     rect.width -= EditorGUIUtility.standardVerticalSpacing * 5 + 20 * 3;
                     rect.width /= 2;
                     EditorGUIUtility.labelWidth = 50;
-                    ChooseNames[index] = TextField(rect, $"{T.選択肢}{index}", ChooseName(index));
+                    var chooseName = ChooseName(index);
+                    var newChooseName = TextField(rect, $"{T.選択肢}{index}", chooseName);
+                    if (newChooseName != chooseName)
+                    {
+                        WillChange();
+                        ChooseNames[index] = newChooseName;
+                    }
                     EditorGUIUtility.labelWidth = 0;
                     rect.x += rect.width + EditorGUIUtility.standardVerticalSpacing;
-                    ChooseIcons[index] = TextureField(rect, ChooseIcon(index));
+                    var chooseIcon = ChooseIcon(index);
+                    var newChooseIcon = TextureField(rect, chooseIcon);
+                    if (newChooseIcon != chooseIcon)
+                    {
+                        WillChange();
+                        ChooseIcons[index] = newChooseIcon;
+                    }
                     rect.x += rect.width + EditorGUIUtility.standardVerticalSpacing;
                     rect.width = 20;
                     if (GUI.Button(rect, PickerGUIContent))
