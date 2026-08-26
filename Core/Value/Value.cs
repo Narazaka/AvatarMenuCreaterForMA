@@ -28,7 +28,7 @@ namespace net.narazaka.avatarmenucreator.value
         protected float[] value;
 
         public Value() { value = new float[0]; }
-        public Value(float[] value) { this.value = value; }
+        public Value(float[] value) { this.value = value ?? new float[0]; }
 
         public object As(Type type)
         {

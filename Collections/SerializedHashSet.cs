@@ -24,7 +24,7 @@ namespace net.narazaka.avatarmenucreator.collections
         public void OnAfterDeserialize()
         {
             hashSet = new HashSet<V>();
-            hashSet.UnionWith(values);
+            if (values != null) hashSet.UnionWith(values);
         }
 
         public void OnBeforeSerialize()
