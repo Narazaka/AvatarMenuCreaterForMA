@@ -62,7 +62,7 @@ namespace net.narazaka.avatarmenucreator.util
 
         public static (string basePath, string baseName) GetBasePathAndNameFromPrefabPath(string prefabPath)
         {
-            var basePath = new System.Text.RegularExpressions.Regex(@"\.prefab").Replace(prefabPath, "");
+            var basePath = new System.Text.RegularExpressions.Regex(@"\.prefab$").Replace(prefabPath, "");
             var baseName = System.IO.Path.GetFileNameWithoutExtension(basePath);
             return (basePath, baseName);
         }
