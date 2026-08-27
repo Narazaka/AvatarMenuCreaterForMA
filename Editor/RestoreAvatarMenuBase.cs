@@ -175,6 +175,16 @@ namespace net.narazaka.avatarmenucreator.editor
                 objectReferenceCurves.Add(name, curve);
             }
 
+            public bool HasCurve(object postfix)
+            {
+                return curves.ContainsKey(WithName(postfix));
+            }
+
+            public bool HasObjectReferenceCurve(object postfix)
+            {
+                return objectReferenceCurves.ContainsKey(WithName(postfix));
+            }
+
             public AnimationCurve GetCurve(object postfix)
             {
                 return curves[WithName(postfix)];

@@ -52,8 +52,24 @@ namespace net.narazaka.avatarmenucreator
         public Texture2D ChooseParentIcon;
         [SerializeField]
         public IntTexture2DDictionary ChooseIcons = new IntTexture2DDictionary();
+        [SerializeField]
+        public IntHashSetDictionary ChooseObjectNoControls = new IntHashSetDictionary();
+        [SerializeField]
+        public MaterialChoiceFlagDictionary ChooseMaterialNoControls = new MaterialChoiceFlagDictionary();
+        [SerializeField]
+        public NestedIntHashSetDictionary ChooseBlendShapeNoControls = new NestedIntHashSetDictionary();
+        [SerializeField]
+        public NestedIntHashSetDictionary ChooseShaderParameterNoControls = new NestedIntHashSetDictionary();
+        [SerializeField]
+        public NestedIntHashSetDictionary ChooseShaderVectorParameterNoControls = new NestedIntHashSetDictionary();
+        [SerializeField]
+        public ValueChoiceFlagDictionary ChooseValueNoControls = new ValueChoiceFlagDictionary();
+        [SerializeField]
+        public NestedIntHashSetDictionary TransformNoControls = new NestedIntHashSetDictionary();
 
         public bool CanUseCompressed => Synced && ChooseCount > 1;
+
+        public static bool IsNoControl<K>(Dictionary<K, IntHashSet> noControls, K key, int index) => noControls.TryGetValue(key, out var set) && set.Contains(index);
 
 #if UNITY_EDITOR
         static readonly string[] TransformComponentNames = new[] { "Position", "Rotation", "Scale" };
@@ -67,6 +83,47 @@ namespace net.narazaka.avatarmenucreator
                 default: throw new ArgumentException();
             }
         }
+
+        [NonSerialized]
+        bool _UseAdvanced;
+        public bool UseAdvanced
+        {
+            get
+            {
+                if (_UseAdvanced) return true;
+                if (HasNoControls)
+                {
+                    _UseAdvanced = true;
+                }
+                return _UseAdvanced;
+            }
+            set
+            {
+                if (_UseAdvanced != value)
+                {
+                    if (!value && HasNoControls)
+                    {
+                        if (EditorUtility.DisplayDialog(T.高度な設定の削除, T.高度な設定がリセットされます_n_本当に高度な設定を無効にしますか_Q_, "OK", "Cancel"))
+                        {
+                            _UseAdvanced = value;
+                            WillChange();
+                            ChooseObjectNoControls.Clear();
+                            ChooseMaterialNoControls.Clear();
+                            ChooseBlendShapeNoControls.Clear();
+                            ChooseShaderParameterNoControls.Clear();
+                            ChooseShaderVectorParameterNoControls.Clear();
+                            ChooseValueNoControls.Clear();
+                            TransformNoControls.Clear();
+                        }
+                    }
+                    else
+                    {
+                        _UseAdvanced = value;
+                    }
+                }
+            }
+        }
+        bool HasNoControls => ChooseObjectNoControls.Count > 0 || ChooseMaterialNoControls.Count > 0 || ChooseBlendShapeNoControls.Count > 0 || ChooseShaderParameterNoControls.Count > 0 || ChooseShaderVectorParameterNoControls.Count > 0 || ChooseValueNoControls.Count > 0 || TransformNoControls.Count > 0;
 
         public string ChooseName(int index)
         {
@@ -96,6 +153,13 @@ namespace net.narazaka.avatarmenucreator
                 Positions.ReplaceKey(oldChild, newChild);
                 Rotations.ReplaceKey(oldChild, newChild);
                 Scales.ReplaceKey(oldChild, newChild);
+                ChooseObjectNoControls.ReplaceKey(oldChild, newChild);
+                ChooseMaterialNoControls.ReplacePrimaryKey(oldChild, newChild);
+                ChooseBlendShapeNoControls.ReplacePrimaryKey(oldChild, newChild);
+                ChooseShaderParameterNoControls.ReplacePrimaryKey(oldChild, newChild);
+                ChooseShaderVectorParameterNoControls.ReplacePrimaryKey(oldChild, newChild);
+                ChooseValueNoControls.ReplacePrimaryKey(oldChild, newChild);
+                TransformNoControls.ReplacePrimaryKey(oldChild, newChild);
             }
         }
 
@@ -111,6 +175,13 @@ namespace net.narazaka.avatarmenucreator
             Positions.ReplaceKeys(mapping);
             Rotations.ReplaceKeys(mapping);
             Scales.ReplaceKeys(mapping);
+            ChooseObjectNoControls.ReplaceKeys(mapping);
+            ChooseMaterialNoControls.ReplacePrimaryKeys(mapping);
+            ChooseBlendShapeNoControls.ReplacePrimaryKeys(mapping);
+            ChooseShaderParameterNoControls.ReplacePrimaryKeys(mapping);
+            ChooseShaderVectorParameterNoControls.ReplacePrimaryKeys(mapping);
+            ChooseValueNoControls.ReplacePrimaryKeys(mapping);
+            TransformNoControls.ReplacePrimaryKeys(mapping);
         }
 
         public override void FilterStoredTargets(IEnumerable<string> children)
@@ -152,6 +223,34 @@ namespace net.narazaka.avatarmenucreator
             {
                 Scales.Remove(child);
             }
+            foreach (var child in ChooseObjectNoControls.Keys.Where(child => !filter.Contains(child)).ToList())
+            {
+                ChooseObjectNoControls.Remove(child);
+            }
+            foreach (var key in ChooseMaterialNoControls.Keys.Where(key => !filter.Contains(key.Item1)).ToList())
+            {
+                ChooseMaterialNoControls.Remove(key);
+            }
+            foreach (var key in ChooseBlendShapeNoControls.Keys.Where(key => !filter.Contains(key.Item1)).ToList())
+            {
+                ChooseBlendShapeNoControls.Remove(key);
+            }
+            foreach (var key in ChooseShaderParameterNoControls.Keys.Where(key => !filter.Contains(key.Item1)).ToList())
+            {
+                ChooseShaderParameterNoControls.Remove(key);
+            }
+            foreach (var key in ChooseShaderVectorParameterNoControls.Keys.Where(key => !filter.Contains(key.Item1)).ToList())
+            {
+                ChooseShaderVectorParameterNoControls.Remove(key);
+            }
+            foreach (var key in ChooseValueNoControls.Keys.Where(key => !filter.Contains(key.Item1)).ToList())
+            {
+                ChooseValueNoControls.Remove(key);
+            }
+            foreach (var key in TransformNoControls.Keys.Where(key => !filter.Contains(key.Item1)).ToList())
+            {
+                TransformNoControls.Remove(key);
+            }
         }
 
         public override void RemoveStoredChild(string child)
@@ -181,6 +280,31 @@ namespace net.narazaka.avatarmenucreator
             Positions.Remove(child);
             Rotations.Remove(child);
             Scales.Remove(child);
+            ChooseObjectNoControls.Remove(child);
+            foreach (var key in ChooseMaterialNoControls.Keys.Where(key => key.Item1 == child).ToList())
+            {
+                ChooseMaterialNoControls.Remove(key);
+            }
+            foreach (var key in ChooseBlendShapeNoControls.Keys.Where(key => key.Item1 == child).ToList())
+            {
+                ChooseBlendShapeNoControls.Remove(key);
+            }
+            foreach (var key in ChooseShaderParameterNoControls.Keys.Where(key => key.Item1 == child).ToList())
+            {
+                ChooseShaderParameterNoControls.Remove(key);
+            }
+            foreach (var key in ChooseShaderVectorParameterNoControls.Keys.Where(key => key.Item1 == child).ToList())
+            {
+                ChooseShaderVectorParameterNoControls.Remove(key);
+            }
+            foreach (var key in ChooseValueNoControls.Keys.Where(key => key.Item1 == child).ToList())
+            {
+                ChooseValueNoControls.Remove(key);
+            }
+            foreach (var key in TransformNoControls.Keys.Where(key => key.Item1 == child).ToList())
+            {
+                TransformNoControls.Remove(key);
+            }
         }
 
         protected override bool IsSuitableForTransition() => ChooseBlendShapes.Count > 0 || ChooseShaderParameters.Count > 0 || ChooseShaderVectorParameters.Count > 0 || ChooseValues.Names().Where(t => t.MemberType.IsSuitableForTransition()).Count() > 0 || Positions.Count > 0 || Rotations.Count > 0 || Scales.Count > 0;
@@ -243,6 +367,8 @@ namespace net.narazaka.avatarmenucreator
             EditorGUILayout.Space();
 
             ShowTransitionSeconds();
+
+            UseAdvanced = Toggle(T.高度な設定, UseAdvanced);
 
             EditorGUILayout.Space();
 
@@ -470,6 +596,7 @@ namespace net.narazaka.avatarmenucreator
                     {
                         indexes = new IntHashSet();
                         ChooseObjects.Remove(child);
+                        ChooseObjectNoControls.Remove(child);
                     }
                 }
                 EditorGUILayout.EndHorizontal();
@@ -516,7 +643,7 @@ namespace net.narazaka.avatarmenucreator
                         ))
                 {
                     EditorGUI.indentLevel++;
-                    ShowChooseBlendShapeControl(true, children, child, ChooseBlendShapes, names.ToNames());
+                    ShowChooseBlendShapeControl(true, children, child, ChooseBlendShapes, ChooseBlendShapeNoControls, names.ToNames());
                     EditorGUI.indentLevel--;
                 }
                 if (parameters.Count > 0 &&
@@ -545,7 +672,7 @@ namespace net.narazaka.avatarmenucreator
                         ))
                 {
                     EditorGUI.indentLevel++;
-                    ShowChooseBlendShapeControl(false, children, child, ChooseShaderParameters, parameters, minValue: null, maxValue: null);
+                    ShowChooseBlendShapeControl(false, children, child, ChooseShaderParameters, ChooseShaderParameterNoControls, parameters, minValue: null, maxValue: null);
                     ShowChooseShaderVectorParameterControl(children, child, parameters);
                     EditorGUI.indentLevel--;
                 }
@@ -590,21 +717,11 @@ namespace net.narazaka.avatarmenucreator
             ChooseIcons.SwapKey(from, to);
             foreach (var indexes in ChooseObjects.Values)
             {
-                var hasFrom = indexes.Contains(from);
-                var hasTo = indexes.Contains(to);
-                if (hasFrom != hasTo)
-                {
-                    if (hasFrom)
-                    {
-                        indexes.Remove(from);
-                        indexes.Add(to);
-                    }
-                    else
-                    {
-                        indexes.Remove(to);
-                        indexes.Add(from);
-                    }
-                }
+                SwapChoice(indexes, from, to);
+            }
+            foreach (var indexes in NoControlHashSets())
+            {
+                SwapChoice(indexes, from, to);
             }
             foreach (var value in ChooseMaterials.Values)
             {
@@ -640,6 +757,33 @@ namespace net.narazaka.avatarmenucreator
             }
         }
 
+        static void SwapChoice(IntHashSet indexes, int from, int to)
+        {
+            var hasFrom = indexes.Contains(from);
+            var hasTo = indexes.Contains(to);
+            if (hasFrom != hasTo)
+            {
+                if (hasFrom)
+                {
+                    indexes.Remove(from);
+                    indexes.Add(to);
+                }
+                else
+                {
+                    indexes.Remove(to);
+                    indexes.Add(from);
+                }
+            }
+        }
+
+        IEnumerable<IntHashSet> NoControlHashSets() => ChooseObjectNoControls.Values
+            .Concat(ChooseMaterialNoControls.Values)
+            .Concat(ChooseBlendShapeNoControls.Values)
+            .Concat(ChooseShaderParameterNoControls.Values)
+            .Concat(ChooseShaderVectorParameterNoControls.Values)
+            .Concat(ChooseValueNoControls.Values)
+            .Concat(TransformNoControls.Values);
+
         void RemoveChoice(int index)
         {
             WillChange();
@@ -647,7 +791,8 @@ namespace net.narazaka.avatarmenucreator
             if (ChooseDefaultValue > index) ChooseDefaultValue--;
             RemoveAndReorderDictionary(ChooseNames, index);
             RemoveAndReorderDictionary(ChooseIcons, index);
-            RemoveAndReorderHashSet(ChooseObjects, index);
+            RemoveAndReorderHashSets(ChooseObjects.Values, index);
+            RemoveAndReorderHashSets(NoControlHashSets(), index);
             RemoveAndReorderValues<Material, IntMaterialDictionary>(ChooseMaterials, index);
             RemoveAndReorderValues<float, IntFloatDictionary>(ChooseBlendShapes, index);
             RemoveAndReorderValues<float, IntFloatDictionary>(ChooseShaderParameters, index);
@@ -668,9 +813,9 @@ namespace net.narazaka.avatarmenucreator
             }
         }
 
-        void RemoveAndReorderHashSet(IntHashSetDictionary dic, int index)
+        void RemoveAndReorderHashSets(IEnumerable<IntHashSet> sets, int index)
         {
-            foreach (var value in dic.Values)
+            foreach (var value in sets)
             {
                 value.Remove(index);
                 foreach (var key in value.Where(i => i > index).OrderBy(i => i).ToArray())
@@ -709,25 +854,56 @@ namespace net.narazaka.avatarmenucreator
             }
         }
 
+        bool NoControlToggleGUI<K>(Dictionary<K, IntHashSet> noControls, K key, int index)
+        {
+            var noControl = IsNoControl(noControls, key, index);
+            if (!UseAdvanced) return noControl;
+            var indentLevel = EditorGUI.indentLevel;
+            EditorGUI.indentLevel = 0;
+            var newNoControl = EditorGUILayout.ToggleLeft(T.制御しない, noControl, GUILayout.Width(85));
+            EditorGUI.indentLevel = indentLevel;
+            if (newNoControl != noControl)
+            {
+                WillChange();
+                if (newNoControl)
+                {
+                    if (!noControls.TryGetValue(key, out var set)) noControls[key] = set = new IntHashSet();
+                    set.Add(index);
+                }
+                else if (noControls.TryGetValue(key, out var set))
+                {
+                    set.Remove(index);
+                    if (set.Count == 0) noControls.Remove(key);
+                }
+            }
+            return newNoControl;
+        }
+
         void ShowChooseObjectControl(string child, IntHashSet indexes)
         {
             var changed = false;
             for (var i = 0; i < ChooseCount; i++)
             {
-                var active = indexes.Contains(i);
-                var newActive = EditorGUILayout.ToggleLeft(ChooseName(i), active);
-                if (active != newActive)
+                EditorGUILayout.BeginHorizontal();
+                using (new EditorGUI.DisabledGroupScope(IsNoControl(ChooseObjectNoControls, child, i)))
                 {
-                    if (newActive)
+                    var active = indexes.Contains(i);
+                    var newActive = EditorGUILayout.ToggleLeft(ChooseName(i), active);
+                    if (active != newActive)
                     {
-                        indexes.Add(i);
+                        if (newActive)
+                        {
+                            indexes.Add(i);
+                        }
+                        else
+                        {
+                            indexes.Remove(i);
+                        }
+                        changed = true;
                     }
-                    else
-                    {
-                        indexes.Remove(i);
-                    }
-                    changed = true;
                 }
+                NoControlToggleGUI(ChooseObjectNoControls, child, i);
+                EditorGUILayout.EndHorizontal();
             }
             if (changed)
             {
@@ -767,9 +943,14 @@ namespace net.narazaka.avatarmenucreator
                         {
                             var value = values.ContainsKey(j) ? values[j] : null;
                             EditorGUILayout.BeginHorizontal();
-                            var newValue = EditorGUILayout.ObjectField(ChooseName(j), value, typeof(Material), false) as Material;
-                            MaterialPickerButton(child, i, ref newValue);
-                            MaterialApplyButton(child, i, newValue);
+                            Material newValue;
+                            using (new EditorGUI.DisabledGroupScope(IsNoControl(ChooseMaterialNoControls, key, j)))
+                            {
+                                newValue = EditorGUILayout.ObjectField(ChooseName(j), value, typeof(Material), false) as Material;
+                                MaterialPickerButton(child, i, ref newValue);
+                                MaterialApplyButton(child, i, newValue);
+                            }
+                            NoControlToggleGUI(ChooseMaterialNoControls, key, j);
                             EditorGUILayout.EndHorizontal();
                             if (value != newValue)
                             {
@@ -928,6 +1109,7 @@ namespace net.narazaka.avatarmenucreator
             IList<string> children,
             string child,
             ChooseBlendShapeDictionary choices,
+            NestedIntHashSetDictionary noControls,
             IEnumerable<INameAndDescription> names,
             float? minValue = 0,
             float? maxValue = 100
@@ -946,9 +1128,14 @@ namespace net.narazaka.avatarmenucreator
                         {
                             var value = values.ContainsKey(i) ? values[i] : 0;
                             EditorGUILayout.BeginHorizontal();
-                            var newValue = EditorGUILayout.FloatField(ChooseName(i), value);
-                            BlendShapeLikePickerButton(isBlendShape, child, name.Name, ref newValue);
-                            BlendShapeLikeApplyButton(isBlendShape, child, name.Name, newValue);
+                            float newValue;
+                            using (new EditorGUI.DisabledGroupScope(IsNoControl(noControls, key, i)))
+                            {
+                                newValue = EditorGUILayout.FloatField(ChooseName(i), value);
+                                BlendShapeLikePickerButton(isBlendShape, child, name.Name, ref newValue);
+                                BlendShapeLikeApplyButton(isBlendShape, child, name.Name, newValue);
+                            }
+                            NoControlToggleGUI(noControls, key, i);
                             EditorGUILayout.EndHorizontal();
 
                             if (value != newValue)
@@ -1055,9 +1242,14 @@ namespace net.narazaka.avatarmenucreator
                         {
                             var value = values.ContainsKey(i) ? values[i] : Vector4.zero;
                             EditorGUILayout.BeginHorizontal();
-                            var newValue = EditorGUILayout.Vector4Field(ChooseName(i), value);
-                            ShaderVectorParameterPickerButton(child, name.Name, ref newValue);
-                            ShaderVectorParameterApplyButton(child, name.Name, newValue);
+                            Vector4 newValue;
+                            using (new EditorGUI.DisabledGroupScope(IsNoControl(ChooseShaderVectorParameterNoControls, key, i)))
+                            {
+                                newValue = EditorGUILayout.Vector4Field(ChooseName(i), value);
+                                ShaderVectorParameterPickerButton(child, name.Name, ref newValue);
+                                ShaderVectorParameterApplyButton(child, name.Name, newValue);
+                            }
+                            NoControlToggleGUI(ChooseShaderVectorParameterNoControls, key, i);
                             EditorGUILayout.EndHorizontal();
 
                             if (value != newValue)
@@ -1157,6 +1349,7 @@ namespace net.narazaka.avatarmenucreator
                             var value = values.ContainsKey(i) ? values[i] : 0;
                             Value newValue = null;
                             EditorGUILayout.BeginHorizontal();
+                            EditorGUI.BeginDisabledGroup(IsNoControl(ChooseValueNoControls, key, i));
                             if (member.MemberType == typeof(float))
                             {
                                 newValue = EditorGUILayout.FloatField(ChooseName(i), (float)value);
@@ -1227,6 +1420,8 @@ namespace net.narazaka.avatarmenucreator
                                 ValueApplyButton(child, member, newValue);
                                 EditorGUIUtility.wideMode = widemode;
                             }
+                            EditorGUI.EndDisabledGroup();
+                            NoControlToggleGUI(ChooseValueNoControls, key, i);
                             EditorGUILayout.EndHorizontal();
 
                             if (value != newValue)
@@ -1319,9 +1514,14 @@ namespace net.narazaka.avatarmenucreator
                     {
                         var value = values.ContainsKey(i) ? values[i] : Vector3.zero;
                         EditorGUILayout.BeginHorizontal();
-                        var newValue = EditorGUILayout.Vector3Field(ChooseName(i), value);
-                        TransformPickerButton(child, title, ref newValue);
-                        TransformApplyButton(child, title, newValue);
+                        Vector3 newValue;
+                        using (new EditorGUI.DisabledGroupScope(IsNoControl(TransformNoControls, (child, title), i)))
+                        {
+                            newValue = EditorGUILayout.Vector3Field(ChooseName(i), value);
+                            TransformPickerButton(child, title, ref newValue);
+                            TransformApplyButton(child, title, newValue);
+                        }
+                        NoControlToggleGUI(TransformNoControls, (child, title), i);
                         EditorGUILayout.EndHorizontal();
 
                         if (value != newValue)
@@ -1556,7 +1756,7 @@ namespace net.narazaka.avatarmenucreator
                 if (go == null) continue;
                 // GameObject active
                 ChooseObjects.TryGetValue(child, out var objIndexes);
-                if (objIndexes != null)
+                if (objIndexes != null && !IsNoControl(ChooseObjectNoControls, child, chooseIndex))
                 {
                     Undo.RecordObject(go, "AvatarMenuCreator Apply");
                     go.SetActive(objIndexes.Contains(chooseIndex));
@@ -1566,7 +1766,7 @@ namespace net.narazaka.avatarmenucreator
             foreach (var (child, index) in ChooseMaterials.Keys)
             {
                 var key = (child, index);
-                if (ChooseMaterials.TryGetValue(key, out var values))
+                if (ChooseMaterials.TryGetValue(key, out var values) && !IsNoControl(ChooseMaterialNoControls, key, chooseIndex))
                 {
                     var mat = values.ContainsKey(chooseIndex) ? values[chooseIndex] : null;
                     ApplyMaterial(child, index, mat);
@@ -1576,7 +1776,7 @@ namespace net.narazaka.avatarmenucreator
             foreach (var (child, name) in ChooseBlendShapes.Keys)
             {
                 var key = (child, name);
-                if (ChooseBlendShapes.TryGetValue(key, out var values))
+                if (ChooseBlendShapes.TryGetValue(key, out var values) && !IsNoControl(ChooseBlendShapeNoControls, key, chooseIndex))
                 {
                     var value = values.ContainsKey(chooseIndex) ? values[chooseIndex] : 0f;
                     ApplyBlendShapeWeight(child, name, value);
@@ -1586,7 +1786,7 @@ namespace net.narazaka.avatarmenucreator
             foreach (var (child, name) in ChooseShaderParameters.Keys)
             {
                 var key = (child, name);
-                if (ChooseShaderParameters.TryGetValue(key, out var values))
+                if (ChooseShaderParameters.TryGetValue(key, out var values) && !IsNoControl(ChooseShaderParameterNoControls, key, chooseIndex))
                 {
                     var value = values.ContainsKey(chooseIndex) ? values[chooseIndex] : 0f;
                     ApplyShaderFloatParameter(child, name, value);
@@ -1596,7 +1796,7 @@ namespace net.narazaka.avatarmenucreator
             foreach (var (child, name) in ChooseShaderVectorParameters.Keys)
             {
                 var key = (child, name);
-                if (ChooseShaderVectorParameters.TryGetValue(key, out var values))
+                if (ChooseShaderVectorParameters.TryGetValue(key, out var values) && !IsNoControl(ChooseShaderVectorParameterNoControls, key, chooseIndex))
                 {
                     var value = values.ContainsKey(chooseIndex) ? values[chooseIndex] : Vector4.zero;
                     ApplyShaderVectorParameter(child, name, value);
@@ -1606,7 +1806,7 @@ namespace net.narazaka.avatarmenucreator
             foreach (var (child, member) in ChooseValues.Keys)
             {
                 var key = (child, member);
-                if (ChooseValues.TryGetValue(key, out var values))
+                if (ChooseValues.TryGetValue(key, out var values) && !IsNoControl(ChooseValueNoControls, key, chooseIndex))
                 {
                     var value = values.ContainsKey(chooseIndex) ? values[chooseIndex] : new Value();
                     ApplyValue(child, member, value);
@@ -1616,7 +1816,7 @@ namespace net.narazaka.avatarmenucreator
             foreach (var child in Positions.Keys)
             {
                 var key = child;
-                if (Positions.TryGetValue(key, out var values))
+                if (Positions.TryGetValue(key, out var values) && !IsNoControl(TransformNoControls, (child, "Position"), chooseIndex))
                 {
                     var value = values.ContainsKey(chooseIndex) ? values[chooseIndex] : Vector3.zero;
                     ApplyTransform(child, "Position", value);
@@ -1626,7 +1826,7 @@ namespace net.narazaka.avatarmenucreator
             foreach (var child in Rotations.Keys)
             {
                 var key = child;
-                if (Rotations.TryGetValue(key, out var values))
+                if (Rotations.TryGetValue(key, out var values) && !IsNoControl(TransformNoControls, (child, "Rotation"), chooseIndex))
                 {
                     var value = values.ContainsKey(chooseIndex) ? values[chooseIndex] : Vector3.zero;
                     ApplyTransform(child, "Rotation", value);
@@ -1636,7 +1836,7 @@ namespace net.narazaka.avatarmenucreator
             foreach (var child in Scales.Keys)
             {
                 var key = child;
-                if (Scales.TryGetValue(key, out var values))
+                if (Scales.TryGetValue(key, out var values) && !IsNoControl(TransformNoControls, (child, "Scale"), chooseIndex))
                 {
                     var value = values.ContainsKey(chooseIndex) ? values[chooseIndex] : Vector3.one;
                     ApplyTransform(child, "Scale", value);
