@@ -301,9 +301,8 @@ namespace net.narazaka.avatarmenucreator.editor
                 choices.Add(pbEnableClip);
             }
             // menu
-            var menu = new VRCExpressionsMenu
-            {
-                controls = Enumerable.Range(0, AvatarMenu.ChooseCount).Select(i => new VRCExpressionsMenu.Control
+            var menu = ScriptableObject.CreateInstance<VRCExpressionsMenu>();
+            menu.controls = Enumerable.Range(0, AvatarMenu.ChooseCount).Select(i => new VRCExpressionsMenu.Control
                 {
                     name = AvatarMenu.ChooseName(i),
                     type = VRCExpressionsMenu.Control.ControlType.Toggle,
@@ -315,12 +314,10 @@ namespace net.narazaka.avatarmenucreator.editor
                     value = i,
                     labels = new VRCExpressionsMenu.Control.Label[] { },
                     icon = AvatarMenu.ChooseIcon(i),
-                }).ToList(),
-            };
+                }).ToList();
             menu.name = baseName;
-            var parentMenu = new VRCExpressionsMenu
-            {
-                controls = new List<VRCExpressionsMenu.Control>
+            var parentMenu = ScriptableObject.CreateInstance<VRCExpressionsMenu>();
+            parentMenu.controls = new List<VRCExpressionsMenu.Control>
                 {
                     new VRCExpressionsMenu.Control {
                         name = baseName,
@@ -335,8 +332,7 @@ namespace net.narazaka.avatarmenucreator.editor
                         subMenu = menu,
                         icon = AvatarMenu.ChooseParentIcon,
                     },
-                },
-            };
+                };
             parentMenu.name = $"{baseName}_parent";
             return new CreatedAssets(baseName, controller, choices, menu, AvatarMenu.UseParentMenu ? parentMenu : null, new ParameterConfig[]
             {

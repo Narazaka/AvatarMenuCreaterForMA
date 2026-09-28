@@ -425,9 +425,8 @@ namespace net.narazaka.avatarmenucreator.editor
                 inactivate.SetCurve(curvePath, typeof(VRCPhysBone), "m_Enabled", curve);
             }
             // menu
-            var menu = new VRCExpressionsMenu
-            {
-                controls = new List<VRCExpressionsMenu.Control>
+            var menu = ScriptableObject.CreateInstance<VRCExpressionsMenu>();
+            menu.controls = new List<VRCExpressionsMenu.Control>
                 {
                     new VRCExpressionsMenu.Control {
                         name = baseName,
@@ -441,8 +440,7 @@ namespace net.narazaka.avatarmenucreator.editor
                         labels = new VRCExpressionsMenu.Control.Label[] { },
                         icon = AvatarMenu.ToggleIcon,
                     },
-                },
-            };
+                };
             menu.name = baseName;
             var clips = new List<AnimationClip> { active, inactive };
             if (transitionSeconds > 0) clips.AddRange(new AnimationClip[] { activate, inactivate });

@@ -325,9 +325,8 @@ namespace net.narazaka.avatarmenucreator.editor
                 };
             }
             // menu
-            var menu = new VRCExpressionsMenu
-            {
-                controls = new List<VRCExpressionsMenu.Control>
+            var menu = ScriptableObject.CreateInstance<VRCExpressionsMenu>();
+            menu.controls = new List<VRCExpressionsMenu.Control>
                 {
                     new VRCExpressionsMenu.Control {
                         name = baseName,
@@ -342,8 +341,7 @@ namespace net.narazaka.avatarmenucreator.editor
                         labels = new VRCExpressionsMenu.Control.Label[] { },
                         icon = AvatarMenu.RadialIcon,
                     },
-                },
-            };
+                };
             if (needChangingParameter)
             {
                 menu.controls[0].parameter = new VRCExpressionsMenu.Control.Parameter
