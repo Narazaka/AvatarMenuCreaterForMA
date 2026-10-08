@@ -1435,7 +1435,7 @@ namespace net.narazaka.avatarmenucreator
         void PickAll(int chooseIndex)
         {
             WillChange();
-            foreach (var child in GetStoredChildren())
+            foreach (var child in GetStoredChildren().ToArray())
             {
                 var go = GetGameObject(child);
                 if (go != null)
