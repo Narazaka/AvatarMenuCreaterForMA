@@ -54,6 +54,14 @@ https://github.com/Narazaka/AvatarMenuCreaterForMA/releases/latest から `net.n
 
 ## 更新履歴
 
+- 1.39.0
+  - 機能改善
+    - MA的なリネーム追従をするように（参照が残っていればリネーム追従）
+  - 不具合修正
+    - ScriptableObjectの警告が出ないように (by @ieyoukan )
+    - 選択式で全選択肢OFFになったGameObject（選択肢の削除や全抽出で発生）が、表示上は制御なしなのに生成や全適用ではOFFに固定されていた問題を修正。
+    - 選択式のGameObjectの選択肢チェックの変更がUndo出来なかった問題を修正。
+    - 選択式の全抽出ボタンで、GameObjectのON/OFFが抽出と異なる場合にエラーになり、以降の項目が抽出されなかった問題を修正。
 - 1.39.0-beta.2
   - ScriptableObjectの警告が出ないように (by @ieyoukan )
 - 1.39.0-beta.1
