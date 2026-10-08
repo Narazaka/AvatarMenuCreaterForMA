@@ -641,7 +641,7 @@ namespace net.narazaka.avatarmenucreator
                         () => names,
                         () => ChooseBlendShapes.Names(child).ToImmutableHashSet(),
                         name => AddChooseBlendShape(ChooseBlendShapes, children, child, name),
-                        name => RemoveChooseBlendShape(ChooseBlendShapes, children, child, name)
+                        name => RemoveChooseBlendShape(ChooseBlendShapes, ChooseBlendShapeNoControls, children, child, name)
                         ))
                 {
                     EditorGUI.indentLevel++;
@@ -668,7 +668,7 @@ namespace net.narazaka.avatarmenucreator
                         },
                         name =>
                         {
-                            RemoveChooseBlendShape(ChooseShaderParameters, children, child, name);
+                            RemoveChooseBlendShape(ChooseShaderParameters, ChooseShaderParameterNoControls, children, child, name);
                             RemoveChooseShaderVectorParameter(children, child, name);
                         }
                         ))
@@ -699,7 +699,7 @@ namespace net.narazaka.avatarmenucreator
                     () => TransformComponentNames.Select(s => new NameAndDescriptionItemContainer(new Util.NameWithDescription { Name = s }) as ListTreeViewItemContainer<string>).ToList(),
                     () => TransformComponentNames.Where(s => TransformComponent(s).ContainsKey(child)).ToImmutableHashSet(),
                     name => AddTransformComponent(TransformComponent(name), children, child),
-                    name => RemoveTransformComponent(TransformComponent(name), children, child)
+                    name => RemoveTransformComponent(name, children, child)
                     ))
                 {
                     EditorGUI.indentLevel++;
@@ -1058,6 +1058,7 @@ namespace net.narazaka.avatarmenucreator
             if (!ChooseMaterials.ContainsKey(key)) return;
             WillChange();
             ChooseMaterials.Remove(key);
+            ChooseMaterialNoControls.Remove(key);
         }
 
         IEnumerable<Material> DistinctSourceMaterial(Func<(string, int), Material> keyToMaterial)
@@ -1157,7 +1158,7 @@ namespace net.narazaka.avatarmenucreator
                     }
                     else
                     {
-                        RemoveChooseBlendShape(choices, children, child, name.Name);
+                        RemoveChooseBlendShape(choices, noControls, children, child, name.Name);
                     }
                 }
             }
@@ -1197,27 +1198,28 @@ namespace net.narazaka.avatarmenucreator
             choices[key] = new IntFloatDictionary();
         }
 
-        void RemoveChooseBlendShape(ChooseBlendShapeDictionary choices, IList<string> children, string child, string name)
+        void RemoveChooseBlendShape(ChooseBlendShapeDictionary choices, NestedIntHashSetDictionary noControls, IList<string> children, string child, string name)
         {
             if (BulkSet)
             {
                 foreach (var c in children)
                 {
-                    RemoveChooseBlendShapeSingle(choices, c, name);
+                    RemoveChooseBlendShapeSingle(choices, noControls, c, name);
                 }
             }
             else
             {
-                RemoveChooseBlendShapeSingle(choices, child, name);
+                RemoveChooseBlendShapeSingle(choices, noControls, child, name);
             }
         }
 
-        void RemoveChooseBlendShapeSingle(ChooseBlendShapeDictionary choices, string child, string name)
+        void RemoveChooseBlendShapeSingle(ChooseBlendShapeDictionary choices, NestedIntHashSetDictionary noControls, string child, string name)
         {
             var key = (child, name);
             if (!choices.ContainsKey(key)) return;
             WillChange();
             choices.Remove(key);
+            noControls.Remove(key);
         }
 
         void ShowChooseShaderVectorParameterControl(
@@ -1324,6 +1326,7 @@ namespace net.narazaka.avatarmenucreator
             if (!ChooseShaderVectorParameters.ContainsKey(key)) return;
             WillChange();
             ChooseShaderVectorParameters.Remove(key);
+            ChooseShaderVectorParameterNoControls.Remove(key);
         }
 
         void ShowChooseValueControl(
@@ -1496,6 +1499,7 @@ namespace net.narazaka.avatarmenucreator
             if (!ChooseValues.ContainsKey(key)) return;
             WillChange();
             ChooseValues.Remove(key);
+            ChooseValueNoControls.Remove(key);
         }
 
         void ShowTransformComponentControl(IList<string> children, string child, ChooseVector3Dictionary choices, string title)
@@ -1536,7 +1540,7 @@ namespace net.narazaka.avatarmenucreator
                 }
                 else
                 {
-                    RemoveTransformComponent(choices, children, child);
+                    RemoveTransformComponent(title, children, child);
                 }
             }
         }
@@ -1571,26 +1575,28 @@ namespace net.narazaka.avatarmenucreator
             values[child] = new IntVector3Dictionary();
         }
 
-        void RemoveTransformComponent(ChooseVector3Dictionary values, IList<string> children, string child)
+        void RemoveTransformComponent(string title, IList<string> children, string child)
         {
             if (BulkSet)
             {
                 foreach (var c in children)
                 {
-                    RemoveTransformComponentSingle(values, c);
+                    RemoveTransformComponentSingle(title, c);
                 }
             }
             else
             {
-                RemoveTransformComponentSingle(values, child);
+                RemoveTransformComponentSingle(title, child);
             }
         }
 
-        void RemoveTransformComponentSingle(ChooseVector3Dictionary values, string child)
+        void RemoveTransformComponentSingle(string title, string child)
         {
+            var values = TransformComponent(title);
             if (!values.ContainsKey(child)) return;
             WillChange();
             values.Remove(child);
+            TransformNoControls.Remove((child, title));
         }
 
         UnityEngine.Object[] DropAreaGUI(Rect rect, string label)
