@@ -1644,7 +1644,7 @@ namespace net.narazaka.avatarmenucreator
                 if (go != null)
                 {
                     ChooseObjects.TryGetValue(child, out var objIndexes);
-                    if (IsObjectControlled(child))
+                    if (IsObjectControlled(child) && !IsNoControl(ChooseObjectNoControls, child, chooseIndex))
                     {
                         if (go.activeSelf != objIndexes.Contains(chooseIndex))
                         {
@@ -1665,7 +1665,7 @@ namespace net.narazaka.avatarmenucreator
             foreach (var (child, index) in ChooseMaterials.Keys)
             {
                 var key = (child, index);
-                if (ChooseMaterials.TryGetValue(key, out var values))
+                if (ChooseMaterials.TryGetValue(key, out var values) && !IsNoControl(ChooseMaterialNoControls, key, chooseIndex))
                 {
                     var mat = values.ContainsKey(chooseIndex) ? values[chooseIndex] : null;
                     PickMaterial(child, index, ref mat);
@@ -1676,7 +1676,7 @@ namespace net.narazaka.avatarmenucreator
             foreach (var (child, name) in ChooseBlendShapes.Keys)
             {
                 var key = (child, name);
-                if (ChooseBlendShapes.TryGetValue(key, out var values))
+                if (ChooseBlendShapes.TryGetValue(key, out var values) && !IsNoControl(ChooseBlendShapeNoControls, key, chooseIndex))
                 {
                     var value = values.ContainsKey(chooseIndex) ? values[chooseIndex] : 0f;
                     PickBlendShapeWeight(child, name, ref value);
@@ -1687,7 +1687,7 @@ namespace net.narazaka.avatarmenucreator
             foreach (var (child, name) in ChooseShaderParameters.Keys)
             {
                 var key = (child, name);
-                if (ChooseShaderParameters.TryGetValue(key, out var values))
+                if (ChooseShaderParameters.TryGetValue(key, out var values) && !IsNoControl(ChooseShaderParameterNoControls, key, chooseIndex))
                 {
                     var value = values.ContainsKey(chooseIndex) ? values[chooseIndex] : 0f;
                     PickShaderFloatParameter(child, name, ref value);
@@ -1698,7 +1698,7 @@ namespace net.narazaka.avatarmenucreator
             foreach (var (child, name) in ChooseShaderVectorParameters.Keys)
             {
                 var key = (child, name);
-                if (ChooseShaderVectorParameters.TryGetValue(key, out var values))
+                if (ChooseShaderVectorParameters.TryGetValue(key, out var values) && !IsNoControl(ChooseShaderVectorParameterNoControls, key, chooseIndex))
                 {
                     var value = values.ContainsKey(chooseIndex) ? values[chooseIndex] : Vector4.zero;
                     PickShaderVectorParameter(child, name, ref value);
@@ -1709,7 +1709,7 @@ namespace net.narazaka.avatarmenucreator
             foreach (var (child, member) in ChooseValues.Keys)
             {
                 var key = (child, member);
-                if (ChooseValues.TryGetValue(key, out var values))
+                if (ChooseValues.TryGetValue(key, out var values) && !IsNoControl(ChooseValueNoControls, key, chooseIndex))
                 {
                     var value = values.ContainsKey(chooseIndex) ? values[chooseIndex] : new Value();
                     PickValue(child, member, ref value);
@@ -1720,7 +1720,7 @@ namespace net.narazaka.avatarmenucreator
             foreach (var child in Positions.Keys)
             {
                 var key = child;
-                if (Positions.TryGetValue(key, out var values))
+                if (Positions.TryGetValue(key, out var values) && !IsNoControl(TransformNoControls, (child, "Position"), chooseIndex))
                 {
                     var value = values.ContainsKey(chooseIndex) ? values[chooseIndex] : Vector3.zero;
                     PickTransform(child, "Position", ref value);
@@ -1731,7 +1731,7 @@ namespace net.narazaka.avatarmenucreator
             foreach (var child in Rotations.Keys)
             {
                 var key = child;
-                if (Rotations.TryGetValue(key, out var values))
+                if (Rotations.TryGetValue(key, out var values) && !IsNoControl(TransformNoControls, (child, "Rotation"), chooseIndex))
                 {
                     var value = values.ContainsKey(chooseIndex) ? values[chooseIndex] : Vector3.zero;
                     PickTransform(child, "Rotation", ref value);
@@ -1742,7 +1742,7 @@ namespace net.narazaka.avatarmenucreator
             foreach (var child in Scales.Keys)
             {
                 var key = child;
-                if (Scales.TryGetValue(key, out var values))
+                if (Scales.TryGetValue(key, out var values) && !IsNoControl(TransformNoControls, (child, "Scale"), chooseIndex))
                 {
                     var value = values.ContainsKey(chooseIndex) ? values[chooseIndex] : Vector3.one;
                     PickTransform(child, "Scale", ref value);
