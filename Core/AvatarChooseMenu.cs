@@ -55,6 +55,8 @@ namespace net.narazaka.avatarmenucreator
 
         public bool CanUseCompressed => Synced && ChooseCount > 1;
 
+        public bool IsObjectControlled(string child) => ChooseObjects.TryGetValue(child, out var indexes) && indexes.Count > 0;
+
 #if UNITY_EDITOR
         static readonly string[] TransformComponentNames = new[] { "Position", "Rotation", "Scale" };
         ChooseVector3Dictionary TransformComponent(string transformComponentName)
@@ -452,7 +454,7 @@ namespace net.narazaka.avatarmenucreator
                     indexes = new IntHashSet();
                 }
                 EditorGUILayout.BeginHorizontal();
-                var hasSetting = indexes.Count > 0;
+                var hasSetting = IsObjectControlled(child);
                 var foldoutGameObject = FoldoutHeader(child, "GameObject", hasSetting);
                 EditorGUIUtility.labelWidth = 40;
                 var newHasSetting = EditorGUILayout.Toggle(T.制御, hasSetting, GUILayout.Width(57));
@@ -1441,7 +1443,7 @@ namespace net.narazaka.avatarmenucreator
                 if (go != null)
                 {
                     ChooseObjects.TryGetValue(child, out var objIndexes);
-                    if (objIndexes != null)
+                    if (IsObjectControlled(child))
                     {
                         if (go.activeSelf != objIndexes.Contains(chooseIndex))
                         {
@@ -1556,7 +1558,7 @@ namespace net.narazaka.avatarmenucreator
                 if (go == null) continue;
                 // GameObject active
                 ChooseObjects.TryGetValue(child, out var objIndexes);
-                if (objIndexes != null)
+                if (IsObjectControlled(child))
                 {
                     Undo.RecordObject(go, "AvatarMenuCreator Apply");
                     go.SetActive(objIndexes.Contains(chooseIndex));

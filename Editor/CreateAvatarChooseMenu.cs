@@ -25,7 +25,7 @@ namespace net.narazaka.avatarmenucreator.editor
             var choices = Enumerable.Range(0, AvatarMenu.ChooseCount).Select(i => new AnimationClip { name = $"{baseName}_{i}" }).ToList();
             foreach (var child in AvatarMenu.ChooseObjects.Keys)
             {
-                if (!matchGameObjects.Contains(child)) continue;
+                if (!matchGameObjects.Contains(child) || !AvatarMenu.IsObjectControlled(child)) continue;
                 var curvePath = child;
                 for (var i = 0; i < AvatarMenu.ChooseCount; ++i)
                 {
