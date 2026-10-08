@@ -887,7 +887,8 @@ namespace net.narazaka.avatarmenucreator
             for (var i = 0; i < ChooseCount; i++)
             {
                 EditorGUILayout.BeginHorizontal();
-                using (new EditorGUI.DisabledGroupScope(IsNoControl(ChooseObjectNoControls, child, i)))
+                var noControl = IsNoControl(ChooseObjectNoControls, child, i);
+                using (new EditorGUI.DisabledGroupScope(noControl))
                 {
                     var active = indexes.Contains(i);
                     var newActive = EditorGUILayout.ToggleLeft(ChooseName(i), active);
@@ -905,19 +906,13 @@ namespace net.narazaka.avatarmenucreator
                         changed = true;
                     }
                 }
-                NoControlToggleGUI(ChooseObjectNoControls, child, i);
+                if (NoControlToggleGUI(ChooseObjectNoControls, child, i) != noControl) changed = true;
                 EditorGUILayout.EndHorizontal();
             }
             if (changed)
             {
-                if (!IsObjectControlled(child))
-                {
-                    ChooseObjects.Remove(child);
-                }
-                else
-                {
-                    ChooseObjects[child] = indexes;
-                }
+                ChooseObjects[child] = indexes;
+                if (!IsObjectControlled(child)) ChooseObjects.Remove(child);
             }
         }
 
