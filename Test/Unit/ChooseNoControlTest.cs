@@ -52,6 +52,27 @@ namespace net.narazaka.avatarmenucreator.test
         }
 
         [Test]
+        public void EmptyObjectSetSkipsCurve()
+        {
+            var menu = NewMenu();
+            menu.ChooseObjects["A"] = Set();
+            var clips = Clips(menu);
+            Assert.IsFalse(clips.Any(clip => HasCurve(clip, "A", typeof(GameObject), "m_IsActive")));
+        }
+
+        [Test]
+        public void EmptyObjectSetWithNoControlKeepsOtherCurves()
+        {
+            var menu = NewMenu();
+            menu.ChooseObjects["A"] = Set();
+            menu.ChooseObjectNoControls["A"] = Set(2);
+            var clips = Clips(menu);
+            Assert.IsTrue(HasCurve(clips[0], "A", typeof(GameObject), "m_IsActive"));
+            Assert.IsTrue(HasCurve(clips[1], "A", typeof(GameObject), "m_IsActive"));
+            Assert.IsFalse(HasCurve(clips[2], "A", typeof(GameObject), "m_IsActive"));
+        }
+
+        [Test]
         public void BlendShapeNoControlSkipsCurve()
         {
             var menu = NewMenu();

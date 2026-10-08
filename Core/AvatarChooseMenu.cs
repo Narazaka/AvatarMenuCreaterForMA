@@ -69,7 +69,7 @@ namespace net.narazaka.avatarmenucreator
 
         public bool CanUseCompressed => Synced && ChooseCount > 1;
 
-        public bool IsObjectControlled(string child) => ChooseObjects.TryGetValue(child, out var indexes) && indexes.Count > 0;
+        public bool IsObjectControlled(string child) => ChooseObjects.TryGetValue(child, out var indexes) && (indexes.Count > 0 || (ChooseObjectNoControls.TryGetValue(child, out var noControls) && noControls.Count > 0));
 
         public static bool IsNoControl<K>(Dictionary<K, IntHashSet> noControls, K key, int index) => noControls.TryGetValue(key, out var set) && set.Contains(index);
 
@@ -910,7 +910,7 @@ namespace net.narazaka.avatarmenucreator
             }
             if (changed)
             {
-                if (indexes.Count == 0)
+                if (!IsObjectControlled(child))
                 {
                     ChooseObjects.Remove(child);
                 }
