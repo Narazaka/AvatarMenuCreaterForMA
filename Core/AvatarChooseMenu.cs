@@ -718,6 +718,7 @@ namespace net.narazaka.avatarmenucreator
                 var newActive = EditorGUILayout.ToggleLeft(ChooseName(i), active);
                 if (active != newActive)
                 {
+                    WillChange();
                     if (newActive)
                     {
                         indexes.Add(i);
@@ -731,7 +732,6 @@ namespace net.narazaka.avatarmenucreator
             }
             if (changed)
             {
-                WillChange();
                 if (indexes.Count == 0)
                 {
                     ChooseObjects.Remove(child);
