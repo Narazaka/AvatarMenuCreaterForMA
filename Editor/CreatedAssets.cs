@@ -21,6 +21,12 @@ namespace net.narazaka.avatarmenucreator.editor
         IEnumerable<ParameterConfig> parameters;
         int compressedMaxValue;
 
+        internal AnimatorController Controller => controller;
+        internal IEnumerable<AnimationClip> Clips => clips;
+        internal VRCExpressionsMenu Menu => menu;
+        internal VRCExpressionsMenu ParentMenu => parentMenu;
+        internal IEnumerable<ParameterConfig> Parameters => parameters;
+
         public CreatedAssets(string baseName, AnimatorController controller, IEnumerable<AnimationClip> clips, VRCExpressionsMenu menu, VRCExpressionsMenu parentMenu, IEnumerable<ParameterConfig> parameters, int compressedMaxValue = 0)
         {
             this.baseName = baseName;

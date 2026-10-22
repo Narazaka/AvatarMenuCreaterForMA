@@ -43,34 +43,47 @@ namespace net.narazaka.avatarmenucreator.editor
                 if (info.IsGameObjectActive)
                 {
                     var choose = avatarMenu.ChooseObjects[info.path] = new collections.instance.IntHashSet();
-                    choose.UnionWith(values.Where(value => bindingGroup.GetCurve(value)[0].value > 0.5f));
+                    choose.UnionWith(values.Where(value => bindingGroup.HasCurve(value) && bindingGroup.GetCurve(value)[0].value > 0.5f));
+                    RestoreNoControls(avatarMenu.ChooseObjectNoControls, info.path, values, bindingGroup);
                 }
                 else if (info.IsBlendShape)
                 {
                     var choose = avatarMenu.ChooseBlendShapes[(info.path, info.BlendShapeName)] = new collections.instance.IntFloatDictionary();
-                    foreach (var value in values)
+                    foreach (var value in values.Where(value => bindingGroup.HasCurve(value)))
                     {
                         choose[value] = bindingGroup.GetCurve(value)[0].value;
                     }
+                    RestoreNoControls(avatarMenu.ChooseBlendShapeNoControls, (info.path, info.BlendShapeName), values, bindingGroup);
                 }
                 else if (info.IsShaderParameter)
                 {
                     var choose = avatarMenu.ChooseShaderParameters[(info.path, info.ShaderParameterName)] = new collections.instance.IntFloatDictionary();
-                    foreach (var value in values)
+                    foreach (var value in values.Where(value => bindingGroup.HasCurve(value)))
                     {
                         choose[value] = bindingGroup.GetCurve(value)[0].value;
                     }
+                    RestoreNoControls(avatarMenu.ChooseShaderParameterNoControls, (info.path, info.ShaderParameterName), values, bindingGroup);
                 }
                 else if (info.IsMaterial)
                 {
                     var choose = avatarMenu.ChooseMaterials[(info.path, info.MaterialIndex)] = new collections.instance.IntMaterialDictionary();
-                    foreach (var value in values)
+                    foreach (var value in values.Where(value => bindingGroup.HasObjectReferenceCurve(value)))
                     {
                         choose[value] = bindingGroup.GetObjectReferenceCurve(value)[0].value as Material;
                     }
+                    RestoreNoControls(avatarMenu.ChooseMaterialNoControls, (info.path, info.MaterialIndex), values, bindingGroup, objectReference: true);
                 }
             }
             return avatarMenu;
+        }
+
+        void RestoreNoControls<K>(System.Collections.Generic.Dictionary<K, collections.instance.IntHashSet> noControls, K key, int[] values, BindingGroup bindingGroup, bool objectReference = false)
+        {
+            var missing = values.Where(value => !(objectReference ? bindingGroup.HasObjectReferenceCurve(value) : bindingGroup.HasCurve(value))).ToArray();
+            if (missing.Length == 0) return;
+            var set = new collections.instance.IntHashSet();
+            set.UnionWith(missing);
+            noControls[key] = set;
         }
 
         public override void CheckAssets()

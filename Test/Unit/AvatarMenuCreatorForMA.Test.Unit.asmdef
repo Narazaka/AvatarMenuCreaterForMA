@@ -6,7 +6,9 @@
         "UnityEditor.TestRunner",
         "AvatarMenuCreatorForMA.Core",
         "AvatarMenuCreatorForMA.Collections",
-        "AvatarMenuCreatorForMA.Editor.Util"
+        "AvatarMenuCreatorForMA.Editor.Util",
+        "AvatarMenuCreatorForMA.Editor",
+        "nadena.dev.modular-avatar.core"
     ],
     "includePlatforms": [
         "Editor"
@@ -15,7 +17,8 @@
     "allowUnsafeCode": false,
     "overrideReferences": true,
     "precompiledReferences": [
-        "nunit.framework.dll"
+        "nunit.framework.dll",
+        "VRCSDK3A.dll"
     ],
     "autoReferenced": false,
     "defineConstraints": [
